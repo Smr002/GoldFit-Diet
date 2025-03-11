@@ -16,6 +16,7 @@ export default function NavBar() {
     >
       <Spline
       // scene="https://prod.spline.design/lvKHRIond7TKjDk9/scene.splinecode"
+      //https://prod.spline.design/3BA7i1My9MXsu71T/scene.splinecode
         scene="https://prod.spline.design/T1tZP4lWDfSJgJcJ/scene.splinecode"
         style={{ width: '100%', height: '100%', maxWidth: '100vw'
         }}
