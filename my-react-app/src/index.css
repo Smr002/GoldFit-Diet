@@ -11,7 +11,6 @@
 body {
   margin: 0;
   display: block; /* Change to block to prevent centering */
-  width: 1400px;
   max-width: 100%; /* Ensure the body does not exceed 1200px */
   min-height: 100vh; /* Ensure the body takes full height */
   overflow: hidden;
