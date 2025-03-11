@@ -1,12 +1,10 @@
-import CustomHeader from "@/components/CustomHeader";
-import NavBar from "@/components/navbar"
+import Navbar from "@/components/Navbar"
+import Landing from "./components/Landing";
 function App() {
   return (
     <>
-      <CustomHeader />
-      <NavBar />
-
-      
+      <Navbar />
+      <Landing />
     </>
   );
 }
