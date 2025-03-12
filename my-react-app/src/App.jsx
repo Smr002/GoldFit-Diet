@@ -1,11 +1,25 @@
+import { BrowserRouter, Routes, Route, Link } from "react-router-dom";
+import React, { useState } from "react";
+import HomePage from "@/pages/HomePage";
+import AccModal from "@/components/AccModal";
 
-import HomePage from "@/pages/homePage";
-function App() {
+export default function App() {
+  const [isModalOpen, setModalOpen] = useState(false);
+
   return (
-    <>
-      <HomePage />
-    </>
+    <BrowserRouter>
+      <Routes>
+        <Route
+          path="/"
+          element={
+            <HomePage
+              isModalOpen={isModalOpen}
+              setModalOpen={setModalOpen}
+            />
+          }
+        />
+      </Routes>
+      <AccModal open={isModalOpen} onClose={() => setModalOpen(false)} />
+    </BrowserRouter>
   );
 }
-
-export default App;
