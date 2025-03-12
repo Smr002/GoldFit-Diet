@@ -1,7 +1,7 @@
 import { BrowserRouter, Routes, Route, Link } from "react-router-dom";
 import React, { useState } from "react";
-import HomePage from "@/pages/HomePage";
-import AccModal from "@/components/AccModal";
+import HomePage from "../src/pages/HomePage";
+import AccModal from "../src/components/AccModal";
 
 export default function App() {
   const [isModalOpen, setModalOpen] = useState(false);
@@ -12,10 +12,7 @@ export default function App() {
         <Route
           path="/"
           element={
-            <HomePage
-              isModalOpen={isModalOpen}
-              setModalOpen={setModalOpen}
-            />
+            <HomePage isModalOpen={isModalOpen} setModalOpen={setModalOpen} />
           }
         />
       </Routes>
