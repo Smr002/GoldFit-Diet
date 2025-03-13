@@ -16,7 +16,7 @@ const Workouts = () => {
       id: 1,
       title: "Full Body Blast",
       description: "Complete body workout targeting all major muscle groups",
-      image: fullbody, //"/api/placeholder/300/200",
+      image: fullbody,
       duration: "45 min",
       difficulty: "Intermediate",
       exercises: [
@@ -31,7 +31,7 @@ const Workouts = () => {
       id: 2,
       title: "Core Crusher",
       description: "Intense core workout for defined abs and stronger back",
-      image: corecrusher, //"/api/placeholder/300/200",
+      image: corecrusher,
       duration: "30 min",
       difficulty: "Beginner",
       exercises: [
@@ -46,7 +46,7 @@ const Workouts = () => {
       id: 3,
       title: "Upper Body Focus",
       description: "Build strength and definition in arms, chest and shoulders",
-      image: upperbody,//"/api/placeholder/300/200",
+      image: upperbody,
       duration: "40 min",
       difficulty: "Intermediate",
       exercises: [
@@ -61,7 +61,7 @@ const Workouts = () => {
       id: 4,
       title: "Lower Body Power",
       description: "Strengthen legs, glutes and improve overall stability",
-      image: lowerbody,//"/api/placeholder/300/200",
+      image: lowerbody,
       duration: "35 min",
       difficulty: "Advanced",
       exercises: [
@@ -76,7 +76,7 @@ const Workouts = () => {
       id: 5,
       title: "HIIT Cardio",
       description: "High intensity intervals to maximize calorie burn",
-      image: hiit, //"/api/placeholder/300/200",
+      image: hiit,
       duration: "25 min",
       difficulty: "All Levels",
       exercises: [

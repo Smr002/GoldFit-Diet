@@ -8,6 +8,10 @@
   box-sizing: border-box;
 }
 
+html {
+  scroll-behavior: smooth;
+}
+
 body {
   margin: 0;
   display: block; 
@@ -15,6 +19,42 @@ body {
   min-height: 100vh; 
   overflow: auto !important;
   background-color: #FFF;
+}
+
+:root {
+  /* Light Theme Variables */
+  --bg-gradient: linear-gradient(135deg, #f5f7fa 0%, #e9edf2 100%);
+  --text-color: #555;
+  --heading-gradient: linear-gradient(90deg, #6c63ff, #4834d4);
+  --heading-color: #333;
+  --button-primary-bg: linear-gradient(to right, #6c63ff, #4834d4);
+  --button-primary-hover: linear-gradient(to right, #7c73ff, #5844e4);
+  --button-secondary-bg: white;
+  --button-secondary-color: #6c63ff;
+  --button-secondary-border: #6c63ff;
+  --button-secondary-hover: rgba(108, 99, 255, 0.05);
+  --shadow-color: rgba(50, 50, 93, 0.11);
+  --shadow-color-2: rgba(0, 0, 0, 0.08);
+  --shadow-color-hover: rgba(50, 50, 93, 0.1);
+  --image-shadow: rgba(0, 0, 0, 0.15);
+}
+
+/* Dark Theme Variables */
+body.dark-mode {
+  --bg-gradient: linear-gradient(135deg, #1a1a1a 0%, #2d2d2d 100%);
+  --text-color: #e0e0e0;
+  --heading-gradient: linear-gradient(90deg, #D4AF37, #ffd700);
+  --heading-color: #e0e0e0;
+  --button-primary-bg: linear-gradient(to right, #D4AF37, #ffd700);
+  --button-primary-hover: linear-gradient(to right, #e5c04a, #ffeb3b);
+  --button-secondary-bg: #2d2d2d;
+  --button-secondary-color: #D4AF37;
+  --button-secondary-border: #D4AF37;
+  --button-secondary-hover: rgba(212, 175, 55, 0.1);
+  --shadow-color: rgba(0, 0, 0, 0.2);
+  --shadow-color-2: rgba(0, 0, 0, 0.15);
+  --shadow-color-hover: rgba(0, 0, 0, 0.25);
+  --image-shadow: rgba(0, 0, 0, 0.3);
 }
 
 
@@ -36,7 +76,32 @@ button:focus-visible {
 
 
 /* Custom header Css */
-/* Enhanced Navbar CSS */
+:root {
+  /* Light Theme Variables */
+  --navbar-bg: white;
+  --navbar-transparent: transparent;
+  --navbar-shadow: rgba(0, 0, 0, 0.05);
+  --text-color: #333;
+  --text-hover: #6c63ff;
+  --underline-gradient: linear-gradient(to right, #6c63ff, #4834d4);
+  --button-gradient: linear-gradient(to right, #6c63ff, #4834d4);
+  --button-shadow: rgba(108, 99, 255, 0.2);
+  --button-shadow-hover: rgba(108, 99, 255, 0.3);
+}
+
+/* Dark Theme Variables */
+body.dark-mode {
+  --navbar-bg: #1a1a1a;
+  --navbar-transparent: transparent;
+  --navbar-shadow: rgba(0, 0, 0, 0.2);
+  --text-color: white;
+  --text-hover: #D4AF37;
+  --underline-gradient: linear-gradient(to right, #D4AF37, #ffd700);
+  --button-gradient: linear-gradient(to right, #D4AF37, #ffd700);
+  --button-shadow: rgba(212, 175, 55, 0.2);
+  --button-shadow-hover: rgba(212, 175, 55, 0.3);
+}
+
 .custom-header {
   position: fixed;
   top: 0;
@@ -47,12 +112,12 @@ button:focus-visible {
   padding: 20px 40px;
   z-index: 1000;
   transition: all 0.3s ease;
-  background-color: transparent;
+  background-color: var(--navbar-transparent);
 }
 
 .custom-header.scrolled {
-  background-color: white;
-  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.05);
+  background-color: var(--navbar-bg);
+  box-shadow: 0 4px 10px var(--navbar-shadow);
   padding: 12px 40px;
 }
 
@@ -72,7 +137,11 @@ button:focus-visible {
 .logo {
   height: 40px;
   width: auto;
-  transition: transform 0.3s ease;
+  transition: transform 0.3s ease, filter 0.3s ease;
+}
+
+body.dark-mode .logo {
+  filter: brightness(0.9) contrast(1.1);
 }
 
 .logo:hover {
@@ -86,7 +155,7 @@ button:focus-visible {
 }
 
 .nav-link {
-  color: #333;
+  color: var(--text-color);
   font-weight: 500;
   font-size: 16px;
   text-decoration: none;
@@ -102,14 +171,14 @@ button:focus-visible {
   left: 0;
   width: 100%;
   height: 2px;
-  background: linear-gradient(to right, #6c63ff, #4834d4);
+  background: var(--underline-gradient);
   transform: scaleX(0);
   transition: transform 0.3s ease;
   transform-origin: bottom right;
 }
 
 .nav-link:hover {
-  color: #6c63ff;
+  color: var(--text-hover);
 }
 
 .nav-link:hover::after {
@@ -118,7 +187,7 @@ button:focus-visible {
 }
 
 .try-now-button {
-  background: linear-gradient(to right, #6c63ff, #4834d4);
+  background: var(--button-gradient);
   border: none;
   border-radius: 30px;
   padding: 10px 24px;
@@ -128,12 +197,12 @@ button:focus-visible {
   font-family: 'Poppins', sans-serif;
   cursor: pointer;
   transition: transform 0.3s ease, box-shadow 0.3s ease;
-  box-shadow: 0 4px 6px rgba(108, 99, 255, 0.2);
+  box-shadow: 0 4px 6px var(--button-shadow);
 }
 
 .try-now-button:hover {
   transform: translateY(-2px);
-  box-shadow: 0 7px 10px rgba(108, 99, 255, 0.3);
+  box-shadow: 0 7px 10px var(--button-shadow-hover);
 }
 
 /* Media Queries for Responsiveness */
@@ -164,15 +233,15 @@ button:focus-visible {
 
 /* Landing Css */
 
-/* Landing CSS */
 .landing-container {
   display: flex;
   align-items: center;
   justify-content: space-between;
   padding: 60px 80px;
-  background: linear-gradient(135deg, #f5f7fa 0%, #e9edf2 100%);
+  background: var(--bg-gradient);
   min-height: 100vh;
   font-family: 'Poppins', sans-serif;
+  transition: background 0.3s ease;
 }
 
 .text-content {
@@ -181,20 +250,22 @@ button:focus-visible {
 
 .text-content h1 {
   font-size: 48px;
-  color: #333;
+  color: var(--heading-color);
   font-weight: 800;
   line-height: 1.2;
   margin-bottom: 24px;
-  background: linear-gradient(90deg, #6c63ff, #4834d4);
+  background: var(--heading-gradient);
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
+  transition: background 0.3s ease, color 0.3s ease;
 }
 
 .text-content p {
   font-size: 18px;
-  color: #555;
+  color: var(--text-color);
   line-height: 1.6;
   margin-bottom: 32px;
+  transition: color 0.3s ease;
 }
 
 .buttons {
@@ -210,30 +281,30 @@ button:focus-visible {
   cursor: pointer;
   border: none;
   transition: all 0.3s ease;
-  box-shadow: 0 4px 6px rgba(50, 50, 93, 0.11), 0 1px 3px rgba(0, 0, 0, 0.08);
+  box-shadow: 0 4px 6px var(--shadow-color), 0 1px 3px var(--shadow-color-2);
 }
 
 .get-started {
-  background: linear-gradient(to right, #6c63ff, #4834d4);
+  background: var(--button-primary-bg);
   color: white;
 }
 
 .get-started:hover {
   transform: translateY(-2px);
-  box-shadow: 0 7px 14px rgba(50, 50, 93, 0.1), 0 3px 6px rgba(0, 0, 0, 0.08);
-  background: linear-gradient(to right, #7c73ff, #5844e4);
+  box-shadow: 0 7px 14px var(--shadow-color-hover), 0 3px 6px var(--shadow-color-2);
+  background: var(--button-primary-hover);
 }
 
 .sign-in {
-  background: white;
-  color: #6c63ff;
-  border: 2px solid #6c63ff;
+  background: var(--button-secondary-bg);
+  color: var(--button-secondary-color);
+  border: 2px solid var(--button-secondary-border);
 }
 
 .sign-in:hover {
   transform: translateY(-2px);
-  box-shadow: 0 7px 14px rgba(50, 50, 93, 0.1), 0 3px 6px rgba(0, 0, 0, 0.08);
-  background: rgba(108, 99, 255, 0.05);
+  box-shadow: 0 7px 14px var(--shadow-color-hover), 0 3px 6px var(--shadow-color-2);
+  background: var(--button-secondary-hover);
 }
 
 .image-container {
@@ -243,8 +314,13 @@ button:focus-visible {
 .image-container img {
   width: 450px;
   height: auto;
-  filter: drop-shadow(0 10px 20px rgba(0, 0, 0, 0.15));
-  transition: all 0.3s ease;
+  filter: drop-shadow(0 10px 20px var(--image-shadow));
+  transition: all 0.3s ease, filter 0.3s ease;
+}
+
+/* Optional: Add image inversion for dark mode */
+body.dark-mode .image-container img {
+  filter: drop-shadow(0 10px 20px var(--image-shadow)) brightness(0.9) contrast(1.1);
 }
 
 @keyframes float {
@@ -295,16 +371,39 @@ button:focus-visible {
   }
 }
 
+/*OUR VISION CSS*/
+:root {
+  /* Light Theme Variables */
+  --vision-bg: white;
+  --heading-color: #333;
+  --heading-gradient: linear-gradient(90deg, #6c63ff, #4834d4);
+  --divider-gradient: linear-gradient(to right, #6c63ff, #4834d4);
+  --text-color: #555;
+  --feature-icon-bg: rgba(108, 99, 255, 0.1);
+  --feature-text-color: #6c63ff;
+  --section-gradient: linear-gradient(135deg, #f5f7fa 0%, #e9edf2 100%);
+}
 
-/* Our VISION CSS */
+/* Dark Theme Variables */
+body.dark-mode {
+  --vision-bg: #1a1a1a;
+  --heading-color: #e0e0e0;
+  --heading-gradient: linear-gradient(90deg, #D4AF37, #ffd700);
+  --divider-gradient: linear-gradient(to right, #D4AF37, #ffd700);
+  --text-color: #e0e0e0;
+  --feature-icon-bg: rgba(212, 175, 55, 0.1);
+  --feature-text-color: #D4AF37;
+  --section-gradient: linear-gradient(135deg, #1a1a1a 0%, #2d2d2d 100%);
+}
+
 .vision-container {
   max-width: 100%;
   padding: 100px 20px;
   text-align: center;
   opacity: 0;
   transform: translateY(50px);
-  transition: opacity 1s ease-out, transform 1s ease-out;
-  background: white; /* White background for this section */
+  transition: opacity 1s ease-out, transform 1s ease-out, background-color 0.3s ease;
+  background: var(--vision-bg);
 }
 
 .vision-container.visible {
@@ -320,28 +419,31 @@ button:focus-visible {
 .vision-container h2 {
   font-size: 36px;
   font-weight: 800;
-  color: #333;
+  color: var(--heading-color);
   margin-bottom: 20px;
-  background: linear-gradient(90deg, #6c63ff, #4834d4);
+  background: var(--heading-gradient);
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
   font-family: 'Poppins', sans-serif;
+  transition: background 0.3s ease, color 0.3s ease;
 }
 
 .vision-divider {
   height: 4px;
   width: 80px;
-  background: linear-gradient(to right, #6c63ff, #4834d4);
+  background: var(--divider-gradient);
   margin: 0 auto 30px;
   border-radius: 2px;
+  transition: background 0.3s ease;
 }
 
 .vision-container p {
   font-size: 18px;
-  color: #555;
+  color: var(--text-color);
   line-height: 1.8;
   margin-bottom: 40px;
   font-family: 'Poppins', sans-serif;
+  transition: color 0.3s ease;
 }
 
 .vision-features {
@@ -366,19 +468,21 @@ button:focus-visible {
   font-size: 32px;
   margin-bottom: 15px;
   padding: 20px;
-  background: rgba(108, 99, 255, 0.1);
+  background: var(--feature-icon-bg);
   border-radius: 50%;
   width: 80px;
   height: 80px;
   display: flex;
   align-items: center;
   justify-content: center;
+  transition: background 0.3s ease;
 }
 
 .feature-text {
   font-weight: 600;
-  color: #6c63ff;
+  color: var(--feature-text-color);
   font-family: 'Poppins', sans-serif;
+  transition: color 0.3s ease;
 }
 
 /* Media Queries for Responsiveness */
@@ -395,7 +499,8 @@ button:focus-visible {
 
 /* For the next section (alternating pattern) */
 .alternating-section {
-  background: linear-gradient(135deg, #f5f7fa 0%, #e9edf2 100%);
+  background: var(--section-gradient);
+  transition: background 0.3s ease;
 }
 
 /* Alternating Sections System */
@@ -409,12 +514,14 @@ button:focus-visible {
 
 /* Even sections (landing page, testimonials, pricing, etc.) */
 .section-gradient {
-  background: linear-gradient(135deg, #f5f7fa 0%, #e9edf2 100%);
+  background: var(--section-gradient);
+  transition: background 0.3s ease;
 }
 
 /* Odd sections (our vision, features, contact, etc.) */
 .section-white {
-  background: white;
+  background: var(--vision-bg);
+  transition: background-color 0.3s ease;
 }
 
 /* Content container for all sections */
@@ -442,8 +549,68 @@ button:focus-visible {
   }
 }
 
-
 /* Workouts CSS */
+/* Workouts CSS */
+
+:root {
+  /* Light Theme Variables */
+  --bg-gradient: linear-gradient(135deg, #f5f7fa 0%, #e9edf2 100%);
+  --text-color: #555;
+  --heading-gradient: linear-gradient(90deg, #6c63ff, #4834d4);
+  --heading-color: #333;
+  --card-bg: white;
+  --card-text: #333;
+  --card-description: #666;
+  --button-primary-bg: linear-gradient(to right, #6c63ff, #4834d4);
+  --button-primary-hover: linear-gradient(to right, #7c73ff, #5844e4);
+  --button-secondary-bg: white;
+  --button-secondary-color: #6c63ff;
+  --button-secondary-border: #6c63ff;
+  --button-secondary-hover: rgba(108, 99, 255, 0.05);
+  --shadow-color: rgba(50, 50, 93, 0.11);
+  --shadow-color-2: rgba(0, 0, 0, 0.08);
+  --shadow-color-hover: rgba(50, 50, 93, 0.1);
+  --image-shadow: rgba(0, 0, 0, 0.15);
+  --table-header-bg: #f9f9f9;
+  --table-border: #eee;
+  --modal-bg: white;
+  --tag-bg: rgba(108, 99, 255, 0.1);
+  --tag-color: #6c63ff;
+  --overlay-bg: rgba(0, 0, 0, 0.7);
+  --divider-gradient: linear-gradient(to right, #6c63ff, #4834d4);
+  --section-gradient: linear-gradient(135deg, #f5f7fa 0%, #e9edf2 100%);
+  --modal-border: #eee;
+}
+
+/* Dark Theme Variables */
+body.dark-mode {
+  --heading-color: #e0e0e0;
+  --heading-gradient: linear-gradient(90deg, #D4AF37, #ffd700);
+  --divider-gradient: linear-gradient(to right, #D4AF37, #ffd700);
+  --text-color: #e0e0e0;
+  --section-gradient: linear-gradient(135deg, #1a1a1a 0%, #2d2d2d 100%);
+  
+  /* Workouts specific dark mode variables */
+  --card-bg: #2d2d2d;
+  --card-text: #e0e0e0;
+  --card-description: #aaa;
+  --button-primary-bg: linear-gradient(to right, #D4AF37, #ffd700);
+  --button-primary-hover: linear-gradient(to right, #e4bf47, #ffdf20);
+  --button-secondary-bg: #2d2d2d;
+  --button-secondary-color: #D4AF37;
+  --button-secondary-border: #D4AF37;
+  --button-secondary-hover: rgba(212, 175, 55, 0.1);
+  --shadow-color: rgba(0, 0, 0, 0.3);
+  --shadow-color-2: rgba(0, 0, 0, 0.2);
+  --shadow-color-hover: rgba(0, 0, 0, 0.35);
+  --table-header-bg: #333;
+  --table-border: #444;
+  --modal-bg: #1a1a1a;
+  --modal-border: #444;
+  --tag-bg: rgba(212, 175, 55, 0.1);
+  --tag-color: #D4AF37;
+  --overlay-bg: rgba(0, 0, 0, 0.8);
+}
 
 .workouts-content {
   text-align: center;
@@ -452,31 +619,34 @@ button:focus-visible {
 .workouts-content h2 {
   font-size: 36px;
   font-weight: 800;
-  color: #333;
+  color: var(--heading-color);
   margin-bottom: 20px;
-  background: linear-gradient(90deg, #6c63ff, #4834d4);
+  background: var(--heading-gradient);
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
   font-family: 'Poppins', sans-serif;
+  transition: background 0.3s ease, color 0.3s ease;
 }
 
 .section-divider {
   height: 4px;
   width: 80px;
-  background: linear-gradient(to right, #6c63ff, #4834d4);
+  background: var(--divider-gradient);
   margin: 0 auto 30px;
   border-radius: 2px;
+  transition: background 0.3s ease;
 }
 
 .workouts-description {
   font-size: 18px;
-  color: #555;
+  color: var(--text-color);
   line-height: 1.8;
   margin-bottom: 40px;
   max-width: 800px;
   margin-left: auto;
   margin-right: auto;
   font-family: 'Poppins', sans-serif;
+  transition: color 0.3s ease;
 }
 
 /* Carousel Styles */
@@ -512,16 +682,16 @@ button:focus-visible {
   width: 300px;
   border-radius: 10px;
   overflow: hidden;
-  background: white;
-  box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
-  transition: transform 0.3s ease, box-shadow 0.3s ease;
+  background: var(--card-bg);
+  box-shadow: 0 5px 15px var(--shadow-color);
+  transition: transform 0.3s ease, box-shadow 0.3s ease, background-color 0.3s ease;
   cursor: pointer;
   flex-shrink: 0;
 }
 
 .workout-card:hover {
   transform: translateY(-10px);
-  box-shadow: 0 15px 30px rgba(0, 0, 0, 0.15);
+  box-shadow: 0 15px 30px var(--shadow-color-hover);
 }
 
 .workout-image {
@@ -559,19 +729,21 @@ button:focus-visible {
 }
 
 .workout-info h3 {
-  color: #333;
+  color: var(--card-text);
   font-size: 18px;
   margin-bottom: 8px;
   font-family: 'Poppins', sans-serif;
   font-weight: 600;
+  transition: color 0.3s ease;
 }
 
 .workout-info p {
-  color: #666;
+  color: var(--card-description);
   font-size: 14px;
   line-height: 1.5;
   margin-bottom: 15px;
   font-family: 'Poppins', sans-serif;
+  transition: color 0.3s ease;
 }
 
 .workout-meta {
@@ -582,19 +754,21 @@ button:focus-visible {
 }
 
 .workout-duration {
-  background: rgba(108, 99, 255, 0.1);
-  color: #6c63ff;
+  background: var(--tag-bg);
+  color: var(--tag-color);
   padding: 4px 10px;
   border-radius: 20px;
   font-size: 12px;
   font-weight: 500;
+  transition: background 0.3s ease, color 0.3s ease;
 }
 
 .workout-details-btn {
-  color: #6c63ff;
+  color: var(--tag-color);
   font-size: 14px;
   font-weight: 600;
   cursor: pointer;
+  transition: color 0.3s ease;
 }
 
 .workout-details-btn:hover {
@@ -608,12 +782,13 @@ button:focus-visible {
   left: 0;
   width: 100%;
   height: 100%;
-  background-color: rgba(0, 0, 0, 0.7);
+  background-color: var(--overlay-bg);
   display: flex;
   justify-content: center;
   align-items: center;
   z-index: 1001;
   animation: fadeIn 0.3s ease;
+  transition: background-color 0.3s ease;
 }
 
 @keyframes fadeIn {
@@ -622,7 +797,7 @@ button:focus-visible {
 }
 
 .workout-modal {
-  background: white;
+  background: var(--modal-bg);
   width: 90%;
   max-width: 600px;
   border-radius: 10px;
@@ -632,6 +807,7 @@ button:focus-visible {
   display: flex;
   flex-direction: column;
   animation: slideUp 0.3s ease;
+  transition: background-color 0.3s ease;
 }
 
 @keyframes slideUp {
@@ -646,22 +822,25 @@ button:focus-visible {
   background: none;
   border: none;
   font-size: 24px;
-  color: #555;
+  color: var(--text-color);
   cursor: pointer;
   z-index: 1;
+  transition: color 0.3s ease;
 }
 
 .modal-header {
   padding: 25px 30px 15px;
-  border-bottom: 1px solid #eee;
+  border-bottom: 1px solid var(--modal-border);
+  transition: border-color 0.3s ease;
 }
 
 .modal-header h3 {
-  color: #333;
+  color: var(--card-text);
   font-size: 24px;
   margin-bottom: 10px;
   font-family: 'Poppins', sans-serif;
   font-weight: 700;
+  transition: color 0.3s ease;
 }
 
 .modal-meta {
@@ -670,21 +849,23 @@ button:focus-visible {
 }
 
 .modal-difficulty, .modal-duration {
-  background: rgba(108, 99, 255, 0.1);
-  color: #6c63ff;
+  background: var(--tag-bg);
+  color: var(--tag-color);
   padding: 5px 12px;
   border-radius: 20px;
   font-size: 14px;
   font-weight: 500;
   font-family: 'Poppins', sans-serif;
+  transition: background 0.3s ease, color 0.3s ease;
 }
 
 .modal-description {
   padding: 20px 30px;
-  color: #555;
+  color: var(--text-color);
   line-height: 1.6;
   font-size: 16px;
   font-family: 'Poppins', sans-serif;
+  transition: color 0.3s ease;
 }
 
 .modal-exercises {
@@ -693,11 +874,12 @@ button:focus-visible {
 }
 
 .modal-exercises h4 {
-  color: #333;
+  color: var(--card-text);
   font-size: 18px;
   margin-bottom: 15px;
   font-family: 'Poppins', sans-serif;
   font-weight: 600;
+  transition: color 0.3s ease;
 }
 
 .exercises-table {
@@ -709,13 +891,20 @@ button:focus-visible {
 .exercises-table th, .exercises-table td {
   padding: 12px 15px;
   text-align: left;
-  border-bottom: 1px solid #eee;
+  border-bottom: 1px solid var(--table-border);
+  transition: border-color 0.3s ease, color 0.3s ease;
 }
 
 .exercises-table th {
-  background-color: #f9f9f9;
+  background-color: var(--table-header-bg);
   font-weight: 600;
-  color: #333;
+  color: var(--card-text);
+  transition: background-color 0.3s ease, color 0.3s ease;
+}
+
+.exercises-table td {
+  color: var(--text-color);
+  transition: color 0.3s ease;
 }
 
 .exercises-table tr:last-child td {
@@ -724,12 +913,13 @@ button:focus-visible {
 
 .modal-footer {
   padding: 20px 30px;
-  border-top: 1px solid #eee;
+  border-top: 1px solid var(--table-border);
   text-align: center;
+  transition: border-color 0.3s ease;
 }
 
 .start-workout-btn {
-  background: linear-gradient(to right, #6c63ff, #4834d4);
+  background: var(--button-primary-bg);
   color: white;
   border: none;
   padding: 12px 30px;
@@ -737,14 +927,15 @@ button:focus-visible {
   font-size: 16px;
   font-weight: 600;
   cursor: pointer;
-  transition: transform 0.3s ease, box-shadow 0.3s ease;
+  transition: transform 0.3s ease, box-shadow 0.3s ease, background 0.3s ease;
   font-family: 'Poppins', sans-serif;
-  box-shadow: 0 4px 6px rgba(72, 52, 212, 0.2);
+  box-shadow: 0 4px 6px var(--shadow-color);
 }
 
 .start-workout-btn:hover {
   transform: translateY(-2px);
-  box-shadow: 0 7px 14px rgba(72, 52, 212, 0.3);
+  box-shadow: 0 7px 14px var(--shadow-color-hover);
+  background: var(--button-primary-hover);
 }
 
 /* Responsive Styles */
@@ -808,7 +999,17 @@ button:focus-visible {
   }
 }
 
-
+/* For the theme toggle button */
+.theme-toggle {
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  font-size: 24px;
+  color: var(--text-color);
+  padding: 8px;
+  border-radius: 50%;
+  transition: background-color 0.3s ease, color 0.3s ease;
+}
 /* PRICES CSS*/
 
 .prices-content {
@@ -1123,5 +1324,123 @@ button:focus-visible {
   .pricing-card {
     min-width: unset;
     width: 280px;
+  }
+}
+
+/* THEME TOGGLE CSS*/
+/* Theme Variables */
+:root {
+  --background-color: white;
+  --text-color: black;
+  --code-color: purple;
+  --primary-color: #6c63ff;
+  --secondary-color: #4834d4;
+  --shadow-color: rgba(72, 52, 212, 0.3);
+  --hover-shadow-color: rgba(72, 52, 212, 0.4);
+  --option-background: white;
+  --option-border: #6c63ff;
+  --option-hover-bg: rgba(108, 99, 255, 0.1);
+}
+
+/* Theme Toggle Styles */
+.theme-toggle-container {
+  position: fixed;
+  bottom: 30px;
+  right: 30px;
+  z-index: 1000;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+}
+
+.theme-toggle-button {
+  width: 50px;
+  height: 50px;
+  border-radius: 50%;
+  background: linear-gradient(to right, var(--primary-color), var(--secondary-color));
+  border: none;
+  color: white;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  box-shadow: 0 4px 10px var(--shadow-color);
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+  font-size: 18px;
+}
+
+.theme-toggle-button:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 6px 15px var(--hover-shadow-color);
+}
+
+.theme-options {
+  margin-bottom: 15px;
+  animation: fadeIn 0.3s ease;
+}
+
+.theme-option {
+  width: 45px;
+  height: 45px;
+  border-radius: 50%;
+  background: var(--option-background);
+  border: 2px solid var(--option-border);
+  color: var(--option-border);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+  transition: all 0.3s ease;
+}
+
+.theme-option:hover {
+  background: var(--option-hover-bg);
+  transform: translateY(-2px);
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(10px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+/* Dark Mode Styles */
+body.dark-mode {
+  --background-color: black;
+  --text-color: white;
+  --code-color: #D4AF37; /* Gold */
+  --option-background: #222;
+  --option-border: #D4AF37;
+  --option-hover-bg: rgba(212, 175, 55, 0.1);
+}
+
+/* Apply theme colors to the body */
+body {
+  background-color: var(--background-color);
+  color: var(--text-color);
+  transition: background-color 0.3s ease, color 0.3s ease;
+}
+
+/* For code blocks */
+pre, code {
+  color: var(--code-color);
+  transition: color 0.3s ease;
+}
+
+/* Media Query for smaller screens */
+@media (max-width: 768px) {
+  .theme-toggle-container {
+    bottom: 20px;
+    right: 20px;
+  }
+  
+  .theme-toggle-button {
+    width: 45px;
+    height: 45px;
+  }
+  
+  .theme-option {
+    width: 40px;
+    height: 40px;
   }
 }
