@@ -1,10 +1,26 @@
 import React, { useState, useEffect } from "react";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { faEllipsisH, faMoon, faSun } from "@fortawesome/free-solid-svg-icons";
 
 const Prices = () => {
+  // Theme toggle state
+  const [isMenuOpen, setIsMenuOpen] = useState(false);
+  const [isDarkMode, setIsDarkMode] = useState(false);
+  
+  // Pricing component state
   const [isVisible, setIsVisible] = useState(false);
   const [selectedPlan, setSelectedPlan] = useState("monthly");
   
+  // Check for saved theme preference and set up visibility detection on mount
   useEffect(() => {
+    // Theme preference check
+    const savedTheme = localStorage.getItem("theme");
+    if (savedTheme === "dark") {
+      setIsDarkMode(true);
+      document.body.classList.add("dark-mode");
+    }
+    
+    // Visibility detection for animation
     const handleScroll = () => {
       const section = document.getElementById("prices-section");
       if (section) {
@@ -20,10 +36,34 @@ const Prices = () => {
     return () => window.removeEventListener("scroll", handleScroll);
   }, []);
   
+  // Theme toggle functions
+  const toggleMenu = () => {
+    setIsMenuOpen(!isMenuOpen);
+  };
+  
+  const toggleDarkMode = () => {
+    const newDarkModeState = !isDarkMode;
+    setIsDarkMode(newDarkModeState);
+    
+    // Apply theme changes using CSS class
+    if (newDarkModeState) {
+      document.body.classList.add("dark-mode");
+      localStorage.setItem("theme", "dark");
+    } else {
+      document.body.classList.remove("dark-mode");
+      localStorage.setItem("theme", "light");
+    }
+    
+    // Close the menu after selecting an option
+    setIsMenuOpen(false);
+  };
+  
+  // Pricing plan toggle function
   const togglePlan = (plan) => {
     setSelectedPlan(plan);
   };
   
+  // Pricing plans data
   const plans = {
     monthly: [
       {
@@ -43,7 +83,7 @@ const Prices = () => {
         ],
         popular: false,
         cta: "Get Started",
-        color: "#6c63ff"
+        color: "var(--primary-color)"
       },
       {
         id: 2,
@@ -62,7 +102,7 @@ const Prices = () => {
         ],
         popular: true,
         cta: "Join Now",
-        color: "#4834d4"
+        color: "var(--secondary-color)"
       },
       {
         id: 3,
@@ -81,7 +121,7 @@ const Prices = () => {
         ],
         popular: false,
         cta: "Go Premium",
-        color: "#6c63ff"
+        color: "var(--primary-color)"
       }
     ],
     annual: [
@@ -102,7 +142,7 @@ const Prices = () => {
         ],
         popular: false,
         cta: "Get Started",
-        color: "#6c63ff",
+        color: "var(--primary-color)",
         savings: "Save $60"
       },
       {
@@ -122,7 +162,7 @@ const Prices = () => {
         ],
         popular: true,
         cta: "Join Now",
-        color: "#4834d4",
+        color: "var(--secondary-color)",
         savings: "Save $100"
       },
       {
@@ -142,7 +182,7 @@ const Prices = () => {
         ],
         popular: false,
         cta: "Go Premium",
-        color: "#6c63ff",
+        color: "var(--primary-color)",
         savings: "Save $160"
       }
     ]
@@ -205,7 +245,7 @@ const Prices = () => {
               <div className="pricing-footer">
                 <button 
                   className="pricing-cta" 
-                  style={{ background: `linear-gradient(to right, ${plan.color}, ${plan.popular ? "#4834d4" : "#6c63ff"})` }}
+                  style={{ background: `linear-gradient(to right, ${plan.color}, ${plan.popular ? "var(--secondary-color)" : "var(--primary-color)"})` }}
                 >
                   {plan.cta}
                 </button>
@@ -218,6 +258,20 @@ const Prices = () => {
           <p>All plans include a 7-day free trial. Cancel anytime during trial period.</p>
           <p>Need a custom plan? <a href="#contact">Contact us</a></p>
         </div>
+      </div>
+      
+      {/* Theme Toggle */}
+      <div className="theme-toggle-container">
+        {isMenuOpen && (
+          <div className="theme-options">
+            <button className="theme-option" onClick={toggleDarkMode}>
+              <FontAwesomeIcon icon={isDarkMode ? faSun : faMoon} />
+            </button>
+          </div>
+        )}
+        <button className="theme-toggle-button" onClick={toggleMenu}>
+          <FontAwesomeIcon icon={faEllipsisH} />
+        </button>
       </div>
     </section>
   );

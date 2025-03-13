@@ -4,6 +4,7 @@ import OurVision from "../components/OurVision";
 import Workouts from "../components/Workouts";
 import Prices from "../components/Prices";
 import ThemeToggle from "../components/ThemeToggle";
+import ContactUs from "../components/ContactUs";
 
 
 function HomePage({ setModalOpen, isModalOpen }) {
@@ -15,6 +16,7 @@ function HomePage({ setModalOpen, isModalOpen }) {
         <OurVision/>
         <Workouts/>
         <Prices/>
+        <ContactUs/>
       </>
     );
   }
