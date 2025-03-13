@@ -17,6 +17,8 @@ import logo from "../assets/react.svg";
 export default function AccModal({ open, onClose }) {
   const [email, setEmail] = useState("");
 
+  const gradientColor = "linear-gradient(90deg, #6c63ff, #4834d4)";
+
   return (
     <Dialog
       open={open}
@@ -26,7 +28,7 @@ export default function AccModal({ open, onClose }) {
       sx={{
         "& .MuiDialog-paper": {
           borderRadius: 3,
-          border: "2px solid #D4AF37",
+          border: `2px solid #6c63ff`,
           padding: 2,
         },
       }}
@@ -39,11 +41,20 @@ export default function AccModal({ open, onClose }) {
         <Box sx={{ textAlign: "center", marginBottom: 2 }}>
           <img src={logo} alt="Logo" style={{ width: "50px" }} />
         </Box>
-        <DialogTitle sx={{ fontWeight: "bold", textAlign: "center", color: "#D4AF37", fontSize: "1.8rem" }}>
+        <DialogTitle
+          sx={{
+            fontWeight: "bold",
+            textAlign: "center",
+            color: "#6c63ff",
+            fontSize: "1.8rem",
+          }}
+        >
           Welcome
         </DialogTitle>
         <DialogContent sx={{ textAlign: "center" }}>
-          <DialogContentText sx={{ marginBottom: 3, fontSize: "1rem", color: "text.secondary" }}>
+          <DialogContentText
+            sx={{ marginBottom: 3, fontSize: "1rem", color: "text.secondary" }}
+          >
             Sign in or create an account to continue
           </DialogContentText>
 
@@ -53,11 +64,11 @@ export default function AccModal({ open, onClose }) {
             startIcon={<Google />}
             sx={{
               marginBottom: 2,
-              borderColor: "#D4AF37",
-              color: "#D4AF37",
+              borderColor: "#6c63ff",
+              color: "#6c63ff",
               textTransform: "none",
               fontWeight: "bold",
-              '&:hover': { backgroundColor: "#D4AF37", color: "#fff" },
+              "&:hover": { background: gradientColor, color: "#fff" },
             }}
           >
             Continue with Google
@@ -72,7 +83,9 @@ export default function AccModal({ open, onClose }) {
             onChange={(e) => setEmail(e.target.value)}
             sx={{ marginBottom: 2 }}
             InputProps={{
-              startAdornment: <Email sx={{ marginRight: 1, color: "#D4AF37" }} />,
+              startAdornment: (
+                <Email sx={{ marginRight: 1, color: "#6c63ff" }} />
+              ),
               sx: { borderRadius: 1 },
             }}
           />
@@ -91,7 +104,9 @@ export default function AccModal({ open, onClose }) {
                 placeholder="Enter your password"
                 sx={{ marginBottom: 2 }}
                 InputProps={{
-                  startAdornment: <Lock sx={{ marginRight: 1, color: "#D4AF37" }} />,
+                  startAdornment: (
+                    <Lock sx={{ marginRight: 1, color: "#6c63ff" }} />
+                  ),
                   sx: { borderRadius: 1 },
                 }}
               />
@@ -99,27 +114,35 @@ export default function AccModal({ open, onClose }) {
           )}
 
           <Divider sx={{ marginY: 2 }}>or</Divider>
-
-          <Button
-            fullWidth
-            variant="contained"
-            startIcon={<PersonAdd />}
-            sx={{
-              marginBottom: 2,
-              backgroundColor: "#D4AF37",
-              color: "#000",
-              fontWeight: "bold",
-              textTransform: "none",
-              '&:hover': { backgroundColor: "#e6b800" },
-            }}
+          <Link
+            href="/create-account/age-selection"
+            style={{ textDecoration: "none" }}
           >
-            Create New Account
-          </Button>
+            <Button
+              fullWidth
+              variant="contained"
+              startIcon={<PersonAdd />}
+              sx={{
+                marginBottom: 2,
+                background: "linear-gradient(90deg, #6c63ff, #4834d4)",
+                color: "#fff",
+                fontWeight: "bold",
+                textTransform: "none",
+              }}
+            >
+              Create New Account
+            </Button>
+          </Link>
 
           <Link
             href="#"
             underline="hover"
-            sx={{ display: "block", marginTop: 1, color: "#D4AF37", fontWeight: "bold" }}
+            sx={{
+              display: "block",
+              marginTop: 1,
+              color: "#6c63ff",
+              fontWeight: "bold",
+            }}
           >
             Forgot Password?
           </Link>
