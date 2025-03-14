@@ -3,24 +3,19 @@ import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faEllipsisH, faMoon, faSun } from "@fortawesome/free-solid-svg-icons";
 
 const Prices = () => {
-  // Theme toggle state
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [isDarkMode, setIsDarkMode] = useState(false);
   
-  // Pricing component state
   const [isVisible, setIsVisible] = useState(false);
   const [selectedPlan, setSelectedPlan] = useState("monthly");
   
-  // Check for saved theme preference and set up visibility detection on mount
   useEffect(() => {
-    // Theme preference check
     const savedTheme = localStorage.getItem("theme");
     if (savedTheme === "dark") {
       setIsDarkMode(true);
       document.body.classList.add("dark-mode");
     }
     
-    // Visibility detection for animation
     const handleScroll = () => {
       const section = document.getElementById("prices-section");
       if (section) {
@@ -36,7 +31,6 @@ const Prices = () => {
     return () => window.removeEventListener("scroll", handleScroll);
   }, []);
   
-  // Theme toggle functions
   const toggleMenu = () => {
     setIsMenuOpen(!isMenuOpen);
   };
@@ -45,7 +39,6 @@ const Prices = () => {
     const newDarkModeState = !isDarkMode;
     setIsDarkMode(newDarkModeState);
     
-    // Apply theme changes using CSS class
     if (newDarkModeState) {
       document.body.classList.add("dark-mode");
       localStorage.setItem("theme", "dark");
@@ -54,16 +47,13 @@ const Prices = () => {
       localStorage.setItem("theme", "light");
     }
     
-    // Close the menu after selecting an option
     setIsMenuOpen(false);
   };
   
-  // Pricing plan toggle function
   const togglePlan = (plan) => {
     setSelectedPlan(plan);
   };
   
-  // Pricing plans data
   const plans = {
     monthly: [
       {
@@ -191,7 +181,7 @@ const Prices = () => {
   return (
     <section id="prices" className="section">
       <div id="prices-section" className={`prices-content section-content fade-in ${isVisible ? "visible" : ""}`}>
-        <h2>Membership Plans</h2>
+        <h2 className="section-title">Membership Plans</h2>
         <div className="section-divider"></div>
         <p className="prices-description">
           Choose the perfect membership plan to achieve your fitness goals. 

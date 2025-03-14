@@ -20,11 +20,9 @@ const ContactUs = () => {
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    // In a real application, you would handle form submission here
     console.log("Form submitted:", formData);
     setSubmitted(true);
 
-    // Reset form after submission
     setTimeout(() => {
       setFormData({
         name: "",
@@ -37,7 +35,7 @@ const ContactUs = () => {
   };
 
   return (
-    <section id="contact" className="contact-section">
+    <section id="contact-us" className="contact-section">
       <div className="contact-container">
         <div className="contact-header">
           <h2>Contact Us</h2>
