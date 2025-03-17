@@ -4,6 +4,10 @@ export const useCreateAccountStore = create((set) => ({
   selectedBodyType: null,
   selectedAgeGroup: null,
   selectedGoal: null,
+  selectedBodyYouWant: null,
+  selectedLoseWeight: null,
+  selectedGainMuscle: null,
+  selectedGetShredded: null,
 
   setBodyType: (bodyType) => set({ selectedBodyType: bodyType }),
   setAgeGroup: (ageGroup) => set({ selectedAgeGroup: ageGroup }),
@@ -14,5 +18,6 @@ export const useCreateAccountStore = create((set) => ({
       selectedBodyType: null,
       selectedAgeGroup: null,
       selectedGoal: null,
+      selectedBodyYouWant: null,
     }),
 }));

@@ -67,7 +67,7 @@ export default function DynamicSelection({
             gap: 3,
           }}
         >
-          {data.map((item) => (
+          {(data || []).map((item) => (
             <Card
               key={item.label}
               sx={{
