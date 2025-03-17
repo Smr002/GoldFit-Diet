@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import {
   Dialog,
   DialogTitle,
@@ -16,8 +16,45 @@ import logo from "../assets/react.svg";
 
 export default function AccModal({ open, onClose }) {
   const [email, setEmail] = useState("");
+  const [isDarkMode, setIsDarkMode] = useState(false);
 
-  const gradientColor = "linear-gradient(90deg, #6c63ff, #4834d4)";
+  // Check for dark mode on component mount and when body class changes
+  useEffect(() => {
+    const checkDarkMode = () => {
+      setIsDarkMode(document.body.classList.contains("dark-mode"));
+    };
+
+    // Initial check
+    checkDarkMode();
+
+    // Create a mutation observer to detect changes to body class
+    const observer = new MutationObserver((mutations) => {
+      mutations.forEach((mutation) => {
+        if (
+          mutation.type === "attributes" &&
+          mutation.attributeName === "class"
+        ) {
+          checkDarkMode();
+        }
+      });
+    });
+
+    // Start observing the body element
+    observer.observe(document.body, { attributes: true });
+
+    // Clean up observer on component unmount
+    return () => observer.disconnect();
+  }, []);
+
+  // Define colors based on theme
+  const primaryColor = isDarkMode ? "#ffd700" : "#6c63ff"; // Gold in dark mode, purple in light
+  const backgroundColor = isDarkMode ? "#121212" : "#ffffff";
+  const textPrimaryColor = isDarkMode ? "#ffffff" : "#000000";
+  const textSecondaryColor = isDarkMode ? "rgba(255, 255, 255, 0.7)" : "rgba(0, 0, 0, 0.6)";
+  const dividerColor = isDarkMode ? "rgba(255, 255, 255, 0.12)" : "rgba(0, 0, 0, 0.12)";
+  const gradientColor = isDarkMode 
+    ? "linear-gradient(90deg, #ffd700, #ffb700)" // Gold gradient for dark mode
+    : "linear-gradient(90deg, #6c63ff, #4834d4)"; // Purple gradient for light mode
 
   return (
     <Dialog
@@ -28,8 +65,10 @@ export default function AccModal({ open, onClose }) {
       sx={{
         "& .MuiDialog-paper": {
           borderRadius: 3,
-          border: `2px solid #6c63ff`,
+          border: `2px solid ${primaryColor}`,
           padding: 2,
+          backgroundColor: backgroundColor,
+          color: textPrimaryColor,
         },
       }}
     >
@@ -45,7 +84,7 @@ export default function AccModal({ open, onClose }) {
           sx={{
             fontWeight: "bold",
             textAlign: "center",
-            color: "#6c63ff",
+            color: primaryColor,
             fontSize: "1.8rem",
           }}
         >
@@ -53,7 +92,7 @@ export default function AccModal({ open, onClose }) {
         </DialogTitle>
         <DialogContent sx={{ textAlign: "center" }}>
           <DialogContentText
-            sx={{ marginBottom: 3, fontSize: "1rem", color: "text.secondary" }}
+            sx={{ marginBottom: 3, fontSize: "1rem", color: textSecondaryColor }}
           >
             Sign in or create an account to continue
           </DialogContentText>
@@ -64,8 +103,8 @@ export default function AccModal({ open, onClose }) {
             startIcon={<Google />}
             sx={{
               marginBottom: 2,
-              borderColor: "#6c63ff",
-              color: "#6c63ff",
+              borderColor: primaryColor,
+              color: primaryColor,
               textTransform: "none",
               fontWeight: "bold",
               "&:hover": { background: gradientColor, color: "#fff" },
@@ -81,10 +120,26 @@ export default function AccModal({ open, onClose }) {
             placeholder="henry@example.com"
             value={email}
             onChange={(e) => setEmail(e.target.value)}
-            sx={{ marginBottom: 2 }}
+            sx={{ 
+              marginBottom: 2,
+              "& .MuiOutlinedInput-root": {
+                "& fieldset": {
+                  borderColor: isDarkMode ? "rgba(255, 255, 255, 0.23)" : "rgba(0, 0, 0, 0.23)",
+                },
+                "&:hover fieldset": {
+                  borderColor: primaryColor,
+                },
+                "&.Mui-focused fieldset": {
+                  borderColor: primaryColor,
+                },
+              },
+              "& .MuiInputBase-input": {
+                color: textPrimaryColor,
+              },
+            }}
             InputProps={{
               startAdornment: (
-                <Email sx={{ marginRight: 1, color: "#6c63ff" }} />
+                <Email sx={{ marginRight: 1, color: primaryColor }} />
               ),
               sx: { borderRadius: 1 },
             }}
@@ -102,10 +157,26 @@ export default function AccModal({ open, onClose }) {
                 variant="outlined"
                 type="password"
                 placeholder="Enter your password"
-                sx={{ marginBottom: 2 }}
+                sx={{ 
+                  marginBottom: 2,
+                  "& .MuiOutlinedInput-root": {
+                    "& fieldset": {
+                      borderColor: isDarkMode ? "rgba(255, 255, 255, 0.23)" : "rgba(0, 0, 0, 0.23)",
+                    },
+                    "&:hover fieldset": {
+                      borderColor: primaryColor,
+                    },
+                    "&.Mui-focused fieldset": {
+                      borderColor: primaryColor,
+                    },
+                  },
+                  "& .MuiInputBase-input": {
+                    color: textPrimaryColor,
+                  },
+                }}
                 InputProps={{
                   startAdornment: (
-                    <Lock sx={{ marginRight: 1, color: "#6c63ff" }} />
+                    <Lock sx={{ marginRight: 1, color: primaryColor }} />
                   ),
                   sx: { borderRadius: 1 },
                 }}
@@ -113,7 +184,7 @@ export default function AccModal({ open, onClose }) {
             </motion.div>
           )}
 
-          <Divider sx={{ marginY: 2 }}>or</Divider>
+          <Divider sx={{ marginY: 2, bgcolor: dividerColor }}>or</Divider>
           <Link
             href="/create-account/age-selection"
             style={{ textDecoration: "none" }}
@@ -124,7 +195,7 @@ export default function AccModal({ open, onClose }) {
               startIcon={<PersonAdd />}
               sx={{
                 marginBottom: 2,
-                background: "linear-gradient(90deg, #6c63ff, #4834d4)",
+                background: gradientColor,
                 color: "#fff",
                 fontWeight: "bold",
                 textTransform: "none",
@@ -140,7 +211,7 @@ export default function AccModal({ open, onClose }) {
             sx={{
               display: "block",
               marginTop: 1,
-              color: "#6c63ff",
+              color: primaryColor,
               fontWeight: "bold",
             }}
           >

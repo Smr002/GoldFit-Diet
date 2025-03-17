@@ -26,7 +26,7 @@ export default function DynamicSelection({
       <Box
         sx={{
           textAlign: "center",
-          padding: { xs: 2, sm: 4 }, // Responsive padding: 16px on mobile, 32px on larger screens
+          padding: { xs: 2, sm: 4 },
           width: "100%",
         }}
       >
@@ -58,10 +58,10 @@ export default function DynamicSelection({
                 borderRadius: "12px",
                 overflow: "hidden",
                 transition: "transform 0.4s",
-                boxShadow: "0px 4px 12px rgba(0, 0, 0, 0.4)", // Regular shadow
+                boxShadow: "0px 4px 12px rgba(0, 0, 0, 0.4)",
                 "&:hover": {
                   transform: "scale(1.05)",
-                  boxShadow: "0px 6px 18px rgba(0, 0, 0, 0.6)", // Enhanced shadow on hover
+                  boxShadow: "0px 6px 18px rgba(0, 0, 0, 0.6)",
                 },
               }}
             >
@@ -70,14 +70,14 @@ export default function DynamicSelection({
                 src={item.image}
                 alt={item.label}
                 sx={{
-                  width: { imageHeight } || "100%",
-                  height: 320,
+                  width: "100%",
+                  height: imageHeight || 320,
                   objectFit: "cover",
                 }}
               />
               <Box
                 sx={{
-                  background: "linear-gradient(90deg, #6c63ff, #4834d4)",
+                  background: "linear-gradient(90deg, var(--primary-color), var(--secondary-color))",
                   padding: "12px 16px",
                   display: "flex",
                   justifyContent: "space-between",
@@ -110,7 +110,7 @@ export default function DynamicSelection({
                 startIcon={<ArrowBack />}
                 sx={{
                   marginBottom: 2,
-                  background: "linear-gradient(90deg, #6c63ff, #4834d4)",
+                  background: "linear-gradient(90deg, var(--primary-color), var(--secondary-color))",
                   color: "#fff",
                   fontWeight: "bold",
                   textTransform: "none",
