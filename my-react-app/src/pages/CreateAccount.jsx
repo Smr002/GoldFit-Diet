@@ -1,5 +1,7 @@
 import { Routes, Route } from "react-router-dom";
+import { useEffect } from "react";
 import DynamicSelection from "@/components/CreateAccount/DynamicSelection";
+import { useCreateAccountStore } from "@/store/useCreateAccountStore";
 
 const bodyTypes = [
   {
@@ -41,6 +43,7 @@ const ageGroups = [
       "https://madmuscles.com/_next/image?url=%2F_next%2Fstatic%2Fmedia%2F50%2Bv5.76f38f2b.png&w=384&q=100",
   },
 ];
+
 const yourGoal = [
   {
     label: "Lose Weight",
@@ -59,7 +62,62 @@ const yourGoal = [
   },
 ];
 
+const selectedLoseWeight = [
+  {
+    label: "Slim Body",
+    image:
+      "https://madmuscles.com/_next/image?url=%2F_next%2Fstatic%2Fassets%2FaJuJ2fVCrgIDArhVE-ubV%2Fimages%2Fbody-muscles%2FSLIM_BODY.png&w=256&q=55",
+  },
+  {
+    label: "Slim,Shredded Body",
+    image:
+      "https://madmuscles.com/_next/image?url=%2F_next%2Fstatic%2Fassets%2FaJuJ2fVCrgIDArhVE-ubV%2Fimages%2Fbody-muscles%2FSLIM_SHREDDED_BODY.png&w=256&q=55",
+  },
+];
+
+const selectedGainMuscle = [
+  {
+    label: "Athlete",
+    image:
+      "https://madmuscles.com/_next/image?url=%2F_next%2Fstatic%2Fassets%2FaJuJ2fVCrgIDArhVE-ubV%2Fimages%2Fbody-muscles%2FATHLETE.png&w=256&q=55",
+  },
+  {
+    label: "Hero",
+    image:
+      "https://madmuscles.com/_next/image?url=%2F_next%2Fstatic%2Fassets%2FaJuJ2fVCrgIDArhVE-ubV%2Fimages%2Fbody-muscles%2FHERO.png&w=256&q=55",
+  },
+  {
+    label: "BodyBuilder",
+    image:
+      "https://madmuscles.com/_next/image?url=%2F_next%2Fstatic%2Fassets%2FaJuJ2fVCrgIDArhVE-ubV%2Fimages%2Fbody-muscles%2FBODYBUILDER.png&w=256&q=55",
+  },
+];
+
+const selectedGetShredded = [
+  {
+    label: "Beach Body",
+    image:
+      "https://madmuscles.com/_next/image?url=%2F_next%2Fstatic%2Fassets%2FaJuJ2fVCrgIDArhVE-ubV%2Fimages%2Fbody-muscles%2FBEACH_BODY.png&w=256&q=55",
+  },
+  {
+    label: "Wourkout Body",
+    image:
+      "https://madmuscles.com/_next/image?url=%2F_next%2Fstatic%2Fassets%2FaJuJ2fVCrgIDArhVE-ubV%2Fimages%2Fbody-muscles%2FWORKOUT_BODY.png&w=256&q=55",
+  },
+  {
+    label: "CrossFit Body",
+    image:
+      "https://madmuscles.com/_next/image?url=%2F_next%2Fstatic%2Fassets%2FaJuJ2fVCrgIDArhVE-ubV%2Fimages%2Fbody-muscles%2FCROSS_FIT_BODY.png&w=256&q=55",
+  },
+];
+
 export default function CreateAccount() {
+  const store = useCreateAccountStore();
+
+  useEffect(() => {
+    console.log("Store State:", store);
+  }, [store.selectedBodyType, store.selectedAgeGroup, store.selectedGoal]);
+
   return (
     <Routes>
       <Route
@@ -98,6 +156,26 @@ export default function CreateAccount() {
             data={yourGoal}
             linkPrefix="/create-account/your-goal"
             prevLink="/create-account/body-type"
+            nextLink="/create-account/body-you-want"
+            imageHeight={30}
+          />
+        }
+      />
+      <Route
+        path="body-you-want"
+        element={
+          <DynamicSelection
+            title="Choose the body you want"
+            description={`Ok, so your goal is ${store.selectedGoal}`}
+            data={
+              store.selectedGoal === "Lose Weight"
+                ? selectedLoseWeight
+                : store.selectedGoal === "Gain Muscle Mass"
+                ? selectedGainMuscle
+                : selectedGetShredded
+            }
+            linkPrefix="/create-account/body-you-want"
+            prevLink="/create-account/your-goal"
             imageHeight={30}
           />
         }

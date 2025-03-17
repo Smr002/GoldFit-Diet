@@ -9,8 +9,9 @@ import {
   Button,
 } from "@mui/material";
 import { ArrowForward, ArrowBack } from "@mui/icons-material";
-import { Link as RouterLink } from "react-router-dom";
+import { Link as RouterLink, useNavigate } from "react-router-dom";
 import ThemeTogglee from "../ThemeToggle";
+import { useCreateAccountStore } from "@/store/useCreateAccountStore";
 
 export default function DynamicSelection({
   title,
@@ -21,6 +22,22 @@ export default function DynamicSelection({
   imageHeight,
   prevLink,
 }) {
+  const navigate = useNavigate();
+
+  const { setBodyType, setAgeGroup, setGoal } = useCreateAccountStore();
+
+  const handleSelect = (itemLabel) => {
+    if (linkPrefix.includes("body-type")) {
+      setBodyType(itemLabel);
+    } else if (linkPrefix.includes("age-selection")) {
+      setAgeGroup(itemLabel);
+    } else if (linkPrefix.includes("your-goal")) {
+      setGoal(itemLabel);
+    }
+
+    navigate(nextLink || `${linkPrefix}/${itemLabel.toLowerCase()}`);
+  };
+
   return (
     <div className="dynamicSelection">
       <Box
@@ -50,7 +67,7 @@ export default function DynamicSelection({
             gap: 3,
           }}
         >
-          {data.map((item) => (
+          {(data || []).map((item) => (
             <Card
               key={item.label}
               sx={{
@@ -64,6 +81,7 @@ export default function DynamicSelection({
                   boxShadow: "0px 6px 18px rgba(0, 0, 0, 0.6)",
                 },
               }}
+              onClick={() => handleSelect(item.label)}
             >
               <Box
                 component="img"
@@ -90,17 +108,14 @@ export default function DynamicSelection({
                 >
                   {item.label}
                 </Typography>
-                <Link
-                  href={nextLink || `${linkPrefix}/${item.label.toLowerCase()}`}
-                >
-                  <IconButton sx={{ color: "#fff" }}>
-                    <ArrowForward />
-                  </IconButton>
-                </Link>
+                <IconButton sx={{ color: "#fff" }}>
+                  <ArrowForward />
+                </IconButton>
               </Box>
             </Card>
           ))}
         </Box>
+
         {prevLink && (
           <>
             <Divider sx={{ marginY: 2 }}>or</Divider>
