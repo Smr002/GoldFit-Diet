@@ -1,5 +1,7 @@
 import { Routes, Route } from "react-router-dom";
+import { useEffect } from "react";
 import DynamicSelection from "@/components/CreateAccount/DynamicSelection";
+import { useCreateAccountStore } from "@/store/useCreateAccountStore";
 
 const bodyTypes = [
   {
@@ -41,6 +43,7 @@ const ageGroups = [
       "https://madmuscles.com/_next/image?url=%2F_next%2Fstatic%2Fmedia%2F50%2Bv5.76f38f2b.png&w=384&q=100",
   },
 ];
+
 const yourGoal = [
   {
     label: "Lose Weight",
@@ -60,6 +63,12 @@ const yourGoal = [
 ];
 
 export default function CreateAccount() {
+  const store = useCreateAccountStore();
+
+  useEffect(() => {
+    console.log("Store State:", store);
+  }, [store.selectedBodyType, store.selectedAgeGroup, store.selectedGoal]);
+
   return (
     <Routes>
       <Route

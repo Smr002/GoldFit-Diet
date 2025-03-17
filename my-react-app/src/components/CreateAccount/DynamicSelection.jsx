@@ -9,8 +9,9 @@ import {
   Button,
 } from "@mui/material";
 import { ArrowForward, ArrowBack } from "@mui/icons-material";
-import { Link as RouterLink } from "react-router-dom";
+import { Link as RouterLink, useNavigate } from "react-router-dom";
 import ThemeTogglee from "../ThemeToggle";
+import { useCreateAccountStore } from "@/store/useCreateAccountStore";
 
 export default function DynamicSelection({
   title,
@@ -21,12 +22,28 @@ export default function DynamicSelection({
   imageHeight,
   prevLink,
 }) {
+  const navigate = useNavigate();
+
+  const { setBodyType, setAgeGroup, setGoal } = useCreateAccountStore();
+
+  const handleSelect = (itemLabel) => {
+    if (linkPrefix.includes("body-type")) {
+      setBodyType(itemLabel);
+    } else if (linkPrefix.includes("age-selection")) {
+      setAgeGroup(itemLabel);
+    } else if (linkPrefix.includes("your-goal")) {
+      setGoal(itemLabel);
+    }
+
+    navigate(nextLink || `${linkPrefix}/${itemLabel.toLowerCase()}`);
+  };
+
   return (
     <div className="dynamicSelection">
       <Box
         sx={{
           textAlign: "center",
-          padding: { xs: 2, sm: 4 }, // Responsive padding: 16px on mobile, 32px on larger screens
+          padding: { xs: 2, sm: 4 },
           width: "100%",
         }}
       >
@@ -58,12 +75,13 @@ export default function DynamicSelection({
                 borderRadius: "12px",
                 overflow: "hidden",
                 transition: "transform 0.4s",
-                boxShadow: "0px 4px 12px rgba(0, 0, 0, 0.4)", // Regular shadow
+                boxShadow: "0px 4px 12px rgba(0, 0, 0, 0.4)",
                 "&:hover": {
                   transform: "scale(1.05)",
-                  boxShadow: "0px 6px 18px rgba(0, 0, 0, 0.6)", // Enhanced shadow on hover
+                  boxShadow: "0px 6px 18px rgba(0, 0, 0, 0.6)",
                 },
               }}
+              onClick={() => handleSelect(item.label)}
             >
               <Box
                 component="img"
@@ -90,17 +108,14 @@ export default function DynamicSelection({
                 >
                   {item.label}
                 </Typography>
-                <Link
-                  href={nextLink || `${linkPrefix}/${item.label.toLowerCase()}`}
-                >
-                  <IconButton sx={{ color: "#fff" }}>
-                    <ArrowForward />
-                  </IconButton>
-                </Link>
+                <IconButton sx={{ color: "#fff" }}>
+                  <ArrowForward />
+                </IconButton>
               </Box>
             </Card>
           ))}
         </Box>
+
         {prevLink && (
           <>
             <Divider sx={{ marginY: 2 }}>or</Divider>
