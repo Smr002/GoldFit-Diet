@@ -2,6 +2,7 @@ import { Routes, Route } from "react-router-dom";
 import { useEffect } from "react";
 import DynamicSelection from "@/components/CreateAccount/DynamicSelection";
 import { useCreateAccountStore } from "@/store/useCreateAccountStore";
+import SliderHowManyTimes from "@/components/CreateAccount/SliderHowManyTimes";
 
 const bodyTypes = [
   {
@@ -176,10 +177,13 @@ export default function CreateAccount() {
             }
             linkPrefix="/create-account/body-you-want"
             prevLink="/create-account/your-goal"
+            nextLink="/create-account/how-many-times"
             imageHeight={30}
           />
         }
       />
+
+      <Route path="how-many-times" element={<SliderHowManyTimes />} />
     </Routes>
   );
 }

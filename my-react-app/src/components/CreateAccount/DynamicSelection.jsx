@@ -88,14 +88,14 @@ export default function DynamicSelection({
                 src={item.image}
                 alt={item.label}
                 sx={{
-                  width: "100%",
-                  height: imageHeight || 320,
+                  height: 400,
                   objectFit: "cover",
                 }}
               />
               <Box
                 sx={{
-                  background: "linear-gradient(90deg, var(--primary-color), var(--secondary-color))",
+                  background:
+                    "linear-gradient(90deg, var(--primary-color), var(--secondary-color))",
                   padding: "12px 16px",
                   display: "flex",
                   justifyContent: "space-between",
@@ -125,7 +125,8 @@ export default function DynamicSelection({
                 startIcon={<ArrowBack />}
                 sx={{
                   marginBottom: 2,
-                  background: "linear-gradient(90deg, var(--primary-color), var(--secondary-color))",
+                  background:
+                    "linear-gradient(90deg, var(--primary-color), var(--secondary-color))",
                   color: "#fff",
                   fontWeight: "bold",
                   textTransform: "none",
