@@ -3,63 +3,80 @@ import { useEffect } from "react";
 import DynamicSelection from "@/components/CreateAccount/DynamicSelection";
 import { useCreateAccountStore } from "@/store/useCreateAccountStore";
 import SliderHowManyTimes from "@/components/CreateAccount/SliderHowManyTimes";
+import male1829 from "../assets/male_18_29.png";
+import male3039 from "../assets/male_30_39.png";
+import male4049 from "../assets/male_40_49.png";
+import male50 from "../assets/male_50.png";
+import maleGainMuscle from "../assets/male_gain_muscle.png";
+//import maleGender from "../assets/male_gender.png";
+import maleGetShredded from "../assets/male_get_shredded.png";
+import maleHeavy from "../assets/male_heavy.png";
+import maleLoseWeight from "../assets/male_lose_weight.png";
+import maleSlim from "../assets/male_slim.png";
+import maleAverage from "../assets/male-average.png";
+
+// import female1829 from "../assets/female_18_29.png";
+// import female3039 from "../assets/female_30_39.png";
+// import female4049 from "../assets/female_40_49.png";
+// import female50 from "../assets/female_50.png";
+// import femaleAverage from "../assets/female_average.png";
+// import femaleGainMuscle from "../assets/female_gain_muscle.png";
+// import femaleGender from "../assets/female_gender.png";
+// import femaleGetShredded from "../assets/female_get_shredded.png";
+// import femaleHeavy from "../assets/female_heavy.png";
+// import femaleLoseWeight from "../assets/female_lose_weight.png";
+// import femaleSlim from "../assets/female_slim.png";
+
+
 
 const bodyTypes = [
   {
     label: "Slim",
-    image:
-      "https://madmuscles.com/_next/image?url=%2F_next%2Fstatic%2Fassets%2Ft2JoubbDtBW0KvYg8RmFZ%2Fimages%2Fbody-muscles%2FSLIM_SHREDDED_BODY.png&w=256&q=55",
+    image: maleSlim,
   },
   {
     label: "Average",
-    image:
-      "https://madmuscles.com/_next/image?url=%2F_next%2Fstatic%2Fassets%2Ft2JoubbDtBW0KvYg8RmFZ%2Fimages%2Fbody-fat-level%2FFROM_15_TO_19.png&w=256&q=55",
+    image: maleAverage,
   },
   {
     label: "Heavy",
-    image:
-      "https://madmuscles.com/_next/image?url=%2F_next%2Fstatic%2Fassets%2Ft2JoubbDtBW0KvYg8RmFZ%2Fimages%2Fbody-fat-level%2FFROM_25_TO_29.png&w=256&q=55",
+    image: maleHeavy,
   },
 ];
 
 const ageGroups = [
   {
     label: "Age: 18-29",
-    image:
-      "https://madmuscles.com/_next/image?url=%2F_next%2Fstatic%2Fmedia%2F18-29v5.0024e0ba.png&w=384&q=100",
+    image: male1829,
   },
   {
     label: "Age: 30-39",
-    image:
-      "https://madmuscles.com/_next/image?url=%2F_next%2Fstatic%2Fmedia%2F30-39v5.e6724dfb.png&w=384&q=100",
+    image: male3039,
+      
   },
   {
     label: "Age: 40-49",
-    image:
-      "https://madmuscles.com/_next/image?url=%2F_next%2Fstatic%2Fmedia%2F40-49v5.fa977b7b.png&w=384&q=100",
+    image: male4049,
   },
   {
     label: "Age: 50+",
-    image:
-      "https://madmuscles.com/_next/image?url=%2F_next%2Fstatic%2Fmedia%2F50%2Bv5.76f38f2b.png&w=384&q=100",
+    image: male50,
   },
 ];
 
 const yourGoal = [
   {
     label: "Lose Weight",
-    image:
-      "https://madmuscles.com/_next/image?url=%2F_next%2Fstatic%2Fassets%2Ft2JoubbDtBW0KvYg8RmFZ%2Fimages%2Fbody-muscles%2FSLIM_SHREDDED_BODY.png&w=256&q=55",
+    image: maleLoseWeight,
   },
   {
     label: "Gain Muscle Mass",
-    image:
-      "https://madmuscles.com/_next/image?url=%2F_next%2Fstatic%2Fassets%2Ft2JoubbDtBW0KvYg8RmFZ%2Fimages%2Fbody-muscles%2FHERO.png&w=256&q=55",
+    image: maleGainMuscle,
   },
   {
     label: "Get Shredded",
-    image:
-      "https://madmuscles.com/_next/image?url=%2F_next%2Fstatic%2Fassets%2Ft2JoubbDtBW0KvYg8RmFZ%2Fimages%2Fbody-muscles%2FBEACH_BODY.png&w=256&q=55",
+    image: maleGetShredded,
+      
   },
 ];
 

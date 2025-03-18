@@ -93,7 +93,7 @@ const Footer = () => {
 
         <div className="footer-bottom">
           <div className="footer-copyright">
-            © {currentYear} FitLife. All rights reserved.
+            © {currentYear} GoldFit&Diet. All rights reserved.
           </div>
           <div className="footer-legal-links">
             <a href="#">Privacy Policy</a>

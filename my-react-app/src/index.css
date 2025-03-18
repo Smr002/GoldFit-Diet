@@ -802,9 +802,8 @@ body.dark-mode {
 
 /* Almost hidden (4th and 5th exercises) */
 .workout-modal .exercises-table .almost-hidden {
-  opacity: 0.04;
+  opacity: 0.1;
 }
-
 
 .workout-modal-overlay {
   position: fixed;

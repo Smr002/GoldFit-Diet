@@ -114,7 +114,7 @@ const ContactUs = () => {
               </div>
               <div>
                 <p className="info-label">Email</p>
-                <p>info@fitlife.com</p>
+                <p>info@goldfit.com</p>
               </div>
             </div>
 
