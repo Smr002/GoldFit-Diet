@@ -11,19 +11,18 @@ import Zoom from "@mui/material/Zoom";
 import FitnessCenterIcon from "@mui/icons-material/FitnessCenter";
 import DirectionsRunIcon from "@mui/icons-material/DirectionsRun";
 
-// Custom styled slider with improved aesthetics
 const ExerciseSlider = styled(Slider)(({ theme }) => ({
-  color: "#52af77",
+  color: "#D4AF37",
   height: 8,
   padding: "12px 0",
   "& .MuiSlider-track": {
-    background: "linear-gradient(to right, #52af77, #2e7d32)",
+    background: "linear-gradient(to right, #D4AF37, #b8860b)",
     border: "none",
     height: 8,
   },
   "& .MuiSlider-rail": {
     opacity: 0.5,
-    backgroundColor: "#a5d6a7",
+    backgroundColor: "#e3c16f",
     height: 8,
     borderRadius: 4,
   },
@@ -31,7 +30,7 @@ const ExerciseSlider = styled(Slider)(({ theme }) => ({
     height: 24,
     width: 24,
     backgroundColor: "#fff",
-    border: "2px solid #52af77",
+    border: "2px solid #D4AF37",
     boxShadow: "0 2px 6px rgba(0,0,0,0.2)",
     transition: "all 0.2s ease-in-out",
     "&:hover": {
@@ -45,28 +44,8 @@ const ExerciseSlider = styled(Slider)(({ theme }) => ({
       display: "none",
     },
   },
-  "& .MuiSlider-valueLabel": {
-    lineHeight: 1.2,
-    fontSize: 12,
-    fontWeight: "bold",
-    background: "unset",
-    padding: 0,
-    width: 32,
-    height: 32,
-    borderRadius: "50% 50% 50% 0",
-    backgroundColor: "#52af77",
-    transformOrigin: "bottom left",
-    transform: "translate(50%, -100%) rotate(-45deg) scale(0)",
-    "&::before": { display: "none" },
-    "&.MuiSlider-valueLabelOpen": {
-      transform: "translate(50%, -100%) rotate(-45deg) scale(1)",
-    },
-    "& > *": {
-      transform: "rotate(45deg)",
-    },
-  },
   "& .MuiSlider-markLabel": {
-    color: "#f8f8f8",
+    color: "#fff", 
     fontSize: "14px",
     fontWeight: 500,
     marginTop: 6,
@@ -79,16 +58,16 @@ const ExerciseSlider = styled(Slider)(({ theme }) => ({
   },
 }));
 
-// Animated activity icon row component
+
 const ActivityIcons = ({ count, animate }) => {
   const icons = [];
-  
+
   for (let i = 0; i < count; i++) {
     icons.push(
       <DirectionsRunIcon
         key={i}
         sx={{
-          color: "#78c48c",
+          color: "#D4AF37",
           fontSize: 22,
           opacity: animate ? 0.6 : 1,
           transform: animate ? "translateY(-3px)" : "none",
@@ -99,7 +78,7 @@ const ActivityIcons = ({ count, animate }) => {
       />
     );
   }
-  
+
   return (
     <Box sx={{ display: "flex", justifyContent: "center", my: 1.5 }}>
       {icons}
@@ -119,16 +98,6 @@ export default function EnhancedExerciseSlider() {
     setAnimate(true);
     setTimeout(() => setAnimate(false), 600);
   };
-  
-  // Background gradient animation
-  const [gradientPosition, setGradientPosition] = useState(0);
-  
-  useEffect(() => {
-    const interval = setInterval(() => {
-      setGradientPosition((prev) => (prev >= 100 ? 0 : prev + 1));
-    }, 150);
-    return () => clearInterval(interval);
-  }, []);
 
   return (
     <Box
@@ -138,9 +107,9 @@ export default function EnhancedExerciseSlider() {
         display: "flex",
         alignItems: "center",
         justifyContent: "center",
-        background: `linear-gradient(${gradientPosition}deg, #1b1b2f, #0f172a)`,
+        background: `linear-gradient(135deg, #1b1b2f, #0f172a)`,
         transition: "background 0.5s ease",
-        overflow: "hidden", // Prevent scrolling
+        overflow: "hidden",
       }}
     >
       <Zoom in timeout={800}>
@@ -162,7 +131,7 @@ export default function EnhancedExerciseSlider() {
         >
           <Box
             sx={{
-              backgroundColor: "rgba(82, 175, 119, 0.15)",
+              backgroundColor: "rgba(212, 175, 55, 0.15)",
               borderRadius: "50%",
               p: 1.5,
               mb: 2,
@@ -171,11 +140,9 @@ export default function EnhancedExerciseSlider() {
               alignItems: "center",
             }}
           >
-            <FitnessCenterIcon
-              sx={{ color: "#52af77", fontSize: 32 }}
-            />
+            <FitnessCenterIcon sx={{ color: "#D4AF37", fontSize: 32 }} />
           </Box>
-          
+
           <Typography
             variant="h5"
             fontWeight="bold"
@@ -188,7 +155,7 @@ export default function EnhancedExerciseSlider() {
           >
             Set Your Weekly Exercise Goal
           </Typography>
-          
+
           <Typography
             variant="body2"
             sx={{
@@ -200,9 +167,9 @@ export default function EnhancedExerciseSlider() {
           >
             How many days will you commit to your fitness journey?
           </Typography>
-          
+
           <ActivityIcons count={value} animate={animate} />
-          
+
           <Box sx={{ width: "90%", mt: 1, mb: 2 }}>
             <ExerciseSlider
               value={value}
@@ -220,10 +187,10 @@ export default function EnhancedExerciseSlider() {
               max={6}
             />
           </Box>
-          
+
           <Box
             sx={{
-              backgroundColor: "rgba(82, 175, 119, 0.1)",
+              backgroundColor: "rgba(212, 175, 55, 0.1)",
               borderRadius: "10px",
               p: 1.5,
               width: "80%",
@@ -242,7 +209,7 @@ export default function EnhancedExerciseSlider() {
             <Typography
               variant="body2"
               sx={{
-                color: "#a3e635",
+                color: "#D4AF37",
                 fontWeight: 500,
                 fontSize: "0.85rem",
               }}
@@ -250,18 +217,18 @@ export default function EnhancedExerciseSlider() {
               {value >= 5 ? "Great commitment!" : "Good starting point!"}
             </Typography>
           </Box>
-          
+
           <Button
             variant="contained"
             endIcon={<ArrowForward />}
             sx={{
               padding: "8px 20px",
               borderRadius: "24px",
-              backgroundColor: "#52af77",
+              backgroundColor: "#D4AF37",
               "&:hover": {
-                backgroundColor: "#429964",
+                backgroundColor: "#b8860b",
                 transform: "translateY(-2px)",
-                boxShadow: "0 4px 12px rgba(82, 175, 119, 0.4)",
+                boxShadow: "0 4px 12px rgba(212, 175, 55, 0.4)",
               },
               transition: "all 0.3s ease",
               fontSize: "0.95rem",
