@@ -661,10 +661,12 @@ body.dark-mode {
   display: flex;
   gap: 20px;
   width: max-content;
+  animation: scroll 40s linear infinite;
+  animation-play-state: running;
 }
 
-.workout-carousel.animating {
-  animation: scroll 40s linear infinite;
+.workout-carousel:hover {
+  animation-play-state: paused; /* Pauses the animation on hover */
 }
 
 @keyframes scroll {
@@ -672,11 +674,11 @@ body.dark-mode {
     transform: translateX(0);
   }
   100% {
-    transform: translateX(calc(-300px * 5 - 20px * 5)); /* Width of all cards + gaps */
+    transform: translateX(calc(-300px * 5 - 20px * 5)); /* Adjusted for all cards */
   }
 }
 
-/* Workout Card Styles */
+
 .workout-card {
   width: 300px;
   border-radius: 10px;
@@ -687,6 +689,7 @@ body.dark-mode {
   cursor: pointer;
   flex-shrink: 0;
 }
+
 
 .workout-card:hover {
   transform: translateY(-10px);
@@ -775,6 +778,34 @@ body.dark-mode {
 }
 
 /* Modal Styles */
+
+.modal-content {
+  position: relative;
+  background: var(--modal-bg);
+  padding: 20px;
+  border-radius: 10px;
+  box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+  max-width: 600px;
+  width: 100%;
+}
+
+/* Normal visibility */
+.workout-modal .exercises-table tr {
+  opacity: 1;
+  transition: opacity 0.3s ease-in-out;
+}
+
+/* Semi-visible (3rd exercise) */
+.workout-modal .exercises-table .semi-visible {
+  opacity: 0.5;
+}
+
+/* Almost hidden (4th and 5th exercises) */
+.workout-modal .exercises-table .almost-hidden {
+  opacity: 0.04;
+}
+
+
 .workout-modal-overlay {
   position: fixed;
   top: 0;

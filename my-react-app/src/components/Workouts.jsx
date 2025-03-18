@@ -10,7 +10,7 @@ const Workouts = () => {
   const [isVisible, setIsVisible] = useState(false);
   const carouselRef = useRef(null);
   const [isAnimating, setIsAnimating] = useState(true);
-  
+
   const workouts = [
     {
       id: 1,
@@ -24,8 +24,8 @@ const Workouts = () => {
         { name: "Push-ups", sets: 3, reps: 10 },
         { name: "Lunges", sets: 3, reps: 12 },
         { name: "Plank", sets: 3, reps: "45 sec" },
-        { name: "Burpees", sets: 3, reps: 10 }
-      ]
+        { name: "Burpees", sets: 3, reps: 10 },
+      ],
     },
     {
       id: 2,
@@ -39,8 +39,8 @@ const Workouts = () => {
         { name: "Russian Twists", sets: 3, reps: 20 },
         { name: "Leg Raises", sets: 3, reps: 12 },
         { name: "Mountain Climbers", sets: 3, reps: "30 sec" },
-        { name: "Plank Variations", sets: 3, reps: "45 sec" }
-      ]
+        { name: "Plank Variations", sets: 3, reps: "45 sec" },
+      ],
     },
     {
       id: 3,
@@ -54,8 +54,8 @@ const Workouts = () => {
         { name: "Pull-ups", sets: 3, reps: "Max" },
         { name: "Shoulder Press", sets: 3, reps: 10 },
         { name: "Bicep Curls", sets: 3, reps: 12 },
-        { name: "Tricep Dips", sets: 3, reps: 12 }
-      ]
+        { name: "Tricep Dips", sets: 3, reps: 12 },
+      ],
     },
     {
       id: 4,
@@ -69,8 +69,8 @@ const Workouts = () => {
         { name: "Hip Thrusts", sets: 3, reps: 12 },
         { name: "Bulgarian Split Squats", sets: 3, reps: 10 },
         { name: "Calf Raises", sets: 3, reps: 15 },
-        { name: "Leg Press", sets: 3, reps: 12 }
-      ]
+        { name: "Leg Press", sets: 3, reps: 12 },
+      ],
     },
     {
       id: 5,
@@ -84,13 +84,13 @@ const Workouts = () => {
         { name: "High Knees", sets: 1, reps: "30 sec" },
         { name: "Burpees", sets: 1, reps: "30 sec" },
         { name: "Mountain Climbers", sets: 1, reps: "30 sec" },
-        { name: "Rest", sets: 1, reps: "15 sec" }
-      ]
-    }
+        { name: "Rest", sets: 1, reps: "15 sec" },
+      ],
+    },
   ];
-  
+
   const extendedWorkouts = [...workouts, ...workouts, ...workouts];
-  
+
   useEffect(() => {
     const handleScroll = () => {
       const section = document.getElementById("workouts-section");
@@ -101,46 +101,52 @@ const Workouts = () => {
         }
       }
     };
-    
+
     window.addEventListener("scroll", handleScroll);
     handleScroll();
     return () => window.removeEventListener("scroll", handleScroll);
   }, []);
-  
+
   const pauseAnimation = () => setIsAnimating(false);
   const resumeAnimation = () => setIsAnimating(true);
-  
+
   const openWorkoutModal = (workout) => {
     setActiveWorkout(workout);
-    document.body.style.overflow = 'hidden'; 
+    document.body.style.overflow = "hidden";
   };
-  
+
   const closeWorkoutModal = () => {
     setActiveWorkout(null);
-    document.body.style.overflow = 'auto'; 
+    document.body.style.overflow = "auto";
   };
 
   return (
     <section id="workouts" className="section section-gradient">
-      <div id="workouts-section" className={`workouts-content section-content fade-in ${isVisible ? "visible" : ""}`}>
+      <div
+        id="workouts-section"
+        className={`workouts-content section-content fade-in ${
+          isVisible ? "visible" : ""
+        }`}
+      >
         <h2>Our Workouts</h2>
         <div className="section-divider"></div>
         <p className="workouts-description">
-          Discover our expertly designed workout programs crafted to help you reach your fitness goals.
-          Click on any workout to see the detailed exercise plan.
+          Discover our expertly designed workout programs crafted to help you
+          reach your fitness goals. Click on any workout to see the detailed
+          exercise plan.
         </p>
-        
+
         {/* Workouts Carousel */}
-        <div 
+        <div
           className="workout-carousel-container"
           onMouseEnter={pauseAnimation}
           onMouseLeave={resumeAnimation}
           ref={carouselRef}
         >
-          <div className={`workout-carousel ${isAnimating ? 'animating' : ''}`}>
+          <div className={`workout-carousel ${isAnimating ? "animating" : ""}`}>
             {extendedWorkouts.map((workout, index) => (
-              <div 
-                className="workout-card" 
+              <div
+                className="workout-card"
                 key={`${workout.id}-${index}`}
                 onClick={() => openWorkoutModal(workout)}
               >
@@ -161,16 +167,20 @@ const Workouts = () => {
           </div>
         </div>
       </div>
-      
+
       {/* Workout Detail Modal */}
       {activeWorkout && (
         <div className="workout-modal-overlay" onClick={closeWorkoutModal}>
           <div className="workout-modal" onClick={(e) => e.stopPropagation()}>
-            <button className="modal-close-btn" onClick={closeWorkoutModal}>×</button>
+            <button className="modal-close-btn" onClick={closeWorkoutModal}>
+              ×
+            </button>
             <div className="modal-header">
               <h3>{activeWorkout.title}</h3>
               <div className="modal-meta">
-                <span className="modal-difficulty">{activeWorkout.difficulty}</span>
+                <span className="modal-difficulty">
+                  {activeWorkout.difficulty}
+                </span>
                 <span className="modal-duration">{activeWorkout.duration}</span>
               </div>
             </div>
@@ -186,13 +196,19 @@ const Workouts = () => {
                   </tr>
                 </thead>
                 <tbody>
-                  {activeWorkout.exercises.map((exercise, index) => (
-                    <tr key={index}>
-                      <td>{exercise.name}</td>
-                      <td>{exercise.sets}</td>
-                      <td>{exercise.reps}</td>
-                    </tr>
-                  ))}
+                  {activeWorkout.exercises.map((exercise, index) => {
+                    let visibilityClass = "";
+                    if (index === 2) visibilityClass = "semi-visible";
+                    else if (index > 2) visibilityClass = "almost-hidden";
+
+                    return (
+                      <tr key={index} className={visibilityClass}>
+                        <td>{exercise.name}</td>
+                        <td>{exercise.sets}</td>
+                        <td>{exercise.reps}</td>
+                      </tr>
+                    );
+                  })}
                 </tbody>
               </table>
             </div>

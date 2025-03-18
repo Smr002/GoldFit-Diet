@@ -8,7 +8,7 @@ const Footer = () => {
       <div className="footer-container">
         <div className="footer-content">
           <div className="footer-logo-section">
-            <h3 className="footer-logo">FitLife</h3>
+            <h3 className="footer-logo">GoldFit&Diet</h3>
             <p className="footer-tagline">
               Your journey to a healthier lifestyle starts here.
             </p>
