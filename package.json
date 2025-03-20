@@ -1,0 +1,10 @@
+{
+  "dependencies": {
+    "mongodb": "^6.15.0",
+    "mongoose": "^8.12.1",
+    "uuid": "^11.1.0"
+  },
+  "devDependencies": {
+    "@types/node": "^22.13.10"
+  }
+}
