@@ -6,7 +6,7 @@ import bcrypt from 'bcrypt';
 import jwt from 'jsonwebtoken';
 import dotenv from 'dotenv';
 
-// Load environment variables
+// Load environment variables test
 dotenv.config();
 
 // Define user interface based on the model
@@ -36,7 +36,7 @@ declare global {
 
 const JWT_SECRET = process.env.JWT_SECRET;
 if (!JWT_SECRET) {
-    throw new Error('JWT_SECRET is not defined in environment variables');
+    throw new Error('JWT_SECRET is not defined in environment');
 }
 
 export const registerUser = async (req: Request, res: Response) => {
