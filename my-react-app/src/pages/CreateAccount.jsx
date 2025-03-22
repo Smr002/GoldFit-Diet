@@ -1,7 +1,8 @@
 import { Routes, Route } from "react-router-dom";
 import { useEffect } from "react";
 import DynamicSelection from "@/components/CreateAccount/DynamicSelection";
-import HeightWeightInput from "@/components/CreateAccount/HeightWeightInput";
+import WeightInput from "@/components/CreateAccount/WeightInput";
+import HeightInput from "@/components/CreateAccount/HeightInput";
 import { useCreateAccountStore } from "@/store/useCreateAccountStore";
 import SliderHowManyTimes from "@/components/CreateAccount/SliderHowManyTimes";
 import male1829 from "../assets/male_18_29.png";
@@ -158,7 +159,7 @@ export default function CreateAccount() {
       <Route
         path="height"
         element={
-          <HeightWeightInput
+          <HeightInput
             type="height"
             prevLink="/create-account/age-selection"
             nextLink="/create-account/weight"
@@ -168,7 +169,7 @@ export default function CreateAccount() {
       <Route
         path="weight"
         element={
-          <HeightWeightInput
+          <WeightInput
             type="weight"
             prevLink="/create-account/height"
             nextLink="/create-account/body-type"
