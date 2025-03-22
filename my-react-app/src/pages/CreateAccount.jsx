@@ -1,6 +1,7 @@
 import { Routes, Route } from "react-router-dom";
 import { useEffect } from "react";
 import DynamicSelection from "@/components/CreateAccount/DynamicSelection";
+import HeightWeightInput from "@/components/CreateAccount/HeightWeightInput";
 import { useCreateAccountStore } from "@/store/useCreateAccountStore";
 import SliderHowManyTimes from "@/components/CreateAccount/SliderHowManyTimes";
 import male1829 from "../assets/male_18_29.png";
@@ -8,26 +9,11 @@ import male3039 from "../assets/male_30_39.png";
 import male4049 from "../assets/male_40_49.png";
 import male50 from "../assets/male_50.png";
 import maleGainMuscle from "../assets/male_gain_muscle.png";
-//import maleGender from "../assets/male_gender.png";
 import maleGetShredded from "../assets/male_get_shredded.png";
 import maleHeavy from "../assets/male_heavy.png";
 import maleLoseWeight from "../assets/male_lose_weight.png";
 import maleSlim from "../assets/male_slim.png";
 import maleAverage from "../assets/male-average.png";
-
-// import female1829 from "../assets/female_18_29.png";
-// import female3039 from "../assets/female_30_39.png";
-// import female4049 from "../assets/female_40_49.png";
-// import female50 from "../assets/female_50.png";
-// import femaleAverage from "../assets/female_average.png";
-// import femaleGainMuscle from "../assets/female_gain_muscle.png";
-// import femaleGender from "../assets/female_gender.png";
-// import femaleGetShredded from "../assets/female_get_shredded.png";
-// import femaleHeavy from "../assets/female_heavy.png";
-// import femaleLoseWeight from "../assets/female_lose_weight.png";
-// import femaleSlim from "../assets/female_slim.png";
-
-
 
 const bodyTypes = [
   {
@@ -52,7 +38,6 @@ const ageGroups = [
   {
     label: "Age: 30-39",
     image: male3039,
-      
   },
   {
     label: "Age: 40-49",
@@ -76,7 +61,6 @@ const yourGoal = [
   {
     label: "Get Shredded",
     image: maleGetShredded,
-      
   },
 ];
 
@@ -134,7 +118,13 @@ export default function CreateAccount() {
 
   useEffect(() => {
     console.log("Store State:", store);
-  }, [store.selectedBodyType, store.selectedAgeGroup, store.selectedGoal]);
+  }, [
+    store.selectedBodyType,
+    store.selectedAgeGroup,
+    store.selectedHeight,
+    store.selectedWeight,
+    store.selectedGoal,
+  ]);
 
   return (
     <Routes>
@@ -147,7 +137,7 @@ export default function CreateAccount() {
             data={bodyTypes}
             linkPrefix="/create-account/body-type"
             nextLink="/create-account/your-goal"
-            prevLink="/create-account/age-selection"
+            prevLink="/create-account/weight"
             imageHeight={30}
           />
         }
@@ -161,6 +151,26 @@ export default function CreateAccount() {
             data={ageGroups}
             linkPrefix="/create-account/age-selection"
             prevLink="/"
+            nextLink="/create-account/height"
+          />
+        }
+      />
+      <Route
+        path="height"
+        element={
+          <HeightWeightInput
+            type="height"
+            prevLink="/create-account/age-selection"
+            nextLink="/create-account/weight"
+          />
+        }
+      />
+      <Route
+        path="weight"
+        element={
+          <HeightWeightInput
+            type="weight"
+            prevLink="/create-account/height"
             nextLink="/create-account/body-type"
           />
         }
