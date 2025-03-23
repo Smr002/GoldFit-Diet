@@ -3,18 +3,26 @@
   "version": "1.0.0",
   "main": "index.js",
   "scripts": {
-  "start": "node dist/server.js",
-  "dev": "ts-node-dev --respawn --transpile-only src/server.ts",
-  "build": "tsc"
-},
+    "start": "node dist/server.js",
+    "dev": "ts-node-dev --respawn --transpile-only src/server.ts",
+    "build": "tsc"
+  },
   "keywords": [],
   "author": "",
   "license": "ISC",
   "description": "",
   "dependencies": {
-    "express": "^4.21.2"
+    "@prisma/client": "^6.5.0",
+    "express": "^4.21.2",
+    "prisma": "^6.5.0"
   },
   "devDependencies": {
-    "nodemon": "^3.1.9"
+    "@types/node": "^22.13.11",
+    "nodemon": "^3.1.9",
+    "ts-node": "^10.9.2",
+    "typescript": "^5.8.2"
+  },
+  "prisma": {
+    "schema": "src/prisma/schema.prisma"
   }
 }
