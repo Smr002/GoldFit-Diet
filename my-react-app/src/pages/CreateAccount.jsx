@@ -3,123 +3,193 @@ import { useEffect } from "react";
 import DynamicSelection from "@/components/CreateAccount/DynamicSelection";
 import WeightInput from "@/components/CreateAccount/WeightInput";
 import HeightInput from "@/components/CreateAccount/HeightInput";
-import { useCreateAccountStore } from "@/store/useCreateAccountStore";
 import SliderHowManyTimes from "@/components/CreateAccount/SliderHowManyTimes";
+import { useCreateAccountStore } from "@/store/useCreateAccountStore";
+
+// Gender images
+import maleGender from "../assets/male_gender.png";
+import femaleGender from "../assets/female_gender.png";
+
+// Male images
 import male1829 from "../assets/male_18_29.png";
 import male3039 from "../assets/male_30_39.png";
 import male4049 from "../assets/male_40_49.png";
 import male50 from "../assets/male_50.png";
-import maleGainMuscle from "../assets/male_gain_muscle.png";
-import maleGetShredded from "../assets/male_get_shredded.png";
-import maleHeavy from "../assets/male_heavy.png";
-import maleLoseWeight from "../assets/male_lose_weight.png";
 import maleSlim from "../assets/male_slim.png";
 import maleAverage from "../assets/male-average.png";
+import maleHeavy from "../assets/male_heavy.png";
+import maleLoseWeight from "../assets/male_lose_weight.png";
+import maleGainMuscle from "../assets/male_gain_muscle.png";
+import maleGetShredded from "../assets/male_get_shredded.png";
 
-const bodyTypes = [
-  {
-    label: "Slim",
-    image: maleSlim,
-  },
-  {
-    label: "Average",
-    image: maleAverage,
-  },
-  {
-    label: "Heavy",
-    image: maleHeavy,
-  },
-];
-
-const ageGroups = [
-  {
-    label: "Age: 18-29",
-    image: male1829,
-  },
-  {
-    label: "Age: 30-39",
-    image: male3039,
-  },
-  {
-    label: "Age: 40-49",
-    image: male4049,
-  },
-  {
-    label: "Age: 50+",
-    image: male50,
-  },
-];
-
-const yourGoal = [
-  {
-    label: "Lose Weight",
-    image: maleLoseWeight,
-  },
-  {
-    label: "Gain Muscle Mass",
-    image: maleGainMuscle,
-  },
-  {
-    label: "Get Shredded",
-    image: maleGetShredded,
-  },
-];
-
-const selectedLoseWeight = [
-  {
-    label: "Slim Body",
-    image:
-      "https://madmuscles.com/_next/image?url=%2F_next%2Fstatic%2Fassets%2FaJuJ2fVCrgIDArhVE-ubV%2Fimages%2Fbody-muscles%2FSLIM_BODY.png&w=256&q=55",
-  },
-  {
-    label: "Slim,Shredded Body",
-    image:
-      "https://madmuscles.com/_next/image?url=%2F_next%2Fstatic%2Fassets%2FaJuJ2fVCrgIDArhVE-ubV%2Fimages%2Fbody-muscles%2FSLIM_SHREDDED_BODY.png&w=256&q=55",
-  },
-];
-
-const selectedGainMuscle = [
-  {
-    label: "Athlete",
-    image:
-      "https://madmuscles.com/_next/image?url=%2F_next%2Fstatic%2Fassets%2FaJuJ2fVCrgIDArhVE-ubV%2Fimages%2Fbody-muscles%2FATHLETE.png&w=256&q=55",
-  },
-  {
-    label: "Hero",
-    image:
-      "https://madmuscles.com/_next/image?url=%2F_next%2Fstatic%2Fassets%2FaJuJ2fVCrgIDArhVE-ubV%2Fimages%2Fbody-muscles%2FHERO.png&w=256&q=55",
-  },
-  {
-    label: "BodyBuilder",
-    image:
-      "https://madmuscles.com/_next/image?url=%2F_next%2Fstatic%2Fassets%2FaJuJ2fVCrgIDArhVE-ubV%2Fimages%2Fbody-muscles%2FBODYBUILDER.png&w=256&q=55",
-  },
-];
-
-const selectedGetShredded = [
-  {
-    label: "Beach Body",
-    image:
-      "https://madmuscles.com/_next/image?url=%2F_next%2Fstatic%2Fassets%2FaJuJ2fVCrgIDArhVE-ubV%2Fimages%2Fbody-muscles%2FBEACH_BODY.png&w=256&q=55",
-  },
-  {
-    label: "Wourkout Body",
-    image:
-      "https://madmuscles.com/_next/image?url=%2F_next%2Fstatic%2Fassets%2FaJuJ2fVCrgIDArhVE-ubV%2Fimages%2Fbody-muscles%2FWORKOUT_BODY.png&w=256&q=55",
-  },
-  {
-    label: "CrossFit Body",
-    image:
-      "https://madmuscles.com/_next/image?url=%2F_next%2Fstatic%2Fassets%2FaJuJ2fVCrgIDArhVE-ubV%2Fimages%2Fbody-muscles%2FCROSS_FIT_BODY.png&w=256&q=55",
-  },
-];
+// Female images
+import female1829 from "../assets/female_18_29.png";
+import female3039 from "../assets/female_30_39.png";
+import female4049 from "../assets/female_40_49.png";
+import female50 from "../assets/female_50.png";
+import femaleSlim from "../assets/female_slim_body.png";
+import femaleAverage from "../assets/female_average.png";
+import femaleHeavy from "../assets/female_heavy.png";
+import femaleLoseWeight from "../assets/female_lose_weight.png";
+import femaleGainMuscle from "../assets/female_gain_muscle.png";
+import femaleGetShredded from "../assets/female_get_shredded.png";
 
 export default function CreateAccount() {
   const store = useCreateAccountStore();
 
+  const selectedGender = store.selectedGender || "Male";
+
+  const gender = [
+    { label: "Male", image: maleGender },
+    { label: "Female", image: femaleGender },
+  ];
+
+  const bodyTypes =
+    selectedGender === "Female"
+      ? [
+          { label: "Slim", image: femaleSlim },
+          { label: "Average", image: femaleAverage },
+          { label: "Heavy", image: femaleHeavy },
+        ]
+      : [
+          { label: "Slim", image: maleSlim },
+          { label: "Average", image: maleAverage },
+          { label: "Heavy", image: maleHeavy },
+        ];
+
+  const ageGroups =
+    selectedGender === "Female"
+      ? [
+          { label: "Age: 18-29", image: female1829 },
+          { label: "Age: 30-39", image: female3039 },
+          { label: "Age: 40-49", image: female4049 },
+          { label: "Age: 50+", image: female50 },
+        ]
+      : [
+          { label: "Age: 18-29", image: male1829 },
+          { label: "Age: 30-39", image: male3039 },
+          { label: "Age: 40-49", image: male4049 },
+          { label: "Age: 50+", image: male50 },
+        ];
+
+  const yourGoal =
+    selectedGender === "Female"
+      ? [
+          { label: "Lose Weight", image: femaleLoseWeight },
+          { label: "Gain Muscle Mass", image: femaleGainMuscle },
+          { label: "Get Shredded", image: femaleGetShredded },
+        ]
+      : [
+          { label: "Lose Weight", image: maleLoseWeight },
+          { label: "Gain Muscle Mass", image: maleGainMuscle },
+          { label: "Get Shredded", image: maleGetShredded },
+        ];
+
+  const selectedLoseWeight =
+    selectedGender === "Female"
+      ? [
+          {
+            label: "Slim Body",
+            image:
+              "https://madmuscles.com/_next/image?url=%2F_next%2Fstatic%2Fassets%2FaJuJ2fVCrgIDArhVE-ubV%2Fimages%2Fbody-muscles%2FSLIM_BODY.png&w=256&q=55",
+          },
+          {
+            label: "Slim,Shredded Body",
+            image:
+              "https://madmuscles.com/_next/image?url=%2F_next%2Fstatic%2Fassets%2FaJuJ2fVCrgIDArhVE-ubV%2Fimages%2Fbody-muscles%2FSLIM_SHREDDED_BODY.png&w=256&q=55",
+          },
+        ]
+      : [
+          {
+            label: "Slim Body",
+            image:
+              "https://madmuscles.com/_next/image?url=%2F_next%2Fstatic%2Fassets%2FaJuJ2fVCrgIDArhVE-ubV%2Fimages%2Fbody-muscles%2FSLIM_BODY.png&w=256&q=55",
+          },
+          {
+            label: "Slim,Shredded Body",
+            image:
+              "https://madmuscles.com/_next/image?url=%2F_next%2Fstatic%2Fassets%2FaJuJ2fVCrgIDArhVE-ubV%2Fimages%2Fbody-muscles%2FSLIM_SHREDDED_BODY.png&w=256&q=55",
+          },
+        ];
+
+  const selectedGainMuscle =
+    selectedGender === "Female"
+      ? [
+          {
+            label: "Athlete",
+            image:
+              "https://madmuscles.com/_next/image?url=%2F_next%2Fstatic%2Fassets%2FaJuJ2fVCrgIDArhVE-ubV%2Fimages%2Fbody-muscles%2FATHLETE.png&w=256&q=55",
+          },
+          {
+            label: "Hero",
+            image:
+              "https://madmuscles.com/_next/image?url=%2F_next%2Fstatic%2Fassets%2FaJuJ2fVCrgIDArhVE-ubV%2Fimages%2Fbody-muscles%2FHERO.png&w=256&q=55",
+          },
+          {
+            label: "BodyBuilder",
+            image:
+              "https://madmuscles.com/_next/image?url=%2F_next%2Fstatic%2Fassets%2FaJuJ2fVCrgIDArhVE-ubV%2Fimages%2Fbody-muscles%2FBODYBUILDER.png&w=256&q=55",
+          },
+        ]
+      : [
+          {
+            label: "Athlete",
+            image:
+              "https://madmuscles.com/_next/image?url=%2F_next%2Fstatic%2Fassets%2FaJuJ2fVCrgIDArhVE-ubV%2Fimages%2Fbody-muscles%2FATHLETE.png&w=256&q=55",
+          },
+          {
+            label: "Hero",
+            image:
+              "https://madmuscles.com/_next/image?url=%2F_next%2Fstatic%2Fassets%2FaJuJ2fVCrgIDArhVE-ubV%2Fimages%2Fbody-muscles%2FHERO.png&w=256&q=55",
+          },
+          {
+            label: "BodyBuilder",
+            image:
+              "https://madmuscles.com/_next/image?url=%2F_next%2Fstatic%2Fassets%2FaJuJ2fVCrgIDArhVE-ubV%2Fimages%2Fbody-muscles%2FBODYBUILDER.png&w=256&q=55",
+          },
+        ];
+
+  const selectedGetShredded =
+    selectedGender === "Female"
+      ? [
+          {
+            label: "Beach Body",
+            image:
+              "https://madmuscles.com/_next/image?url=%2F_next%2Fstatic%2Fassets%2FaJuJ2fVCrgIDArhVE-ubV%2Fimages%2Fbody-muscles%2FBEACH_BODY.png&w=256&q=55",
+          },
+          {
+            label: "Workout Body",
+            image:
+              "https://madmuscles.com/_next/image?url=%2F_next%2Fstatic%2Fassets%2FaJuJ2fVCrgIDArhVE-ubV%2Fimages%2Fbody-muscles%2FWORKOUT_BODY.png&w=256&q=55",
+          },
+          {
+            label: "CrossFit Body",
+            image:
+              "https://madmuscles.com/_next/image?url=%2F_next%2Fstatic%2Fassets%2FaJuJ2fVCrgIDArhVE-ubV%2Fimages%2Fbody-muscles%2FCROSS_FIT_BODY.png&w=256&q=55",
+          },
+        ]
+      : [
+          {
+            label: "Beach Body",
+            image:
+              "https://madmuscles.com/_next/image?url=%2F_next%2Fstatic%2Fassets%2FaJuJ2fVCrgIDArhVE-ubV%2Fimages%2Fbody-muscles%2FBEACH_BODY.png&w=256&q=55",
+          },
+          {
+            label: "Workout Body",
+            image:
+              "https://madmuscles.com/_next/image?url=%2F_next%2Fstatic%2Fassets%2FaJuJ2fVCrgIDArhVE-ubV%2Fimages%2Fbody-muscles%2FWORKOUT_BODY.png&w=256&q=55",
+          },
+          {
+            label: "CrossFit Body",
+            image:
+              "https://madmuscles.com/_next/image?url=%2F_next%2Fstatic%2Fassets%2FaJuJ2fVCrgIDArhVE-ubV%2Fimages%2Fbody-muscles%2FCROSS_FIT_BODY.png&w=256&q=55",
+          },
+        ];
+
   useEffect(() => {
     console.log("Store State:", store);
   }, [
+    store.selectedGender,
     store.selectedBodyType,
     store.selectedAgeGroup,
     store.selectedHeight,
@@ -129,6 +199,20 @@ export default function CreateAccount() {
 
   return (
     <Routes>
+      <Route
+        path="gender"
+        element={
+          <DynamicSelection
+            title="Choose your gender"
+            description="Select your gender"
+            data={gender}
+            linkPrefix="/create-account/gender"
+            nextLink="/create-account/age-selection"
+            prevLink="/"
+            imageHeight={30}
+          />
+        }
+      />
       <Route
         path="body-type"
         element={
@@ -151,7 +235,7 @@ export default function CreateAccount() {
             description="Choose the age range that fits you best"
             data={ageGroups}
             linkPrefix="/create-account/age-selection"
-            prevLink="/"
+            prevLink="/create-account/gender"
             nextLink="/create-account/height"
           />
         }

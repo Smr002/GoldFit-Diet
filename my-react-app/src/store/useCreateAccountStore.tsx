@@ -1,6 +1,7 @@
 import { create } from "zustand";
 
 export const useCreateAccountStore = create((set) => ({
+  selectedGender: null,
   selectedBodyType: null,
   selectedAgeGroup: null,
   selectedHeight: null,
@@ -11,15 +12,18 @@ export const useCreateAccountStore = create((set) => ({
   selectedGainMuscle: null,
   selectedGetShredded: null,
   workoutFrequency: 3,
-  
+  setGender: (gender) => set({ selectedGender: gender }),
   setBodyType: (bodyType) => set({ selectedBodyType: bodyType }),
   setAgeGroup: (ageGroup) => set({ selectedAgeGroup: ageGroup }),
   setHeight: (height) => set({ selectedHeight: height }),
   setWeight: (weight) => set({ selectedWeight: weight }),
   setGoal: (goal) => set({ selectedGoal: goal }),
+  setLoseWeight: (loseWeight) => set({ selectedLoseWeight: loseWeight }),
+  setGainMuscle: (gainMuscle) => set({ selectedGainMuscle: gainMuscle }),
+  setGetShredded: (getShredded) => set({ selectedGetShredded: getShredded }),
   setBodyYouWant: (bodyYouWant) => set({ selectedBodyYouWant: bodyYouWant }),
   setWorkoutFrequency: (frequency) => set({ workoutFrequency: frequency }),
-  
+
   reset: () =>
     set({
       selectedBodyType: null,

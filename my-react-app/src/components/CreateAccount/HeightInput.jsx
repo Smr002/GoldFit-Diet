@@ -14,22 +14,29 @@ import { useCreateAccountStore } from "@/store/useCreateAccountStore";
 // Import all your images
 import male1829 from "../../assets/male_18_29.png";
 import male3039 from "../../assets/male_30_39.png";
+import male4049 from "../../assets/male_40_49.png";
 import male50 from "../../assets/male_50.png";
+import female1829 from "../../assets/female_18_29.png";
+import female3039 from "../../assets/female_30_39.png";
+import female4049 from "../../assets/female_40_49.png";
+import female50 from "../../assets/female_50.png";
 
 export default function HeightInput({ type, prevLink, nextLink }) {
   const navigate = useNavigate();
-  const { setHeight, getAge } = useCreateAccountStore();
-
+  const { setHeight } = useCreateAccountStore();
+  const selectedGender =
+    useCreateAccountStore((state) => state.selectedGender) || "Male";
   const selectedAgeGroup =
     useCreateAccountStore((state) => state.selectedAgeGroup) || "Age: 30-39";
 
   const ageGroupImages = {
-    "Age: 18-29": male1829,
-    "Age: 30-39": male3039,
-    "Age: 50+": male50,
+    "Age: 18-29": selectedGender === "Female" ? female1829 : male1829,
+    "Age: 30-39": selectedGender === "Female" ? female3039 : male3039,
+    "Age: 40-49": selectedGender === "Female" ? female4049 : male4049,
+    "Age: 50+": selectedGender === "Female" ? female50 : male50,
   };
 
-  const maleImage = ageGroupImages[selectedAgeGroup] || male3039;
+  const imagePath = ageGroupImages[selectedAgeGroup] || male3039;
 
   // State for height and unit toggle
   const [value, setValue] = useState(170);
@@ -39,7 +46,6 @@ export default function HeightInput({ type, prevLink, nextLink }) {
   const cmToFt = (cm) => (cm / 30.48).toFixed(1);
   const ftToCm = (ft) => Math.round(ft * 30.48);
 
-  // Handle unit toggle for height (cm <-> ft)
   const toggleUnit = () => {
     if (unit === "cm") {
       setUnit("ft");
@@ -260,7 +266,7 @@ export default function HeightInput({ type, prevLink, nextLink }) {
 
               <Box
                 component="img"
-                src={maleImage}
+                src={imagePath}
                 alt={`Male ${selectedAgeGroup}`}
                 sx={{
                   height: { xs: 280, md: 360 },

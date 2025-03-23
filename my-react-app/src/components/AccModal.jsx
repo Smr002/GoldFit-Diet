@@ -50,9 +50,13 @@ export default function AccModal({ open, onClose }) {
   const primaryColor = isDarkMode ? "#ffd700" : "#6c63ff"; // Gold in dark mode, purple in light
   const backgroundColor = isDarkMode ? "#121212" : "#ffffff";
   const textPrimaryColor = isDarkMode ? "#ffffff" : "#000000";
-  const textSecondaryColor = isDarkMode ? "rgba(255, 255, 255, 0.7)" : "rgba(0, 0, 0, 0.6)";
-  const dividerColor = isDarkMode ? "rgba(255, 255, 255, 0.12)" : "rgba(0, 0, 0, 0.12)";
-  const gradientColor = isDarkMode 
+  const textSecondaryColor = isDarkMode
+    ? "rgba(255, 255, 255, 0.7)"
+    : "rgba(0, 0, 0, 0.6)";
+  const dividerColor = isDarkMode
+    ? "rgba(255, 255, 255, 0.12)"
+    : "rgba(0, 0, 0, 0.12)";
+  const gradientColor = isDarkMode
     ? "linear-gradient(90deg, #ffd700, #ffb700)" // Gold gradient for dark mode
     : "linear-gradient(90deg, #6c63ff, #4834d4)"; // Purple gradient for light mode
 
@@ -92,7 +96,11 @@ export default function AccModal({ open, onClose }) {
         </DialogTitle>
         <DialogContent sx={{ textAlign: "center" }}>
           <DialogContentText
-            sx={{ marginBottom: 3, fontSize: "1rem", color: textSecondaryColor }}
+            sx={{
+              marginBottom: 3,
+              fontSize: "1rem",
+              color: textSecondaryColor,
+            }}
           >
             Sign in or create an account to continue
           </DialogContentText>
@@ -120,11 +128,13 @@ export default function AccModal({ open, onClose }) {
             placeholder="henry@example.com"
             value={email}
             onChange={(e) => setEmail(e.target.value)}
-            sx={{ 
+            sx={{
               marginBottom: 2,
               "& .MuiOutlinedInput-root": {
                 "& fieldset": {
-                  borderColor: isDarkMode ? "rgba(255, 255, 255, 0.23)" : "rgba(0, 0, 0, 0.23)",
+                  borderColor: isDarkMode
+                    ? "rgba(255, 255, 255, 0.23)"
+                    : "rgba(0, 0, 0, 0.23)",
                 },
                 "&:hover fieldset": {
                   borderColor: primaryColor,
@@ -157,11 +167,13 @@ export default function AccModal({ open, onClose }) {
                 variant="outlined"
                 type="password"
                 placeholder="Enter your password"
-                sx={{ 
+                sx={{
                   marginBottom: 2,
                   "& .MuiOutlinedInput-root": {
                     "& fieldset": {
-                      borderColor: isDarkMode ? "rgba(255, 255, 255, 0.23)" : "rgba(0, 0, 0, 0.23)",
+                      borderColor: isDarkMode
+                        ? "rgba(255, 255, 255, 0.23)"
+                        : "rgba(0, 0, 0, 0.23)",
                     },
                     "&:hover fieldset": {
                       borderColor: primaryColor,
@@ -186,7 +198,7 @@ export default function AccModal({ open, onClose }) {
 
           <Divider sx={{ marginY: 2, bgcolor: dividerColor }}>or</Divider>
           <Link
-            href="/create-account/age-selection"
+            href="/create-account/gender"
             style={{ textDecoration: "none" }}
           >
             <Button

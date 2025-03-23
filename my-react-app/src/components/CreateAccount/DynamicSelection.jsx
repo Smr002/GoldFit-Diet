@@ -23,7 +23,15 @@ export default function DynamicSelection({
 }) {
   const navigate = useNavigate();
 
-  const { setBodyType, setAgeGroup, setHeight, setWeight, setGoal, setBodyYouWant } = useCreateAccountStore();
+  const {
+    setBodyType,
+    setAgeGroup,
+    setHeight,
+    setWeight,
+    setGoal,
+    setBodyYouWant,
+    setGender,
+  } = useCreateAccountStore();
 
   const handleSelect = (itemLabel) => {
     if (linkPrefix.includes("body-type")) {
@@ -38,6 +46,8 @@ export default function DynamicSelection({
       setGoal(itemLabel);
     } else if (linkPrefix.includes("body-you-want")) {
       setBodyYouWant(itemLabel);
+    } else if (linkPrefix.includes("gender")) {
+      setGender(itemLabel);
     }
 
     navigate(nextLink || `${linkPrefix}/${itemLabel.toLowerCase()}`);
