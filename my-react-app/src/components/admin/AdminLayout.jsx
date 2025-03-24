@@ -2,12 +2,13 @@ import React, { useState } from 'react';
 import { Outlet } from 'react-router-dom';
 import Sidebar from './Sidebar';
 import Header from './Header';
+import 'admin.css';
 
 const AdminLayout = ({ isSuperAdmin = false }) => {
   const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
 
   return (
-    <div className="flex h-screen bg-fitness-light-bg overflow-hidden">
+    <div className="admin-layout">
       {/* Sidebar Component */}
       <Sidebar 
         isSuperAdmin={isSuperAdmin} 
@@ -16,7 +17,7 @@ const AdminLayout = ({ isSuperAdmin = false }) => {
       />
       
       {/* Main Content Area */}
-      <div className="flex flex-col flex-1 overflow-hidden">
+      <div className="admin-main-container">
         {/* Header */}
         <Header 
           username={isSuperAdmin ? "Super Admin" : "Admin"} 
@@ -24,7 +25,7 @@ const AdminLayout = ({ isSuperAdmin = false }) => {
         />
 
         {/* Page Content */}
-        <main className="flex-1 overflow-y-auto p-6" aria-label="Admin Content">
+        <main className="admin-content" aria-label="Admin Content">
           <Outlet />
         </main>
       </div>

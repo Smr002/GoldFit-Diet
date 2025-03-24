@@ -1,4 +1,6 @@
 import React, { useState } from 'react';
+import { Plus, Bell, Calendar, RefreshCw } from 'lucide-react';
+import StatCard from '../../components/admin/StatCard';
 
 const NotificationManagement = () => {
   const [filterOpen, setFilterOpen] = useState(false);
@@ -62,105 +64,150 @@ const NotificationManagement = () => {
   ];
 
   return (
-    <div className="space-y-6">
-      <div className="flex justify-between items-center mb-6">
-        <h1 className="text-2xl font-bold">Notification Management</h1>
-        <div className="flex space-x-4">
-          <button className="admin-button-primary flex items-center space-x-2">
-            {/* Plus Icon */}
-            <svg
-              xmlns="http://www.w3.org/2000/svg"
-              width="18"
-              height="18"
-              viewBox="0 0 24 24"
-              fill="none"
-              stroke="currentColor"
-              strokeWidth="2"
-              strokeLinecap="round"
-              strokeLinejoin="round"
-            >
-              <line x1="12" y1="5" x2="12" y2="19"></line>
-              <line x1="5" y1="12" x2="19" y2="12"></line>
-            </svg>
-            <span>Create Notification</span>
-          </button>
+    <div className="admin-page">
+      <div className="admin-page-header">
+        <h1 className="admin-page-title">Notification Management</h1>
+        <button className="admin-btn admin-btn-primary">
+          <Plus size={18} />
+          <span>Create Notification</span>
+        </button>
+      </div>
+
+      <div className="admin-stats-grid">
+        <div className="admin-stat-card">
+          <div className="admin-stat-content">
+            <div className="admin-stat-icon">
+              <Bell size={24} />
+            </div>
+            <div className="admin-stat-info">
+              <p className="admin-stat-label">Total Sent</p>
+              <h3 className="admin-stat-value">1,348</h3>
+            </div>
+          </div>
+        </div>
+
+        <div className="admin-stat-card">
+          <div className="admin-stat-content">
+            <div className="admin-stat-icon">
+              <Calendar size={24} />
+            </div>
+            <div className="admin-stat-info">
+              <p className="admin-stat-label">This Month</p>
+              <h3 className="admin-stat-value">287</h3>
+            </div>
+          </div>
+        </div>
+
+        <div className="admin-stat-card">
+          <div className="admin-stat-content">
+            <div className="admin-stat-icon">
+              <RefreshCw size={24} />
+            </div>
+            <div className="admin-stat-info">
+              <p className="admin-stat-label">Automated Active</p>
+              <h3 className="admin-stat-value">5</h3>
+            </div>
+          </div>
         </div>
       </div>
 
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-6">
-        <div className="admin-card flex items-center">
-          <div className="bg-fitness-purple/10 p-3 rounded-full mr-4">
-            {/* Bell Icon */}
-            <svg
-              xmlns="http://www.w3.org/2000/svg"
-              width="24"
-              height="24"
-              viewBox="0 0 24 24"
-              fill="none"
-              stroke="currentColor"
-              strokeWidth="2"
-              strokeLinecap="round"
-              strokeLinejoin="round"
-            >
-              <path d="M18 8a6 6 0 0 0-12 0c0 7-3 9-3 9h18s-3-2-3-9"></path>
-              <path d="M13.73 21a2 2 0 0 1-3.46 0"></path>
-            </svg>
-          </div>
-          <div>
-            <p className="text-gray-500 text-sm">Total Sent</p>
-            <h3 className="text-2xl font-bold">1,348</h3>
-          </div>
+      <div className="admin-card">
+        <div className="admin-tabs">
+          <button 
+            className={`admin-tab ${activeTab === 'manual' ? 'active' : ''}`}
+            onClick={() => setActiveTab('manual')}
+          >
+            Manual Notifications
+          </button>
+          <button 
+            className={`admin-tab ${activeTab === 'automated' ? 'active' : ''}`}
+            onClick={() => setActiveTab('automated')}
+          >
+            Automated Rules
+          </button>
         </div>
-        <div className="admin-card flex items-center">
-          <div className="bg-fitness-purple/10 p-3 rounded-full mr-4">
-            {/* Calendar Icon */}
-            <svg
-              xmlns="http://www.w3.org/2000/svg"
-              width="24"
-              height="24"
-              viewBox="0 0 24 24"
-              fill="none"
-              stroke="currentColor"
-              strokeWidth="2"
-              strokeLinecap="round"
-              strokeLinejoin="round"
-            >
-              <rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect>
-              <line x1="16" y1="2" x2="16" y2="6"></line>
-              <line x1="8" y1="2" x2="8" y2="6"></line>
-              <line x1="3" y1="10" x2="21" y2="10"></line>
-            </svg>
+
+        {activeTab === 'manual' ? (
+          <div className="admin-table-container">
+            <table className="admin-table">
+              <thead>
+                <tr>
+                  <th>Title</th>
+                  <th>Sent To</th>
+                  <th>Date</th>
+                  <th>Status</th>
+                  <th>Reads</th>
+                  <th>Actions</th>
+                </tr>
+              </thead>
+              <tbody>
+                {mockNotifications.map((notification) => (
+                  <tr key={notification.id}>
+                    <td>
+                      <div className="admin-notification-title">
+                        <h4>{notification.title}</h4>
+                        <p>{notification.message}</p>
+                      </div>
+                    </td>
+                    <td>{notification.sentTo}</td>
+                    <td>{notification.sentDate}</td>
+                    <td>
+                      <span className="admin-badge admin-badge-success">
+                        {notification.status}
+                      </span>
+                    </td>
+                    <td>{notification.reads}</td>
+                    <td>
+                      <div className="admin-actions">
+                        <button className="admin-action-btn">View</button>
+                      </div>
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
           </div>
-          <div>
-            <p className="text-gray-500 text-sm">This Month</p>
-            <h3 className="text-2xl font-bold">287</h3>
+        ) : (
+          <div className="admin-table-container">
+            <table className="admin-table">
+              <thead>
+                <tr>
+                  <th>Title</th>
+                  <th>Trigger</th>
+                  <th>Status</th>
+                  <th>Last Updated</th>
+                  <th>Actions</th>
+                </tr>
+              </thead>
+              <tbody>
+                {mockAutomated.map((rule) => (
+                  <tr key={rule.id}>
+                    <td>
+                      <div className="admin-notification-title">
+                        <h4>{rule.title}</h4>
+                        <p>{rule.message}</p>
+                      </div>
+                    </td>
+                    <td>{rule.trigger}</td>
+                    <td>
+                      <span className={`admin-badge ${
+                        rule.status === 'Active' ? 'admin-badge-success' : 'admin-badge-warning'
+                      }`}>
+                        {rule.status}
+                      </span>
+                    </td>
+                    <td>{rule.lastUpdated}</td>
+                    <td>
+                      <div className="admin-actions">
+                        <button className="admin-action-btn">Edit</button>
+                      </div>
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
           </div>
-        </div>
-        <div className="admin-card flex items-center">
-          <div className="bg-fitness-purple/10 p-3 rounded-full mr-4">
-            {/* Repeat Icon */}
-            <svg
-              xmlns="http://www.w3.org/2000/svg"
-              width="24"
-              height="24"
-              viewBox="0 0 24 24"
-              fill="none"
-              stroke="currentColor"
-              strokeWidth="2"
-              strokeLinecap="round"
-              strokeLinejoin="round"
-            >
-              <polyline points="17 1 21 5 17 9"></polyline>
-              <path d="M3 11V9a4 4 0 0 1 4-4h14"></path>
-              <polyline points="7 23 3 19 7 15"></polyline>
-              <path d="M21 13v2a4 4 0 0 1-4 4H3"></path>
-            </svg>
-          </div>
-          <div>
-            <p className="text-gray-500 text-sm">Automated Active</p>
-            <h3 className="text-2xl font-bold">5</h3>
-          </div>
-        </div>
+        )}
       </div>
     </div>
   );

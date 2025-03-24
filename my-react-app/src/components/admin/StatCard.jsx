@@ -1,22 +1,22 @@
-
 import React from 'react';
+import 'admin.css';
 
 const StatCard = ({ title, value, icon, change, changeType = 'increase' }) => {
   return (
-    <div className="admin-card animate-fade-in">
-      <div className="flex items-start justify-between">
-        <div>
-          <h3 className="text-gray-500 text-sm font-medium mb-1">{title}</h3>
-          <p className="text-2xl font-bold">{value}</p>
+    <div className="admin-stat-card">
+      <div className="admin-stat-content">
+        <div className="admin-stat-info">
+          <h3 className="admin-stat-title">{title}</h3>
+          <p className="admin-stat-value">{value}</p>
           
           {change && (
-            <div className={`flex items-center mt-2 ${changeType === 'increase' ? 'text-green-500' : 'text-red-500'}`}>
-              <span className="text-xs font-medium">{change}</span>
+            <div className={`admin-stat-change ${changeType === 'increase' ? 'increase' : 'decrease'}`}>
+              <span>{change}</span>
             </div>
           )}
         </div>
         
-        <div className="bg-fitness-purple/10 p-3 rounded-full">
+        <div className="admin-stat-icon">
           {icon}
         </div>
       </div>

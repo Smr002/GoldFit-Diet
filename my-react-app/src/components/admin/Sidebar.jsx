@@ -4,6 +4,7 @@ import {
   Users, Dumbbell, Bell, MessageSquare, UserPlus, 
   Settings, Home, LogOut, ChevronLeft, ChevronRight
 } from 'lucide-react';
+import 'admin.css';
 
 const Sidebar = ({ isSuperAdmin, collapsed, toggleCollapse }) => {
   const location = useLocation();
@@ -38,7 +39,6 @@ const Sidebar = ({ isSuperAdmin, collapsed, toggleCollapse }) => {
     }
   ];
   
-  // Super admin only menu items
   const superAdminItems = [
     { 
       path: '/admin/admin-management', 
@@ -53,13 +53,13 @@ const Sidebar = ({ isSuperAdmin, collapsed, toggleCollapse }) => {
   ];
 
   return (
-    <div className={`h-screen bg-purple-900 flex flex-col transition-all duration-300 ease-in-out ${collapsed ? 'w-20' : 'w-64'} shadow-lg`}>
-      <div className="flex items-center justify-between p-4 border-b border-white/10">
+    <div className={`admin-sidebar ${collapsed ? 'collapsed' : ''}`}>
+      <div className="admin-sidebar-header">
         {!collapsed && (
-          <div className="text-white font-bold text-xl">Fitness Admin</div>
+          <span className="admin-sidebar-logo">Fitness Admin</span>
         )}
         <button 
-          className="text-white/80 hover:text-white transition-colors p-2 rounded-full hover:bg-white/10"
+          className="admin-sidebar-toggle"
           onClick={toggleCollapse}
           aria-label={collapsed ? "Expand sidebar" : "Collapse sidebar"}
         >
@@ -67,56 +67,46 @@ const Sidebar = ({ isSuperAdmin, collapsed, toggleCollapse }) => {
         </button>
       </div>
       
-      <div className="flex-1 overflow-y-auto py-4 px-3">
-        <nav className="space-y-1">
-          {menuItems.map((item) => (
-            <Link
-              key={item.path}
-              to={item.path}
-              className={`flex items-center text-white/80 hover:text-white px-4 py-3 rounded-lg transition-colors ${
-                isActive(item.path) 
-                  ? 'bg-purple-700 text-white font-medium' 
-                  : 'hover:bg-purple-800'
-              } ${collapsed ? 'justify-center' : 'space-x-3'}`}
-            >
-              <item.icon size={collapsed ? 24 : 20} />
-              {!collapsed && <span className="truncate">{item.name}</span>}
-            </Link>
-          ))}
-          
-          {isSuperAdmin && (
-            <>
-              {!collapsed && (
-                <div className="text-white/60 uppercase text-xs font-semibold mt-6 mb-2 px-4">
-                  Super Admin
-                </div>
-              )}
-              {superAdminItems.map((item) => (
-                <Link
-                  key={item.path}
-                  to={item.path}
-                  className={`flex items-center text-white/80 hover:text-white px-4 py-3 rounded-lg transition-colors ${
-                    isActive(item.path) 
-                      ? 'bg-purple-700 text-white font-medium' 
-                      : 'hover:bg-purple-800'
-                  } ${collapsed ? 'justify-center' : 'space-x-3'}`}
-                >
-                  <item.icon size={collapsed ? 24 : 20} />
-                  {!collapsed && <span className="truncate">{item.name}</span>}
-                </Link>
-              ))}
-            </>
-          )}
-        </nav>
-      </div>
+      <nav className="admin-flex-1">
+        {menuItems.map((item) => (
+          <Link
+            key={item.path}
+            to={item.path}
+            className={`admin-nav-item ${isActive(item.path) ? 'active' : ''}`}
+          >
+            <item.icon className="admin-nav-icon" size={collapsed ? 24 : 20} />
+            {!collapsed && <span>{item.name}</span>}
+          </Link>
+        ))}
+        
+        {isSuperAdmin && (
+          <>
+            {!collapsed && (
+              <div className="admin-nav-section-title">
+                Super Admin
+              </div>
+            )}
+            {superAdminItems.map((item) => (
+              <Link
+                key={item.path}
+                to={item.path}
+                className={`admin-nav-item ${isActive(item.path) ? 'active' : ''}`}
+              >
+                <item.icon className="admin-nav-icon" size={collapsed ? 24 : 20} />
+                {!collapsed && <span>{item.name}</span>}
+              </Link>
+            ))}
+          </>
+        )}
+      </nav>
       
-      <div className="p-4 border-t border-white/10">
+      <div className="admin-sidebar-footer">
         <Link 
           to="/logout" 
-          className={`flex items-center text-white/80 hover:text-white px-4 py-3 rounded-lg transition-colors hover:bg-purple-800 ${collapsed ? 'justify-center' : 'space-x-3'}`}
+          className="admin-nav-item"
         >
-          <LogOut size={collapsed ? 24 : 20} />
-          {!collapsed && <span className="truncate">Logout</span>}
+          <LogOut className="admin-nav-icon" size={collapsed ? 24 : 20} />
+          {!collapsed && <span>Logout</span>}
         </Link>
       </div>
     </div>
