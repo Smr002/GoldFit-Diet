@@ -400,7 +400,7 @@ export default function WeightInput({ prevLink, nextLink }) {
           --secondary-color: #4834d4;
           --shadow-color: rgba(108, 99, 255, 0.5);
           --shadow-color-light: rgba(108, 99, 255, 0.3);
-          --background-color: #121212;
+          --background-color: #ffffff;
         }
 
         .dark-mode {
@@ -417,6 +417,31 @@ export default function WeightInput({ prevLink, nextLink }) {
           align-items: center;
           min-height: 100vh;
           background-color: var(--background-color);
+          position: relative;
+          color: #fff;
+          padding: 5px;
+          transition: background-color 0.3s ease;
+        }
+
+        .weightInput::before {
+          content: "";
+          position: absolute;
+          top: 0;
+          left: 0;
+          right: 0;
+          bottom: 0;
+          z-index: 0;
+          opacity: 0.03;
+          background-image: 
+            linear-gradient(45deg, #f0f0f0 25%, transparent 25%),
+            linear-gradient(-45deg, #f0f0f0 25%, transparent 25%),
+            linear-gradient(45deg, transparent 75%, #f0f0f0 75%),
+            linear-gradient(-45deg, transparent 75%, #f0f0f0 75%);
+          background-size: 20px 20px;
+          background-position: 0 0, 0 10px, 10px -10px, -10px 0px;
+        }
+
+        .dark-mode .weightInput {
           background-image: radial-gradient(
               circle at top right,
               var(--primary-color) 0%,
@@ -427,9 +452,10 @@ export default function WeightInput({ prevLink, nextLink }) {
               var(--primary-color) 0%,
               transparent 50%
             );
-          color: #fff;
-          padding: 5px;
-          transition: background-color 0.3s ease;
+        }
+
+        .dark-mode .weightInput::before {
+          display: none;
         }
       `}</style>
     </div>

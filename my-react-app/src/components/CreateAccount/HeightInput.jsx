@@ -20,6 +20,7 @@ import female1829 from "../../assets/female_18_29.png";
 import female3039 from "../../assets/female_30_39.png";
 import female4049 from "../../assets/female_40_49.png";
 import female50 from "../../assets/female_50.png";
+import ThemeToggle from "../ThemeToggle";
 
 export default function HeightInput({ type, prevLink, nextLink }) {
   const navigate = useNavigate();
@@ -89,12 +90,12 @@ export default function HeightInput({ type, prevLink, nextLink }) {
     <Box
       sx={{
         minHeight: "100vh",
-        background: "linear-gradient(135deg, #f0f0f0, #e0e0e0)",
         display: "flex",
         alignItems: "center",
         justifyContent: "center",
         py: 4,
       }}
+      className="height-input-container"
     >
       <Container maxWidth="md">
         <Paper
@@ -102,10 +103,10 @@ export default function HeightInput({ type, prevLink, nextLink }) {
           sx={{
             p: { xs: 3, md: 4 },
             borderRadius: 4,
-            backgroundColor: "rgba(0, 0, 0, 0.6)",
+            backgroundColor: "var(--card-bg)",
             backdropFilter: "blur(8px)",
-            boxShadow: "0 8px 32px rgba(0, 0, 0, 0.3)",
-            border: "1px solid rgba(255, 255, 255, 0.2)",
+            boxShadow: "0 8px 32px rgba(0, 0, 0, 0.2)",
+            border: "1px solid var(--border-color)",
           }}
         >
           <Typography
@@ -113,9 +114,7 @@ export default function HeightInput({ type, prevLink, nextLink }) {
             fontWeight="bold"
             sx={{
               textAlign: "center",
-              background: "linear-gradient(90deg, #ffffff, #dcdcdc)",
-              WebkitBackgroundClip: "text",
-              WebkitTextFillColor: "transparent",
+              color: "var(--text-primary)",
               letterSpacing: 1,
               mb: 3,
             }}
@@ -131,12 +130,17 @@ export default function HeightInput({ type, prevLink, nextLink }) {
                   borderRadius: "20px 0 0 20px",
                   px: 3,
                   bgcolor:
-                    unit === "cm" ? "rgba(108, 99, 255, 0.2)" : "transparent",
-                  borderColor: "#6c63ff",
-                  color: "#fff",
+                    unit === "cm" ? "var(--primary-color)" : "transparent",
+                  borderColor: "var(--primary-color)",
+                  color: unit === "cm" ? "#fff" : "var(--primary-color)",
                   fontWeight: "bold",
                   letterSpacing: "0.5px",
-                  "&:hover": { bgcolor: "rgba(108, 99, 255, 0.3)" },
+                  "&:hover": {
+                    bgcolor:
+                      unit === "cm"
+                        ? "var(--primary-hover)"
+                        : "rgba(255, 255, 255, 0.1)",
+                  },
                 }}
                 variant={unit === "cm" ? "contained" : "outlined"}
                 onClick={() => setUnit("cm")}
@@ -148,12 +152,17 @@ export default function HeightInput({ type, prevLink, nextLink }) {
                   borderRadius: "0 20px 20px 0",
                   px: 3,
                   bgcolor:
-                    unit === "ft" ? "rgba(108, 99, 255, 0.2)" : "transparent",
-                  borderColor: "#6c63ff",
-                  color: "#fff",
+                    unit === "ft" ? "var(--primary-color)" : "transparent",
+                  borderColor: "var(--primary-color)",
+                  color: unit === "ft" ? "#fff" : "var(--primary-color)",
                   fontWeight: "bold",
                   letterSpacing: "0.5px",
-                  "&:hover": { bgcolor: "rgba(108, 99, 255, 0.3)" },
+                  "&:hover": {
+                    bgcolor:
+                      unit === "ft"
+                        ? "var(--primary-hover)"
+                        : "rgba(108, 99, 255, 0.1)",
+                  },
                 }}
                 variant={unit === "ft" ? "contained" : "outlined"}
                 onClick={() => setUnit("ft")}
@@ -189,7 +198,7 @@ export default function HeightInput({ type, prevLink, nextLink }) {
                   transform: "translateX(-50%)",
                   height: "100%",
                   width: 6,
-                  bgcolor: "#333",
+                  bgcolor: "var(--slider-rail)",
                   borderRadius: 3,
                 }}
               />
@@ -203,19 +212,26 @@ export default function HeightInput({ type, prevLink, nextLink }) {
                 sx={{
                   height: { xs: 200, md: 300 },
                   "& .MuiSlider-track": {
-                    background: "linear-gradient(0deg, #6c63ff, #4834d4)",
+                    background:
+                      "linear-gradient(0deg, var(--primary-color), var(--secondary-color))",
                     border: "none",
                   },
                   "& .MuiSlider-rail": {
-                    background: "transparent",
+                    background: "var(--slider-rail-light)", // Light theme variable
+                    opacity: 0.6,
+                    "@media (prefers-color-scheme: dark)": {
+                      background: "var(--slider-rail-dark)", // Dark theme variable
+                      opacity: 0.8,
+                    },
                   },
+
                   "& .MuiSlider-thumb": {
                     width: 24,
                     height: 24,
-                    background: "#ff5722",
-                    boxShadow: "0 2px 8px rgba(0, 0, 0, 0.5)",
+                    background: "var(--accent-color)",
+                    boxShadow: "0 2px 8px rgba(0, 0, 0, 0.3)",
                     "&:focus, &:hover, &.Mui-active, &.Mui-focusVisible": {
-                      boxShadow: "0 0 0 8px rgba(255, 87, 34, 0.2)",
+                      boxShadow: "0 0 0 8px var(--accent-color-light)",
                     },
                     "&:before": {
                       display: "none",
@@ -228,7 +244,7 @@ export default function HeightInput({ type, prevLink, nextLink }) {
                   position: "absolute",
                   bottom: 0,
                   left: "calc(50% + 15px)",
-                  color: "#aaa",
+                  color: "var(--text-secondary)",
                   transform: "translateX(-50%)",
                   fontSize: 14,
                 }}
@@ -240,7 +256,7 @@ export default function HeightInput({ type, prevLink, nextLink }) {
                   position: "absolute",
                   top: 0,
                   left: "calc(50% + 15px)",
-                  color: "#aaa",
+                  color: "var(--text-secondary)",
                   transform: "translateX(-50%)",
                   fontSize: 14,
                 }}
@@ -255,9 +271,9 @@ export default function HeightInput({ type, prevLink, nextLink }) {
                 variant="h2"
                 fontWeight="bold"
                 sx={{
-                  color: "#fff",
+                  color: "var(--text-primary)",
                   mb: 2,
-                  textShadow: "0 2px 6px rgba(0,0,0,0.3)",
+                  textShadow: "0 2px 6px rgba(0,0,0,0.1)",
                   letterSpacing: "1px",
                 }}
               >
@@ -267,12 +283,12 @@ export default function HeightInput({ type, prevLink, nextLink }) {
               <Box
                 component="img"
                 src={imagePath}
-                alt={`Male ${selectedAgeGroup}`}
+                alt={`${selectedGender} ${selectedAgeGroup}`}
                 sx={{
                   height: { xs: 280, md: 360 },
                   position: "relative",
                   zIndex: 1,
-                  filter: "drop-shadow(0 10px 10px rgba(0,0,0,0.4))",
+                  filter: "drop-shadow(0 10px 10px rgba(0,0,0,0.2))",
                 }}
               />
             </Box>
@@ -285,7 +301,8 @@ export default function HeightInput({ type, prevLink, nextLink }) {
               onClick={handleSave}
               sx={{
                 width: "100%",
-                background: "linear-gradient(90deg, #6c63ff, #4834d4)",
+                background:
+                  "linear-gradient(90deg, var(--primary-color), var(--secondary-color))",
                 color: "#fff",
                 borderRadius: "50px",
                 padding: "12px 0",
@@ -293,9 +310,10 @@ export default function HeightInput({ type, prevLink, nextLink }) {
                 fontWeight: "bold",
                 textTransform: "none",
                 letterSpacing: "0.5px",
-                boxShadow: "0 4px 15px rgba(0,0,0,0.3)",
+                boxShadow: "0 4px 15px rgba(0,0,0,0.2)",
                 "&:hover": {
-                  background: "linear-gradient(90deg, #5a52d5, #3b2ab0)",
+                  background:
+                    "linear-gradient(90deg, var(--primary-hover), var(--secondary-hover))",
                 },
               }}
             >
@@ -304,6 +322,42 @@ export default function HeightInput({ type, prevLink, nextLink }) {
           </Box>
         </Paper>
       </Container>
+
+      <style jsx global>{`
+        /* Light mode */
+        html[data-theme="light"],
+        @media (prefers-color-scheme: light) {
+          body,
+          #root,
+          .height-input-container {
+            background-color: #ffffff !important;
+          }
+        }
+
+        /* Dark mode */
+        html[data-theme="dark"],
+        @media (prefers-color-scheme: dark) {
+          body,
+          #root,
+          .height-input-container {
+            background-color: #000000 !important;
+          }
+        }
+
+        /* Ensure that the parent container adapts properly */
+        html[data-theme="dark"] .MuiBox-root.height-input-container {
+          background-color: #000000 !important;
+        }
+
+        html[data-theme="light"] .MuiBox-root.height-input-container {
+          background-color: #ffffff !important;
+        }
+        :root {
+          --slider-rail-light: rgba(0, 0, 0, 0.2);
+          --slider-rail-dark: rgba(255, 255, 255, 0.3);
+        }
+      `}</style>
+      <ThemeToggle />
     </Box>
   );
 }
