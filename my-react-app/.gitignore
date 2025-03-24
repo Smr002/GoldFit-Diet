@@ -11,6 +11,20 @@ node_modules
 dist
 dist-ssr
 *.local
+.env
+.env.development
+.env.test
+.env.production
+.env.local
+.env.*.local
+*.pem
+*.key
+*.pub
+*.pfx
+*.p12
+*.der
+*.cer
+*.crt
 
 # Editor directories and files
 .vscode/*

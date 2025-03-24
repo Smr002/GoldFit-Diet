@@ -3,6 +3,7 @@ import React, { useState } from "react";
 import HomePage from "../src/pages/HomePage";
 import AccModal from "../src/components/AccModal";
 import CreateAccount from "./pages/CreateAccount";
+import Exercises from "./components/Exercises";
 
 export default function App() {
   const [isModalOpen, setModalOpen] = useState(false);
@@ -17,6 +18,7 @@ export default function App() {
           }
         />
         <Route path="/create-account/*" element={<CreateAccount />} />
+        <Route path="/exercises" element={<Exercises />} />
       </Routes>
       <AccModal open={isModalOpen} onClose={() => setModalOpen(false)} />
     </BrowserRouter>
