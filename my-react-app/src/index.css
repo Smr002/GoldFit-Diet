@@ -3913,3 +3913,171 @@ Sy: nowrap;
   background: #2563eb;
   box-shadow: 0 4px 15px rgba(59, 130, 246, 0.4);
 }
+
+/* Scoped Admin Styles */
+.admin-theme {
+  --background: 240 4% 98%;
+  --foreground: 222.2 84% 4.9%;
+
+  --card: 0 0% 100%;
+  --card-foreground: 222.2 84% 4.9%;
+
+  --popover: 0 0% 100%;
+  --popover-foreground: 222.2 84% 4.9%;
+
+  --primary: 252 77% 67%;
+  --primary-foreground: 0 0% 100%;
+
+  --secondary: 210 40% 96.1%;
+  --secondary-foreground: 222.2 47.4% 11.2%;
+
+  --muted: 210 40% 96.1%;
+  --muted-foreground: 215.4 16.3% 46.9%;
+
+  --accent: 252 77% 67%;
+  --accent-foreground: 0 0% 100%;
+
+  --destructive: 0 84.2% 60.2%;
+  --destructive-foreground: 210 40% 98%;
+
+  --border: 214.3 31.8% 91.4%;
+  --input: 214.3 31.8% 91.4%;
+  --ring: 252 77% 67%;
+
+  --radius: 0.75rem;
+
+  --sidebar-background: 252 77% 67%;
+  --sidebar-foreground: 0 0% 100%;
+  --sidebar-primary: 240 5.9% 10%;
+  --sidebar-primary-foreground: 0 0% 98%;
+  --sidebar-accent: 240 4.8% 95.9%;
+  --sidebar-accent-foreground: 240 5.9% 10%;
+  --sidebar-border: 0 0% 100%;
+  --sidebar-ring: 252 77% 67%;
+}
+
+.admin-theme.dark {
+  --background: 222.2 84% 4.9%;
+  --foreground: 210 40% 98%;
+
+  --card: 222.2 84% 4.9%;
+  --card-foreground: 210 40% 98%;
+
+  --popover: 222.2 84% 4.9%;
+  --popover-foreground: 210 40% 98%;
+
+  --primary: 252 77% 67%;
+  --primary-foreground: 0 0% 100%;
+
+  --secondary: 217.2 32.6% 17.5%;
+  --secondary-foreground: 210 40% 98%;
+
+  --muted: 217.2 32.6% 17.5%;
+  --muted-foreground: 215 20.2% 65.1%;
+
+  --accent: 252 77% 67%;
+  --accent-foreground: 0 0% 100%;
+
+  --destructive: 0 62.8% 30.6%;
+  --destructive-foreground: 210 40% 98%;
+
+  --border: 217.2 32.6% 17.5%;
+  --input: 217.2 32.6% 17.5%;
+  --ring: 252 77% 67%;
+}
+
+.admin-theme .admin-card {
+  background-color: var(--fitness-card-bg);
+  border-radius: 16px; /* Tailwind's rounded-2xl */
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05); /* Tailwind's shadow-sm */
+  padding: 1.5rem; /* Tailwind's p-6 */
+  transition: all 0.3s ease; /* Tailwind's transition-all duration-300 */
+}
+
+.admin-theme .admin-card:hover {
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1); /* Tailwind's hover:shadow-md */
+}
+
+.admin-theme .admin-button-primary {
+  background-color: var(--fitness-purple);
+  color: white;
+  font-weight: 500; /* Tailwind's font-medium */
+  border-radius: 9999px; /* Tailwind's rounded-full */
+  padding: 0.75rem 1.5rem; /* Tailwind's px-6 py-3 */
+  transition: all 0.3s ease; /* Tailwind's transition-all duration-300 */
+}
+
+.admin-theme .admin-button-primary:hover {
+  background-color: var(--fitness-dark-purple);
+}
+
+.admin-theme .admin-button-primary:focus {
+  outline: none;
+  box-shadow: 0 0 0 2px rgba(128, 90, 213, 0.5); /* Tailwind's focus:ring-2 focus:ring-opacity-50 */
+}
+
+.admin-theme .admin-button-secondary {
+  background-color: white;
+  color: var(--fitness-purple);
+  border: 1px solid var(--fitness-purple);
+  font-weight: 500; /* Tailwind's font-medium */
+  border-radius: 9999px; /* Tailwind's rounded-full */
+  padding: 0.75rem 1.5rem; /* Tailwind's px-6 py-3 */
+  transition: all 0.3s ease; /* Tailwind's transition-all duration-300 */
+}
+
+.admin-theme .admin-button-secondary:hover {
+  background-color: var(--fitness-light-purple);
+  color: white;
+}
+
+.admin-theme .admin-input {
+  width: 100%;
+  padding: 0.75rem 1rem; /* Tailwind's px-4 py-3 */
+  border-radius: 0.5rem; /* Tailwind's rounded-lg */
+  border: 1px solid #e5e7eb; /* Tailwind's border-gray-200 */
+  transition: all 0.3s ease; /* Tailwind's transition-all duration-300 */
+}
+
+.admin-theme .admin-input:focus {
+  outline: none;
+  border-color: var(--fitness-purple);
+  box-shadow: 0 0 0 2px rgba(128, 90, 213, 0.5); /* Tailwind's focus:ring-2 */
+}
+
+.admin-theme .admin-table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.admin-theme .admin-table th {
+  text-align: left;
+  padding: 1rem 1.5rem; /* Tailwind's py-4 px-6 */
+  background-color: #f9fafb; /* Tailwind's bg-gray-50 */
+  font-weight: 500; /* Tailwind's font-medium */
+  color: #6b7280; /* Tailwind's text-gray-600 */
+}
+
+.admin-theme .admin-table td {
+  padding: 1rem 1.5rem; /* Tailwind's py-4 px-6 */
+  border-top: 1px solid #e5e7eb; /* Tailwind's border-t border-gray-100 */
+}
+
+.admin-theme .admin-sidebar-item {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem; /* Tailwind's space-x-3 */
+  color: rgba(255, 255, 255, 0.9); /* Tailwind's text-white/90 */
+  padding: 0.75rem 1rem; /* Tailwind's py-3 px-4 */
+  border-radius: 0.5rem; /* Tailwind's rounded-lg */
+  transition: all 0.3s ease; /* Tailwind's transition-all duration-300 */
+}
+
+.admin-theme .admin-sidebar-item:hover {
+  background-color: rgba(255, 255, 255, 0.1); /* Tailwind's hover:bg-white/10 */
+}
+
+.admin-theme .admin-sidebar-item.active {
+  background-color: rgba(255, 255, 255, 0.2); /* Tailwind's bg-white/20 */
+  color: white;
+}

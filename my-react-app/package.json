@@ -25,6 +25,7 @@
     "dotenv": "^16.4.7",
     "font-awesome": "^4.7.0",
     "framer-motion": "^12.5.0",
+    "lucide-react": "^0.483.0",
     "react": "^19.0.0",
     "react-dom": "^19.0.0",
     "react-redux": "^9.2.0",
@@ -43,7 +44,7 @@
     "eslint-plugin-react-refresh": "^0.4.19",
     "globals": "^15.15.0",
     "postcss": "^8.5.3",
-    "tailwindcss": "^4.0.13",
+    "tailwindcss": "^4.0.15",
     "vite": "^6.2.0",
     "vite-tsconfig-paths": "^5.1.4"
   }
