@@ -36,27 +36,37 @@ const Sidebar = ({ isSuperAdmin, collapsed, toggleCollapse }) => {
       path: '/admin/faqs', 
       name: 'FAQs', 
       icon: MessageSquare 
-    }
-  ];
-  
-  const superAdminItems = [
+    },
     { 
       path: '/admin/admin-management', 
       name: 'Admin Management', 
       icon: UserPlus 
     },
     { 
-      path: '/admin/settings', 
-      name: 'Settings', 
-      icon: Settings 
-    }
+          path: '/admin/settings', 
+          name: 'Settings', 
+          icon: Settings 
+        }
   ];
+  
+  // const superAdminItems = [
+  //   { 
+  //     path: '/admin/admin-management', 
+  //     name: 'Admin Management', 
+  //     icon: UserPlus 
+  //   },
+  //   { 
+  //     path: '/admin/settings', 
+  //     name: 'Settings', 
+  //     icon: Settings 
+  //   }
+  // ];
 
   return (
     <div className={`admin-sidebar ${collapsed ? 'collapsed' : ''}`}>
       <div className="admin-sidebar-header">
         {!collapsed && (
-          <span className="admin-sidebar-logo">Fitness Admin</span>
+          <span className="admin-sidebar-logo">GoldFit&Diet Admin</span>
         )}
         <button 
           className="admin-sidebar-toggle"
@@ -74,12 +84,12 @@ const Sidebar = ({ isSuperAdmin, collapsed, toggleCollapse }) => {
             to={item.path}
             className={`admin-nav-item ${isActive(item.path) ? 'active' : ''}`}
           >
-            <item.icon className="admin-nav-icon" size={collapsed ? 24 : 20} />
+            <item.icon className="admin-nav-icon" size={collapsed ? 28 : 24} />
             {!collapsed && <span>{item.name}</span>}
           </Link>
         ))}
-        
-        {isSuperAdmin && (
+
+        {/* {isSuperAdmin && (
           <>
             {!collapsed && (
               <div className="admin-nav-section-title">
@@ -97,7 +107,7 @@ const Sidebar = ({ isSuperAdmin, collapsed, toggleCollapse }) => {
               </Link>
             ))}
           </>
-        )}
+        )} */}
       </nav>
       
       <div className="admin-sidebar-footer">
@@ -105,7 +115,7 @@ const Sidebar = ({ isSuperAdmin, collapsed, toggleCollapse }) => {
           to="/logout" 
           className="admin-nav-item"
         >
-          <LogOut className="admin-nav-icon" size={collapsed ? 24 : 20} />
+          <LogOut className="admin-nav-icon" size={collapsed ? 28 : 24} />
           {!collapsed && <span>Logout</span>}
         </Link>
       </div>

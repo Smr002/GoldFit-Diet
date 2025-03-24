@@ -1,5 +1,5 @@
 import React, { useState, useRef, useEffect } from 'react';
-import { Bell, Search, User, ChevronDown } from 'lucide-react';
+import { Bell, User, ChevronDown } from 'lucide-react';
 import 'admin.css';
 
 const Header = ({ username = "Admin User", userRole = "Administrator" }) => {
@@ -18,18 +18,6 @@ const Header = ({ username = "Admin User", userRole = "Administrator" }) => {
 
   return (
     <header className="admin-header">
-      {/* Search Input */}
-      <div className="admin-header-search">
-        <div className="admin-search-wrapper">
-          <Search className="admin-search-icon" size={18} />
-          <input
-            type="text"
-            placeholder="Search..."
-            className="admin-input admin-search-input"
-          />
-        </div>
-      </div>
-
       {/* Icons and User Dropdown */}
       <div className="admin-header-actions">
         {/* Notification Bell */}
