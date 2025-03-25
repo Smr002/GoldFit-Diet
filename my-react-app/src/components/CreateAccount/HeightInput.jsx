@@ -114,7 +114,7 @@ export default function HeightInput({ type, prevLink, nextLink }) {
             fontWeight="bold"
             sx={{
               textAlign: "center",
-              color: "var(--text-primary)",
+              color: "var(--primary-color)",
               letterSpacing: 1,
               mb: 3,
             }}
@@ -212,26 +212,26 @@ export default function HeightInput({ type, prevLink, nextLink }) {
                 sx={{
                   height: { xs: 200, md: 300 },
                   "& .MuiSlider-track": {
-                    background:
-                      "linear-gradient(0deg, var(--primary-color), var(--secondary-color))",
+                    background: "var(--slider-gradient)",
                     border: "none",
+                    width: "6px",
                   },
                   "& .MuiSlider-rail": {
-                    background: "var(--slider-rail-light)", // Light theme variable
-                    opacity: 0.6,
+                    background: "#e0e0e0",
+                    opacity: 1,
+                    width: "6px",
                     "@media (prefers-color-scheme: dark)": {
-                      background: "var(--slider-rail-dark)", // Dark theme variable
-                      opacity: 0.8,
+                      background: "#404040",
+                      opacity: 1,
                     },
                   },
-
                   "& .MuiSlider-thumb": {
                     width: 24,
                     height: 24,
-                    background: "var(--accent-color)",
-                    boxShadow: "0 2px 8px rgba(0, 0, 0, 0.3)",
+                    background: "var(--primary-color)",
+                    boxShadow: "var(--thumb-shadow)",
                     "&:focus, &:hover, &.Mui-active, &.Mui-focusVisible": {
-                      boxShadow: "0 0 0 8px var(--accent-color-light)",
+                      boxShadow: "var(--thumb-focus-shadow)",
                     },
                     "&:before": {
                       display: "none",
@@ -244,7 +244,7 @@ export default function HeightInput({ type, prevLink, nextLink }) {
                   position: "absolute",
                   bottom: 0,
                   left: "calc(50% + 15px)",
-                  color: "var(--text-secondary)",
+                  color: "var(--primary-color)",
                   transform: "translateX(-50%)",
                   fontSize: 14,
                 }}
@@ -256,7 +256,7 @@ export default function HeightInput({ type, prevLink, nextLink }) {
                   position: "absolute",
                   top: 0,
                   left: "calc(50% + 15px)",
-                  color: "var(--text-secondary)",
+                  color: "var(--primary-color)",
                   transform: "translateX(-50%)",
                   fontSize: 14,
                 }}
@@ -271,7 +271,7 @@ export default function HeightInput({ type, prevLink, nextLink }) {
                 variant="h2"
                 fontWeight="bold"
                 sx={{
-                  color: "var(--text-primary)",
+                  color: "var(--primary-color)",
                   mb: 2,
                   textShadow: "0 2px 6px rgba(0,0,0,0.1)",
                   letterSpacing: "1px",
@@ -301,19 +301,39 @@ export default function HeightInput({ type, prevLink, nextLink }) {
               onClick={handleSave}
               sx={{
                 width: "100%",
-                background:
-                  "linear-gradient(90deg, var(--primary-color), var(--secondary-color))",
+                background: "var(--button-gradient)",
                 color: "#fff",
                 borderRadius: "50px",
-                padding: "12px 0",
+                padding: "14px 0",
                 fontSize: "18px",
                 fontWeight: "bold",
                 textTransform: "none",
                 letterSpacing: "0.5px",
-                boxShadow: "0 4px 15px rgba(0,0,0,0.2)",
+                boxShadow: "var(--button-shadow)",
+                transition: "all 0.3s ease-in-out",
+                position: "relative",
+                overflow: "hidden",
                 "&:hover": {
-                  background:
-                    "linear-gradient(90deg, var(--primary-hover), var(--secondary-hover))",
+                  background: "var(--button-hover-gradient)",
+                  transform: "translateY(-2px)",
+                  boxShadow: "var(--button-hover-shadow)",
+                },
+                "&:active": {
+                  transform: "translateY(0)",
+                  boxShadow: "var(--button-active-shadow)",
+                },
+                "&::before": {
+                  content: '""',
+                  position: "absolute",
+                  top: 0,
+                  left: "-100%",
+                  width: "100%",
+                  height: "100%",
+                  background: "linear-gradient(90deg, transparent, rgba(255,255,255,0.2), transparent)",
+                  transition: "0.5s",
+                },
+                "&:hover::before": {
+                  left: "100%",
                 },
               }}
             >
@@ -353,8 +373,29 @@ export default function HeightInput({ type, prevLink, nextLink }) {
           background-color: #ffffff !important;
         }
         :root {
-          --slider-rail-light: rgba(0, 0, 0, 0.2);
-          --slider-rail-dark: rgba(255, 255, 255, 0.3);
+          --primary-color: #6c63ff;
+          --secondary-color: #4a3f8c;
+          --slider-gradient: linear-gradient(0deg, #6c63ff, #4a3f8c);
+          --button-gradient: linear-gradient(135deg, #6c63ff, #4a3f8c);
+          --button-hover-gradient: linear-gradient(135deg, #5a52e6, #3a2f7c);
+          --thumb-shadow: 0 2px 8px rgba(107, 99, 255, 0.4);
+          --thumb-focus-shadow: 0 0 0 8px rgba(107, 99, 255, 0.2);
+          --button-shadow: 0 4px 15px rgba(107, 99, 255, 0.3);
+          --button-hover-shadow: 0 6px 20px rgba(107, 99, 255, 0.4);
+          --button-active-shadow: 0 2px 10px rgba(107, 99, 255, 0.3);
+        }
+
+        body.dark-mode {
+          --primary-color: #D4AF37;
+          --secondary-color: #ffd700;
+          --slider-gradient: linear-gradient(0deg, #D4AF37, #ffd700);
+          --button-gradient: linear-gradient(135deg, #D4AF37, #ffd700);
+          --button-hover-gradient: linear-gradient(135deg, #c19b2e, #e6c200);
+          --thumb-shadow: 0 2px 8px rgba(212, 175, 55, 0.4);
+          --thumb-focus-shadow: 0 0 0 8px rgba(212, 175, 55, 0.2);
+          --button-shadow: 0 4px 15px rgba(212, 175, 55, 0.3);
+          --button-hover-shadow: 0 6px 20px rgba(212, 175, 55, 0.4);
+          --button-active-shadow: 0 2px 10px rgba(212, 175, 55, 0.3);
         }
       `}</style>
       <ThemeToggle />
