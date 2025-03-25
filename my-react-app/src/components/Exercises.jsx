@@ -16,8 +16,7 @@ const bodyParts = [
   { name: "Waist", icon: "waist" },
   { name: "Lower Legs", icon: "lower-legs" },
   { name: "Lower Arms", icon: "lower-arms" },
-  { name: "Neck", icon: "neck" },
-  { name: "Filters", icon: "filters" },
+  { name: "Neck", icon: "neck" }
 ];
 
 const bodyPartMapping = {
@@ -243,7 +242,7 @@ const Exercises = () => {
           </div>
           <input
             type="text"
-            placeholder="Search exercises..."
+            placeholder="Search exercises in this category..."
             className="search-input"
             value={search}
             onChange={handleSearchChange}
