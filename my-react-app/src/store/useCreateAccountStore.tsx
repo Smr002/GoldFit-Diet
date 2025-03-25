@@ -11,7 +11,9 @@ export const useCreateAccountStore = create((set) => ({
   selectedLoseWeight: null,
   selectedGainMuscle: null,
   selectedGetShredded: null,
+  selectedYourRealGoal: null,
   workoutFrequency: 3,
+
   setGender: (gender) => set({ selectedGender: gender }),
   setBodyType: (bodyType) => set({ selectedBodyType: bodyType }),
   setAgeGroup: (ageGroup) => set({ selectedAgeGroup: ageGroup }),
@@ -23,6 +25,34 @@ export const useCreateAccountStore = create((set) => ({
   setGetShredded: (getShredded) => set({ selectedGetShredded: getShredded }),
   setBodyYouWant: (bodyYouWant) => set({ selectedBodyYouWant: bodyYouWant }),
   setWorkoutFrequency: (frequency) => set({ workoutFrequency: frequency }),
+
+  setYourRealGoal: (goal) => {
+    if (goal === "loseWeight") {
+      set({
+        selectedLoseWeight: true,
+        selectedGainMuscle: null,
+        selectedGetShredded: null,
+      });
+    } else if (goal === "gainMuscle") {
+      set({
+        selectedLoseWeight: null,
+        selectedGainMuscle: true,
+        selectedGetShredded: null,
+      });
+    } else if (goal === "getShredded") {
+      set({
+        selectedLoseWeight: null,
+        selectedGainMuscle: null,
+        selectedGetShredded: true,
+      });
+    } else {
+      set({
+        selectedLoseWeight: null,
+        selectedGainMuscle: null,
+        selectedGetShredded: null,
+      });
+    }
+  },
 
   reset: () =>
     set({

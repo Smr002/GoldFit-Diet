@@ -10,7 +10,7 @@ import { ArrowForward } from "@mui/icons-material";
 import Zoom from "@mui/material/Zoom";
 import FitnessCenterIcon from "@mui/icons-material/FitnessCenter";
 import DirectionsRunIcon from "@mui/icons-material/DirectionsRun";
-
+import { Link as RouterLink } from "react-router-dom";
 const ExerciseSlider = styled(Slider)(({ theme }) => ({
   color: "#D4AF37",
   height: 8,
@@ -45,7 +45,7 @@ const ExerciseSlider = styled(Slider)(({ theme }) => ({
     },
   },
   "& .MuiSlider-markLabel": {
-    color: "#fff", 
+    color: "#fff",
     fontSize: "14px",
     fontWeight: 500,
     marginTop: 6,
@@ -57,7 +57,6 @@ const ExerciseSlider = styled(Slider)(({ theme }) => ({
     marginTop: -2,
   },
 }));
-
 
 const ActivityIcons = ({ count, animate }) => {
   const icons = [];
@@ -86,7 +85,7 @@ const ActivityIcons = ({ count, animate }) => {
   );
 };
 
-export default function EnhancedExerciseSlider() {
+export default function EnhancedExerciseSlider({ nextLink, prevLink }) {
   const [value, setValue] = useState(3);
   const [animate, setAnimate] = useState(false);
 
@@ -219,6 +218,8 @@ export default function EnhancedExerciseSlider() {
           </Box>
 
           <Button
+            component={RouterLink}
+            to={nextLink}
             variant="contained"
             endIcon={<ArrowForward />}
             sx={{

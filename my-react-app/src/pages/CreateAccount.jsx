@@ -49,6 +49,7 @@ import femaleHero from "../assets/female_hero.png";
 import femaleSlimBody from "../assets/female_slim_body.png";
 import femaleSlimShreddedBody from "../assets/female_slim_shredded_body.png";
 import femaleWorkoutBody from "../assets/female_workout_body.png";
+import SignUp from "@/components/CreateAccount/SignUp";
 
 export default function CreateAccount() {
   const store = useCreateAccountStore();
@@ -63,143 +64,90 @@ export default function CreateAccount() {
   const bodyTypes =
     selectedGender === "Female"
       ? [
-        { label: "Slim", image: femaleSlim },
-        { label: "Average", image: femaleAverage },
-        { label: "Heavy", image: femaleHeavy },
-      ]
+          { label: "Slim", image: femaleSlim },
+          { label: "Average", image: femaleAverage },
+          { label: "Heavy", image: femaleHeavy },
+        ]
       : [
-        { label: "Slim", image: maleSlim },
-        { label: "Average", image: maleAverage },
-        { label: "Heavy", image: maleHeavy },
-      ];
+          { label: "Slim", image: maleSlim },
+          { label: "Average", image: maleAverage },
+          { label: "Heavy", image: maleHeavy },
+        ];
 
   const ageGroups =
     selectedGender === "Female"
       ? [
-        { label: "Age: 18-29", image: female1829 },
-        { label: "Age: 30-39", image: female3039 },
-        { label: "Age: 40-49", image: female4049 },
-        { label: "Age: 50+", image: female50 },
-      ]
+          { label: "Age: 18-29", image: female1829 },
+          { label: "Age: 30-39", image: female3039 },
+          { label: "Age: 40-49", image: female4049 },
+          { label: "Age: 50+", image: female50 },
+        ]
       : [
-        { label: "Age: 18-29", image: male1829 },
-        { label: "Age: 30-39", image: male3039 },
-        { label: "Age: 40-49", image: male4049 },
-        { label: "Age: 50+", image: male50 },
-      ];
+          { label: "Age: 18-29", image: male1829 },
+          { label: "Age: 30-39", image: male3039 },
+          { label: "Age: 40-49", image: male4049 },
+          { label: "Age: 50+", image: male50 },
+        ];
 
   const yourGoal =
     selectedGender === "Female"
       ? [
-        { label: "Lose Weight", image: femaleLoseWeight },
-        { label: "Gain Muscle Mass", image: femaleGainMuscle },
-        { label: "Get Shredded", image: femaleGetShredded },
-      ]
+          { label: "Lose Weight", image: femaleLoseWeight },
+          { label: "Gain Muscle Mass", image: femaleGainMuscle },
+          { label: "Get Shredded", image: femaleGetShredded },
+        ]
       : [
-        { label: "Lose Weight", image: maleLoseWeight },
-        { label: "Gain Muscle Mass", image: maleGainMuscle },
-        { label: "Get Shredded", image: maleGetShredded },
-      ];
+          { label: "Lose Weight", image: maleLoseWeight },
+          { label: "Gain Muscle Mass", image: maleGainMuscle },
+          { label: "Get Shredded", image: maleGetShredded },
+        ];
 
   const selectedLoseWeight =
     selectedGender === "Female"
       ? [
-        {
-          label: "Slim Body",
-          image: femaleSlimBody
-        },
-        {
-          label: "Slim,Shredded Body",
-          image: femaleSlimShreddedBody
-
-        },
-      ]
+          { label: "Slim Body", image: femaleSlimBody },
+          { label: "Slim, Shredded Body", image: femaleSlimShreddedBody },
+        ]
       : [
-        {
-          label: "Slim Body",
-          image: maleSlimBody
-
-        },
-        {
-          label: "Slim,Shredded Body",
-          image: maleSlimShreddedBody
-
-        },
-      ];
+          { label: "Slim Body", image: maleSlimBody },
+          { label: "Slim, Shredded Body", image: maleSlimShreddedBody },
+        ];
 
   const selectedGainMuscle =
     selectedGender === "Female"
       ? [
-        {
-          label: "Athlete",
-          image: femaleAthlete
-
-        },
-        {
-          label: "Hero",
-          image: femaleHero
-
-        },
-        {
-          label: "BodyBuilder",
-          image: femaleBodybuilder
-
-        },
-      ]
+          { label: "Athlete", image: femaleAthlete },
+          { label: "Hero", image: femaleHero },
+          { label: "BodyBuilder", image: femaleBodybuilder },
+        ]
       : [
-        {
-          label: "Athlete",
-          image: maleAthlete
-
-        },
-        {
-          label: "Hero",
-          image: maleHero
-
-        },
-        {
-          label: "BodyBuilder",
-          image: maleBodybuilder
-
-        },
-      ];
+          { label: "Athlete", image: maleAthlete },
+          { label: "Hero", image: maleHero },
+          { label: "BodyBuilder", image: maleBodybuilder },
+        ];
 
   const selectedGetShredded =
     selectedGender === "Female"
       ? [
-        {
-          label: "Beach Body",
-          image: femaleBeachBody
-
-        },
-        {
-          label: "Workout Body",
-          image: femaleWorkoutBody
-
-        },
-        {
-          label: "CrossFit Body",
-          image: femaleCrossfitBody
-
-        },
-      ]
+          { label: "Beach Body", image: femaleBeachBody },
+          { label: "Workout Body", image: femaleWorkoutBody },
+          { label: "CrossFit Body", image: femaleCrossfitBody },
+        ]
       : [
-        {
-          label: "Beach Body",
-          image: maleBeachBody
+          { label: "Beach Body", image: maleBeachBody },
+          { label: "Workout Body", image: maleWorkoutBody },
+          { label: "CrossFit Body", image: maleCrossfitBody },
+        ];
 
-        },
-        {
-          label: "Workout Body",
-          image: maleWorkoutBody
-
-        },
-        {
-          label: "CrossFit Body",
-          image: maleCrossfitBody
-
-        },
-      ];
+  // Dynamically choose the “body you want” options based on the selected goal.
+  const selectedYourRealGoal =
+    store.selectedGoal === "Lose Weight"
+      ? selectedLoseWeight
+      : store.selectedGoal === "Gain Muscle Mass"
+      ? selectedGainMuscle
+      : store.selectedGoal === "Get Shredded"
+      ? selectedGetShredded
+      : [];
 
   useEffect(() => {
     console.log("Store State:", store);
@@ -210,6 +158,7 @@ export default function CreateAccount() {
     store.selectedHeight,
     store.selectedWeight,
     store.selectedGoal,
+    store.selectedYourRealGoal,
   ]);
 
   return (
@@ -280,7 +229,7 @@ export default function CreateAccount() {
         element={
           <DynamicSelection
             title="Select Your Goal"
-            description="Choose your goal that you want to reach"
+            description="Choose the goal you want to reach"
             data={yourGoal}
             linkPrefix="/create-account/your-goal"
             prevLink="/create-account/body-type"
@@ -295,13 +244,7 @@ export default function CreateAccount() {
           <DynamicSelection
             title="Choose the body you want"
             description={`Ok, so your goal is ${store.selectedGoal}`}
-            data={
-              store.selectedGoal === "Lose Weight"
-                ? selectedLoseWeight
-                : store.selectedGoal === "Gain Muscle Mass"
-                  ? selectedGainMuscle
-                  : selectedGetShredded
-            }
+            data={selectedYourRealGoal}
             linkPrefix="/create-account/body-you-want"
             prevLink="/create-account/your-goal"
             nextLink="/create-account/how-many-times"
@@ -309,8 +252,16 @@ export default function CreateAccount() {
           />
         }
       />
-
-      <Route path="how-many-times" element={<SliderHowManyTimes />} />
+      <Route
+        path="how-many-times"
+        element={
+          <SliderHowManyTimes
+            prevLink="/create-account/body-you-want"
+            nextLink="/create-account/sign-up"
+          />
+        }
+      />
+      <Route path="sign-up" element={<SignUp />} />
     </Routes>
   );
 }
