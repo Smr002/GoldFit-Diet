@@ -5,6 +5,7 @@ import BodyPartIcons from "./BodyPartIcons";
 import FilterModal from "./FilterModal";
 import CreateExerciseModal from "./CreateExerciseModal";
 import Navbar from "./Navbar";
+import MobileFooter from "./MobileFooter"; // Import the new component
 
 const bodyParts = [
   { name: "Favorites", icon: "favorites" },
@@ -59,34 +60,6 @@ const Exercises = () => {
   const [equipmentList, setEquipmentList] = useState([]);
   const [detailsOpen, setDetailsOpen] = useState(false);
   const [instructionsOpen, setInstructionsOpen] = useState(false);
-  const [isMainContentVisible, setIsMainContentVisible] = useState(false);
-
-  // Add scroll animation effect
-  useEffect(() => {
-    const observer = new IntersectionObserver(
-      ([entry]) => {
-        if (entry.isIntersecting) {
-          setIsMainContentVisible(true);
-          observer.unobserve(entry.target);
-        }
-      },
-      {
-        threshold: 0.1,
-        rootMargin: '50px'
-      }
-    );
-
-    const mainContent = document.querySelector('.exercises-main-content');
-    if (mainContent) {
-      observer.observe(mainContent);
-    }
-
-    return () => {
-      if (mainContent) {
-        observer.unobserve(mainContent);
-      }
-    };
-  }, []);
 
   // Persist favorites and custom exercises
   useEffect(() => {
@@ -266,38 +239,14 @@ const Exercises = () => {
 
   return (
     <>
-    <Navbar/>
-    <div className="exercises-page-container"> 
-      {/* Hero Section */}
-      <div className="exercises-hero">
-        <div className="exercises-hero-content">
-          <h1>Explore Our Exercise Library</h1>
-          <p>Discover a comprehensive collection of exercises tailored to your fitness goals. From strength training to cardio, find the perfect workout for your needs.</p>
-          <div className="exercises-hero-features">
-            <div className="hero-feature">
-              <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                <path d="M20 6L9 17l-5-5"/>
-              </svg>
-              <span>Detailed Instructions</span>
-            </div>
-            <div className="hero-feature">
-              <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                <path d="M12 2v20M2 12h20"/>
-              </svg>
-              <span>Multiple Categories</span>
-            </div>
-            <div className="hero-feature">
-              <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                <path d="M19 21l-7-5-7 5V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2z"/>
-              </svg>
-              <span>Save Favorites</span>
-            </div>
-          </div>
-        </div>
-      </div>
-
-      {/* Main Content Section */}
-      <div className={`exercises-main-content ${isMainContentVisible ? 'visible' : ''}`}>
+      <Navbar />
+      <div
+        style={{
+          minHeight: "100vh",
+          background: "linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%)",
+          paddingTop: "80px", // Matches navbar height
+        }}
+      >
         <div className="exercises-container">
           {/* Search Bar */}
           <div className="search-container">
@@ -336,7 +285,8 @@ const Exercises = () => {
                   key={part.name}
                   onClick={() => handleBodyPartClick(part.name)}
                   className={`body-part-item ${
-                    (part.name === "Favorites" && filterOptions.showFavorites) ||
+                    (part.name === "Favorites" &&
+                      filterOptions.showFavorites) ||
                     bodyPart === part.name.toLowerCase()
                       ? "active"
                       : ""
@@ -605,8 +555,8 @@ const Exercises = () => {
             />
           )}
         </div>
+        <MobileFooter /> {/* Add the MobileFooter here */}
       </div>
-    </div>
     </>
   );
 };
