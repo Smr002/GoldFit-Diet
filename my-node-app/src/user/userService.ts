@@ -1,5 +1,4 @@
 import bcrypt from "bcrypt";
-import { UsersRepository } from "./userRepository";
 import type { User } from "@prisma/client";
 import { mapCreateUserInput } from "./utlis/mapCreateUserInput";
 import { usersRepository } from "./userRepository";
