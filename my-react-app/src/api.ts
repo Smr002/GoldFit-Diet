@@ -1,0 +1,45 @@
+import axios from "axios";
+import { CreateUserDto, LoginDto, AuthResponse } from "@/types/user";
+
+const API_BASE_URL =  "http://localhost:3000";
+
+export async function createUser(user: CreateUserDto) {
+  try {
+   
+    const response = await axios.post(`${API_BASE_URL}/users/`, user);
+    return response.data; 
+  } catch (error: any) {
+    if (axios.isAxiosError(error)) {
+      throw new Error(error.response?.data?.error || "Failed to create user");
+    }
+    throw new Error("Unexpected error");
+  }
+}
+
+export async function loginUser(credentials: LoginDto): Promise<AuthResponse> {
+  try {
+    const response = await axios.post(`${API_BASE_URL}/auth/login`, credentials);
+    return response.data;
+  } catch (error: any) {
+    if (axios.isAxiosError(error)) {
+      throw new Error(error.response?.data?.error || "Login failed");
+    }
+    throw new Error("Unexpected error");
+  }
+}
+
+export async function getUsers(token: string) {
+  try {
+    const response = await axios.get(`${API_BASE_URL}/users`, {
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    });
+    return response.data; 
+  } catch (error: any) {
+    if (axios.isAxiosError(error)) {
+      throw new Error(error.response?.data?.error || "Failed to fetch users");
+    }
+    throw new Error("Unexpected error");
+  }
+}

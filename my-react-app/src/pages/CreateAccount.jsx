@@ -159,6 +159,7 @@ export default function CreateAccount() {
     store.selectedWeight,
     store.selectedGoal,
     store.selectedYourRealGoal,
+    store.setWorkoutFrequency,
   ]);
 
   return (

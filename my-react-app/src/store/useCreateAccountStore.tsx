@@ -24,7 +24,10 @@ export const useCreateAccountStore = create((set) => ({
   setGainMuscle: (gainMuscle) => set({ selectedGainMuscle: gainMuscle }),
   setGetShredded: (getShredded) => set({ selectedGetShredded: getShredded }),
   setBodyYouWant: (bodyYouWant) => set({ selectedBodyYouWant: bodyYouWant }),
-  setWorkoutFrequency: (frequency) => set({ workoutFrequency: frequency }),
+  setWorkoutFrequency: (frequency) => {
+    console.log("Setting workoutFrequency to:", frequency);
+    set({ workoutFrequency: frequency });
+  },
 
   setYourRealGoal: (goal) => {
     if (goal === "loseWeight") {

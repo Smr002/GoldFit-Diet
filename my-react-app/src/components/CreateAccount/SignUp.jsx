@@ -9,8 +9,24 @@ import {
   Zoom,
 } from "@mui/material";
 import { ArrowForward } from "@mui/icons-material";
+import { useCreateAccountStore } from "@/store/useCreateAccountStore";
+import { createUser } from "@/api";
 
 export default function SignUp() {
+  const {
+    selectedGender,
+    selectedBodyType,
+    selectedAgeGroup,
+    selectedHeight,
+    selectedWeight,
+    selectedGoal,
+    selectedBodyYouWant,
+    selectedLoseWeight,
+    selectedGainMuscle,
+    selectedGetShredded,
+    workoutFrequency,
+  } = useCreateAccountStore();
+
   const [formData, setFormData] = useState({
     fullName: "",
     email: "",
@@ -19,15 +35,39 @@ export default function SignUp() {
   });
 
   const handleChange = (e) => {
-    setFormData({ ...formData, [e.target.name]: e.target.value });
+    setFormData((prev) => ({
+      ...prev,
+      [e.target.name]: e.target.value,
+    }));
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    // Perform validation or API call here
-    console.log("Form Data:", formData);
-  };
 
+    const requestBody = {
+      fullName: formData.fullName,
+      email: formData.email,
+      password: formData.password,
+      selectedGender,
+      selectedBodyType,
+      selectedAgeGroup,
+      selectedHeight,
+      selectedWeight,
+      selectedGoal,
+      selectedBodyYouWant,
+      selectedLoseWeight,
+      selectedGainMuscle,
+      selectedGetShredded,
+      workoutFrequency,
+    };
+
+    try {
+      const response = await createUser(requestBody);
+      console.log("User created successfully:", response);
+    } catch (error) {
+      console.error("Error creating user:", error.message);
+    }
+  };
   return (
     <Box
       sx={{

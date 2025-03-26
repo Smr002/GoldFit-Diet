@@ -1,5 +1,5 @@
 import * as React from "react";
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import Slider from "@mui/material/Slider";
 import { styled } from "@mui/material/styles";
 import Typography from "@mui/material/Typography";
@@ -11,10 +11,11 @@ import Zoom from "@mui/material/Zoom";
 import FitnessCenterIcon from "@mui/icons-material/FitnessCenter";
 import DirectionsRunIcon from "@mui/icons-material/DirectionsRun";
 import { Link as RouterLink } from "react-router-dom";
+import { useCreateAccountStore } from "@/store/useCreateAccountStore";
+
 const ExerciseSlider = styled(Slider)(({ theme }) => ({
   color: "#D4AF37",
   height: 8,
-  padding: "12px 0",
   "& .MuiSlider-track": {
     background: "linear-gradient(to right, #D4AF37, #b8860b)",
     border: "none",
@@ -85,12 +86,17 @@ const ActivityIcons = ({ count, animate }) => {
   );
 };
 
-export default function EnhancedExerciseSlider({ nextLink, prevLink }) {
-  const [value, setValue] = useState(3);
+export default function EnhancedExerciseSlider({ nextLink }) {
+  const workoutFrequency = useCreateAccountStore(
+    (state) => state.workoutFrequency
+  );
+  const setWorkoutFrequency = useCreateAccountStore(
+    (state) => state.setWorkoutFrequency
+  );
   const [animate, setAnimate] = useState(false);
 
   const handleChange = (event, newValue) => {
-    setValue(newValue);
+    setWorkoutFrequency(newValue);
   };
 
   const handleChangeCommitted = () => {
@@ -167,11 +173,11 @@ export default function EnhancedExerciseSlider({ nextLink, prevLink }) {
             How many days will you commit to your fitness journey?
           </Typography>
 
-          <ActivityIcons count={value} animate={animate} />
+          <ActivityIcons count={workoutFrequency} animate={animate} />
 
           <Box sx={{ width: "90%", mt: 1, mb: 2 }}>
             <ExerciseSlider
-              value={value}
+              value={workoutFrequency}
               onChange={handleChange}
               onChangeCommitted={handleChangeCommitted}
               valueLabelDisplay="auto"
@@ -203,7 +209,7 @@ export default function EnhancedExerciseSlider({ nextLink, prevLink }) {
                 fontWeight: 500,
               }}
             >
-              {value} days per week
+              {workoutFrequency} days per week
             </Typography>
             <Typography
               variant="body2"
@@ -213,7 +219,9 @@ export default function EnhancedExerciseSlider({ nextLink, prevLink }) {
                 fontSize: "0.85rem",
               }}
             >
-              {value >= 5 ? "Great commitment!" : "Good starting point!"}
+              {workoutFrequency >= 5
+                ? "Great commitment!"
+                : "Good starting point!"}
             </Typography>
           </Box>
 
