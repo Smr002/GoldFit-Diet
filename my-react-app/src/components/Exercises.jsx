@@ -59,6 +59,34 @@ const Exercises = () => {
   const [equipmentList, setEquipmentList] = useState([]);
   const [detailsOpen, setDetailsOpen] = useState(false);
   const [instructionsOpen, setInstructionsOpen] = useState(false);
+  const [isMainContentVisible, setIsMainContentVisible] = useState(false);
+
+  // Add scroll animation effect
+  useEffect(() => {
+    const observer = new IntersectionObserver(
+      ([entry]) => {
+        if (entry.isIntersecting) {
+          setIsMainContentVisible(true);
+          observer.unobserve(entry.target);
+        }
+      },
+      {
+        threshold: 0.1,
+        rootMargin: '50px'
+      }
+    );
+
+    const mainContent = document.querySelector('.exercises-main-content');
+    if (mainContent) {
+      observer.observe(mainContent);
+    }
+
+    return () => {
+      if (mainContent) {
+        observer.unobserve(mainContent);
+      }
+    };
+  }, []);
 
   // Persist favorites and custom exercises
   useEffect(() => {
@@ -239,206 +267,142 @@ const Exercises = () => {
   return (
     <>
     <Navbar/>
-    <div style={{ marginTop: "80px" , backgroundColor: "linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%)"}}> 
-      <div className="exercises-container">
-        {/* Search Bar */}
-        <div className="search-container">
-          <div className="search-bar">
-            <div className="search-icon">
-              <svg
-                xmlns="http://www.w3.org/2000/svg"
-                width="24"
-                height="24"
-                viewBox="0 0 24 24"
-                fill="none"
-                stroke="currentColor"
-                strokeWidth="2"
-                strokeLinecap="round"
-                strokeLinejoin="round"
-              >
-                <circle cx="11" cy="11" r="8"></circle>
-                <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+    <div className="exercises-page-container"> 
+      {/* Hero Section */}
+      <div className="exercises-hero">
+        <div className="exercises-hero-content">
+          <h1>Explore Our Exercise Library</h1>
+          <p>Discover a comprehensive collection of exercises tailored to your fitness goals. From strength training to cardio, find the perfect workout for your needs.</p>
+          <div className="exercises-hero-features">
+            <div className="hero-feature">
+              <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                <path d="M20 6L9 17l-5-5"/>
               </svg>
+              <span>Detailed Instructions</span>
             </div>
-            <input
-              type="text"
-              placeholder="Search exercises in this category..."
-              className="search-input"
-              value={search}
-              onChange={handleSearchChange}
-            />
+            <div className="hero-feature">
+              <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                <path d="M12 2v20M2 12h20"/>
+              </svg>
+              <span>Multiple Categories</span>
+            </div>
+            <div className="hero-feature">
+              <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                <path d="M19 21l-7-5-7 5V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2z"/>
+              </svg>
+              <span>Save Favorites</span>
+            </div>
           </div>
         </div>
+      </div>
 
-        {/* Body Part Filter */}
-        <div className="body-parts-container">
-          <div className="body-parts-scroll">
-            {bodyParts.map((part) => (
-              <div
-                key={part.name}
-                onClick={() => handleBodyPartClick(part.name)}
-                className={`body-part-item ${
-                  (part.name === "Favorites" && filterOptions.showFavorites) ||
-                  bodyPart === part.name.toLowerCase()
-                    ? "active"
-                    : ""
-                }`}
-              >
-                <div className="body-part-icon">
-                  <BodyPartIcons type={part.icon} />
-                </div>
-                <span className="body-part-name">{part.name}</span>
+      {/* Main Content Section */}
+      <div className={`exercises-main-content ${isMainContentVisible ? 'visible' : ''}`}>
+        <div className="exercises-container">
+          {/* Search Bar */}
+          <div className="search-container">
+            <div className="search-bar">
+              <div className="search-icon">
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  width="24"
+                  height="24"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  strokeWidth="2"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                >
+                  <circle cx="11" cy="11" r="8"></circle>
+                  <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+                </svg>
               </div>
-            ))}
+              <input
+                type="text"
+                placeholder="Search exercises in this category..."
+                className="search-input"
+                value={search}
+                onChange={handleSearchChange}
+              />
+            </div>
           </div>
-        </div>
 
-        {/* Error Message */}
-        {error && <div className="error-message">{error}</div>}
-
-        {/* Exercises Grid */}
-        {loading ? (
-          <div className="loading-container">
-            <div className="loading-spinner"></div>
-          </div>
-        ) : exercises.length === 0 ? (
-          <div className="no-results">
-            <h3>No Exercises Found</h3>
-            <p>Try adjusting your search or filters.</p>
-          </div>
-        ) : (
-          <div className="exercises-grid">
-            {exercises.map((exercise) => (
-              <div
-                key={exercise.id}
-                className="exercise-card"
-                onClick={() => openExerciseDetails(exercise)}
-              >
-                <div className="exercise-image-container">
-                  <div className="top-buttons">
-                    <button
-                      className="circle-button bookmark-button"
-                      onClick={(e) => toggleFavorite(e, exercise.id)}
-                      aria-label="Bookmark"
-                    >
-                      <svg
-                        xmlns="http://www.w3.org/2000/svg"
-                        width="24"
-                        height="24"
-                        viewBox="0 0 24 24"
-                        fill={
-                          favorites.includes(exercise.id) ? "#ef4444" : "none"
-                        }
-                        stroke="currentColor"
-                        strokeWidth="2"
-                        strokeLinecap="round"
-                        strokeLinejoin="round"
-                      >
-                        <path d="M19 21l-7-5-7 5V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2z"></path>
-                      </svg>
-                    </button>
-                    <button
-                      className="circle-button inspect-button"
-                      onClick={(e) => {
-                        e.stopPropagation();
-                        openExerciseDetails(exercise);
-                      }}
-                      aria-label="Inspect"
-                    >
-                      <svg
-                        xmlns="http://www.w3.org/2000/svg"
-                        width="24"
-                        height="24"
-                        viewBox="0 0 24 24"
-                        fill="none"
-                        stroke="currentColor"
-                        strokeWidth="2"
-                        strokeLinecap="round"
-                        strokeLinejoin="round"
-                      >
-                        <circle cx="11" cy="11" r="8"></circle>
-                        <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
-                      </svg>
-                    </button>
+          {/* Body Part Filter */}
+          <div className="body-parts-container">
+            <div className="body-parts-scroll">
+              {bodyParts.map((part) => (
+                <div
+                  key={part.name}
+                  onClick={() => handleBodyPartClick(part.name)}
+                  className={`body-part-item ${
+                    (part.name === "Favorites" && filterOptions.showFavorites) ||
+                    bodyPart === part.name.toLowerCase()
+                      ? "active"
+                      : ""
+                  }`}
+                >
+                  <div className="body-part-icon">
+                    <BodyPartIcons type={part.icon} />
                   </div>
-                  <div className="exercise-static-image">
-                    <img
-                      src={exercise.gifUrl || "/placeholder.svg"}
-                      alt={exercise.name}
-                      className="exercise-image"
-                    />
-                    <div className="view-exercise-overlay">
-                      <svg
-                        xmlns="http://www.w3.org/2000/svg"
-                        width="24"
-                        height="24"
-                        viewBox="0 0 24 24"
-                        fill="none"
-                        stroke="#fff"
-                        strokeWidth="2"
-                        strokeLinecap="round"
-                        strokeLinejoin="round"
-                        className="view-icon"
-                      >
-                        <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path>
-                        <circle cx="12" cy="12" r="3"></circle>
-                      </svg>
-                    </div>
-                  </div>
+                  <span className="body-part-name">{part.name}</span>
                 </div>
-                <div className="exercise-details">
-                  <h3 className="exercise-name">{exercise.name}</h3>
-                  <div className="exercise-tags">
-                    <span className="exercise-tag">{exercise.bodyPart}</span>
-                    <span className="exercise-tag">{exercise.target}</span>
-                    <span className="exercise-tag">{exercise.equipment}</span>
-                  </div>
-                </div>
-              </div>
-            ))}
+              ))}
+            </div>
           </div>
-        )}
 
-        {/* Exercise Detail Modal */}
-        {selectedExercise && (
-          <div
-            className="exercise-modal-overlay"
-            onClick={closeExerciseDetails}
-          >
-            <div
-              className="exercise-modal"
-              onClick={(e) => e.stopPropagation()}
-            >
-              <button
-                className="close-modal"
-                onClick={closeExerciseDetails}
-                aria-label="Close modal"
-                title="Close"
-              >
-                <span className="close-icon">✕</span>
-              </button>
+          {/* Error Message */}
+          {error && <div className="error-message">{error}</div>}
 
-              <div className="modal-container">
-                <div className="modal-header">
-                  <h2 className="modal-title">{selectedExercise.name}</h2>
-                </div>
-
-                <div className="modal-gif-section">
-                  <img
-                    src={selectedExercise.gifUrl || "/placeholder.svg"}
-                    alt={selectedExercise.name}
-                    className="modal-gif"
-                  />
-                </div>
-
-                <div className="modal-content-section">
-                  <div className="modal-info">
-                    <div className="info-section details-section">
-                      <div
-                        className="section-header"
-                        onClick={() => setDetailsOpen(!detailsOpen)}
+          {/* Exercises Grid */}
+          {loading ? (
+            <div className="loading-container">
+              <div className="loading-spinner"></div>
+            </div>
+          ) : exercises.length === 0 ? (
+            <div className="no-results">
+              <h3>No Exercises Found</h3>
+              <p>Try adjusting your search or filters.</p>
+            </div>
+          ) : (
+            <div className="exercises-grid">
+              {exercises.map((exercise) => (
+                <div
+                  key={exercise.id}
+                  className="exercise-card"
+                  onClick={() => openExerciseDetails(exercise)}
+                >
+                  <div className="exercise-image-container">
+                    <div className="top-buttons">
+                      <button
+                        className="circle-button bookmark-button"
+                        onClick={(e) => toggleFavorite(e, exercise.id)}
+                        aria-label="Bookmark"
                       >
-                        <h3>Details</h3>
+                        <svg
+                          xmlns="http://www.w3.org/2000/svg"
+                          width="24"
+                          height="24"
+                          viewBox="0 0 24 24"
+                          fill={
+                            favorites.includes(exercise.id) ? "#ef4444" : "none"
+                          }
+                          stroke="currentColor"
+                          strokeWidth="2"
+                          strokeLinecap="round"
+                          strokeLinejoin="round"
+                        >
+                          <path d="M19 21l-7-5-7 5V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2z"></path>
+                        </svg>
+                      </button>
+                      <button
+                        className="circle-button inspect-button"
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          openExerciseDetails(exercise);
+                        }}
+                        aria-label="Inspect"
+                      >
                         <svg
                           xmlns="http://www.w3.org/2000/svg"
                           width="24"
@@ -449,103 +413,198 @@ const Exercises = () => {
                           strokeWidth="2"
                           strokeLinecap="round"
                           strokeLinejoin="round"
-                          className={`dropdown-icon ${
-                            detailsOpen ? "rotate-180" : ""
-                          }`}
                         >
-                          <polyline points="6 9 12 15 18 9"></polyline>
+                          <circle cx="11" cy="11" r="8"></circle>
+                          <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+                        </svg>
+                      </button>
+                    </div>
+                    <div className="exercise-static-image">
+                      <img
+                        src={exercise.gifUrl || "/placeholder.svg"}
+                        alt={exercise.name}
+                        className="exercise-image"
+                      />
+                      <div className="view-exercise-overlay">
+                        <svg
+                          xmlns="http://www.w3.org/2000/svg"
+                          width="24"
+                          height="24"
+                          viewBox="0 0 24 24"
+                          fill="none"
+                          stroke="#fff"
+                          strokeWidth="2"
+                          strokeLinecap="round"
+                          strokeLinejoin="round"
+                          className="view-icon"
+                        >
+                          <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path>
+                          <circle cx="12" cy="12" r="3"></circle>
                         </svg>
                       </div>
-                      <div
-                        className={`collapsible-content ${
-                          detailsOpen ? "open" : ""
-                        }`}
-                      >
-                        <div className="exercise-details-grid">
-                          <span className="detail-label">Body Part:</span>
-                          <span className="detail-value">
-                            {selectedExercise.bodyPart}
-                          </span>
-                          <span className="detail-label">Target:</span>
-                          <span className="detail-value">
-                            {selectedExercise.target}
-                          </span>
-                          <span className="detail-label">Equipment:</span>
-                          <span className="detail-value">
-                            {selectedExercise.equipment}
-                          </span>
+                    </div>
+                  </div>
+                  <div className="exercise-details">
+                    <h3 className="exercise-name">{exercise.name}</h3>
+                    <div className="exercise-tags">
+                      <span className="exercise-tag">{exercise.bodyPart}</span>
+                      <span className="exercise-tag">{exercise.target}</span>
+                      <span className="exercise-tag">{exercise.equipment}</span>
+                    </div>
+                  </div>
+                </div>
+              ))}
+            </div>
+          )}
+
+          {/* Exercise Detail Modal */}
+          {selectedExercise && (
+            <div
+              className="exercise-modal-overlay"
+              onClick={closeExerciseDetails}
+            >
+              <div
+                className="exercise-modal"
+                onClick={(e) => e.stopPropagation()}
+              >
+                <button
+                  className="close-modal"
+                  onClick={closeExerciseDetails}
+                  aria-label="Close modal"
+                  title="Close"
+                >
+                  <span className="close-icon">✕</span>
+                </button>
+
+                <div className="modal-container">
+                  <div className="modal-header">
+                    <h2 className="modal-title">{selectedExercise.name}</h2>
+                  </div>
+
+                  <div className="modal-gif-section">
+                    <img
+                      src={selectedExercise.gifUrl || "/placeholder.svg"}
+                      alt={selectedExercise.name}
+                      className="modal-gif"
+                    />
+                  </div>
+
+                  <div className="modal-content-section">
+                    <div className="modal-info">
+                      <div className="info-section details-section">
+                        <div
+                          className="section-header"
+                          onClick={() => setDetailsOpen(!detailsOpen)}
+                        >
+                          <h3>Details</h3>
+                          <svg
+                            xmlns="http://www.w3.org/2000/svg"
+                            width="24"
+                            height="24"
+                            viewBox="0 0 24 24"
+                            fill="none"
+                            stroke="currentColor"
+                            strokeWidth="2"
+                            strokeLinecap="round"
+                            strokeLinejoin="round"
+                            className={`dropdown-icon ${
+                              detailsOpen ? "rotate-180" : ""
+                            }`}
+                          >
+                            <polyline points="6 9 12 15 18 9"></polyline>
+                          </svg>
+                        </div>
+                        <div
+                          className={`collapsible-content ${
+                            detailsOpen ? "open" : ""
+                          }`}
+                        >
+                          <div className="exercise-details-grid">
+                            <span className="detail-label">Body Part:</span>
+                            <span className="detail-value">
+                              {selectedExercise.bodyPart}
+                            </span>
+                            <span className="detail-label">Target:</span>
+                            <span className="detail-value">
+                              {selectedExercise.target}
+                            </span>
+                            <span className="detail-label">Equipment:</span>
+                            <span className="detail-value">
+                              {selectedExercise.equipment}
+                            </span>
+                          </div>
+                        </div>
+                      </div>
+
+                      <div className="info-section instructions-section">
+                        <div
+                          className="section-header"
+                          onClick={() => setInstructionsOpen(!instructionsOpen)}
+                        >
+                          <h3>Instructions</h3>
+                          <svg
+                            xmlns="http://www.w3.org/2000/svg"
+                            width="24"
+                            height="24"
+                            viewBox="0 0 24 24"
+                            fill="none"
+                            stroke="currentColor"
+                            strokeWidth="2"
+                            strokeLinecap="round"
+                            strokeLinejoin="round"
+                            className={`dropdown-icon ${
+                              instructionsOpen ? "rotate-180" : ""
+                            }`}
+                          >
+                            <polyline points="6 9 12 15 18 9"></polyline>
+                          </svg>
+                        </div>
+                        <div
+                          className={`collapsible-content ${
+                            instructionsOpen ? "open" : ""
+                          }`}
+                        >
+                          <ol className="instructions-list">
+                            {selectedExercise.instructions?.map(
+                              (instruction, index) => (
+                                <li key={index}>{instruction}</li>
+                              )
+                            ) || <li>Follow the animation above.</li>}
+                          </ol>
                         </div>
                       </div>
                     </div>
-
-                    <div className="info-section instructions-section">
-                      <div
-                        className="section-header"
-                        onClick={() => setInstructionsOpen(!instructionsOpen)}
-                      >
-                        <h3>Instructions</h3>
-                        <svg
-                          xmlns="http://www.w3.org/2000/svg"
-                          width="24"
-                          height="24"
-                          viewBox="0 0 24 24"
-                          fill="none"
-                          stroke="currentColor"
-                          strokeWidth="2"
-                          strokeLinecap="round"
-                          strokeLinejoin="round"
-                          className={`dropdown-icon ${
-                            instructionsOpen ? "rotate-180" : ""
-                          }`}
-                        >
-                          <polyline points="6 9 12 15 18 9"></polyline>
-                        </svg>
-                      </div>
-                      <div
-                        className={`collapsible-content ${
-                          instructionsOpen ? "open" : ""
-                        }`}
-                      >
-                        <ol className="instructions-list">
-                          {selectedExercise.instructions?.map(
-                            (instruction, index) => (
-                              <li key={index}>{instruction}</li>
-                            )
-                          ) || <li>Follow the animation above.</li>}
-                        </ol>
-                      </div>
-                    </div>
                   </div>
                 </div>
               </div>
             </div>
-          </div>
-        )}
+          )}
 
-        {/* Filter Modal */}
-        {showFilterModal && (
-          <FilterModal
-            onClose={() => setShowFilterModal(false)}
-            onApply={handleApplyFilters}
-            bodyParts={bodyParts.filter(
-              (part) => part.name !== "Filters" && part.name !== "Favorites"
-            )}
-            equipmentList={equipmentList}
-            initialFilters={filterOptions}
-            onCreateExercise={() => {
-              setShowFilterModal(false);
-              setShowCreateModal(true);
-            }}
-          />
-        )}
+          {/* Filter Modal */}
+          {showFilterModal && (
+            <FilterModal
+              onClose={() => setShowFilterModal(false)}
+              onApply={handleApplyFilters}
+              bodyParts={bodyParts.filter(
+                (part) => part.name !== "Filters" && part.name !== "Favorites"
+              )}
+              equipmentList={equipmentList}
+              initialFilters={filterOptions}
+              onCreateExercise={() => {
+                setShowFilterModal(false);
+                setShowCreateModal(true);
+              }}
+            />
+          )}
 
-        {/* Create Exercise Modal */}
-        {showCreateModal && (
-          <CreateExerciseModal
-            onClose={() => setShowCreateModal(false)}
-            onSave={handleCreateExercise}
-          />
-        )}
+          {/* Create Exercise Modal */}
+          {showCreateModal && (
+            <CreateExerciseModal
+              onClose={() => setShowCreateModal(false)}
+              onSave={handleCreateExercise}
+            />
+          )}
+        </div>
       </div>
     </div>
     </>

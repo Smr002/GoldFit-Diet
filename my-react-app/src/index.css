@@ -2687,7 +2687,6 @@ li.excluded .feature-text {
     font-size: 32px;
   }
 }
-
 /* THEME TOGGLE CSS*/
 /* Theme Variables */
 :root {
@@ -4685,4 +4684,169 @@ body.dark-mode .footer-legal-links a:hover {
 .apply-button:hover {
   background: #2563eb;
   box-shadow: 0 4px 15px rgba(59, 130, 246, 0.4);
+}
+
+.exercises-hero {
+  padding: 4rem 2rem;
+  background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+  text-align: center;
+  margin-bottom: 2rem;
+}
+
+.exercises-hero-content {
+  max-width: 800px;
+  margin: 0 auto;
+}
+
+.exercises-hero h1 {
+  font-size: 2.5rem;
+  font-weight: 800;
+  color: #1a1a1a;
+  margin-bottom: 1rem;
+  background: linear-gradient(135deg, #1a1a1a 0%, #4a4a4a 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
+.exercises-hero p {
+  font-size: 1.1rem;
+  color: #4a4a4a;
+  margin-bottom: 2rem;
+  line-height: 1.6;
+}
+
+.exercises-hero-features {
+  display: flex;
+  justify-content: center;
+  gap: 3rem;
+  flex-wrap: wrap;
+}
+
+.hero-feature {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.75rem 1.5rem;
+  background: rgba(255, 255, 255, 0.9);
+  border-radius: 50px;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.hero-feature:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 12px rgba(0, 0, 0, 0.15);
+}
+
+.hero-feature svg {
+  color: #4a90e2;
+}
+
+.hero-feature span {
+  font-weight: 600;
+  color: #333;
+}
+
+body.dark-mode .exercises-hero {
+  background: linear-gradient(135deg, #1a1a1a 0%, #2d3436 100%);
+}
+
+body.dark-mode .exercises-hero h1 {
+  background: linear-gradient(135deg, #ffffff 0%, #e0e0e0 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
+body.dark-mode .exercises-hero p {
+  color: #e0e0e0;
+}
+
+body.dark-mode .hero-feature {
+  background: rgba(45, 52, 54, 0.9);
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.2);
+}
+
+body.dark-mode .hero-feature span {
+  color: #e0e0e0;
+}
+
+@media (max-width: 768px) {
+  .exercises-hero {
+    padding: 3rem 1rem;
+  }
+
+  .exercises-hero h1 {
+    font-size: 2rem;
+  }
+
+  .exercises-hero p {
+    font-size: 1rem;
+  }
+
+  .exercises-hero-features {
+    gap: 1rem;
+  }
+
+  .hero-feature {
+    padding: 0.5rem 1rem;
+  }
+}
+
+.exercises-page-container {
+  margin-top: 0;
+  background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+  min-height: 100vh;
+  position: relative;
+}
+
+.exercises-hero {
+  padding: 0;
+  text-align: center;
+  margin-bottom: 0;
+  background: transparent;
+  height: 110vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  position: relative;
+  z-index: 1;
+}
+
+.exercises-main-content {
+  position: relative;
+  z-index: 2;
+  background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+  margin-top: -2rem;
+  padding-top: 2rem;
+  border-radius: 2rem 2rem 0 0;
+  opacity: 0;
+  transform: translateY(30px);
+  transition: opacity 1.2s ease-out, transform 1.2s ease-out;
+}
+
+.exercises-main-content.visible {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+.exercises-container {
+  padding: 0 2rem 2rem;
+}
+
+body.dark-mode .exercises-main-content {
+  background: linear-gradient(135deg, #1a1a1a 0%, #2d3436 100%);
+}
+
+@media (max-width: 768px) {
+  .exercises-hero {
+    height: 100vh;
+  }
+
+  .exercises-hero-content {
+    padding: 0 1rem;
+  }
+
+  .exercises-container {
+    padding: 0 1rem 1rem;
+  }
 }
