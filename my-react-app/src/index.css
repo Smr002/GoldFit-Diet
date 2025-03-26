@@ -5020,3 +5020,107 @@ body.dark-mode .exercises-main-content {
   overflow-y: auto; /* Vertical scroll if needed */
   padding-left: 20px;
 }
+
+
+/* Prevent horizontal scrolling on the entire page */
+body, html {
+  overflow-x: hidden; /* Blocks horizontal scrolling */
+  width: 100%;
+  margin: 0;
+  padding: 0;
+}
+
+/* Ensure main container stays within viewport */
+.exercises-container {
+  width: 100%;
+  max-width: 100vw; /* Prevents content from exceeding viewport width */
+  overflow-x: hidden; /* Hides any horizontal overflow */
+  padding: 0 15px; /* Optional: Adds some padding for aesthetics */
+}
+
+/* Body Parts Section with Horizontal Scrollbar */
+.body-parts-container {
+  width: 100%;
+  overflow-x: auto; /* Enables horizontal scrolling when needed */
+  white-space: nowrap; /* Keeps items in a single row */
+  padding-bottom: 10px; /* Adds space for the scrollbar */
+  -webkit-overflow-scrolling: touch; /* Smooth scrolling on mobile */
+}
+
+/* Styling for the scrollable container */
+.body-parts-scroll {
+  display: inline-flex; /* Displays items in a row */
+  flex-wrap: nowrap; /* Prevents wrapping to next line */
+}
+
+/* Individual body part items */
+.body-part-item {
+  display: inline-flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  margin-right: 15px; /* Space between items */
+  padding: 10px;
+  cursor: pointer;
+  min-width: 80px; /* Ensures items have a consistent minimum width */
+  text-align: center;
+}
+
+.body-part-item:last-child {
+  margin-right: 0; /* Removes margin from the last item */
+}
+
+/* Optional: Style the active state */
+.body-part-item.active {
+  background-color: #e0e0e0; /* Example active state styling */
+  border-radius: 8px;
+}
+
+/* Ensure responsiveness across all sizes */
+@media (min-width: 768px) {
+  .body-parts-container {
+    /* No need to hide scrollbar; let it appear if content overflows */
+  }
+}
+
+/* Prevent overflow in other sections (e.g., exercises grid, modals) */
+.exercises-grid {
+  width: 100%;
+  max-width: 100%;
+  overflow-x: hidden;
+}
+
+.exercise-modal-overlay,
+.filter-modal-overlay,
+.create-exercise-modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  overflow: hidden; /* Prevents overflow issues in modals */
+}
+
+.body-parts-container {
+  width: 100%;
+  overflow-x: auto;
+  white-space: nowrap;
+  padding-bottom: 10px;
+  -webkit-overflow-scrolling: touch;
+}
+
+.body-parts-scroll {
+  display: inline-flex;
+  flex-wrap: nowrap;
+}
+
+.body-part-item {
+  display: inline-flex;
+  flex-direction: column;
+  align-items: center;
+  margin-right: 15px;
+  padding: 10px;
+  cursor: pointer;
+  min-width: 80px;
+  text-align: center;
+}

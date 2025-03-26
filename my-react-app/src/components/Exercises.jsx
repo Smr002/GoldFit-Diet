@@ -1,11 +1,11 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import BodyPartIcons from "./BodyPartIcons";
 import FilterModal from "./FilterModal";
 import CreateExerciseModal from "./CreateExerciseModal";
 import Navbar from "./Navbar";
-import MobileFooter from "./MobileFooter"; // Import the new component
+import MobileFooter from "./MobileFooter";
 
 const bodyParts = [
   { name: "Favorites", icon: "favorites" },
@@ -61,7 +61,10 @@ const Exercises = () => {
   const [detailsOpen, setDetailsOpen] = useState(false);
   const [instructionsOpen, setInstructionsOpen] = useState(false);
 
-  // Persist favorites and custom exercises
+  // Add a ref to control the body parts scroll container
+  const scrollRef = useRef(null);
+
+  // Persist favorites and custom exercises to localStorage
   useEffect(() => {
     localStorage.setItem("favorites", JSON.stringify(favorites));
   }, [favorites]);
@@ -82,7 +85,7 @@ const Exercises = () => {
     };
   }, [selectedExercise]);
 
-  // Fetch equipment list
+  // Fetch equipment list from API
   useEffect(() => {
     const fetchEquipment = async () => {
       try {
@@ -145,7 +148,7 @@ const Exercises = () => {
     fetchExercises();
   }, [bodyPart, equipment]);
 
-  // Apply filters and search
+  // Apply filters and search to exercises
   useEffect(() => {
     let filteredData = [...allExercises, ...myExercises];
 
@@ -175,6 +178,13 @@ const Exercises = () => {
 
     setExercises(filteredData);
   }, [allExercises, myExercises, search, filterOptions, favorites]);
+
+  // Reset scroll position to the left when bodyPart changes
+  useEffect(() => {
+    if (scrollRef.current) {
+      scrollRef.current.scrollLeft = 0;
+    }
+  }, [bodyPart]);
 
   const handleSearchChange = (e) => setSearch(e.target.value);
 
@@ -277,16 +287,15 @@ const Exercises = () => {
             </div>
           </div>
 
-          {/* Body Part Filter */}
+          {/* Body Part Filter with Horizontal Scroll */}
           <div className="body-parts-container">
-            <div className="body-parts-scroll">
+            <div className="body-parts-scroll" ref={scrollRef}>
               {bodyParts.map((part) => (
                 <div
                   key={part.name}
                   onClick={() => handleBodyPartClick(part.name)}
                   className={`body-part-item ${
-                    (part.name === "Favorites" &&
-                      filterOptions.showFavorites) ||
+                    (part.name === "Favorites" && filterOptions.showFavorites) ||
                     bodyPart === part.name.toLowerCase()
                       ? "active"
                       : ""
@@ -555,7 +564,7 @@ const Exercises = () => {
             />
           )}
         </div>
-        <MobileFooter /> {/* Add the MobileFooter here */}
+        <MobileFooter />
       </div>
     </>
   );
