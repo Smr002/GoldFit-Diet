@@ -4,6 +4,7 @@ import jwt from "jsonwebtoken";
 const JWT_SECRET = process.env.JWT_SECRET || "super-secret";
 
 export interface AuthenticatedRequest extends Request {
+  headers: any;
   user?: {
     id: number;
     email: string;

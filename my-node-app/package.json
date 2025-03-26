@@ -3,7 +3,7 @@
   "version": "1.0.0",
   "main": "index.js",
   "scripts": {
-    "start": "node dist/server.js",
+    "start": "node dist/server.ts",
     "dev": "ts-node-dev --respawn --transpile-only src/server.ts",
     "build": "tsc"
   },
@@ -26,6 +26,7 @@
     "nodemon": "^3.1.9",
     "prisma": "^6.5.0",
     "ts-node": "^10.9.2",
+    "ts-node-dev": "^2.0.0",
     "typescript": "^5.8.2"
   },
   "prisma": {
