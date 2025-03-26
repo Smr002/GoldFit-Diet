@@ -37,10 +37,11 @@ export class UserController {
     try {
       const newUser = await userService.createUser(req.body);
       res.status(201).json(newUser);
-    } catch (err) {
-      res.status(400).json({ error: "Failed to create user." });
+    } catch (err: any) {
+      res.status(400).json({ error: "Failed to create user.", details: err?.message });
     }
   }
+  
 
   async update(req: Request, res: Response) {
     try {
@@ -62,15 +63,7 @@ export class UserController {
     }
   }
 
-  async getByRole(req: Request, res: Response) {
-    try {
-      const role = req.params.role as "student" | "professor";
-      const users = await userService.getUsersByRole(role);
-      res.json(users);
-    } catch (err) {
-      res.status(400).json({ error: "Invalid role." });
-    }
-  }
+
 }
 
 export const userController = new UserController();

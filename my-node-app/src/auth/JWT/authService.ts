@@ -10,7 +10,7 @@ export class AuthService {
   async validateUser(email: string, password: string): Promise<User | null> {
     const user = await usersRepository.findByEmail(email);
     if (!user) return null;
-    const isMatch = await bcrypt.compare(password, user.passwordHash);
+    const isMatch = await bcrypt.compare(password, user.password);
     return isMatch ? user : null;
   }
 
@@ -19,7 +19,6 @@ export class AuthService {
       {
         id: user.id,
         email: user.email,
-        role: user.role,
       },
       JWT_SECRET,
       { expiresIn: JWT_EXPIRES_IN }

@@ -1,33 +1,55 @@
 import { z } from "zod";
+export const GoalSchema = z.enum([
+ 
+  "LOSE_WEIGHT",
+  "BUILD_MUSCLE",
+  "MAINTAIN",
+  "RECOMPOSITION",
+]);
 
 export const UserSchema = z.object({
-  id: z.bigint().optional(),
-  name: z
+  id: z.number().optional(), 
+  email: z
     .string()
-    .min(3, { message: "Name must be at least 3 characters long." })
-    .max(100, { message: "Name must be at most 100 characters long." })
-    .regex(/^[a-zA-Z\s.'-]+$/, { message: "Invalid name format." }),
-  email: z.string().email({ message: "Invalid email format." }),
-  passwordHash: z
+    .email({ message: "Invalid email format." }),
+  password: z
     .string()
-    .min(8, { message: "Password must be at least 8 characters." }),
-  role: z.enum(["student", "professor"]),
+    .min(8, { message: "Password must be at least 8 characters long." }),
+  firstName: z.string().optional().nullable(),
+  lastName: z.string().optional().nullable(),
+  age: z.number().min(0, { message: "Age must be >= 0." }),
+  gender: z.string().min(1, { message: "Gender cannot be empty." }),
+  height: z.number().min(0, { message: "Height must be >= 0." }),
+  weight: z.number().min(0, { message: "Weight must be >= 0." }),
+  goal: GoalSchema, 
+  activeWorkoutId: z.number().optional().nullable(),
+  notifyWorkoutSessions: z.boolean().optional().default(false),
+  notifyMotivational: z.boolean().optional().default(false),
+  preferredUnits: z.string().optional().default("metric"),
+  isPremium: z.boolean().optional().default(false),
   createdAt: z.date().optional(),
+  updatedAt: z.date().optional(), 
+  deletedAt: z.date().optional().nullable(),
 });
 
+
 export type User = z.infer<typeof UserSchema>;
+
 
 export class UserModel {
   private data: User;
 
+
   constructor(options: Partial<User>) {
     this.data = UserSchema.parse({
       ...options,
-      name: options.name?.trim() || "",
-      email: options.email?.toLowerCase() || "",
-      passwordHash: options.passwordHash || "",
-      role: options.role || "student",
-      createdAt: options.createdAt || new Date(),
+
+      email: options.email?.trim().toLowerCase() || "",
+      firstName: options.firstName?.trim() || undefined,
+      lastName: options.lastName?.trim() || undefined,
+      createdAt: options.createdAt ?? new Date(),
+      updatedAt: options.updatedAt ?? new Date(),
+
     });
   }
 

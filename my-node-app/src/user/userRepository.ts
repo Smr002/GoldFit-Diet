@@ -20,6 +20,7 @@ export class UsersRepository {
   }
 
   async create(data: Omit<User, "id">): Promise<User> {
+    console.log("Data", data)
     return this.prisma.user.create({ data });
   }
 
@@ -36,25 +37,6 @@ export class UsersRepository {
     });
   }
 
-  async findUserByDetails(
-    userData: Pick<User, "email" | "name">
-  ): Promise<{ id: number } | null> {
-    if (!userData.email || !userData.name) return null;
-
-    return this.prisma.user.findFirst({
-      where: {
-        email: userData.email,
-        name: userData.name,
-      },
-      select: { id: true },
-    });
-  }
-
-  async findUsersByRole(role: "student" | "professor"): Promise<User[]> {
-    return this.prisma.user.findMany({
-      where: { role },
-    });
-  }
 }
 
 export const usersRepository = new UsersRepository();
