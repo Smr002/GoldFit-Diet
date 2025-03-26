@@ -5,7 +5,7 @@ import { authenticateJWT } from "../auth/JWT/authMiddleware";
 const router = Router();
 
 router.post("/", (req, res) => userController.create(req, res));
-router.get("/", (req, res) => userController.getAll(req, res));
+
 
 router.use(authenticateJWT);
 
@@ -13,6 +13,7 @@ router.get("/email/:email", async (req, res) => {
   await userController.getByEmail(req, res);
 });
 
+router.get("/", (req, res) => userController.getAll(req, res));
 
 
 router.get("/:id", async (req, res) => {
