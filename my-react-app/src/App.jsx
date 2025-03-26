@@ -1,4 +1,4 @@
-import { BrowserRouter, Routes, Route, Link } from "react-router-dom";
+import { BrowserRouter, Routes, Route, Link, Navigate } from "react-router-dom";
 import React, { useState } from "react";
 import HomePage from "../src/pages/HomePage";
 import AccModal from "../src/components/AccModal";
@@ -30,8 +30,9 @@ export default function App() {
         <Route path="/exercises" element={<Exercises />} />
 
         {/* Admin Routes */}
-                <Route path="/admin" element={<AdminLayout />}>
-                  <Route path="dashboard" element={<Dashboard />} />
+                <Route path="/admin/*" element={<AdminLayout />}>
+    <Route index element={<Navigate to="/admin/dashboard" replace />} />
+    <Route path="dashboard" element={<Dashboard />} />
                   <Route path="users" element={<UserManagement />} />
                   <Route path="workouts" element={<WorkoutManagement />} />
                   <Route path="notifications" element={<NotificationManagement />} />

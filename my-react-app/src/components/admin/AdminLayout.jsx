@@ -1,7 +1,8 @@
-import React, { useState } from 'react';
-import { Outlet } from 'react-router-dom';
+import React, { useState, useEffect } from 'react';
+import { Outlet, useLocation, useNavigate } from 'react-router-dom';
 import Sidebar from './Sidebar';
 import Header from './Header';
+import Dashboard from '../../pages/admin/Dashboard';
 import 'admin.css';
 
 const AdminLayout = ({ isSuperAdmin = false }) => {

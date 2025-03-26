@@ -18,38 +18,44 @@ const Header = ({ username = "Admin User", userRole = "Administrator" }) => {
 
   return (
     <header className="admin-header">
-      {/* Icons and User Dropdown */}
-      <div className="admin-header-actions">
-        {/* Notification Bell */}
-        <button className="admin-notification-btn">
-          <Bell size={20} />
-          <span className="admin-notification-badge"></span>
-        </button>
-
-        {/* User Dropdown */}
-        <div className="admin-dropdown" ref={dropdownRef}>
-          <button 
-            className="admin-dropdown-trigger"
-            onClick={() => setShowDropdown(!showDropdown)}
-          >
-            <div className="admin-avatar">
-              <User size={20} />
-            </div>
-            <div className="admin-user-info">
-              <span className="admin-username">{username}</span>
-              <span className="admin-user-role">{userRole}</span>
-            </div>
-            <ChevronDown size={16} className="admin-dropdown-arrow" />
+      <div className="admin-header-content">
+        
+        <div className="admin-header-actions">
+          {/* Notification Bell */}
+          <button className="admin-notification-btn">
+            <Bell size={20} />
+            <span className="admin-notification-badge"></span>
           </button>
 
-          {showDropdown && (
-            <div className="admin-dropdown-menu">
-              <a href="#" className="admin-dropdown-item">Your Profile</a>
-              <a href="#" className="admin-dropdown-item">Settings</a>
-              <div className="admin-dropdown-divider"></div>
-              <a href="#" className="admin-dropdown-item">Sign out</a>
-            </div>
-          )}
+          {/* User Dropdown */}
+          <div className="admin-dropdown" ref={dropdownRef}>
+            <button
+              className="admin-dropdown-trigger"
+              onClick={() => setShowDropdown(!showDropdown)}
+            >
+              <div className="admin-avatar">
+                <img
+                  src="https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=facearea&facepad=2&w=256&h=256&q=80"
+                  alt="Admin Avatar"
+                  className="admin-avatar-img"
+                />
+              </div>
+              <div className="admin-user-info">
+                <span className="admin-username">{username}</span>
+                <span className="admin-user-role">{userRole}</span>
+              </div>
+              <ChevronDown size={16} className="admin-dropdown-arrow" />
+            </button>
+
+            {showDropdown && (
+              <div className="admin-dropdown-menu">
+                <a href="#" className="admin-dropdown-item">Your Profile</a>
+                <a href="#" className="admin-dropdown-item">Settings</a>
+                <div className="admin-dropdown-divider"></div>
+                <a href="#" className="admin-dropdown-item">Sign out</a>
+              </div>
+            )}
+          </div>
         </div>
       </div>
     </header>
