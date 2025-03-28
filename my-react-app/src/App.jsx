@@ -13,6 +13,7 @@ import WorkoutManagement from "./pages/admin/WorkoutManagement";
 import NotificationManagement from "./pages/admin/NotificationManagement";
 import FAQManagement from "./pages/admin/FAQManagement";
 import AdminManagement from "./pages/admin/AdminManagement";
+import Workout from "./components/UserWorkout";
 
 export default function App() {
   const [isModalOpen, setModalOpen] = useState(false);
@@ -28,6 +29,7 @@ export default function App() {
         />
         <Route path="/create-account/*" element={<CreateAccount />} />
         <Route path="/exercises" element={<Exercises />} />
+        <Route path="/workouts" element={<Workout/>}/>
 
         {/* Admin Routes */}
                 <Route path="/admin/*" element={<AdminLayout />}>
