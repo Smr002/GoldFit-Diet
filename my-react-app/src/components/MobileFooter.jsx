@@ -1,7 +1,36 @@
-import React from "react";
+import React, { useEffect } from "react";
 import { Link } from "react-router-dom";
 
 const MobileFooter = () => {
+  // Add effect to ensure main content has proper padding
+  useEffect(() => {
+    // Add padding to the bottom of the main content
+    const updateContentPadding = () => {
+      const footerHeight = document.querySelector('.mobile-footer')?.offsetHeight || 70; // Default to 70px if not yet rendered
+      
+      // Add padding to exercises container if it exists
+      const exercisesContainer = document.querySelector('.exercises-container');
+      if (exercisesContainer) {
+        exercisesContainer.style.paddingBottom = `${footerHeight + 20}px`; // 20px extra for spacing
+      }
+    };
+
+    // Call immediately and on resize for responsive support
+    updateContentPadding();
+    window.addEventListener('resize', updateContentPadding);
+
+    // Cleanup on unmount
+    return () => {
+      window.removeEventListener('resize', updateContentPadding);
+      
+      // Reset padding when component unmounts
+      const exercisesContainer = document.querySelector('.exercises-container');
+      if (exercisesContainer) {
+        exercisesContainer.style.paddingBottom = '';
+      }
+    };
+  }, []);
+
   return (
     <div className="mobile-footer">
       <Link to="/" className="footer-item">

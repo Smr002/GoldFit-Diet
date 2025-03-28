@@ -58,8 +58,9 @@ const Exercises = () => {
     showMyExercises: false,
   });
   const [equipmentList, setEquipmentList] = useState([]);
-  const [detailsOpen, setDetailsOpen] = useState(false);
+  const [detailsOpen, setDetailsOpen] = useState(true); // Changed to true
   const [instructionsOpen, setInstructionsOpen] = useState(false);
+  const [modalLoading, setModalLoading] = useState(false);
 
   // Add a ref to control the body parts scroll container
   const scrollRef = useRef(null);
@@ -217,9 +218,15 @@ const Exercises = () => {
   };
 
   const openExerciseDetails = (exercise) => {
+    setModalLoading(true);
     setSelectedExercise(exercise);
-    setDetailsOpen(false);
+    setDetailsOpen(true);
     setInstructionsOpen(false);
+    
+    // Simulate loading time (remove this in production if using real API loading)
+    setTimeout(() => {
+      setModalLoading(false);
+    }, 1000);
   };
 
   const closeExerciseDetails = () => {
@@ -436,104 +443,138 @@ const Exercises = () => {
                 </button>
 
                 <div className="modal-container">
-                  <div className="modal-header">
-                    <h2 className="modal-title">{selectedExercise.name}</h2>
-                  </div>
+                  {modalLoading ? (
+                    /* Skeleton Loading UI */
+                    <div className="modal-skeleton">
+                      <div className="skeleton-header">
+                        <div className="skeleton-title"></div>
+                      </div>
 
-                  <div className="modal-gif-section">
-                    <img
-                      src={selectedExercise.gifUrl || "/placeholder.svg"}
-                      alt={selectedExercise.name}
-                      className="modal-gif"
-                    />
-                  </div>
+                      <div className="skeleton-gif"></div>
 
-                  <div className="modal-content-section">
-                    <div className="modal-info">
-                      <div className="info-section details-section">
-                        <div
-                          className="section-header"
-                          onClick={() => setDetailsOpen(!detailsOpen)}
-                        >
-                          <h3>Details</h3>
-                          <svg
-                            xmlns="http://www.w3.org/2000/svg"
-                            width="24"
-                            height="24"
-                            viewBox="0 0 24 24"
-                            fill="none"
-                            stroke="currentColor"
-                            strokeWidth="2"
-                            strokeLinecap="round"
-                            strokeLinejoin="round"
-                            className={`dropdown-icon ${
-                              detailsOpen ? "rotate-180" : ""
-                            }`}
-                          >
-                            <polyline points="6 9 12 15 18 9"></polyline>
-                          </svg>
+                      <div className="skeleton-content">
+                        <div className="skeleton-section">
+                          <div className="skeleton-section-header"></div>
+                          <div className="skeleton-details">
+                            <div className="skeleton-detail-row"></div>
+                            <div className="skeleton-detail-row"></div>
+                            <div className="skeleton-detail-row"></div>
+                          </div>
                         </div>
-                        <div
-                          className={`collapsible-content ${
-                            detailsOpen ? "open" : ""
-                          }`}
-                        >
-                          <div className="exercise-details-grid">
-                            <span className="detail-label">Body Part:</span>
-                            <span className="detail-value">
-                              {selectedExercise.bodyPart}
-                            </span>
-                            <span className="detail-label">Target:</span>
-                            <span className="detail-value">
-                              {selectedExercise.target}
-                            </span>
-                            <span className="detail-label">Equipment:</span>
-                            <span className="detail-value">
-                              {selectedExercise.equipment}
-                            </span>
+                        
+                        <div className="skeleton-section">
+                          <div className="skeleton-section-header"></div>
+                          <div className="skeleton-instructions">
+                            <div className="skeleton-instruction-line"></div>
+                            <div className="skeleton-instruction-line"></div>
+                            <div className="skeleton-instruction-line"></div>
                           </div>
                         </div>
                       </div>
+                    </div>
+                  ) : (
+                    /* Actual Exercise Content */
+                    <>
+                      <div className="modal-header">
+                        <h2 className="modal-title">{selectedExercise.name}</h2>
+                      </div>
 
-                      <div className="info-section instructions-section">
-                        <div
-                          className="section-header"
-                          onClick={() => setInstructionsOpen(!instructionsOpen)}
-                        >
-                          <h3>Instructions</h3>
-                          <svg
-                            xmlns="http://www.w3.org/2000/svg"
-                            width="24"
-                            height="24"
-                            viewBox="0 0 24 24"
-                            fill="none"
-                            stroke="currentColor"
-                            strokeWidth="2"
-                            strokeLinecap="round"
-                            strokeLinejoin="round"
-                            className={`dropdown-icon ${
-                              instructionsOpen ? "rotate-180" : ""
-                            }`}
-                          >
-                            <polyline points="6 9 12 15 18 9"></polyline>
-                          </svg>
-                        </div>
-                        <div
-                          className={`collapsible-content ${
-                            instructionsOpen ? "open" : ""
-                          }`}
-                        >
-                          <ol className="instructions-list">
-                            {selectedExercise.instructions?.map(
-                              (instruction, index) => (
-                                <li key={index}>{instruction}</li>
-                              )
-                            ) || <li>Follow the animation above.</li>}
-                          </ol>
+                      <div className="modal-gif-section">
+                        <img
+                          src={selectedExercise.gifUrl || "/placeholder.svg"}
+                          alt={selectedExercise.name}
+                          className="modal-gif"
+                        />
+                      </div>
+
+                      <div className="modal-content-section">
+                        <div className="modal-info">
+                          <div className="info-section details-section">
+                            <div
+                              className="section-header"
+                              onClick={() => setDetailsOpen(!detailsOpen)}
+                            >
+                              <h3>Details</h3>
+                              <svg
+                                xmlns="http://www.w3.org/2000/svg"
+                                width="24"
+                                height="24"
+                                viewBox="0 0 24 24"
+                                fill="none"
+                                stroke="currentColor"
+                                strokeWidth="2"
+                                strokeLinecap="round"
+                                strokeLinejoin="round"
+                                className={`dropdown-icon ${
+                                  detailsOpen ? "rotate-180" : ""
+                                }`}
+                              >
+                                <polyline points="6 9 12 15 18 9"></polyline>
+                              </svg>
+                            </div>
+                            <div
+                              className={`collapsible-content ${
+                                detailsOpen ? "open" : ""
+                              }`}
+                            >
+                              <div className="exercise-details-grid">
+                                <span className="detail-label">Body Part:</span>
+                                <span className="detail-value">
+                                  {selectedExercise.bodyPart}
+                                </span>
+                                <span className="detail-label">Target:</span>
+                                <span className="detail-value">
+                                  {selectedExercise.target}
+                                </span>
+                                <span className="detail-label">Equipment:</span>
+                                <span className="detail-value">
+                                  {selectedExercise.equipment}
+                                </span>
+                              </div>
+                            </div>
+                          </div>
+
+                          <div className="info-section instructions-section">
+                            <div
+                              className="section-header"
+                              onClick={() => setInstructionsOpen(!instructionsOpen)}
+                            >
+                              <h3>Instructions</h3>
+                              <svg
+                                xmlns="http://www.w3.org/2000/svg"
+                                width="24"
+                                height="24"
+                                viewBox="0 0 24 24"
+                                fill="none"
+                                stroke="currentColor"
+                                strokeWidth="2"
+                                strokeLinecap="round"
+                                strokeLinejoin="round"
+                                className={`dropdown-icon ${
+                                  instructionsOpen ? "rotate-180" : ""
+                                }`}
+                              >
+                                <polyline points="6 9 12 15 18 9"></polyline>
+                              </svg>
+                            </div>
+                            <div
+                              className={`collapsible-content ${
+                                instructionsOpen ? "open" : ""
+                              }`}
+                            >
+                              <ol className="instructions-list">
+                                {selectedExercise.instructions?.map(
+                                  (instruction, index) => (
+                                    <li key={index}>{instruction}</li>
+                                  )
+                                ) || <li>Follow the animation above.</li>}
+                              </ol>
+                            </div>
+                          </div>
                         </div>
                       </div>
-                    </div>
-                  </div>
+                    </>
+                  )}
                 </div>
               </div>
             </div>

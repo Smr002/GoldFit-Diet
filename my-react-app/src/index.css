@@ -1676,7 +1676,7 @@ body.dark-mode .pricing-features li {
 
 .period {
   font-size: 16px;
-  color: var(--text-color);
+  color: var (--text-color);
   opacity: 0.8;
 }
 
@@ -4910,9 +4910,16 @@ body.dark-mode .exercises-main-content {
   display: flex;
   justify-content: space-around;
   background-color: #fff;
-  padding: 10px 0;
+  padding: 12px 0; /* Slightly increased padding */
   box-shadow: 0 -2px 5px rgba(0, 0, 0, 0.1);
   z-index: 1000;
+  height: 65px; /* Set explicit height for consistent spacing */
+  transition: transform 0.3s ease;
+}
+
+body.dark-mode .mobile-footer {
+  background-color: #1a1a1a;
+  box-shadow: 0 -2px 5px rgba(0, 0, 0, 0.3);
 }
 
 .footer-item {
@@ -4921,16 +4928,59 @@ body.dark-mode .exercises-main-content {
   align-items: center;
   color: #333;
   text-decoration: none;
+  transition: color 0.2s ease;
+  padding: 0 5px;
+}
+
+body.dark-mode .footer-item {
+  color: #e0e0e0;
 }
 
 .footer-item svg {
   width: 24px;
   height: 24px;
+  margin-bottom: 6px; /* Improved spacing between icon and text */
 }
 
 .footer-item span {
   font-size: 12px;
-  margin-top: 5px;
+  font-weight: 500;
+}
+
+.footer-item.active {
+  color: #6c63ff;
+}
+
+body.dark-mode .footer-item.active {
+  color: #d4af37;
+}
+
+@supports (padding-bottom: env(safe-area-inset-bottom)) {
+  .mobile-footer {
+    padding-bottom: calc(12px + env(safe-area-inset-bottom));
+    height: auto; /* Let the height adjust for the safe area */
+    min-height: 65px; /* Maintain minimum height */
+  }
+}
+
+/* Hide footer on larger screens */
+@media (min-width: 768px) {
+  .mobile-footer {
+    display: none;
+  }
+}
+
+/* Ensure content is always accessible on mobile */
+@media (max-width: 767px) {
+  .exercises-container {
+    /* Base padding-bottom managed by JS for dynamic sizing */
+    min-height: calc(100vh - 80px); /* Ensure container is tall enough to scroll */
+  }
+  
+  /* Last item in the grid should have extra margin to ensure visibility */
+  .exercises-grid > *:last-child {
+    margin-bottom: 20px;
+  }
 }
 
 /* Hide footer on larger screens */
@@ -4976,6 +5026,8 @@ body.dark-mode .exercises-main-content {
   justify-content: center; /* Center horizontally */
   align-items: center; /* Center vertically */
   z-index: 1000; /* Ensure it appears above other content */
+  padding: 15px; /* Consistent padding on all sides */
+  box-sizing: border-box; /* Include padding in width calculations */
 }
 
 /* Style the modal content */
@@ -4984,20 +5036,87 @@ body.dark-mode .exercises-main-content {
 .create-exercise-modal {
   background: white;
   padding: 20px;
-  border-radius: 8px;
-  max-width: 90%; /* Limit width on small screens */
-  max-height: 90%; /* Limit height on small screens */
-  overflow: auto; /* Scroll if content overflows */
+  border-radius: 12px;
+  width: 100%;
+  max-width: 600px;
+  max-height: 90vh;
+  overflow: auto;
   position: relative;
-  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2); /* Optional: Add shadow for depth */
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+  margin: 0 auto; /* Center horizontally */
+  /* Remove any transforms that might affect centering */
+  transform: none;
 }
 
-/* Optional: Adjust modal width for larger screens */
+/* Remove previous margin and width settings that were causing the issue */
+.exercise-modal {
+  border-radius: 12px;
+  /* Remove any side-specific margins that might cause uneven spacing */
+  margin: 0 auto;
+  /* Reset any properties that might affect centering */
+  transform: none;
+  left: auto;
+  right: auto;
+}
+
+/* Remove any media queries that override the centering */
 @media (min-width: 768px) {
   .exercise-modal,
   .filter-modal,
   .create-exercise-modal {
-    max-width: 600px; /* Fixed width for larger screens */
+    /* Maintain consistent max-width */
+    max-width: 600px;
+    /* Ensure centering is preserved */
+    margin: 0 auto;
+  }
+  
+  /* Specifically remove the right margin that was causing the issue */
+  .exercise-modal {
+    margin-right: auto;
+    margin-left: auto;
+  }
+}
+
+/* Ensure consistent sizing at smaller screens */
+@media (max-width: 767px) {
+  .exercise-modal,
+  .filter-modal,
+  .create-exercise-modal {
+    max-width: 90%;
+    padding: 15px;
+    /* Ensure the modal stays centered */
+    margin: 0 auto;
+  }
+}
+
+/* Update animation to maintain centering */
+@keyframes scaleUp {
+  from {
+    transform: translate(-50%, -50%) scale(0.95);
+    opacity: 0.8;
+  }
+  to {
+    transform: translate(-50%, -50%) scale(1);
+    opacity: 1;
+  }
+}
+
+/* Fix for intermediate screen sizes */
+@media (min-width: 600px) and (max-width: 900px) {
+  .exercise-modal-overlay,
+  .filter-modal-overlay,
+  .create-exercise-modal-overlay {
+    /* Ensure consistent padding */
+    padding: 15px;
+  }
+  
+  .exercise-modal,
+  .filter-modal,
+  .create-exercise-modal {
+    /* Adjust width for this range */
+    max-width: 85%;
+    /* Maintain center positioning */
+    margin: 0 auto;
   }
 }
 
@@ -5123,4 +5242,343 @@ body, html {
   cursor: pointer;
   min-width: 80px;
   text-align: center;
+}
+
+/* Modal Skeleton Loading Styles */
+.modal-skeleton {
+  width: 100%;
+  padding: 20px;
+}
+
+.skeleton-header {
+  padding: 10px 0 20px;
+}
+
+.skeleton-title {
+  height: 32px;
+  width: 70%;
+  background: linear-gradient(90deg, #f0f0f0 25%, #e0e0e0 50%, #f0f0f0 75%);
+  background-size: 200% 100%;
+  animation: skeleton-loading 1.5s infinite;
+  border-radius: 8px;
+  margin: 0 auto;
+}
+
+.skeleton-gif {
+  height: 250px;
+  width: 250px;
+  margin: 20px auto;
+  background: linear-gradient(90deg, #f0f0f0 25%, #e0e0e0 50%, #f0f0f0 75%);
+  background-size: 200% 100%;
+  animation: skeleton-loading 1.5s infinite;
+  border-radius: 8px;
+}
+
+.skeleton-content {
+  margin-top: 20px;
+}
+
+.skeleton-section {
+  margin-bottom: 30px;
+}
+
+.skeleton-section-header {
+  height: 24px;
+  width: 40%;
+  background: linear-gradient(90deg, #f0f0f0 25%, #e0e0e0 50%, #f0f0f0 75%);
+  background-size: 200% 100%;
+  animation: skeleton-loading 1.5s infinite;
+  border-radius: 6px;
+  margin-bottom: 15px;
+}
+
+.skeleton-details, .skeleton-instructions {
+  padding: 5px 0;
+}
+
+.skeleton-detail-row, .skeleton-instruction-line {
+  height: 16px;
+  margin: 10px 0;
+  background: linear-gradient(90deg, #f0f0f0 25%, #e0e0e0 50%, #f0f0f0 75%);
+  background-size: 200% 100%;
+  animation: skeleton-loading 1.5s infinite;
+  border-radius: 4px;
+}
+
+.skeleton-detail-row {
+  width: 100%;
+}
+
+.skeleton-instruction-line {
+  width: 90%;
+}
+
+.skeleton-instruction-line:nth-child(2) {
+  width: 75%;
+}
+
+.skeleton-instruction-line:nth-child(3) {
+  width: 60%;
+}
+
+@keyframes skeleton-loading {
+  0% {
+    background-position: 200% 0;
+  }
+  100% {
+    background-position: -200% 0;
+  }
+}
+
+/* Dark mode styles for skeleton loading */
+body.dark-mode .skeleton-title,
+body.dark-mode .skeleton-gif,
+body.dark-mode .skeleton-section-header,
+body.dark-mode .skeleton-detail-row,
+body.dark-mode .skeleton-instruction-line {
+  background: linear-gradient(90deg, #2d2d2d 25%, #3d3d3d 50%, #2d2d2d 75%);
+  background-size: 200% 100%;
+  animation: skeleton-loading 1.5s infinite;
+}
+
+/* Universal Modal Styling - Core Fix for All Devices */
+.exercise-modal-overlay,
+.filter-modal-overlay,
+.create-exercise-modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw; /* Use viewport width to avoid horizontal scrolling */
+  height: 100vh; /* Use viewport height for full coverage */
+  background: rgba(0, 0, 0, 0.5);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 1000;
+  padding: 0; /* Remove padding that might interfere with centering */
+  box-sizing: border-box;
+  /* Improve touch behavior on mobile */
+  -webkit-overflow-scrolling: touch;
+  overflow: auto;
+}
+
+/* Modal Content - Base Styling */
+.exercise-modal,
+.filter-modal,
+.create-exercise-modal {
+  background: white;
+  padding: 20px;
+  border-radius: 12px;
+  width: 90%; /* Default base width */
+  max-width: 600px;
+  max-height: 85vh; /* Slightly reduced to ensure it fits */
+  overflow: auto;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+  margin: auto; /* Auto margins for centering */
+  position: relative;
+  transform: none; /* Remove transforms that might affect positioning */
+  animation: fadeIn 0.3s ease; /* Simpler animation that won't affect positioning */
+}
+
+/* Fix animation to not use transforms that might affect positioning */
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+/* Remove any existing scaleUp animations that might affect centering */
+@keyframes scaleUp {
+  from {
+    opacity: 0.8;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+/* Small Phones (iPhone SE, Galaxy S8+) */
+@media screen and (min-width: 320px) and (max-width: 375px) {
+  .exercise-modal,
+  .filter-modal,
+  .create-exercise-modal {
+    width: 95%;
+    padding: 15px;
+    margin: auto;
+    max-height: 80vh;
+  }
+  
+  .modal-header {
+    padding: 10px 0;
+  }
+  
+  .modal-title {
+    font-size: 20px;
+  }
+}
+
+/* Medium Phones (iPhone XR, 12 Pro, Pixel 7, Galaxy A51/71) */
+@media screen and (min-width: 376px) and (max-width: 430px) {
+  .exercise-modal,
+  .filter-modal,
+  .create-exercise-modal {
+    width: 92%;
+    padding: 16px;
+    margin: auto;
+  }
+  
+  .modal-gif {
+    max-width: 85%;
+  }
+}
+
+/* Large Phones (iPhone 14 Pro Max, Galaxy S20 Ultra) */
+@media screen and (min-width: 429px) and (max-width: 500px) {
+  .exercise-modal,
+  .filter-modal,
+  .create-exercise-modal {
+    width: 90%;
+    margin: auto;
+  }
+}
+
+/* Small Tablets and Foldable Devices (iPad Mini, Surface Duo, Galaxy Z Fold) */
+@media screen and (min-width: 540px) and (max-width: 768px) {
+  .exercise-modal,
+  .filter-modal,
+  .create-exercise-modal {
+    width: 85%;
+    max-width: 500px;
+    margin: auto;
+  }
+}
+
+/* Medium Tablets (iPad Air) */
+@media screen and (min-width: 769px) and (max-width: 1024px) {
+  .exercise-modal,
+  .filter-modal,
+  .create-exercise-modal {
+    width: 75%;
+    max-width: 550px;
+    margin: auto;
+  }
+}
+
+/* Large Tablets (iPad Pro, Surface Pro 7, Asus Zenbook Fold) */
+@media screen and (min-width: 1025px) and (max-width: 1280px) {
+  .exercise-modal,
+  .filter-modal,
+  .create-exercise-modal {
+    width: 60%;
+    max-width: 600px;
+    margin: auto;
+  }
+}
+
+/* Large Displays (Nest Hub, Nest Hub Max) */
+@media screen and (min-width: 1281px) {
+  .exercise-modal,
+  .filter-modal,
+  .create-exercise-modal {
+    width: 50%;
+    max-width: 600px;
+    margin: auto;
+  }
+}
+
+/* Special case for foldable displays in folded state */
+@media screen and (max-width: 350px) {
+  .exercise-modal,
+  .filter-modal,
+  .create-exercise-modal {
+    width: 98%;
+    padding: 12px;
+    margin: auto;
+    max-height: 85vh;
+  }
+  
+  .modal-title {
+    font-size: 18px;
+  }
+  
+  .modal-content-section {
+    padding: 0 8px 8px;
+  }
+}
+
+/* Special case for extra-tall devices */
+@media screen and (min-height: 800px) and (max-width: 500px) {
+  .exercise-modal,
+  .filter-modal,
+  .create-exercise-modal {
+    max-height: 75vh; /* Prevents modal from being too tall on tall narrow devices */
+  }
+}
+
+/* Fix for iOS devices to ensure modals stay centered */
+@supports (-webkit-touch-callout: none) {
+  .exercise-modal-overlay,
+  .filter-modal-overlay,
+  .create-exercise-modal-overlay {
+    padding: env(safe-area-inset-top) env(safe-area-inset-right) env(safe-area-inset-bottom) env(safe-area-inset-left);
+  }
+}
+
+/* Ensure content inside modals is centered and responsive */
+.modal-container {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.modal-header, 
+.modal-title {
+  width: 100%;
+  text-align: center;
+}
+
+.modal-gif-section {
+  display: flex;
+  justify-content: center;
+  width: 100%;
+}
+
+.modal-gif {
+  max-width: 100%;
+  height: auto;
+  object-fit: contain;
+}
+
+/* Ensure modal content doesn't overflow on any device */
+.modal-content-section {
+  width: 100%;
+  overflow-x: hidden;
+}
+
+/* Override any transforms in child elements that might affect positioning */
+.exercise-modal *,
+.filter-modal *,
+.create-exercise-modal * {
+  transform: none;
+}
+
+/* Fix for devices with notches or rounded corners */
+@supports (padding: max(0px)) {
+  .exercise-modal-overlay,
+  .filter-modal-overlay,
+  .create-exercise-modal-overlay {
+    padding-left: max(0px, env(safe-area-inset-left));
+    padding-right: max(0px, env(safe-area-inset-right));
+  }
+}
+
+/* Focus styles for keyboard navigation and accessibility */
+.close-modal:focus,
+.close-button:focus {
+  outline: 2px solid #3b82f6;
+  outline-offset: 2px;
 }
