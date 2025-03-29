@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
-import { Crown, Shield, SearchIcon } from 'lucide-react';
+import { Crown, Shield, Search, Pencil, Trash2, UserCog, MoreVertical, Trophy } from 'lucide-react';
 import 'admin.css';
+import DeleteConfirmModal from '../../components/admin/DeleteConfirmModal';
 
 const UserManagement = () => {
   const [users, setUsers] = useState([
@@ -78,6 +79,20 @@ const UserManagement = () => {
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
   const [editingUser, setEditingUser] = useState(null);
   const [searchQuery, setSearchQuery] = useState('');
+  const [currentPage, setCurrentPage] = useState(1);
+  const usersPerPage = 5;
+  const [isSearchFocused, setIsSearchFocused] = useState(false);
+  const [filters, setFilters] = useState({
+    level: '',
+    goal: '',
+    premium: ''
+  });
+  const [activeDropdown, setActiveDropdown] = useState(null);
+  const [isBadgesModalOpen, setIsBadgesModalOpen] = useState(false);
+  const [selectedUserBadges, setSelectedUserBadges] = useState(null);
+  const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
+  const [isPromoteModalOpen, setIsPromoteModalOpen] = useState(false);
+  const [selectedUser, setSelectedUser] = useState(null);
 
   const openEditModal = (user) => {
     setEditingUser({ ...user });
@@ -108,82 +123,241 @@ const UserManagement = () => {
     console.log(`Promoting user ${userId} to admin`);
   };
 
+  const handleViewPRs = (userId) => {
+    console.log(`Viewing PRs for user ${userId}`);
+    // Implement PR view logic here
+  };
+
+  const handleFilterChange = (e) => {
+    const { name, value } = e.target;
+    setFilters(prev => ({
+      ...prev,
+      [name]: value
+    }));
+  };
+
+  const handleViewBadges = (user) => {
+    // Simulated badges data - replace with actual badges data
+    const userBadges = [
+      { id: 1, name: "Weight Loss Champion", description: "Lost 10kg", earnedDate: "2024-02-15" },
+      { id: 2, name: "Workout Warrior", description: "Completed 30 workouts", earnedDate: "2024-03-01" },
+      { id: 3, name: "Early Bird", description: "5 morning workouts", earnedDate: "2024-03-10" }
+    ];
+    setSelectedUserBadges({ user, badges: userBadges });
+    setIsBadgesModalOpen(true);
+  };
+
+  const handleDeleteConfirm = () => {
+    setUsers(users.filter(user => user.id !== selectedUser.id));
+    setIsDeleteModalOpen(false);
+    setSelectedUser(null);
+  };
+
+  const handlePromoteConfirm = () => {
+    // Implement actual promotion logic here
+    console.log(`Promoting user ${selectedUser.id} to admin`);
+    setIsPromoteModalOpen(false);
+    setSelectedUser(null);
+  };
+
   const filteredUsers = users.filter(user => {
     const searchTerm = searchQuery.toLowerCase();
     const fullName = `${user.firstName} ${user.lastName}`.toLowerCase();
-    return fullName.includes(searchTerm) || 
-           user.email.toLowerCase().includes(searchTerm);
+    const matchesSearch = fullName.includes(searchTerm) || 
+                         user.email.toLowerCase().includes(searchTerm);
+    
+    const matchesLevel = !filters.level || user.level === filters.level;
+    const matchesGoal = !filters.goal || user.goal === filters.goal;
+    const matchesPremium = !filters.premium || 
+                          (filters.premium === 'premium' ? user.isPremium : !user.isPremium);
+    
+    return matchesSearch && matchesLevel && matchesGoal && matchesPremium;
   });
+
+  const indexOfLastUser = currentPage * usersPerPage;
+  const indexOfFirstUser = indexOfLastUser - usersPerPage;
+  const currentUsers = filteredUsers.slice(indexOfFirstUser, indexOfLastUser);
+  const pageCount = Math.ceil(filteredUsers.length / usersPerPage);
 
   return (
     <div className="admin-page">
       <div className="admin-page-header">
         <h1 className="admin-page-title">User Management</h1>
-        <div className="search-bar small">
-          <SearchIcon size={16} className="search-icon" />
+        <div className="admin-search-box">
+          <button className="admin-btn-search">
+            <Search size={40} />
+          </button>
           <input
             type="text"
-            placeholder="Search users..."
+            className="admin-input-search"
+            placeholder="Search..."
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
-            className="search-input small"
           />
         </div>
       </div>
       
+      <div className="filters-container">
+        <select
+          name="level"
+          value={filters.level}
+          onChange={handleFilterChange}
+          className="filter-select"
+        >
+          <option value="">All Levels</option>
+          <option value="Beginner">Beginner</option>
+          <option value="Intermediate">Intermediate</option>
+          <option value="Advanced">Advanced</option>
+        </select>
+
+        <select
+          name="goal"
+          value={filters.goal}
+          onChange={handleFilterChange}
+          className="filter-select"
+        >
+          <option value="">All Goals</option>
+          <option value="Weight Loss">Weight Loss</option>
+          <option value="Muscle Gain">Muscle Gain</option>
+          <option value="Maintenance">Maintenance</option>
+        </select>
+
+        <select
+          name="premium"
+          value={filters.premium}
+          onChange={handleFilterChange}
+          className="filter-select"
+        >
+          <option value="">All Users</option>
+          <option value="premium">Premium</option>
+          <option value="standard">Standard</option>
+        </select>
+      </div>
+
       <div className="users-table-container">
-        <table className="users-table">
-          <thead>
-            <tr>
-              <th>Name</th>
-              <th>Email</th>
-              <th>Age</th>
-              <th>Gender</th>
-              <th>Height</th>
-              <th>Weight</th>
-              <th>Goal</th>
-              <th>Level</th>
-              <th>Join Date</th>
-              <th>Actions</th>
-            </tr>
-          </thead>
-          <tbody>
-            {filteredUsers.map(user => (
-              <tr key={user.id}>
-                <td className="name-cell">
-                  {user.isPremium && <Crown size={16} className="premium-icon" />}
-                  {user.firstName} {user.lastName}
-                </td>
-                <td>{user.email}</td>
-                <td>{user.age}</td>
-                <td>{user.gender}</td>
-                <td>{user.height} cm</td>
-                <td>{user.weight} kg</td>
-                <td>{user.goal}</td>
-                <td>{user.level}</td>
-                <td>{user.joinDate}</td>
-                <td>
-                  <div className="table-actions">
-                    <button 
-                      className="action-btn edit"
-                      onClick={() => openEditModal(user)}
-                    >
-                      Edit
-                    </button>
-                    <button className="action-btn delete">Delete</button>
-                    <button 
-                      className="action-btn promote"
-                      onClick={() => handlePromoteToAdmin(user.id)}
-                    >
-                      <Shield size={14} />
-                      Admin
-                    </button>
-                  </div>
-                </td>
+        {filteredUsers.length > 0 ? (
+          <table className="users-table" key={`${filters.level}-${filters.goal}-${filters.premium}-${searchQuery}`}>
+            <thead>
+              <tr>
+                <th>Actions</th>
+                <th>Name</th>
+                <th>Email</th>
+                <th>Age</th>
+                <th>Gender</th>
+                <th>Height</th>
+                <th>Weight</th>
+                <th>Goal</th>
+                <th>Level</th>
+                <th>Join Date</th>
               </tr>
-            ))}
-          </tbody>
-        </table>
+            </thead>
+            <tbody>
+              {currentUsers.map(user => (
+                <tr key={user.id} className="animate-fade-in">
+                  <td>
+                    <div className="actions-dropdown">
+                      <button 
+                        className="dropdown-trigger"
+                        onClick={() => setActiveDropdown(activeDropdown === user.id ? null : user.id)}
+                      >
+                        <MoreVertical size={20} />
+                      </button>
+                      {activeDropdown === user.id && (
+                        <div className="dropdown-menu">
+                          <button
+                            onClick={() => {
+                              openEditModal(user);
+                              setActiveDropdown(null);
+                            }}
+                            className="dropdown-item"
+                          >
+                            <Pencil size={16} />
+                            <span>Edit</span>
+                          </button>
+                          <button
+                            onClick={() => {
+                              handleViewBadges(user);
+                              setActiveDropdown(null);
+                            }}
+                            className="dropdown-item"
+                          >
+                            <Trophy size={16} />
+                            <span>View Badges</span>
+                          </button>
+                          <button
+                            onClick={() => {
+                              setSelectedUser(user);
+                              setIsPromoteModalOpen(true);
+                              setActiveDropdown(null);
+                            }}
+                            className="dropdown-item"
+                          >
+                            <UserCog size={16} />
+                            <span>Promote</span>
+                          </button>
+                          <button
+                            onClick={() => {
+                              setSelectedUser(user);
+                              setIsDeleteModalOpen(true);
+                              setActiveDropdown(null);
+                            }}
+                            className="dropdown-item delete"
+                          >
+                            <Trash2 size={16} />
+                            <span>Delete</span>
+                          </button>
+                        </div>
+                      )}
+                    </div>
+                  </td>
+                  <td>
+                    <div className="name-cell">
+                      <span className={user.isPremium ? 'premium-name' : ''}>
+                        {user.firstName} {user.lastName}
+                      </span>
+                    </div>
+                  </td>
+                  <td>{user.email}</td>
+                  <td>{user.age}</td>
+                  <td>{user.gender}</td>
+                  <td>{user.height} cm</td>
+                  <td>{user.weight} kg</td>
+                  <td>{user.goal}</td>
+                  <td>{user.level}</td>
+                  <td>{user.joinDate}</td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        ) : (
+          <div className="no-results">
+            <div className="no-results-content">
+              <Search size={48} className="no-results-icon" />
+              <h3>No results found</h3>
+              <p>Try adjusting your search or filters</p>
+            </div>
+          </div>
+        )}
+        
+        <div className="pagination">
+          <button 
+            onClick={() => setCurrentPage(prev => Math.max(prev - 1, 1))}
+            disabled={currentPage === 1}
+            className="pagination-btn"
+          >
+            Previous
+          </button>
+          <span className="pagination-info">
+            Page {currentPage} of {pageCount}
+          </span>
+          <button 
+            onClick={() => setCurrentPage(prev => Math.min(prev + 1, pageCount))}
+            disabled={currentPage === pageCount}
+            className="pagination-btn"
+          >
+            Next
+          </button>
+        </div>
       </div>
 
       {isEditModalOpen && (
@@ -298,6 +472,75 @@ const UserManagement = () => {
               </button>
               <button onClick={handleEditUser} className="save-btn">
                 Save Changes
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {isBadgesModalOpen && (
+        <div className="modal-overlay">
+          <div className="modal badges-modal">
+            <button className="modal-close-btn" onClick={() => setIsBadgesModalOpen(false)}>
+              &times;
+            </button>
+            <h2>
+              {selectedUserBadges.user.firstName}'s Badges
+              {selectedUserBadges.user.isPremium && (
+                <span className="premium-badge">
+                  <Crown size={16} /> Premium
+                </span>
+              )}
+            </h2>
+            <div className="badges-grid">
+              {selectedUserBadges.badges.length > 0 ? (
+                selectedUserBadges.badges.map(badge => (
+                  <div key={badge.id} className="badge-card">
+                    <div className="badge-icon">
+                      <Trophy size={32} />
+                    </div>
+                    <h3>{badge.name}</h3>
+                    <p>{badge.description}</p>
+                    <span className="badge-date">Earned: {badge.earnedDate}</span>
+                  </div>
+                ))
+              ) : (
+                <p className="no-badges">No badges earned yet</p>
+              )}
+            </div>
+          </div>
+        </div>
+      )}
+
+      <DeleteConfirmModal
+        isOpen={isDeleteModalOpen}
+        onClose={() => setIsDeleteModalOpen(false)}
+        onConfirm={handleDeleteConfirm}
+        item={selectedUser || {}}
+        itemType="user"
+      />
+
+      {isPromoteModalOpen && (
+        <div className="modal-overlay">
+          <div className="modal confirmation-modal">
+            <h2>Confirm Promotion</h2>
+            <p>
+              Are you sure you want to promote{' '}
+              <strong>{selectedUser.firstName} {selectedUser.lastName}</strong> to admin?
+              They will have full access to the admin dashboard and user management.
+            </p>
+            <div className="modal-actions">
+              <button 
+                onClick={() => setIsPromoteModalOpen(false)} 
+                className="cancel-btn"
+              >
+                Cancel
+              </button>
+              <button 
+                onClick={handlePromoteConfirm} 
+                className="promote-btn"
+              >
+                Promote to Admin
               </button>
             </div>
           </div>
