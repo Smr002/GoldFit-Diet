@@ -2,11 +2,7 @@ import { PrismaClient, Exercise } from "@prisma/client";
 import { ExerciseModel } from "./exerciseModel";
 
 export class ExerciseRepository {
-  private prisma: PrismaClient;
-
-  constructor() {
-    this.prisma = new PrismaClient();
-  }
+  private prisma: PrismaClient = new PrismaClient();
 
   async createExercise(exercise: ExerciseModel): Promise<Exercise> {
     const exerciseData = exercise.toObject();
@@ -59,3 +55,5 @@ export class ExerciseRepository {
     });
   }
 }
+
+export const exerciseRepository = new ExerciseRepository();

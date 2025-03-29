@@ -4,11 +4,7 @@ import { ExerciseModel } from "./exerciseModel";
 import { authenticateJWT } from "../auth/JWT/authMiddleware";
 
 export class ExerciseService {
-  private repository: ExerciseRepository;
-
-  constructor() {
-    this.repository = new ExerciseRepository();
-  }
+  private repository: ExerciseRepository = new ExerciseRepository();
 
   async createExercise(data: { name: string; muscleGroup: string }): Promise<Exercise> {
     const exerciseModel = new ExerciseModel({
@@ -62,3 +58,5 @@ export class ExerciseService {
     return this.repository.deleteExercise(id);
   }
 }
+
+export const exerciseService = new ExerciseService();

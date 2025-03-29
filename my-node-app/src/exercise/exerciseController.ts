@@ -3,13 +3,9 @@ import { ExerciseService } from "./exerciseService";
 import { z } from "zod";
 
 export class ExerciseController {
-  private service: ExerciseService;
+  private service: ExerciseService = new ExerciseService();
 
-  constructor() {
-    this.service = new ExerciseService();
-  }
-
-  createExercise = async (req: Request, res: Response): Promise<void> => {
+  async createExercise(req: Request, res: Response): Promise<void> {
     try {
       const schema = z.object({
         name: z.string().min(1, { message: "Name is required" }),
@@ -32,9 +28,9 @@ export class ExerciseController {
         res.status(500).json({ error: "Failed to create exercise" });
       }
     }
-  };
+  }
 
-  getExerciseById = async (req: Request, res: Response): Promise<void> => {
+  async getExerciseById(req: Request, res: Response): Promise<void> {
     try {
       const id = parseInt(req.params.id);
       if (isNaN(id)) {
@@ -53,9 +49,9 @@ export class ExerciseController {
       console.error("Error fetching exercise:", error);
       res.status(500).json({ error: "Failed to fetch exercise" });
     }
-  };
+  }
 
-  getAllExercises = async (req: Request, res: Response): Promise<void> => {
+  async getAllExercises(req: Request, res: Response): Promise<void> {
     try {
       const exercises = await this.service.getAllExercises();
       res.status(200).json(exercises);
@@ -63,9 +59,9 @@ export class ExerciseController {
       console.error("Error fetching exercises:", error);
       res.status(500).json({ error: "Failed to fetch exercises" });
     }
-  };
+  }
 
-  updateExercise = async (req: Request, res: Response): Promise<void> => {
+  async updateExercise(req: Request, res: Response): Promise<void> {
     try {
       const id = parseInt(req.params.id);
       if (isNaN(id)) {
@@ -92,9 +88,9 @@ export class ExerciseController {
         res.status(500).json({ error: "Failed to update exercise" });
       }
     }
-  };
+  }
 
-  deleteExercise = async (req: Request, res: Response): Promise<void> => {
+  async deleteExercise(req: Request, res: Response): Promise<void> {
     try {
       const id = parseInt(req.params.id);
       if (isNaN(id)) {
@@ -114,5 +110,7 @@ export class ExerciseController {
         res.status(500).json({ error: "Failed to delete exercise" });
       }
     }
-  };
+  }
 }
+
+export const exerciseController = new ExerciseController();
