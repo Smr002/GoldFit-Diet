@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { Crown, Shield, Search, Pencil, Trash2, UserCog, MoreVertical, Trophy } from 'lucide-react';
 import 'admin.css';
 import DeleteConfirmModal from '../../components/admin/DeleteConfirmModal';
@@ -94,6 +94,24 @@ const UserManagement = () => {
   const [isPromoteModalOpen, setIsPromoteModalOpen] = useState(false);
   const [selectedUser, setSelectedUser] = useState(null);
 
+  const dropdownRef = useRef(null);
+
+  useEffect(() => {
+    const handleClickOutside = (event) => {
+      if (dropdownRef.current && !dropdownRef.current.contains(event.target)) {
+        setActiveDropdown(null);
+      }
+    };
+
+    if (activeDropdown !== null) {
+      document.addEventListener('mousedown', handleClickOutside);
+    }
+
+    return () => {
+      document.removeEventListener('mousedown', handleClickOutside);
+    };
+  }, [activeDropdown]);
+
   const openEditModal = (user) => {
     setEditingUser({ ...user });
     setIsEditModalOpen(true);
@@ -179,6 +197,12 @@ const UserManagement = () => {
   const currentUsers = filteredUsers.slice(indexOfFirstUser, indexOfLastUser);
   const pageCount = Math.ceil(filteredUsers.length / usersPerPage);
 
+  // Add this function inside your UserManagement component
+  const shouldFlipDropdown = (index, total) => {
+    // Flip the last 2 rows' dropdowns to prevent them being cut off
+    return index >= total - 2;
+  };
+
   return (
     <div className="admin-page">
       <div className="admin-page-header">
@@ -252,10 +276,13 @@ const UserManagement = () => {
               </tr>
             </thead>
             <tbody>
-              {currentUsers.map(user => (
+              {currentUsers.map((user, index) => (
                 <tr key={user.id} className="animate-fade-in">
                   <td>
-                    <div className="actions-dropdown">
+                    <div 
+                      className="actions-dropdown" 
+                      ref={activeDropdown === user.id ? dropdownRef : null}
+                    >
                       <button 
                         className="dropdown-trigger"
                         onClick={() => setActiveDropdown(activeDropdown === user.id ? null : user.id)}
@@ -263,7 +290,7 @@ const UserManagement = () => {
                         <MoreVertical size={20} />
                       </button>
                       {activeDropdown === user.id && (
-                        <div className="dropdown-menu">
+                        <div className={`dropdown-menu ${shouldFlipDropdown(index, currentUsers.length) ? 'flip-up' : ''}`}>
                           <button
                             onClick={() => {
                               openEditModal(user);

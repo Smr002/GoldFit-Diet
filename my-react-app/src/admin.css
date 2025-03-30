@@ -3811,10 +3811,10 @@ button {
 
 /* Add this class for rows near the bottom */
 .dropdown-menu.flip-up {
-  top: auto !important; /* Use !important to ensure it overrides any other styles */
-  bottom: 100% !important;
-  margin-top: 0 !important;
-  margin-bottom: 0.5rem !important;
+  top: auto;
+  bottom: 100%;
+  margin-top: 0;
+  margin-bottom: 0.5rem;
   transform-origin: bottom right;
 }
 
@@ -3828,4 +3828,964 @@ button {
     opacity: 1;
     transform: scale(1);
   }
+}
+
+/* Add these styles to your admin.css file */
+
+/* Notification Management specific styles */
+.admin-header-actions {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+}
+
+.create-notification-btn,
+.schedule-notification-btn {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.625rem 1rem;
+  border: none;
+  border-radius: 0.375rem;
+  font-size: 0.875rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: background-color 0.2s;
+  white-space: nowrap;
+}
+
+.create-notification-btn {
+  background-color: #4f46e5;
+  color: white;
+}
+
+.create-notification-btn:hover {
+  background-color: #4338ca;
+}
+
+.schedule-notification-btn {
+  background-color: #f59e0b;
+  color: white;
+}
+
+.schedule-notification-btn:hover {
+  background-color: #d97706;
+}
+
+.admin-content-card {
+  background-color: white;
+  border-radius: 0.5rem;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+  margin-top: 1.5rem;
+}
+
+.admin-card-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 1rem 1.5rem;
+  border-bottom: 1px solid #e5e7eb;
+}
+
+.admin-tabs {
+  display: flex;
+  gap: 0.5rem;
+}
+
+.admin-tab {
+  padding: 0.5rem 1rem;
+  border: none;
+  background: none;
+  border-radius: 0.375rem;
+  font-size: 0.875rem;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.admin-tab:hover {
+  background-color: #f3f4f6;
+}
+
+.admin-tab.active {
+  background-color: #4f46e5;
+  color: white;
+}
+
+.filter-toggle-btn {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.5rem 1rem;
+  background-color: white;
+  border: 1px solid #e5e7eb;
+  border-radius: 0.375rem;
+  font-size: 0.875rem;
+  cursor: pointer;
+}
+
+.filter-toggle-btn:hover {
+  background-color: #f9fafb;
+}
+
+.notifications-table-container {
+  padding: 1rem;
+  overflow-x: auto;
+}
+
+.notifications-table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.notifications-table th,
+.notifications-table td {
+  padding: 0.75rem 1rem;
+  text-align: left;
+  border-bottom: 1px solid #e5e7eb;
+}
+
+.notifications-table th {
+  font-weight: 600;
+  color: #4b5563;
+  background-color: #f9fafb;
+}
+
+.notification-type {
+  display: inline-block;
+  padding: 0.25rem 0.75rem;
+  border-radius: 9999px;
+  font-size: 0.75rem;
+  font-weight: 500;
+}
+
+.notification-type.system {
+  background-color: #e0f2fe;
+  color: #0369a1;
+}
+
+.notification-type.reminder {
+  background-color: #e0e7ff;
+  color: #4338ca;
+}
+
+.notification-type.promotion {
+  background-color: #fef3c7;
+  color: #b45309;
+}
+
+.notification-type.update {
+  background-color: #dcfce7;
+  color: #15803d;
+}
+
+.notification-message {
+  max-width: 300px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.status-badge {
+  display: inline-block;
+  padding: 0.25rem 0.75rem;
+  border-radius: 9999px;
+  font-size: 0.75rem;
+  font-weight: 500;
+}
+
+.status-badge.sent {
+  background-color: #dcfce7;
+  color: #15803d;
+}
+
+.status-badge.scheduled {
+  background-color: #ede9fe;
+  color: #6d28d9;
+}
+
+.status-badge.draft {
+  background-color: #f3f4f6;
+  color: #4b5563;
+}
+
+/* Notification detail modal styles */
+.notification-details-modal {
+  max-width: 600px;
+  width: 100%;
+}
+
+.notification-details {
+  margin-top: 1.5rem;
+}
+
+.notification-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 1rem;
+}
+
+.notification-type-large {
+  padding: 0.375rem 1rem;
+  border-radius: 9999px;
+  font-weight: 500;
+}
+
+.notification-message-container {
+  padding: 1rem;
+  background-color: #f9fafb;
+  border-radius: 0.5rem;
+  margin-bottom: 1.5rem;
+}
+
+.notification-message-large {
+  margin: 0;
+  font-size: 1rem;
+  line-height: 1.5;
+}
+
+.notification-info-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+  gap: 1rem;
+}
+
+.info-item {
+  display: flex;
+  flex-direction: column;
+}
+
+.info-item label {
+  font-size: 0.75rem;
+  color: #6b7280;
+  margin-bottom: 0.25rem;
+}
+
+.info-item span {
+  font-weight: 500;
+}
+
+.modal-footer {
+  margin-top: 2rem;
+  display: flex;
+  justify-content: flex-end;
+  gap: 1rem;
+}
+
+.close-btn,
+.edit-btn {
+  padding: 0.5rem 1rem;
+  border-radius: 0.375rem;
+  font-size: 0.875rem;
+  cursor: pointer;
+}
+
+.close-btn {
+  background-color: white;
+  border: 1px solid #e5e7eb;
+}
+
+.close-btn:hover {
+  background-color: #f9fafb;
+}
+
+.edit-btn {
+  background-color: #4f46e5;
+  color: white;
+  border: none;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.edit-btn:hover {
+  background-color: #4338ca;
+}
+
+/* Animation for new items */
+.animate-fade-in {
+  animation: fadeIn 0.3s ease-in-out;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* Responsive styles */
+@media (max-width: 1024px) {
+  .admin-header-actions {
+    flex-wrap: wrap;
+  }
+  
+  .admin-search-box {
+    flex: 1 1 100%;
+    margin-bottom: 0.75rem;
+  }
+  
+  .create-notification-btn,
+  .schedule-notification-btn {
+    flex: 1;
+  }
+  
+  .notification-info-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+@media (max-width: 768px) {
+  .admin-card-header {
+    flex-direction: column;
+    gap: 1rem;
+    align-items: stretch;
+  }
+  
+  .admin-tabs {
+    overflow-x: auto;
+    padding-bottom: 0.5rem;
+  }
+  
+  .filter-toggle-btn {
+    width: 100%;
+    justify-content: center;
+  }
+  
+  .notifications-table th:nth-child(4),
+  .notifications-table td:nth-child(4),
+  .notifications-table th:nth-child(5),
+  .notifications-table td:nth-child(5) {
+    display: none;
+  }
+  
+  .notification-info-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+/* Add or update these styles in your admin.css file */
+
+.admin-page-header {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+  margin-bottom: 1rem;
+}
+
+.admin-page-title {
+  margin: 0;
+  font-size: 1.875rem;
+  font-weight: 700;
+  color: #1f2937;
+}
+
+/* Keep your existing admin-search-box styling */
+
+.admin-action-buttons {
+  display: flex;
+  gap: 1rem;
+  margin-bottom: 1.5rem;
+}
+
+.create-notification-btn,
+.schedule-notification-btn {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.75rem 1.25rem;
+  border: none;
+  border-radius: 0.375rem;
+  font-size: 0.875rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: background-color 0.2s;
+  white-space: nowrap;
+}
+
+.create-notification-btn {
+  background-color: #4f46e5;
+  color: white;
+}
+
+.create-notification-btn:hover {
+  background-color: #4338ca;
+}
+
+.schedule-notification-btn {
+  background-color: #f59e0b;
+  color: white;
+}
+
+.schedule-notification-btn:hover {
+  background-color: #d97706;
+}
+
+/* Responsive styles */
+@media (max-width: 768px) {
+  .admin-action-buttons {
+    flex-direction: column;
+  }
+  
+  .create-notification-btn,
+  .schedule-notification-btn {
+    width: 100%;
+    justify-content: center;
+  }
+}
+
+/* Add to your admin.css file */
+.admin-header-actions {
+  display: flex;
+  align-items: center;
+  flex-wrap: nowrap;
+  gap: 1rem;
+}
+
+
+.admin-buttons {
+  display: flex;
+  gap: 0.75rem;
+  white-space: nowrap;
+}
+
+/* Ensure buttons don't shrink */
+.create-notification-btn,
+.schedule-notification-btn {
+  flex-shrink: 0;
+}
+
+/* Only on very small screens, allow wrapping */
+@media (max-width: 768px) {
+  .admin-header-actions {
+    flex-wrap: wrap;
+  }
+  
+  .admin-search-box,
+  .admin-buttons {
+    flex: 1 1 100%;
+  }
+}
+
+/* Add to your admin.css file if not already present */
+.notification-type-large {
+  display: inline-block;
+  padding: 0.375rem 0.75rem;
+  border-radius: 0.375rem;
+  font-size: 0.875rem;
+  font-weight: 500;
+  margin-right: 0.5rem;
+}
+
+.notification-type-large.system {
+  background-color: #eff6ff;
+  color: #2563eb;
+}
+
+.notification-type-large.reminder {
+  background-color: #f5f3ff;
+  color: #7c3aed;
+}
+
+.notification-type-large.promotion {
+  background-color: #fef2f2;
+  color: #dc2626;
+}
+
+.notification-type-large.update {
+  background-color: #ecfdf5;
+  color: #059669;
+}
+
+.notification-message-container {
+  margin: 1.5rem 0;
+  padding: 1rem;
+  background-color: #f9fafb;
+  border-radius: 0.5rem;
+}
+
+.notification-message-large {
+  font-size: 1.125rem;
+  line-height: 1.5;
+  color: #1f2937;
+}
+
+.notification-info-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+  gap: 1rem;
+}
+
+.info-item {
+  display: flex;
+  flex-direction: column;
+}
+
+.info-item label {
+  font-size: 0.75rem;
+  font-weight: 500;
+  color: #6b7280;
+  margin-bottom: 0.25rem;
+}
+
+.info-item span {
+  font-size: 0.875rem;
+  color: #1f2937;
+}
+
+/* Add to your admin.css if needed */
+.notification-edit-modal {
+  max-width: 550px;
+}
+
+.form-group {
+  margin-bottom: 1.25rem;
+}
+
+.form-group label {
+  display: block;
+  font-size: 0.875rem;
+  font-weight: 500;
+  margin-bottom: 0.5rem;
+  color: #374151;
+}
+
+.form-group select,
+.form-group input,
+.form-group textarea {
+  width: 100%;
+  padding: 0.625rem;
+  border: 1px solid #d1d5db;
+  border-radius: 0.375rem;
+  font-size: 0.875rem;
+}
+
+.form-group textarea {
+  resize: vertical;
+  min-height: 100px;
+}
+
+.form-group select:focus,
+.form-group input:focus,
+.form-group textarea:focus {
+  outline: none;
+  border-color: #4f46e5;
+  box-shadow: 0 0 0 1px rgba(79, 70, 229, 0.2);
+}
+
+.cancel-btn,
+.save-btn {
+  padding: 0.625rem 1.25rem;
+  border-radius: 0.375rem;
+  font-size: 0.875rem;
+  font-weight: 500;
+  cursor: pointer;
+  border: none;
+}
+
+.cancel-btn {
+  background-color: #f3f4f6;
+  color: #4b5563;
+}
+
+.cancel-btn:hover {
+  background-color: #e5e7eb;
+}
+
+.save-btn {
+  background-color: #4f46e5;
+  color: white;
+}
+
+.save-btn:hover {
+  background-color: #4338ca;
+}
+
+/* Add to your admin.css */
+.notification-tabs {
+  display: flex;
+  margin-bottom: 1.5rem;
+  border-bottom: 1px solid #e5e7eb;
+}
+
+.notification-tab {
+  padding: 0.75rem 1.25rem;
+  background: none;
+  border: none;
+  border-bottom: 2px solid transparent;
+  font-size: 0.875rem;
+  font-weight: 500;
+  color: #6b7280;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.notification-tab:hover {
+  color: #4f46e5;
+}
+
+.notification-tab.active {
+  color: #4f46e5;
+  border-bottom-color: #4f46e5;
+}
+
+.template-instruction {
+  margin-bottom: 1rem;
+  font-size: 0.875rem;
+  color: #6b7280;
+}
+
+.template-list {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+  gap: 1rem;
+  margin-bottom: 1.5rem;
+}
+
+.template-item {
+  border: 1px solid #e5e7eb;
+  border-radius: 0.5rem;
+  padding: 1rem;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.template-item:hover {
+  border-color: #4f46e5;
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+}
+
+.template-item.selected {
+  border-color: #4f46e5;
+  background-color: #f5f3ff;
+}
+
+.template-header {
+  margin-bottom: 0.5rem;
+}
+
+.template-message {
+  font-size: 0.875rem;
+  margin-bottom: 0.5rem;
+  color: #1f2937;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+.template-footer {
+  font-size: 0.75rem;
+  color: #6b7280;
+}
+
+.radio-options {
+  display: flex;
+  gap: 1.5rem;
+}
+
+.radio-label {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-size: 0.875rem;
+  cursor: pointer;
+}
+
+.form-section {
+  margin-bottom: 1.5rem;
+  padding-bottom: 1.5rem;
+  border-bottom: 1px solid #e5e7eb;
+}
+
+.form-section h3 {
+  font-size: 1rem;
+  font-weight: 500;
+  margin-bottom: 1rem;
+  color: #374151;
+}
+
+.automation-variables {
+  margin-top: 0.5rem;
+  font-size: 0.75rem;
+  color: #6b7280;
+}
+
+.variables-heading {
+  font-weight: 500;
+  margin-bottom: 0.25rem;
+}
+
+.variables-list {
+  padding-left: 1.5rem;
+}
+
+.variables-list code {
+  background-color: #f3f4f6;
+  padding: 0.125rem 0.25rem;
+  border-radius: 0.25rem;
+  font-family: monospace;
+}
+
+.day-selector {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+}
+
+.day-button {
+  padding: 0.5rem;
+  border: 1px solid #e5e7eb;
+  background-color: white;
+  border-radius: 0.25rem;
+  font-size: 0.75rem;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.day-button:hover {
+  border-color: #4f46e5;
+}
+
+.day-button.selected {
+  background-color: #4f46e5;
+  color: white;
+  border-color: #4f46e5;
+}
+
+.schedule-automation-modal,
+.notification-send-modal {
+  max-width: 650px;
+}
+
+/* Enhance notification tabs styling */
+.notification-tabs {
+  display: flex;
+  margin-bottom: 1.5rem;
+  border-bottom: 1px solid #e5e7eb;
+  position: relative;
+}
+
+.notification-tab {
+  padding: 0.75rem 1.25rem;
+  background: none;
+  border: none;
+  border-bottom: 2px solid transparent;
+  font-size: 0.875rem;
+  font-weight: 500;
+  color: #6b7280;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  position: relative;
+  z-index: 1;
+}
+
+.notification-tab:hover {
+  color: #4f46e5;
+}
+
+.notification-tab.active {
+  color: #4f46e5;
+  border-bottom-color: #4f46e5;
+  font-weight: 600;
+}
+
+/* Remove the ::after pseudo-element that was causing issues */
+.notification-tabs::after {
+  display: none;
+}
+
+/* Animation for tab content */
+.template-selection {
+  animation: fadeSlideIn 0.4s ease-out;
+}
+
+form {
+  animation: fadeSlideIn 0.4s ease-out;
+}
+
+@keyframes fadeSlideIn {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* Template selection improvements */
+.template-list {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+  gap: 1rem;
+  margin-bottom: 1.5rem;
+  animation: fadeScale 0.4s ease-out;
+}
+
+.template-item {
+  border: 1px solid #e5e7eb;
+  border-radius: 0.5rem;
+  padding: 1rem;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  position: relative;
+  overflow: hidden;
+}
+
+.template-item:hover {
+  border-color: #4f46e5;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+  transform: translateY(-2px);
+}
+
+.template-item.selected {
+  border-color: #4f46e5;
+  background-color: #f5f3ff;
+  box-shadow: 0 4px 12px rgba(79, 70, 229, 0.15);
+}
+
+/* Selection indicator */
+.template-item.selected::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  right: 0;
+  width: 0;
+  height: 0;
+  border-style: solid;
+  border-width: 0 24px 24px 0;
+  border-color: transparent #4f46e5 transparent transparent;
+}
+
+.template-header {
+  margin-bottom: 0.75rem;
+}
+
+.template-message {
+  font-size: 0.875rem;
+  margin-bottom: 0.75rem;
+  color: #1f2937;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+  line-height: 1.4;
+}
+
+.template-footer {
+  font-size: 0.75rem;
+  color: #6b7280;
+  padding-top: 0.5rem;
+  border-top: 1px dashed #e5e7eb;
+}
+
+/* Animation for tab content */
+.template-selection {
+  animation: fadeSlideIn 0.4s ease-out;
+}
+
+form {
+  animation: fadeSlideIn 0.4s ease-out;
+}
+
+@keyframes fadeSlideIn {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes fadeScale {
+  from {
+    opacity: 0;
+    transform: scale(0.98);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+/* Selected template form styling */
+.selected-template-form {
+  margin-top: 1.5rem;
+  padding: 1.25rem;
+  background-color: #f8fafc;
+  border-radius: 0.5rem;
+  border: 1px solid #e5e7eb;
+  animation: fadeIn 0.4s ease-out;
+}
+
+/* Radio options styling */
+.radio-options {
+  display: flex;
+  gap: 1.5rem;
+}
+
+.radio-label {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-size: 0.875rem;
+  cursor: pointer;
+  padding: 0.5rem;
+  border-radius: 0.375rem;
+  transition: background-color 0.2s ease;
+}
+
+.radio-label:hover {
+  background-color: #f1f5f9;
+}
+
+.radio-label input {
+  accent-color: #4f46e5;
+}
+
+/* Add a subtle pulse animation for newly selected templates */
+@keyframes selectedPulse {
+  0% { box-shadow: 0 0 0 0 rgba(79, 70, 229, 0.4); }
+  70% { box-shadow: 0 0 0 6px rgba(79, 70, 229, 0); }
+  100% { box-shadow: 0 0 0 0 rgba(79, 70, 229, 0); }
+}
+
+.template-item.selected {
+  animation: selectedPulse 1s 1;
+}
+
+/* Add a specific animation class for tab content transitions */
+.animate-tab-content {
+  animation: fadeSlideIn 0.3s ease-out forwards;
+}
+
+/* This animation works for both tabs */
+@keyframes fadeSlideIn {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* Fix the Create New tab starting state */
+.notification-send-modal form, 
+.notification-send-modal .template-selection {
+  opacity: 0; /* Start hidden */
+}
+
+.notification-send-modal form.animate-tab-content, 
+.notification-send-modal .template-selection.animate-tab-content {
+  opacity: 1; /* Become visible when animation class is added */
 }

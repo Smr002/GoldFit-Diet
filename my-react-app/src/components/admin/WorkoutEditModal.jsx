@@ -1,5 +1,5 @@
-import React, { useState, useEffect } from 'react';
-import { X, Calendar, Clock, User, Target, LayoutTemplate, Dumbbell, ChevronDown, Plus, Trash2, Save, AlertCircle, Info } from 'lucide-react';
+import React, { useState, useEffect, useRef } from 'react';
+import { X, Calendar, Clock, User, Target, LayoutTemplate, Dumbbell, ChevronDown, Plus, Trash2, Save, AlertCircle, Info, Image, Upload } from 'lucide-react';
 
 // Mapping for common exercise name variations
 const exerciseNameMapping = {
@@ -14,18 +14,10 @@ const normalizeExerciseName = (name) => {
   return name.toLowerCase().replace(/\s+/g, ' ').trim();
 };
 
-const WorkoutEditModal = ({ workout, onClose, onSave }) => {
-  // State for storing editable workout details
-  const [workoutData, setWorkoutData] = useState({
-    name: workout.name,
-    level: workout.level,
-    timesPerWeek: workout.timesPerWeek,
-    createdBy: workout.createdBy,
-    isPremade: workout.isPremade,
-    exercises: [...workout.exercises]
-  });
-  
-  // State for managing UI interactions
+const WorkoutEditModal = ({ workout, onClose, onSave, isCreating = false }) => {
+  const [editedWorkout, setEditedWorkout] = useState(workout);
+  const [coverImage, setCoverImage] = useState(workout.coverImage || null);
+  const fileInputRef = useRef(null);
   const [expandedExercise, setExpandedExercise] = useState(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
@@ -132,7 +124,7 @@ const WorkoutEditModal = ({ workout, onClose, onSave }) => {
   // Handle form field changes
   const handleInputChange = (e) => {
     const { name, value, type, checked } = e.target;
-    setWorkoutData(prev => ({
+    setEditedWorkout(prev => ({
       ...prev,
       [name]: type === 'checkbox' ? checked : value
     }));
@@ -145,12 +137,12 @@ const WorkoutEditModal = ({ workout, onClose, onSave }) => {
   
   // Handle exercise changes
   const handleExerciseChange = (index, field, value) => {
-    const updatedExercises = [...workoutData.exercises];
+    const updatedExercises = [...editedWorkout.exercises];
     updatedExercises[index] = {
       ...updatedExercises[index],
       [field]: value
     };
-    setWorkoutData(prev => ({ ...prev, exercises: updatedExercises }));
+    setEditedWorkout(prev => ({ ...prev, exercises: updatedExercises }));
   };
   
   // Add new exercise
@@ -177,7 +169,7 @@ const WorkoutEditModal = ({ workout, onClose, onSave }) => {
       }
     }));
     
-    setWorkoutData(prev => ({
+    setEditedWorkout(prev => ({
       ...prev,
       exercises: [...prev.exercises, newExercise]
     }));
@@ -189,9 +181,9 @@ const WorkoutEditModal = ({ workout, onClose, onSave }) => {
   
   // Remove exercise
   const removeExercise = (index) => {
-    const updatedExercises = [...workoutData.exercises];
+    const updatedExercises = [...editedWorkout.exercises];
     updatedExercises.splice(index, 1);
-    setWorkoutData(prev => ({ ...prev, exercises: updatedExercises }));
+    setEditedWorkout(prev => ({ ...prev, exercises: updatedExercises }));
   };
   
   // Toggle exercise expansion
@@ -208,21 +200,21 @@ const WorkoutEditModal = ({ workout, onClose, onSave }) => {
   const validateForm = () => {
     const errors = {};
     
-    if (!workoutData.name.trim()) {
+    if (!editedWorkout.name.trim()) {
       errors.name = "Workout name is required";
     }
     
-    if (!workoutData.level) {
+    if (!editedWorkout.level) {
       errors.level = "Level is required";
     }
     
-    if (!workoutData.timesPerWeek) {
+    if (!editedWorkout.timesPerWeek) {
       errors.timesPerWeek = "Frequency is required";
-    } else if (isNaN(workoutData.timesPerWeek) || workoutData.timesPerWeek < 1 || workoutData.timesPerWeek > 7) {
+    } else if (isNaN(editedWorkout.timesPerWeek) || editedWorkout.timesPerWeek < 1 || editedWorkout.timesPerWeek > 7) {
       errors.timesPerWeek = "Frequency must be between 1-7";
     }
     
-    if (workoutData.exercises.length === 0) {
+    if (editedWorkout.exercises.length === 0) {
       errors.exercises = "At least one exercise is required";
     }
     
@@ -236,8 +228,8 @@ const WorkoutEditModal = ({ workout, onClose, onSave }) => {
     
     onSave({
       ...workout,
-      ...workoutData,
-      timesPerWeek: Number(workoutData.timesPerWeek)
+      ...editedWorkout,
+      timesPerWeek: Number(editedWorkout.timesPerWeek)
     });
   };
   
@@ -259,12 +251,45 @@ const WorkoutEditModal = ({ workout, onClose, onSave }) => {
   const toggleDetails = () => setDetailsOpen(!detailsOpen);
   const toggleInstructions = () => setInstructionsOpen(!instructionsOpen);
 
+  // Image upload handling
+  const handleFileChange = (e) => {
+    const file = e.target.files[0];
+    if (file) {
+      const reader = new FileReader();
+      reader.onload = (event) => {
+        const imageUrl = event.target.result;
+        setCoverImage(imageUrl);
+        setEditedWorkout(prev => ({
+          ...prev,
+          coverImage: imageUrl
+        }));
+      };
+      reader.readAsDataURL(file);
+    }
+  };
+  
+  const handleRemoveImage = () => {
+    setCoverImage(null);
+    setEditedWorkout(prev => ({
+      ...prev,
+      coverImage: null
+    }));
+    // Clear file input
+    if (fileInputRef.current) {
+      fileInputRef.current.value = '';
+    }
+  };
+
   return (
     <div className="modal-overlay">
       <div className="modal workout-details-modal workout-edit-modal">
         <button className="modal-close-btn" onClick={onClose}>
           <X size={24} />
         </button>
+
+        <div className="modal-header">
+          <h2>{isCreating ? "Create New Workout" : "Edit Workout"}</h2>
+        </div>
 
         <div className="workout-details-header">
           <div className="form-group">
@@ -273,7 +298,7 @@ const WorkoutEditModal = ({ workout, onClose, onSave }) => {
               type="text"
               id="workoutName"
               name="name"
-              value={workoutData.name}
+              value={editedWorkout.name}
               onChange={handleInputChange}
               className={`form-control ${formErrors.name ? 'error' : ''}`}
               placeholder="Enter workout name"
@@ -281,6 +306,45 @@ const WorkoutEditModal = ({ workout, onClose, onSave }) => {
             {formErrors.name && <div className="form-error">{formErrors.name}</div>}
           </div>
           
+          {/* Cover Image Upload Section */}
+          <div className="form-group cover-image-upload">
+            <label>Cover Image {isCreating && <span className="required">*</span>}</label>
+            <div className="image-upload-container">
+              {coverImage ? (
+                <div className="image-preview-container">
+                  <img 
+                    src={coverImage} 
+                    alt="Workout cover" 
+                    className="image-preview" 
+                  />
+                  <button 
+                    className="remove-image-btn"
+                    onClick={handleRemoveImage}
+                    type="button"
+                  >
+                    <Trash2 size={16} />
+                  </button>
+                </div>
+              ) : (
+                <div 
+                  className="upload-placeholder"
+                  onClick={() => fileInputRef.current.click()}
+                >
+                  <Image size={48} />
+                  <p>Click to upload workout cover image</p>
+                  <span>Recommended: 16:9 ratio, min 800x450px</span>
+                </div>
+              )}
+              <input
+                type="file"
+                ref={fileInputRef}
+                onChange={handleFileChange}
+                accept="image/*"
+                style={{ display: 'none' }}
+              />
+            </div>
+          </div>
+
           <div className="workout-meta-grid workout-meta-edit-grid">
             <div className="meta-item">
               <Target size={18} />
@@ -289,7 +353,7 @@ const WorkoutEditModal = ({ workout, onClose, onSave }) => {
                 <select
                   id="level"
                   name="level"
-                  value={workoutData.level}
+                  value={editedWorkout.level}
                   onChange={handleInputChange}
                   className={`form-select ${formErrors.level ? 'error' : ''}`}
                 >
@@ -312,7 +376,7 @@ const WorkoutEditModal = ({ workout, onClose, onSave }) => {
                   name="timesPerWeek"
                   min="1"
                   max="7"
-                  value={workoutData.timesPerWeek}
+                  value={editedWorkout.timesPerWeek}
                   onChange={handleInputChange}
                   className={`form-control ${formErrors.timesPerWeek ? 'error' : ''}`}
                 />
@@ -328,7 +392,7 @@ const WorkoutEditModal = ({ workout, onClose, onSave }) => {
                   type="text"
                   id="createdBy"
                   name="createdBy"
-                  value={workoutData.createdBy}
+                  value={editedWorkout.createdBy}
                   onChange={handleInputChange}
                   className="form-control"
                   placeholder="Creator name"
@@ -344,7 +408,7 @@ const WorkoutEditModal = ({ workout, onClose, onSave }) => {
                     type="checkbox"
                     id="isPremade"
                     name="isPremade"
-                    checked={workoutData.isPremade}
+                    checked={editedWorkout.isPremade}
                     onChange={handleInputChange}
                   />
                   <span>Premade Workout</span>
@@ -359,7 +423,7 @@ const WorkoutEditModal = ({ workout, onClose, onSave }) => {
           </div>
         </div>
 
-        {loading && !workoutData.exercises.length ? (
+        {loading && !editedWorkout.exercises.length ? (
           <div className="workout-loading-container">
             <div className="workout-loading-spinner"></div>
             <span>Loading...</span>
@@ -377,7 +441,7 @@ const WorkoutEditModal = ({ workout, onClose, onSave }) => {
                   <span>Add Exercise</span>
                 </button>
                 <span className="admin-exercise-count">
-                  {workoutData.exercises?.length || 0} exercises
+                  {editedWorkout.exercises?.length || 0} exercises
                 </span>
               </div>
               {formErrors.exercises && <div className="form-error exercise-list-error">{formErrors.exercises}</div>}
@@ -511,7 +575,7 @@ const WorkoutEditModal = ({ workout, onClose, onSave }) => {
             )}
 
             <div className="admin-exercises-list sortable-list">
-              {workoutData.exercises.map((exercise, index) => (
+              {editedWorkout.exercises.map((exercise, index) => (
                 <div key={exercise.id} className="admin-exercise-item-wrapper">
                   <div
                     className={`admin-exercise-item ${expandedExercise === exercise.id ? 'expanded' : ''}`}
@@ -624,9 +688,13 @@ const WorkoutEditModal = ({ workout, onClose, onSave }) => {
         
         <div className="modal-footer">
           <button className="cancel-btn" onClick={onClose}>Cancel</button>
-          <button className="save-btn" onClick={handleSave}>
+          <button 
+            className="save-btn" 
+            onClick={handleSave}
+            disabled={isCreating && !coverImage} // Disable save if creating without image
+          >
             <Save size={16} />
-            <span>Save Workout</span>
+            <span>{isCreating ? "Create Workout" : "Save Changes"}</span>
           </button>
         </div>
       </div>

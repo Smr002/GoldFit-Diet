@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { MoreVertical, Pencil, Trash2, Eye, Plus, Search } from 'lucide-react';
 import 'admin.css';
 // Update the import statements
@@ -20,6 +20,34 @@ const WorkoutManagement = () => {
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
   const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
+  
+  // Add this ref to track dropdown containers
+  const dropdownRef = useRef(null);
+  
+  // Add this useEffect to handle clicks outside the dropdown
+  useEffect(() => {
+    const handleClickOutside = (event) => {
+      if (dropdownRef.current && !dropdownRef.current.contains(event.target)) {
+        setActiveDropdown(null);
+      }
+    };
+
+    // Add event listener when dropdown is open
+    if (activeDropdown !== null) {
+      document.addEventListener('mousedown', handleClickOutside);
+    }
+    
+    // Cleanup function to remove the listener
+    return () => {
+      document.removeEventListener('mousedown', handleClickOutside);
+    };
+  }, [activeDropdown]);
+  
+  // Add this function to determine which dropdowns should flip up
+  const shouldFlipDropdown = (index, total) => {
+    // Always flip the last 2 rows' dropdowns
+    return index >= total - 2;
+  };
 
   const [workouts, setWorkouts] = useState([
     {
@@ -172,6 +200,7 @@ const WorkoutManagement = () => {
       createdBy: "Admin",
       isPremade: true,
       createdAt: new Date().toISOString().split('T')[0],
+      coverImage: null, // Add this empty field for the image
       exercises: []
     };
     
@@ -275,10 +304,13 @@ const WorkoutManagement = () => {
               </tr>
             </thead>
             <tbody>
-              {currentWorkouts.map(workout => (
+              {currentWorkouts.map((workout, index) => (
                 <tr key={workout.id} className="animate-fade-in">
                   <td>
-                    <div className="actions-dropdown">
+                    <div 
+                      className="actions-dropdown"
+                      ref={activeDropdown === workout.id ? dropdownRef : null}
+                    >
                       <button 
                         className="dropdown-trigger"
                         onClick={() => setActiveDropdown(activeDropdown === workout.id ? null : workout.id)}
@@ -286,7 +318,7 @@ const WorkoutManagement = () => {
                         <MoreVertical size={20} />
                       </button>
                       {activeDropdown === workout.id && (
-                        <div className="dropdown-menu">
+                        <div className={`dropdown-menu ${shouldFlipDropdown(index, currentWorkouts.length) ? 'flip-up' : ''}`}>
                           <button 
                             className="dropdown-item"
                             onClick={() => handleViewDetails(workout)}

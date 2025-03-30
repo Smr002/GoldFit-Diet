@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { X, Calendar, Clock, User, Target, LayoutTemplate, Dumbbell, ChevronDown, Info, Edit } from 'lucide-react';
+import { X, Calendar, Clock, User, Target, LayoutTemplate, Dumbbell, ChevronDown, Info, Edit, Shield } from 'lucide-react';
 
 // Updated mapping with more variations and standardized formats
 const exerciseNameMapping = {
@@ -192,6 +192,13 @@ const WorkoutDetailsModal = ({ workout, onClose, onEdit }) => {
             </div>
           </div>
         </div>
+
+        {/* Display workout cover image if available */}
+        {workout.coverImage && (
+          <div className="workout-cover-image">
+            <img src={workout.coverImage} alt={workout.name} />
+          </div>
+        )}
 
         {loading ? (
           <div className="workout-loading-container">

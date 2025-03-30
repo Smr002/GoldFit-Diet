@@ -14,6 +14,13 @@ const DeleteConfirmModal = ({ isOpen, onClose, onConfirm, item, itemType = 'user
       title: 'Delete Workout',
       nameDisplay: item.name,
       buttonText: 'Delete Workout'
+    },
+    notification: {
+      title: 'Delete Notification',
+      nameDisplay: item.message ? 
+        (item.message.length > 30 ? `${item.message.substring(0, 30)}...` : item.message) : 
+        'this notification',
+      buttonText: 'Delete Notification'
     }
   };
 
@@ -24,8 +31,7 @@ const DeleteConfirmModal = ({ isOpen, onClose, onConfirm, item, itemType = 'user
       <div className="modal confirmation-modal">
         <h2>Confirm {config.title}</h2>
         <p>
-          Are you sure you want to delete {itemType}{' '}
-          <strong>{config.nameDisplay}</strong>?
+          Are you sure you want to delete this {itemType}?
           This action cannot be undone.
         </p>
         <div className="modal-actions">
