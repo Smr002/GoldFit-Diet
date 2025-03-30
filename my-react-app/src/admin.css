@@ -798,7 +798,7 @@
   padding: 0.25rem 0.5rem;
   background-color: var(--admin-secondary);
   border-radius: 0.25rem;
-  color: var(--admin-text);
+  color: var (--admin-text);
 }
 
 .admin-actions {
@@ -4788,4 +4788,778 @@ form {
 .notification-send-modal form.animate-tab-content, 
 .notification-send-modal .template-selection.animate-tab-content {
   opacity: 1; /* Become visible when animation class is added */
+}
+
+/* FAQ specific styles */
+.faq-question-cell {
+  cursor: pointer;
+  position: relative;
+  padding-right: 2.5rem !important;
+}
+
+.faq-question-wrapper {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  width: 100%;
+}
+
+.faq-toggle-icon {
+  color: #6b7280;
+  position: absolute;
+  right: 1rem;
+  top: 50%;
+  transform: translateY(-50%);
+}
+
+.faq-answer-preview {
+  margin-top: 0.75rem;
+  padding-top: 0.75rem;
+  border-top: 1px dashed #e5e7eb;
+  font-size: 0.875rem;
+  color: #4b5563;
+  line-height: 1.5;
+}
+
+.category-badge {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0.25rem 0.5rem;
+  background-color: #f3f4f6;
+  color: #374151;
+  border-radius: 0.375rem;
+  font-size: 0.75rem;
+  font-weight: 500;
+}
+
+/* FAQ Table Styles */
+.faq-table {
+  border-collapse: separate;
+  border-spacing: 0;
+}
+
+.faq-table th,
+.faq-table td {
+  padding: 1rem;
+}
+
+.faq-table tr {
+  border-bottom: 1px solid #e5e7eb;
+  transition: background-color 0.2s;
+}
+
+.faq-table tr:hover {
+  background-color: #f9fafb;
+}
+
+.faq-table .actions-column {
+  width: 80px;
+  text-align: center;
+}
+
+.faq-table .question-column {
+  min-width: 300px;
+  max-width: 50%;
+}
+
+.faq-table .category-column {
+  width: 150px;
+}
+
+.faq-table .date-column {
+  width: 120px;
+}
+
+/* FAQ Category Badge Styles */
+.category-badge {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0.25rem 0.75rem;
+  border-radius: 0.375rem;
+  font-size: 0.75rem;
+  font-weight: 500;
+}
+
+.category-badge.workouts {
+  background-color: #e0f2fe;
+  color: #0369a1;
+}
+
+.category-badge.nutrition {
+  background-color: #dcfce7;
+  color: #15803d;
+}
+
+.category-badge.app-features {
+  background-color: #f3e8ff;
+  color: #7e22ce;
+}
+
+.category-badge.tracking {
+  background-color: #fef3c7;
+  color: #b45309;
+}
+
+.category-badge.billing {
+  background-color: #ffe4e6;
+  color: #be123c;
+}
+
+/* FAQ Question Cell */
+.faq-question-cell {
+  cursor: pointer;
+  position: relative;
+  padding-right: 40px !important; /* Give space for the fixed icon */
+}
+
+.faq-question-wrapper {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  width: 100%;
+  position: relative;
+}
+
+.faq-question-text {
+  flex: 1;
+  padding-right: 16px;
+  font-weight: 500;
+  color: #111827;
+}
+
+.faq-toggle-icon {
+  position: absolute;
+  right: -24px; /* Position it outside the text, but within the padding space */
+  top: 2px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 20px;
+  height: 20px;
+  color: #6b7280;
+  transition: transform 0.3s ease;
+}
+
+.faq-toggle-icon.expanded {
+  transform: rotate(180deg);
+}
+
+.faq-answer-preview {
+  margin-top: 0.75rem;
+  padding-top: 0.75rem;
+  border-top: 1px dashed #e5e7eb;
+  font-size: 0.875rem;
+  color: #4b5563;
+  line-height: 1.5;
+  white-space: pre-wrap;
+  animation: fadeDown 0.3s ease-in-out;
+}
+
+@keyframes fadeDown {
+  from {
+    opacity: 0;
+    transform: translateY(-8px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* Add New FAQ Button */
+.admin-header-actions .admin-btn.primary {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.625rem 1rem;
+  background-color: #4f46e5;
+  color: white;
+  border: none;
+  border-radius: 0.375rem;
+  font-size: 0.875rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: background-color 0.2s;
+}
+
+.admin-header-actions .admin-btn.primary:hover {
+  background-color: #4338ca;
+}
+
+/* FAQ Modal Styles */
+.faq-details-modal {
+  max-width: 650px;
+}
+
+.faq-edit-modal {
+  max-width: 600px;
+}
+
+.faq-details {
+  margin-top: 1.5rem;
+}
+
+.faq-detail-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 1.5rem;
+  padding-bottom: 0.75rem;
+  border-bottom: 1px solid #e5e7eb;
+}
+
+.faq-date {
+  font-size: 0.875rem;
+  color: #6b7280;
+}
+
+.faq-detail-question,
+.faq-detail-answer {
+  margin-bottom: 1.5rem;
+}
+
+.faq-detail-question h3,
+.faq-detail-answer h3 {
+  font-size: 0.875rem;
+  text-transform: uppercase;
+  color: #6b7280;
+  margin-bottom: 0.5rem;
+  letter-spacing: 0.05em;
+}
+
+.faq-detail-question p {
+  font-size: 1.125rem;
+  font-weight: 500;
+  color: #111827;
+}
+
+.faq-detail-answer p {
+  font-size: 1rem;
+  line-height: 1.6;
+  color: #374151;
+  white-space: pre-wrap;
+}
+
+/* Modal actions */
+.modal-footer {
+  display: flex;
+  justify-content: flex-end;
+  gap: 0.75rem;
+  margin-top: 1.5rem;
+  padding-top: 1.5rem;
+  border-top: 1px solid #e5e7eb;
+}
+
+.close-btn,
+.edit-btn,
+.cancel-btn,
+.save-btn,
+.delete-btn {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.5rem 1rem;
+  border-radius: 0.375rem;
+  font-size: 0.875rem;
+  font-weight: 500;
+  cursor: pointer;
+  border: none;
+}
+
+.close-btn {
+  background-color: #f3f4f6;
+  color: #4b5563;
+}
+
+.edit-btn {
+  background-color: #4f46e5;
+  color: white;
+}
+
+.delete-emphasis {
+  display: inline-block;
+  margin: 0.5rem 0;
+  color: #b91c1c;
+}
+
+/* Form styles for Edit/Create modal */
+.form-group {
+  margin-bottom: 1.25rem;
+}
+
+.form-group label {
+  display: block;
+  font-size: 0.875rem;
+  font-weight: 500;
+  margin-bottom: 0.5rem;
+  color: #374151;
+}
+
+.form-group input,
+.form-group select,
+.form-group textarea {
+  width: 100%;
+  padding: 0.625rem;
+  border: 1px solid #d1d5db;
+  border-radius: 0.375rem;
+  font-size: 0.875rem;
+}
+
+.form-group textarea {
+  resize: vertical;
+}
+
+.form-group input:focus,
+.form-group select:focus,
+.form-group textarea:focus {
+  outline: none;
+  border-color: #4f46e5;
+  box-shadow: 0 0 0 1px rgba(79, 70, 229, 0.2);
+}
+
+/* Admin Management Page Styles */
+.create-admin-btn {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.625rem 1rem;
+  background-color: #4f46e5;
+  color: white;
+  border: none;
+  border-radius: 0.375rem;
+  font-size: 0.875rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: background-color 0.2s;
+}
+
+.create-admin-btn:hover {
+  background-color: #4338ca;
+}
+
+/* Admin User Cell */
+.admin-user-cell {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+}
+
+.admin-avatar {
+  width: 2.5rem;
+  height: 2.5rem;
+  border-radius: 50%;
+  background-color: #f3f4f6;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #4b5563;
+  font-weight: 600;
+  flex-shrink: 0;
+}
+
+.avatar-initials {
+  font-size: 0.875rem;
+  text-transform: uppercase;
+}
+
+.avatar-initials.large {
+  font-size: 1.25rem;
+  width: 4rem;
+  height: 4rem;
+}
+
+.admin-user-info {
+  display: flex;
+  flex-direction: column;
+}
+
+.admin-user-name {
+  font-weight: 500;
+  color: #111827;
+}
+
+.admin-user-email {
+  font-size: 0.75rem;
+  color: #6b7280;
+}
+
+/* Admin Role Badge */
+.admin-role-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.375rem;
+  padding: 0.25rem 0.5rem;
+  background-color: #f3f4f6;
+  border-radius: 0.375rem;
+  font-size: 0.75rem;
+  font-weight: 500;
+  color: #374151;
+}
+
+/* Admin Permission Tags */
+.admin-permission-tags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.25rem 0.5rem;
+}
+
+.admin-tag {
+  display: inline-block;
+  padding: 0.125rem 0.5rem;
+  background-color: #e0f2fe;
+  color: #0369a1;
+  border-radius: 0.25rem;
+  font-size: 0.75rem;
+  font-weight: 500;
+}
+
+.admin-permission-tags.large {
+  gap: 0.5rem;
+}
+
+.admin-permission-tags.large .admin-tag {
+  padding: 0.25rem 0.75rem;
+  font-size: 0.875rem;
+}
+
+/* Admin Details Modal */
+.admin-details-modal {
+  max-width: 700px;
+}
+
+.admin-details-header {
+  display: flex;
+  gap: 1.5rem;
+  margin-bottom: 2rem;
+}
+
+.admin-details-primary {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.admin-details-primary h3 {
+  font-size: 1.5rem;
+  font-weight: 600;
+  margin: 0;
+}
+
+.admin-info-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 1.5rem;
+  margin-bottom: 2rem;
+}
+
+.info-item {
+  display: flex;
+  flex-direction: column;
+  gap: 0.375rem;
+}
+
+.info-item label {
+  font-size: 0.75rem;
+  text-transform: uppercase;
+  color: #6b7280;
+  letter-spacing: 0.05em;
+}
+
+.info-item span {
+  font-size: 0.875rem;
+  color: #111827;
+}
+
+.admin-permissions-section,
+.admin-activity-section {
+  margin-bottom: 1.5rem;
+}
+
+.admin-permissions-section h4,
+.admin-activity-section h4 {
+  font-size: 1rem;
+  font-weight: 600;
+  margin-bottom: 0.75rem;
+}
+
+.admin-activity-log {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+.activity-item {
+  padding: 0.75rem;
+  background-color: #f9fafb;
+  border-radius: 0.375rem;
+  border-left: 3px solid #4f46e5;
+}
+
+.activity-timestamp {
+  font-size: 0.75rem;
+  color: #6b7280;
+  margin-bottom: 0.25rem;
+}
+
+.activity-action {
+  font-weight: 500;
+  color: #111827;
+  margin-bottom: 0.25rem;
+}
+
+.activity-details {
+  font-size: 0.875rem;
+  color: #4b5563;
+}
+
+.no-activity {
+  color: #6b7280;
+  font-size: 0.875rem;
+  font-style: italic;
+}
+
+/* Admin Edit Modal */
+.admin-edit-modal {
+  max-width: 600px;
+}
+
+.form-row {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 1rem;
+}
+
+.permission-checkboxes {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+  margin-top: 0.5rem;
+  padding: 0.5rem;
+  border: 1px solid #e5e7eb;
+  border-radius: 0.5rem;
+  background-color: #f9fafb;
+}
+
+.checkbox-label {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.75rem;
+  position: relative;
+  cursor: pointer;
+  user-select: none;
+  padding: 0.75rem;
+  border-radius: 0.375rem;
+  transition: all 0.2s ease;
+  background-color: white;
+  border: 1px solid #e5e7eb;
+}
+
+.checkbox-label:hover {
+  border-color: #d1d5db;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+}
+
+.checkbox-label input {
+  position: absolute;
+  opacity: 0;
+  height: 0;
+  width: 0;
+}
+
+/* .checkbox-custom {
+  height: 1.25rem;
+  width: 1.25rem;
+  background-color: #fff;
+  border: 2px solid #d1d5db;
+  border-radius: 0.25rem;
+  position: relative;
+  margin-top: 0.125rem;
+  flex-shrink: 0;
+  transition: all 0.2s ease;
+} */
+
+.checkbox-label:hover .checkbox-custom {
+  border-color: #9ca3af;
+}
+
+.checkbox-label input:checked ~ .checkbox-custom {
+  background-color: #4f46e5;
+  border-color: #4f46e5;
+}
+
+.checkbox-custom:after {
+  content: "";
+  position: absolute;
+  display: none;
+  left: 0.375rem;
+  top: 0.125rem;
+  width: 0.375rem;
+  height: 0.75rem;
+  border: #4f46e5;
+  border-width: 0 2px 2px 0;
+  transform: rotate(45deg);
+}
+
+.checkbox-label input:checked ~ .checkbox-custom:after {
+  display: block;
+}
+
+.checkbox-label input:checked + .checkbox-custom {
+  transform: scale(1.05);
+}
+
+.permission-info {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+  flex: 1;
+}
+
+.permission-name {
+  font-size: 0.875rem;
+  font-weight: 600;
+  color: #111827;
+}
+
+.permission-description {
+  font-size: 0.75rem;
+  color: #6b7280;
+  line-height: 1.4;
+}
+
+/* Selected state for checkbox labels */
+.checkbox-label input:checked ~ .permission-info .permission-name {
+  color: #4338ca;
+}
+
+.checkbox-label.selected {
+  background-color: #f5f3ff;
+  border-color: #8b5cf6;
+}
+
+.password-note {
+  margin-top: 0.375rem;
+  font-size: 0.75rem;
+  color: #6b7280;
+  font-style: italic;
+}
+
+/* Status Badges */
+.status-badge {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0.25rem 0.75rem;
+  border-radius: 9999px;
+  font-size: 0.75rem;
+  font-weight: 500;
+}
+
+.status-badge.active {
+  background-color: #dcfce7;
+  color: #15803d;
+}
+
+.status-badge.inactive {
+  background-color: #fee2e2;
+  color: #b91c1c;
+}
+
+/* Helper Text */
+.helper-text {
+  margin-top: 0.5rem;
+  font-size: 0.75rem;
+  color: #6b7280;
+}
+
+/* Warning button for demote action */
+.warning-btn {
+  background-color: #f59e0b;
+  color: white;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.5rem 1rem;
+  border-radius: 0.375rem;
+  font-size: 0.875rem;
+  font-weight: 500;
+  cursor: pointer;
+  border: none;
+}
+
+.warning-btn:hover {
+  background-color: #d97706;
+}
+
+.dropdown-item.warning {
+  color: #f59e0b;
+}
+
+.dropdown-item.warning:hover {
+  background-color: #fff7ed;
+}
+
+.demote-emphasis {
+  display: inline-block;
+  margin: 0.5rem 0;
+  color: #d97706;
+}
+
+/* Improved search button styles */
+.admin-search-box {
+  position: relative;
+  height: 50px;
+  display: flex;
+  align-items: center;
+}
+
+.admin-input-search {
+  height: 50px;
+  width: 300px;
+  padding: 0.75rem 3rem 0.75rem 1rem;
+  border-radius: 0.5rem;
+  font-size: 0.875rem;
+  background-color: white;
+  color: #1e293b;
+  border: 1px solid #e5e7eb;
+  transition: all 0.3s ease;
+}
+
+.admin-input-search:focus {
+  outline: none;
+  border-color: #4f46e5;
+  box-shadow: 0 0 0 2px rgba(79, 70, 229, 0.1);
+}
+
+.admin-btn-search {
+  position: absolute;
+  right: 0.75rem;
+  top: 50%;
+  transform: translateY(-50%);
+  background: transparent;
+  border: none;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0;
+  cursor: pointer;
+  color: #6b7280;
+  transition: color 0.2s ease;
+}
+
+.admin-btn-search:hover {
+  color: #4f46e5;
+}
+
+.admin-btn-search:focus {
+  outline: none;
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+  .admin-input-search {
+    width: 100%;
+  }
 }

@@ -214,7 +214,7 @@ const UserManagement = () => {
           <input
             type="text"
             className="admin-input-search"
-            placeholder="Search..."
+            placeholder="Search users..."
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
           />
