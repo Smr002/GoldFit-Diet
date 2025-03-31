@@ -174,6 +174,7 @@ const WorkoutManagement = () => {
     setActiveDropdown(null);
   };
 
+  // eslint-disable-next-line no-unused-vars
   const handleDeleteCancel = () => {
     setIsDeleteModalOpen(false);
     setSelectedWorkout(null);

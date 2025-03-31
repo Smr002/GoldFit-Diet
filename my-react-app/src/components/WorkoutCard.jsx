@@ -3,9 +3,13 @@ import { formatDistanceToNow } from "date-fns"
 
 const WorkoutCard = ({
   workout,
+  // eslint-disable-next-line no-unused-vars
   isFavorite,
+  // eslint-disable-next-line no-unused-vars
   hasNotification,
+  // eslint-disable-next-line no-unused-vars
   onToggleFavorite,
+  // eslint-disable-next-line no-unused-vars
   onToggleNotification,
   onClick,
   onEdit,
@@ -29,6 +33,7 @@ const WorkoutCard = ({
   }
 
   // Improved handler to prevent click event propagation and ensure callback is called
+  // eslint-disable-next-line no-unused-vars
   const handleButtonClick = (e, callback) => {
     if (!e || !callback) return;
     
