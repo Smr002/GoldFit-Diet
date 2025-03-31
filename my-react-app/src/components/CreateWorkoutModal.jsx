@@ -15,9 +15,63 @@ const CreateWorkoutModal = ({ onClose, onSave, workout = null }) => {
     reps: 10,
     rest: 60,
   })
-  const [imageUrl, setImageUrl] = useState("https://plus.unsplash.com/premium_photo-1661914978519-52a11fe159a7?fm=jpg&q=60&w=3000&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxzZWFyY2h8MXx8bG9nb3xlbnwwfHwwfHx8MA%3D%3D")
+  const [src, setSrc] = useState("/placeholder.svg") // Changed from imageUrl to src, using placeholder as default
   const [isEditing, setIsEditing] = useState(false)
   const [editingIndex, setEditingIndex] = useState(-1)
+
+  // Add custom styles for the edit and remove buttons
+  const buttonStyles = {
+    editButton: {
+      backgroundColor: '#4ade80', // green
+      color: 'white',
+      borderRadius: '4px',
+      padding: '4px',
+      display: 'flex',
+      alignItems: 'center',
+      justifyContent: 'center',
+      border: 'none',
+      cursor: 'pointer',
+      marginRight: '5px',
+    },
+    removeButton: {
+      backgroundColor: '#ef4444', // red
+      color: 'white',
+      borderRadius: '4px',
+      padding: '4px',
+      display: 'flex',
+      alignItems: 'center',
+      justifyContent: 'center',
+      border: 'none',
+      cursor: 'pointer',
+    }
+  }
+
+  // Enhanced modal styles for better centering on small screens like iPhone SE
+  const modalStyles = {
+    overlay: {
+      position: 'fixed',
+      top: 0,
+      left: 0,
+      right: 0,
+      bottom: 0,
+      display: 'flex',
+      alignItems: 'center',
+      justifyContent: 'center',
+      padding: '10px',
+      overflowY: 'auto',
+      zIndex: 1000,
+    },
+    modal: {
+      margin: '0 auto',
+      maxHeight: '100vh',
+      overflowY: 'auto',
+      width: '100%',
+      maxWidth: '700px',
+      position: 'relative',
+      top: 0,
+      transform: 'none',
+    }
+  };
 
   useEffect(() => {
     if (workout) {
@@ -27,7 +81,7 @@ const CreateWorkoutModal = ({ onClose, onSave, workout = null }) => {
       setDuration(workout.duration)
       setGoal(workout.goal)
       setExercises(workout.exercises)
-      setImageUrl(workout.imageUrl)
+      setSrc(workout.src || "/placeholder.svg") // Changed to src
     }
   }, [workout])
 
@@ -94,7 +148,7 @@ const CreateWorkoutModal = ({ onClose, onSave, workout = null }) => {
       duration: Number.parseInt(duration),
       goal,
       exercises,
-      imageUrl,
+      src, // Changed to src
     }
 
     if (workout) {
@@ -110,12 +164,12 @@ const CreateWorkoutModal = ({ onClose, onSave, workout = null }) => {
     const file = e.target.files[0]
     if (!file) return
     const objectUrl = URL.createObjectURL(file)
-    setImageUrl(objectUrl)
+    setSrc(objectUrl) // Changed to setSrc
   }
 
   return (
-    <div className="workout-modal-overlay" onClick={onClose}>
-      <div className="create-workout-modal" onClick={(e) => e.stopPropagation()}>
+    <div className="workout-modal-overlay" onClick={onClose} style={modalStyles.overlay}>
+      <div className="create-workout-modal" onClick={(e) => e.stopPropagation()} style={modalStyles.modal}>
         <button className="close-modal" onClick={onClose}>
           ×
         </button>
@@ -124,6 +178,7 @@ const CreateWorkoutModal = ({ onClose, onSave, workout = null }) => {
 
         <div className="create-modal-content">
           <div className="create-modal-form">
+            {/* Basic workout information form */}
             <div className="form-group">
               <label htmlFor="workout-title">Workout Title*</label>
               <input
@@ -183,7 +238,7 @@ const CreateWorkoutModal = ({ onClose, onSave, workout = null }) => {
             <div className="form-group">
               <label>Workout Image</label>
               <div className="image-upload-container">
-                <img src={imageUrl || "/placeholder.svg"} alt="Workout" className="workout-image-preview" />
+                <img src={src || "/placeholder.svg"} alt="Workout" className="workout-image-preview" /> {/* Changed to src */}
                 <button
                   className="change-image-button"
                   onClick={() => document.getElementById("workout-image").click()}
@@ -204,6 +259,7 @@ const CreateWorkoutModal = ({ onClose, onSave, workout = null }) => {
           <div className="exercises-form">
             <h3>Exercises*</h3>
 
+            {/* Exercise input form */}
             <div className="exercise-input-form">
               <div className="form-group">
                 <label htmlFor="exercise-name">Exercise Name*</label>
@@ -265,6 +321,7 @@ const CreateWorkoutModal = ({ onClose, onSave, workout = null }) => {
               </button>
             </div>
 
+            {/* Exercise list */}
             <div className="exercises-list">
               {exercises.length > 0 ? (
                 exercises.map((exercise, index) => (
@@ -281,36 +338,43 @@ const CreateWorkoutModal = ({ onClose, onSave, workout = null }) => {
                       </div>
                     </div>
                     <div className="exercise-list-actions">
-                      <button className="edit-exercise-button" onClick={() => handleEditExercise(index)}>
+                      <button
+                        style={buttonStyles.editButton}
+                        onClick={() => handleEditExercise(index)}
+                        title="Edit exercise"
+                      >
                         <svg
                           xmlns="http://www.w3.org/2000/svg"
                           width="16"
                           height="16"
                           viewBox="0 0 24 24"
                           fill="none"
-                          stroke="currentColor"
+                          stroke="white"
                           strokeWidth="2"
                           strokeLinecap="round"
                           strokeLinejoin="round"
                         >
-                          <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path>
-                          <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"></path>
+                          <path d="M20 6L9 17l-5-5"></path>
                         </svg>
                       </button>
-                      <button className="remove-exercise-button" onClick={() => handleRemoveExercise(index)}>
+                      <button
+                        style={buttonStyles.removeButton}
+                        onClick={() => handleRemoveExercise(index)}
+                        title="Remove exercise" // Fixed syntax
+                      >
                         <svg
                           xmlns="http://www.w3.org/2000/svg"
                           width="16"
                           height="16"
                           viewBox="0 0 24 24"
                           fill="none"
-                          stroke="currentColor"
+                          stroke="white"
                           strokeWidth="2"
                           strokeLinecap="round"
                           strokeLinejoin="round"
                         >
-                          <polyline points="3 6 5 6 21 6"></polyline>
-                          <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path>
+                          <line x1="18" y1="6" x2="6" y2="18"></line>
+                          <line x1="6" y1="6" x2="18" y2="18"></line>
                         </svg>
                       </button>
                     </div>
@@ -339,4 +403,3 @@ const CreateWorkoutModal = ({ onClose, onSave, workout = null }) => {
 }
 
 export default CreateWorkoutModal
-

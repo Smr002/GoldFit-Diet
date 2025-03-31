@@ -18,67 +18,38 @@ const WorkoutCard = ({
   const getDifficultyColor = (difficulty) => {
     switch (difficulty) {
       case "beginner":
-        return "#4ade80" 
+        return "#4ade80"
       case "intermediate":
-        return "#facc15" 
+        return "#facc15"
       case "advanced":
-        return "#ef4444" 
+        return "#ef4444"
       default:
-        return "#a3a3a3" 
+        return "#a3a3a3"
     }
   }
+
+  // Improved handler to prevent click event propagation and ensure callback is called
+  const handleButtonClick = (e, callback) => {
+    if (!e || !callback) return;
+    
+    e.preventDefault();
+    e.stopPropagation();
+    
+    // Debug log
+    console.log("Button clicked, calling callback function");
+    
+    // Call the callback directly
+    callback();
+  };
 
   return (
     <div className="workout-card" style={style}>
       <div className="workout-image-container">
-        <img src={workout.imageUrl || "/placeholder.svg"} alt={workout.title} className="workout-image" />
-        <div className="workout-actions">
-          <button
-            className={`action-button favorite-button ${isFavorite ? "active" : ""}`}
-            onClick={(e) => {
-              e.stopPropagation()
-              onToggleFavorite()
-            }}
-            aria-label={isFavorite ? "Remove from favorites" : "Add to favorites"}
-          >
-            <svg
-              xmlns="http://www.w3.org/2000/svg"
-              width="20"
-              height="20"
-              viewBox="0 0 24 24"
-              fill={isFavorite ? "currentColor" : "none"}
-              stroke="currentColor"
-              strokeWidth="2"
-              strokeLinecap="round"
-              strokeLinejoin="round"
-            >
-              <path d="M19 21l-7-5-7 5V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2z"></path>
-            </svg>
-          </button>
-          <button
-            className={`action-button notification-button ${hasNotification ? "active" : ""}`}
-            onClick={(e) => {
-              e.stopPropagation()
-              onToggleNotification()
-            }}
-            aria-label={hasNotification ? "Disable notifications" : "Enable notifications"}
-          >
-            <svg
-              xmlns="http://www.w3.org/2000/svg"
-              width="20"
-              height="20"
-              viewBox="0 0 24 24"
-              fill="none"
-              stroke="currentColor"
-              strokeWidth="2"
-              strokeLinecap="round"
-              strokeLinejoin="round"
-            >
-              <path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"></path>
-              <path d="M13.73 21a2 2 0 0 1-3.46 0"></path>
-            </svg>
-          </button>
-        </div>
+        <img 
+          src={workout.src || "/placeholder.svg"}
+          alt={workout.title} 
+          className="workout-image" 
+        />
       </div>
       <div className="workout-content" onClick={onClick}>
         <h3 className="workout-title">{workout.title}</h3>
@@ -129,7 +100,7 @@ const WorkoutCard = ({
           </div>
         )}
       </div>
-      <div className="workout-footer">
+      <div className="workout-footer" onClick={(e) => e.stopPropagation()}>
         <div className="workout-badges-footer">
           <span className="difficulty-badge" style={{ backgroundColor: getDifficultyColor(workout.difficulty) }}>
             {workout.difficulty}
@@ -137,36 +108,43 @@ const WorkoutCard = ({
           <span className="duration-badge">{workout.duration} min</span>
         </div>
         <div className="workout-actions-footer">
-          {!workout.isRecommended && (
-            <button
-              className="edit-button"
-              onClick={(e) => {
-                e.stopPropagation()
-                onEdit()
-              }}
+          <button
+            className="edit-button"
+            onClick={(e) => {
+              console.log("Edit button clicked");
+              e.preventDefault();
+              e.stopPropagation();
+              if (typeof onEdit === 'function') {
+                onEdit();
+              } else {
+                console.error("onEdit is not a function:", onEdit);
+              }
+            }}
+          >
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              width="16"
+              height="16"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              strokeWidth="2"
+              strokeLinecap="round"
+              strokeLinejoin="round"
             >
-              <svg
-                xmlns="http://www.w3.org/2000/svg"
-                width="16"
-                height="16"
-                viewBox="0 0 24 24"
-                fill="none"
-                stroke="currentColor"
-                strokeWidth="2"
-                strokeLinecap="round"
-                strokeLinejoin="round"
-              >
-                <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path>
-                <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"></path>
-              </svg>
-              Edit
-            </button>
-          )}
+              <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path>
+              <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"></path>
+            </svg>
+            Edit
+          </button>
           <button
             className="log-button"
             onClick={(e) => {
-              e.stopPropagation()
-              onLog()
+              e.preventDefault();
+              e.stopPropagation();
+              if (typeof onLog === 'function') {
+                onLog();
+              }
             }}
           >
             <svg
@@ -195,4 +173,3 @@ const WorkoutCard = ({
 }
 
 export default WorkoutCard
-

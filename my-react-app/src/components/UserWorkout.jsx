@@ -6,6 +6,11 @@ import CreateWorkoutModal from "./CreateWorkoutModal"
 import WorkoutDetailModal from "./WorkoutDetailModal"
 import LogWorkoutModal from "./LogWorkoutModal"
 
+import fullbody from "../assets/fullbody.jpg";
+import hiit from "../assets/hiitcardio.jpg";
+import beginner from "../assets/beginner.jpg";
+import legs from "../assets/legday.jpg";
+
 const UserWorkout = () => {
   const [workouts, setWorkouts] = useState([])
   const [recommendedWorkouts, setRecommendedWorkouts] = useState([])
@@ -45,7 +50,7 @@ const UserWorkout = () => {
               { id: "ex-3", name: "Pull-ups", sets: 3, reps: 8, rest: 60 },
               { id: "ex-4", name: "Deadlifts", sets: 3, reps: 10, rest: 90 },
             ],
-            imageUrl: "/placeholder.svg?height=200&width=300",
+            src: fullbody,
             createdAt: new Date().toISOString(),
             isRecommended: true,
           },
@@ -62,7 +67,7 @@ const UserWorkout = () => {
               { id: "ex-7", name: "Jump Squats", sets: 4, reps: 15, rest: 30 },
               { id: "ex-8", name: "High Knees", sets: 4, reps: 30, rest: 30 },
             ],
-            imageUrl: "/placeholder.svg?height=200&width=300",
+            src: hiit,
             createdAt: new Date().toISOString(),
             isRecommended: true,
           },
@@ -79,7 +84,7 @@ const UserWorkout = () => {
               { id: "ex-11", name: "Plank", sets: 2, reps: "30 sec", rest: 60 },
               { id: "ex-12", name: "Walking Lunges", sets: 2, reps: 10, rest: 60 },
             ],
-            imageUrl: "/placeholder.svg?height=200&width=300",
+            src: beginner,
             createdAt: new Date().toISOString(),
             isRecommended: true,
           },
@@ -99,7 +104,7 @@ const UserWorkout = () => {
               { id: "ex-15", name: "Leg Press", sets: 3, reps: 12, rest: 60 },
               { id: "ex-16", name: "Calf Raises", sets: 4, reps: 15, rest: 45 },
             ],
-            imageUrl: "/placeholder.svg?height=200&width=300",
+            src: legs,
             createdAt: new Date().toISOString(),
             isRecommended: false,
           },
@@ -247,9 +252,17 @@ const UserWorkout = () => {
   }
 
   const startEditWorkout = (workout) => {
-    setEditingWorkout(workout)
-    setShowCreateModal(true)
-  }
+    if (workout.isRecommended) return; // Don't allow editing recommended workouts
+    
+    // Make sure we're getting a full copy of the workout to edit
+    const workoutToEdit = {
+      ...workout,
+      exercises: workout.exercises.map(ex => ({...ex}))
+    };
+    
+    setEditingWorkout(workoutToEdit);
+    setShowCreateModal(true);
+  };
 
   const startLogWorkout = (workout) => {
     setSelectedWorkout(workout)
@@ -429,8 +442,14 @@ const UserWorkout = () => {
           hasNotification={notificationSettings[selectedWorkout.id]}
           onToggleFavorite={() => toggleFavorite(selectedWorkout.id)}
           onToggleNotification={() => toggleNotification(selectedWorkout.id)}
-          onEdit={() => !selectedWorkout.isRecommended && startEditWorkout(selectedWorkout)}
-          onDelete={() => !selectedWorkout.isRecommended && handleDeleteWorkout(selectedWorkout.id)}
+          onEdit={() => {
+            setShowDetailModal(false);
+            startEditWorkout(selectedWorkout);
+          }}
+          onDelete={() => {
+            handleDeleteWorkout(selectedWorkout.id);
+            setShowDetailModal(false);
+          }}
           onLog={() => startLogWorkout(selectedWorkout)}
           logs={getWorkoutLogs(selectedWorkout.id)}
         />
