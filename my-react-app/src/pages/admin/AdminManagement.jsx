@@ -215,8 +215,6 @@ const AdminManagement = () => {
                 <th>Admin</th>
                 <th>Role</th>
                 <th>Permissions</th>
-                <th>Last Active</th>
-                <th>Status</th>
               </tr>
             </thead>
             <tbody>
@@ -302,12 +300,6 @@ const AdminManagement = () => {
                         </span>
                       ))}
                     </div>
-                  </td>
-                  <td>{admin.lastActive}</td>
-                  <td>
-                    <span className={`status-badge ${admin.status.toLowerCase()}`}>
-                      {admin.status}
-                    </span>
                   </td>
                 </tr>
               ))}
@@ -524,22 +516,7 @@ const AdminManagement = () => {
                 </div>
               </div>
               
-              <div className="form-group">
-                <label htmlFor="adminStatus">Status</label>
-                <select 
-                  id="adminStatus"
-                  value={selectedAdmin.status || 'Active'}
-                  onChange={(e) => setSelectedAdmin({
-                    ...selectedAdmin, 
-                    status: e.target.value
-                  })}
-                  required
-                >
-                  <option value="Active">Active</option>
-                  <option value="Inactive">Inactive</option>
-                </select>
-              </div>
-              
+          
               {selectedAdmin.role !== 'Super Admin' && (
                 <div className="form-group">
                   <label>Permissions</label>
