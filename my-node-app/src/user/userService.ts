@@ -1,5 +1,5 @@
 import bcrypt from "bcrypt";
-import type { User } from "@prisma/client";
+import type { Goal, User } from "@prisma/client";
 import { mapCreateUserInput } from "./utlis/mapCreateUserInput";
 import { usersRepository } from "./userRepository";
 
@@ -18,9 +18,16 @@ export class UserService {
   }
 
   async createUser(rawData: any) {
-    const hashedPassword = await bcrypt.hash(rawData.password, 10);
-    const prismaUserData = mapCreateUserInput(rawData, hashedPassword);
-    return usersRepository.create(prismaUserData);
+    try {
+
+      const hashedPassword = await bcrypt.hash(rawData.password, 10);
+      const prismaUserData = mapCreateUserInput(rawData, hashedPassword);
+      console.log("Mapped Prisma User Data:", prismaUserData); 
+      return usersRepository.create(prismaUserData);
+    } catch (error) {
+      console.error("Error in createUser:", error); 
+      throw error;
+    }
   }
   
 

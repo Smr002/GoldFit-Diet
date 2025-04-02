@@ -1,37 +1,46 @@
 import { Goal, User } from "@prisma/client";
 
-export type UserCreateInput = Omit<User, "id"> & {
-  activeWorkoutId?: number | null;
-  deletedAt?: Date | null;
-};
-
-const goalMapping: Record<string, Goal> = {
-  "LOSE_WEIGHT": Goal.WEIGHT_LOSS,
-  "BUILD_MUSCLE": Goal.MUSCLE_GAIN,
-  "MAINTAIN": Goal.MAINTENANCE,
-  "STRENGTH": Goal.STRENGTH,
-  "ENDURANCE": Goal.ENDURANCE
-};
-
-export function mapCreateUserInput(body: any, hashedPassword: string): UserCreateInput {
-
-  return {
-    email: body.email?.toLowerCase() || "",
+export type UserCreateInput = Omit<User, "id">;
+function mapGoal(selectedGoal: string): Goal {
+  switch (selectedGoal) {
+    case "Lose Weight":
+      return Goal.WEIGHT_LOSS;
+    case "Gain Muscle Mass":
+      return Goal.MUSCLE_GAIN;
+    case "Maintain Weight":
+      return Goal.MAINTENANCE;
+    default:
+      console.warn(`Unknown goal: ${selectedGoal}. Defaulting to MAINTENANCE.`);
+      return Goal.MAINTENANCE;
+  }
+}
+export function mapCreateUserInput(rawData: any, hashedPassword: string): UserCreateInput {
+  const mappedData: UserCreateInput = {
+    email: rawData.email,
     password: hashedPassword,
-    firstName: body.firstName || "",
-    lastName: body.lastName || "",
-    age: parseInt(body.age) || 25,
-    gender: body.gender || "Unknown",
-    height: parseFloat(body.height) || 0,
-    weight: parseFloat(body.weight) || 0,
-    goal: goalMapping[body.goal] || Goal.MAINTENANCE,
+    firstName: rawData.fullName.split(" ")[0] || "",
+    lastName: rawData.fullName.split(" ")[1] || "",
+    age: parseInt(rawData.selectedAgeGroup.replace(/\D/g, ""), 10) || 0,
+    gender: rawData.selectedGender || "Unknown",
+    height: rawData.selectedHeight || 0,
+    weight: rawData.selectedWeight || 0,
+    goal:mapGoal(rawData.selectedGoal),
     notifyWorkoutSessions: false,
     notifyMotivational: false,
     preferredUnits: "metric",
     isPremium: false,
     createdAt: new Date(),
     updatedAt: new Date(),
-    activeWorkoutId: null, 
-    deletedAt: null        
+    activeWorkoutId: null,
+    deletedAt: null,
   };
+
+
+  mappedData.goal = mapGoal(rawData.selectedGoal);
+
+
+  return mappedData;
 }
+
+
+

@@ -1,4 +1,4 @@
-import { PrismaClient, type User } from "@prisma/client";
+import { Goal, PrismaClient, type User } from "@prisma/client";
 
 export class UsersRepository {
   private prisma = new PrismaClient();
@@ -20,8 +20,13 @@ export class UsersRepository {
   }
 
   async create(data: Omit<User, "id">): Promise<User> {
-    console.log("Data", data)
-    return this.prisma.user.create({ data });
+    console.log("Creating user with data:", JSON.stringify(data, null, 2));
+    return this.prisma.user.create({
+      data: {
+        ...data,
+        goal: data.goal || Goal.MAINTENANCE,
+      },
+    });
   }
 
   async update(id: number, data: Partial<User>): Promise<User> {
