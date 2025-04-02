@@ -1,10 +1,10 @@
 import { z } from "zod";
 export const GoalSchema = z.enum([
- 
-  "LOSE_WEIGHT",
-  "BUILD_MUSCLE",
-  "MAINTAIN",
-  "RECOMPOSITION",
+  "WEIGHT_LOSS",
+  "MUSCLE_GAIN",
+  "MAINTENANCE",
+  "STRENGTH",
+  "ENDURANCE"
 ]);
 
 export const UserSchema = z.object({

@@ -5,28 +5,26 @@ export type UserCreateInput = Omit<User, "id"> & {
   deletedAt?: Date | null;
 };
 
-const goalLabelToEnum: Record<string, Goal> = {
-    "Lose Weight": Goal.WEIGHT_LOSS,
-    "Gain Muscle Mass": Goal.MUSCLE_GAIN,
-    "Maintain": Goal.MAINTENANCE,
-    "Build Strength": Goal.STRENGTH,
-    "Improve Endurance": Goal.ENDURANCE,
-  };
-  
+const goalMapping: Record<string, Goal> = {
+  "LOSE_WEIGHT": Goal.WEIGHT_LOSS,
+  "BUILD_MUSCLE": Goal.MUSCLE_GAIN,
+  "MAINTAIN": Goal.MAINTENANCE,
+  "STRENGTH": Goal.STRENGTH,
+  "ENDURANCE": Goal.ENDURANCE
+};
 
 export function mapCreateUserInput(body: any, hashedPassword: string): UserCreateInput {
-  const [firstName = "", lastName = ""] = (body.fullName || "").trim().split(" ");
 
   return {
     email: body.email?.toLowerCase() || "",
     password: hashedPassword,
-    firstName,
-    lastName,
+    firstName: body.firstName || "",
+    lastName: body.lastName || "",
     age: parseInt(body.age) || 25,
-    gender: body.selectedGender || "Unknown",
-    height: parseFloat(body.selectedHeight) || 0,
-    weight: parseFloat(body.selectedWeight) || 0,
-    goal: goalLabelToEnum[body.selectedGoal] || "LOSE_WEIGHT",
+    gender: body.gender || "Unknown",
+    height: parseFloat(body.height) || 0,
+    weight: parseFloat(body.weight) || 0,
+    goal: goalMapping[body.goal] || Goal.MAINTENANCE,
     notifyWorkoutSessions: false,
     notifyMotivational: false,
     preferredUnits: "metric",
