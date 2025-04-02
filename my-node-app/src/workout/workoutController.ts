@@ -1,5 +1,6 @@
 import { Request, Response } from 'express';
 import { WorkoutService } from './workoutService';
+import { AuthenticatedRequest } from "../auth/JWT/authMiddleware";
 
 export class WorkoutController {
   private service: WorkoutService;
@@ -106,6 +107,90 @@ export class WorkoutController {
       res.status(201).json(session);
     } catch (error) {
       res.status(400).json({ error: 'Failed to log workout session' });
+    }
+  }
+
+  async createWorkoutSession(req: AuthenticatedRequest, res: Response) {
+    try {
+      
+      const { workoutId, date, exercises } = (req as Request).body as {
+        workoutId: number;
+        date: string;
+        exercises: {
+          exerciseId: number;
+          weightUsed?: number;
+          setsCompleted?: number;
+          repsCompleted?: number;
+        }[];
+      };
+
+      // Then still retrieve user from the AuthenticatedRequest
+      const userId = Number(req.user?.id);
+
+      const session = await this.service.createWorkoutSession(
+        userId,
+        workoutId,
+        new Date(date),
+        exercises
+      );
+
+      res.status(201).json(session);
+    } catch (error) {
+      console.error("Error creating workout session:", error);
+      res.status(400).json({ error: "Failed to create workout session" });
+    }
+  }
+
+  async getSessionById(req: AuthenticatedRequest, res: Response) {
+    try {
+      const sessionId = Number((req as Request).params.id);
+      const userId = Number(req.user?.id);
+
+      const session = await this.service.getSessionById(sessionId, userId);
+      if (!session) {
+        return res.status(404).json({ error: "Session not found" });
+      }
+
+      res.json(session);
+    } catch (error) {
+      res.status(403).json({ error: "Unauthorized or not found" });
+    }
+  }
+
+  async updateSessionExercise(req: AuthenticatedRequest, res: Response) {
+    try {
+      const userId = Number(req.user?.id);
+      const sessionExerciseId = Number((req as Request).params.id);
+
+      const { weightUsed, setsCompleted, repsCompleted } = (req as Request).body as {
+        weightUsed?: number;
+        setsCompleted?: number;
+        repsCompleted?: number;
+      };
+
+      const updated = await this.service.updateSessionExercise(
+        sessionExerciseId,
+        userId,
+        { weightUsed, setsCompleted, repsCompleted }
+      );
+
+      res.json(updated);
+    } catch (error) {
+      res.status(400).json({ error: "Failed to update exercise info" });
+    }
+  }
+
+  async getSessionHistory(req: AuthenticatedRequest, res: Response) {
+    try {
+      const limit = (req as Request).query.limit
+        ? Number((req as Request).query.limit)
+        : undefined;
+
+      const userId = Number(req.user?.id);
+      const sessions = await this.service.getUserSessionHistory(userId, limit);
+      res.json(sessions);
+    } catch (error) {
+      res.status(500).json({ error: "Failed to fetch session history" });
     }
   }
 

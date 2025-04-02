@@ -1,5 +1,6 @@
-import { PrismaClient, Workout, WorkoutExercise, WorkoutSession, Exercise } from '@prisma/client';
+import { PrismaClient, Workout, WorkoutExercise, WorkoutSession, Exercise, SessionExercise } from '@prisma/client';
 import { WorkoutModel } from './workoutModel';
+import { WorkoutSessionModel } from './sessionModel';
 
 export class WorkoutRepository {
   private prisma: PrismaClient;
@@ -158,13 +159,81 @@ export class WorkoutRepository {
     });
   }
 
-  async logWorkoutSession(userId: number, workoutId: number, date: Date): Promise<WorkoutSession> {
-    return this.prisma.workoutSession.create({
+  async logWorkoutSession(
+    sessionModel: WorkoutSessionModel
+  ): Promise<WorkoutSession & { sessionExercises: SessionExercise[] }> {
+    const sessionData = sessionModel.toObject();
+    const { exercises = [], userId, workoutId, date } = sessionData;
+
+    // Create the main session
+    const createdSession = await this.prisma.workoutSession.create({
       data: {
         userId,
         workoutId,
         date,
       },
+    });
+
+    // Create associated session-exercises
+    if (exercises.length) {
+      await this.prisma.sessionExercise.createMany({
+        data: exercises.map((ex) => ({
+          sessionId: createdSession.id,
+          exerciseId: ex.exerciseId,
+          weightUsed: ex.weightUsed || null,
+          setsCompleted: ex.setsCompleted || null,
+          repsCompleted: ex.repsCompleted || null,
+        })),
+      });
+    }
+
+    return this.prisma.workoutSession.findUnique({
+      where: { id: createdSession.id },
+      include: {
+        sessionExercises: {
+          include: { exercise: true },
+        },
+      },
+    }) as Promise<WorkoutSession & { sessionExercises: SessionExercise[] }>;
+  }
+
+  async getSessionById(
+    sessionId: number
+  ): Promise<WorkoutSession & { sessionExercises: SessionExercise[] } | null> {
+    return this.prisma.workoutSession.findUnique({
+      where: { id: sessionId },
+      include: {
+        sessionExercises: {
+          include: { exercise: true },
+        },
+      },
+    });
+  }
+
+  async updateSessionExercise(
+    sessionExerciseId: number,
+    data: { weightUsed?: number; setsCompleted?: number; repsCompleted?: number }
+  ): Promise<SessionExercise> {
+    return this.prisma.sessionExercise.update({
+      where: { id: sessionExerciseId },
+      data,
+      include: { exercise: true },
+    });
+  }
+
+  async getSessionsByUserId(
+    userId: number,
+    limit?: number
+  ): Promise<(WorkoutSession & { sessionExercises: SessionExercise[] })[]> {
+    return this.prisma.workoutSession.findMany({
+      where: { userId },
+      include: {
+        sessionExercises: {
+          include: { exercise: true },
+        },
+      },
+      orderBy: { date: "desc" },
+      take: limit,
     });
   }
 
