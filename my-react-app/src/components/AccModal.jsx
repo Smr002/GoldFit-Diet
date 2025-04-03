@@ -1,4 +1,6 @@
 import React, { useState, useEffect } from "react";
+import { useNavigate } from "react-router-dom";
+import { loginUser } from "../api";
 import {
   Dialog,
   DialogTitle,
@@ -16,6 +18,10 @@ import logo from "../assets/react.svg";
 
 export default function AccModal({ open, onClose }) {
   const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState("");
+  const navigate = useNavigate();
   const [isDarkMode, setIsDarkMode] = useState(false);
 
   // Check for dark mode on component mount and when body class changes
@@ -59,6 +65,24 @@ export default function AccModal({ open, onClose }) {
   const gradientColor = isDarkMode
     ? "linear-gradient(90deg, #ffd700, #ffb700)" // Gold gradient for dark mode
     : "linear-gradient(90deg, #6c63ff, #4834d4)"; // Purple gradient for light mode
+
+  const handleLogin = async (e) => {
+    e.preventDefault();
+    setLoading(true);
+    setError("");
+
+    try {
+      const response = await loginUser({ email, password });
+
+      localStorage.setItem("token", response.token);
+      onClose();
+      navigate("/user-home");
+    } catch (err) {
+      setError(err.message || "Login failed");
+    } finally {
+      setLoading(false);
+    }
+  };
 
   return (
     <Dialog
@@ -121,80 +145,116 @@ export default function AccModal({ open, onClose }) {
             Continue with Google
           </Button>
 
-          <TextField
-            fullWidth
-            size="small"
-            variant="outlined"
-            placeholder="henry@example.com"
-            value={email}
-            onChange={(e) => setEmail(e.target.value)}
-            sx={{
-              marginBottom: 2,
-              "& .MuiOutlinedInput-root": {
-                "& fieldset": {
-                  borderColor: isDarkMode
-                    ? "rgba(255, 255, 255, 0.23)"
-                    : "rgba(0, 0, 0, 0.23)",
+          <form onSubmit={handleLogin}>
+            <TextField
+              fullWidth
+              size="small"
+              variant="outlined"
+              placeholder="henry@example.com"
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
+              disabled={loading}
+              sx={{
+                marginBottom: 2,
+                "& .MuiOutlinedInput-root": {
+                  "& fieldset": {
+                    borderColor: isDarkMode
+                      ? "rgba(255, 255, 255, 0.23)"
+                      : "rgba(0, 0, 0, 0.23)",
+                  },
+                  "&:hover fieldset": {
+                    borderColor: primaryColor,
+                  },
+                  "&.Mui-focused fieldset": {
+                    borderColor: primaryColor,
+                  },
                 },
-                "&:hover fieldset": {
-                  borderColor: primaryColor,
+                "& .MuiInputBase-input": {
+                  color: textPrimaryColor,
                 },
-                "&.Mui-focused fieldset": {
-                  borderColor: primaryColor,
-                },
-              },
-              "& .MuiInputBase-input": {
-                color: textPrimaryColor,
-              },
-            }}
-            InputProps={{
-              startAdornment: (
-                <Email sx={{ marginRight: 1, color: primaryColor }} />
-              ),
-              sx: { borderRadius: 1 },
-            }}
-          />
+              }}
+              InputProps={{
+                startAdornment: (
+                  <Email sx={{ marginRight: 1, color: primaryColor }} />
+                ),
+                sx: { borderRadius: 1 },
+              }}
+            />
 
-          {email && (
-            <motion.div
-              initial={{ y: -20, opacity: 0 }}
-              animate={{ y: 0, opacity: 1 }}
-              transition={{ duration: 0.3 }}
-            >
-              <TextField
+            {email && (
+              <motion.div
+                initial={{ y: -20, opacity: 0 }}
+                animate={{ y: 0, opacity: 1 }}
+                transition={{ duration: 0.3 }}
+              >
+                <TextField
+                  fullWidth
+                  size="small"
+                  variant="outlined"
+                  type="password"
+                  placeholder="Enter your password"
+                  value={password}
+                  onChange={(e) => setPassword(e.target.value)}
+                  disabled={loading}
+                  sx={{
+                    marginBottom: 2,
+                    "& .MuiOutlinedInput-root": {
+                      "& fieldset": {
+                        borderColor: isDarkMode
+                          ? "rgba(255, 255, 255, 0.23)"
+                          : "rgba(0, 0, 0, 0.23)",
+                      },
+                      "&:hover fieldset": {
+                        borderColor: primaryColor,
+                      },
+                      "&.Mui-focused fieldset": {
+                        borderColor: primaryColor,
+                      },
+                    },
+                    "& .MuiInputBase-input": {
+                      color: textPrimaryColor,
+                    },
+                  }}
+                  InputProps={{
+                    startAdornment: (
+                      <Lock sx={{ marginRight: 1, color: primaryColor }} />
+                    ),
+                    sx: { borderRadius: 1 },
+                  }}
+                />
+              </motion.div>
+            )}
+
+            {error && (
+              <DialogContentText
+                sx={{
+                  color: "error.main",
+                  marginBottom: 2,
+                  fontSize: "0.875rem",
+                }}
+              >
+                {error}
+              </DialogContentText>
+            )}
+
+            {email && (
+              <Button
+                type="submit"
                 fullWidth
-                size="small"
-                variant="outlined"
-                type="password"
-                placeholder="Enter your password"
+                variant="contained"
+                disabled={loading}
                 sx={{
                   marginBottom: 2,
-                  "& .MuiOutlinedInput-root": {
-                    "& fieldset": {
-                      borderColor: isDarkMode
-                        ? "rgba(255, 255, 255, 0.23)"
-                        : "rgba(0, 0, 0, 0.23)",
-                    },
-                    "&:hover fieldset": {
-                      borderColor: primaryColor,
-                    },
-                    "&.Mui-focused fieldset": {
-                      borderColor: primaryColor,
-                    },
-                  },
-                  "& .MuiInputBase-input": {
-                    color: textPrimaryColor,
-                  },
+                  background: gradientColor,
+                  color: "#fff",
+                  fontWeight: "bold",
+                  textTransform: "none",
                 }}
-                InputProps={{
-                  startAdornment: (
-                    <Lock sx={{ marginRight: 1, color: primaryColor }} />
-                  ),
-                  sx: { borderRadius: 1 },
-                }}
-              />
-            </motion.div>
-          )}
+              >
+                {loading ? "Signing in..." : "Sign In"}
+              </Button>
+            )}
+          </form>
 
           <Divider sx={{ marginY: 2, bgcolor: dividerColor }}>or</Divider>
           <Link

@@ -1,4 +1,5 @@
 import React, { useState } from "react";
+import { useNavigate } from "react-router-dom";
 import {
   Container,
   Box,
@@ -7,12 +8,27 @@ import {
   Button,
   Link,
   Zoom,
+  Dialog,
+  DialogActions,
+  DialogTitle,
+  DialogContent,
+  Alert,
+  AlertTitle,
+  Slide,
+  useTheme,
 } from "@mui/material";
 import { ArrowForward } from "@mui/icons-material";
 import { useCreateAccountStore } from "@/store/useCreateAccountStore";
 import { createUser } from "@/api";
 
+const Transition = React.forwardRef(function Transition(props, ref) {
+  return <Slide direction="up" ref={ref} {...props} />;
+});
+
 export default function SignUp() {
+  const theme = useTheme();
+  const navigate = useNavigate();
+
   const {
     selectedGender,
     selectedBodyType,
@@ -34,6 +50,14 @@ export default function SignUp() {
     confirmPassword: "",
   });
 
+  const [openModal, setOpenModal] = useState(false);
+  const [submitStatus, setSubmitStatus] = useState({
+    success: false,
+    message: "",
+  });
+
+  const isSuccess = submitStatus.success;
+
   const handleChange = (e) => {
     setFormData((prev) => ({
       ...prev,
@@ -41,8 +65,33 @@ export default function SignUp() {
     }));
   };
 
+  const handleCloseModal = () => {
+    setOpenModal(false);
+    if (isSuccess) {
+      navigate("/");
+    }
+  };
+
   const handleSubmit = async (e) => {
     e.preventDefault();
+
+    if (formData.password.length < 6) {
+      setSubmitStatus({
+        success: false,
+        message: "Password must be at least 6 characters long.",
+      });
+      setOpenModal(true);
+      return;
+    }
+
+    if (formData.password !== formData.confirmPassword) {
+      setSubmitStatus({
+        success: false,
+        message: "Passwords do not match.",
+      });
+      setOpenModal(true);
+      return;
+    }
 
     const requestBody = {
       fullName: formData.fullName,
@@ -63,11 +112,20 @@ export default function SignUp() {
 
     try {
       const response = await createUser(requestBody);
-      console.log("User created successfully:", response);
+      setSubmitStatus({
+        success: true,
+        message: "Account created successfully! Please login to continue.",
+      });
+      setOpenModal(true);
     } catch (error) {
-      console.error("Error creating user:", error.message);
+      setSubmitStatus({
+        success: false,
+        message: error.message || "Failed to create account. Please try again.",
+      });
+      setOpenModal(true);
     }
   };
+
   return (
     <Box
       sx={{
@@ -106,117 +164,47 @@ export default function SignUp() {
               onSubmit={handleSubmit}
               sx={{ mt: 2, textAlign: "left" }}
             >
-              <TextField
-                fullWidth
-                required
-                id="fullName"
-                label="Full Name"
-                name="fullName"
-                margin="normal"
-                variant="outlined"
-                value={formData.fullName}
-                onChange={handleChange}
-                InputLabelProps={{ sx: { color: "#fff" } }}
-                InputProps={{
-                  sx: {
-                    color: "#fff",
-                    "& .MuiOutlinedInput-notchedOutline": {
-                      borderColor: "rgba(212, 175, 55, 0.7)",
-                    },
-                    "&:hover .MuiOutlinedInput-notchedOutline": {
-                      borderColor: "#D4AF37",
-                    },
-                    "&.Mui-focused .MuiOutlinedInput-notchedOutline": {
-                      borderColor: "#D4AF37",
-                    },
-                  },
-                }}
-                sx={{ mb: 2 }}
-              />
-              <TextField
-                fullWidth
-                required
-                id="email"
-                label="Email Address"
-                name="email"
-                type="email"
-                margin="normal"
-                variant="outlined"
-                value={formData.email}
-                onChange={handleChange}
-                InputLabelProps={{ sx: { color: "#fff" } }}
-                InputProps={{
-                  sx: {
-                    color: "#fff",
-                    "& .MuiOutlinedInput-notchedOutline": {
-                      borderColor: "rgba(212, 175, 55, 0.7)",
-                    },
-                    "&:hover .MuiOutlinedInput-notchedOutline": {
-                      borderColor: "#D4AF37",
-                    },
-                    "&.Mui-focused .MuiOutlinedInput-notchedOutline": {
-                      borderColor: "#D4AF37",
-                    },
-                  },
-                }}
-                sx={{ mb: 2 }}
-              />
-              <TextField
-                fullWidth
-                required
-                id="password"
-                label="Password"
-                name="password"
-                type="password"
-                margin="normal"
-                variant="outlined"
-                value={formData.password}
-                onChange={handleChange}
-                InputLabelProps={{ sx: { color: "#fff" } }}
-                InputProps={{
-                  sx: {
-                    color: "#fff",
-                    "& .MuiOutlinedInput-notchedOutline": {
-                      borderColor: "rgba(212, 175, 55, 0.7)",
-                    },
-                    "&:hover .MuiOutlinedInput-notchedOutline": {
-                      borderColor: "#D4AF37",
-                    },
-                    "&.Mui-focused .MuiOutlinedInput-notchedOutline": {
-                      borderColor: "#D4AF37",
-                    },
-                  },
-                }}
-                sx={{ mb: 2 }}
-              />
-              <TextField
-                fullWidth
-                required
-                id="confirmPassword"
-                label="Confirm Password"
-                name="confirmPassword"
-                type="password"
-                margin="normal"
-                variant="outlined"
-                value={formData.confirmPassword}
-                onChange={handleChange}
-                InputLabelProps={{ sx: { color: "#fff" } }}
-                InputProps={{
-                  sx: {
-                    color: "#fff",
-                    "& .MuiOutlinedInput-notchedOutline": {
-                      borderColor: "rgba(212, 175, 55, 0.7)",
-                    },
-                    "&:hover .MuiOutlinedInput-notchedOutline": {
-                      borderColor: "#D4AF37",
-                    },
-                    "&.Mui-focused .MuiOutlinedInput-notchedOutline": {
-                      borderColor: "#D4AF37",
-                    },
-                  },
-                }}
-                sx={{ mb: 3 }}
-              />
+              {["fullName", "email", "password", "confirmPassword"].map(
+                (field, idx) => (
+                  <TextField
+                    key={field}
+                    fullWidth
+                    required
+                    id={field}
+                    label={
+                      field === "confirmPassword"
+                        ? "Confirm Password"
+                        : field.charAt(0).toUpperCase() + field.slice(1)
+                    }
+                    name={field}
+                    type={
+                      ["password", "confirmPassword"].includes(field)
+                        ? "password"
+                        : "text"
+                    }
+                    margin="normal"
+                    variant="outlined"
+                    value={formData[field]}
+                    onChange={handleChange}
+                    InputLabelProps={{ sx: { color: "#fff" } }}
+                    InputProps={{
+                      sx: {
+                        color: "#fff",
+                        "& .MuiOutlinedInput-notchedOutline": {
+                          borderColor: "rgba(212, 175, 55, 0.7)",
+                        },
+                        "&:hover .MuiOutlinedInput-notchedOutline": {
+                          borderColor: "#D4AF37",
+                        },
+                        "&.Mui-focused .MuiOutlinedInput-notchedOutline": {
+                          borderColor: "#D4AF37",
+                        },
+                      },
+                    }}
+                    sx={{ mb: 2 }}
+                  />
+                )
+              )}
               <Button
                 type="submit"
                 fullWidth
@@ -256,6 +244,54 @@ export default function SignUp() {
           </Box>
         </Zoom>
       </Container>
+
+      {/* Modal Dialog */}
+      <Dialog
+        open={openModal}
+        TransitionComponent={Transition}
+        keepMounted
+        onClose={handleCloseModal}
+        aria-labelledby="alert-dialog-title"
+        aria-describedby="alert-dialog-description"
+        PaperProps={{
+          sx: {
+            borderRadius: 3,
+            p: 1,
+            backgroundColor: theme.palette.background.default,
+          },
+        }}
+      >
+        <DialogTitle
+          id="alert-dialog-title"
+          sx={{ textAlign: "center", pb: 0, fontWeight: 600 }}
+        >
+          {isSuccess ? "🎉 Success" : "⚠️ Oops!"}
+        </DialogTitle>
+
+        <DialogContent>
+          <Alert
+            severity={isSuccess ? "success" : "error"}
+            variant="outlined"
+            sx={{ borderRadius: 2, px: 2, py: 1 }}
+          >
+            <AlertTitle>
+              {isSuccess ? "Your action was successful!" : "There was an error"}
+            </AlertTitle>
+            {submitStatus.message}
+          </Alert>
+        </DialogContent>
+
+        <DialogActions sx={{ justifyContent: "center", pb: 2 }}>
+          <Button
+            onClick={handleCloseModal}
+            color={isSuccess ? "success" : "error"}
+            variant={isSuccess ? "contained" : "outlined"}
+            autoFocus
+          >
+            {isSuccess ? "Go to Login" : "Close"}
+          </Button>
+        </DialogActions>
+      </Dialog>
     </Box>
   );
 }

@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState, useEffect } from "react";
 import {
   Box,
   Typography,
@@ -14,11 +14,24 @@ import ThemeToggle from "../ThemeToggle";
 
 function ProfileHeader() {
   const theme = useTheme();
+  const [userName, setUserName] = useState("");
+
+  useEffect(() => {
+    const token = localStorage.getItem("token");
+    if (token) {
+      try {
+        const payload = JSON.parse(atob(token.split(".")[1]));
+        setUserName(payload.firstName || "User");
+      } catch (error) {
+        console.error("Error decoding token:", error);
+        setUserName("User");
+      }
+    }
+  }, []);
 
   const userData = {
-    firstName: "Alex",
     level: "Intermediate",
-    profileImage: "https://avatars.dicebear.com/api/personas/alex.svg",
+    profileImage: `https://avatars.dicebear.com/api/personas/${userName}.svg`,
 
     stats: {
       currentWeight: "175 lbs",
@@ -71,7 +84,7 @@ function ProfileHeader() {
 
         <Box>
           <Typography variant="h5" fontWeight={600}>
-            Welcome back, {userData.firstName}!
+            Welcome back, {userName}!
           </Typography>
           <Stack
             direction="row"

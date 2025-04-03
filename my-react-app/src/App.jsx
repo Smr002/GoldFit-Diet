@@ -16,6 +16,14 @@ import FAQManagement from "./pages/admin/FAQManagement";
 import AdminManagement from "./pages/admin/AdminManagement";
 import Workout from "./components/UserWorkout";
 
+const ProtectedRoute = ({ children }) => {
+  const token = localStorage.getItem("token");
+  if (!token) {
+    return <Navigate to="/" replace />;
+  }
+  return children;
+};
+
 export default function App() {
   const [isModalOpen, setModalOpen] = useState(false);
 
@@ -30,7 +38,14 @@ export default function App() {
         />
         <Route path="/create-account/*" element={<CreateAccount />} />
         <Route path="/exercises" element={<Exercises />} />
-        <Route path="/user-home" element={<UserHomePage />} />
+        <Route
+          path="/user-home"
+          element={
+            <ProtectedRoute>
+              <UserHomePage />
+            </ProtectedRoute>
+          }
+        />
         <Route path="/workouts" element={<Workout />} />
 
         {/* Admin Routes */}
