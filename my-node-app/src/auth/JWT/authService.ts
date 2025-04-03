@@ -19,6 +19,7 @@ export class AuthService {
       {
         id: user.id,
         email: user.email,
+        firstName: user.firstName,
       },
       JWT_SECRET,
       { expiresIn: JWT_EXPIRES_IN }
