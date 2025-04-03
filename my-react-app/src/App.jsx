@@ -4,6 +4,7 @@ import HomePage from "../src/pages/HomePage";
 import AccModal from "../src/components/AccModal";
 import CreateAccount from "./pages/CreateAccount";
 import Exercises from "./components/Exercises";
+import UserHomePage from "./pages/UserHomePage";
 
 // Admin imports
 import AdminLayout from "./components/admin/AdminLayout";
@@ -29,22 +30,23 @@ export default function App() {
         />
         <Route path="/create-account/*" element={<CreateAccount />} />
         <Route path="/exercises" element={<Exercises />} />
-        <Route path="/workouts" element={<Workout/>}/>
+        <Route path="/user-home" element={<UserHomePage />} />
+        <Route path="/workouts" element={<Workout />} />
 
         {/* Admin Routes */}
-                <Route path="/admin/*" element={<AdminLayout />}>
-    <Route index element={<Navigate to="/admin/dashboard" replace />} />
-    <Route path="dashboard" element={<Dashboard />} />
-                  <Route path="users" element={<UserManagement />} />
-                  <Route path="workouts" element={<WorkoutManagement />} />
-                  <Route path="notifications" element={<NotificationManagement />} />
-                  <Route path="faqs" element={<FAQManagement />} />
-                </Route>
-                
-                {/* Super Admin Routes */}
-                <Route path="/admin" element={<AdminLayout isSuperAdmin={true} />}>
-                  <Route path="admin-management" element={<AdminManagement />} />
-                </Route>
+        <Route path="/admin/*" element={<AdminLayout />}>
+          <Route index element={<Navigate to="/admin/dashboard" replace />} />
+          <Route path="dashboard" element={<Dashboard />} />
+          <Route path="users" element={<UserManagement />} />
+          <Route path="workouts" element={<WorkoutManagement />} />
+          <Route path="notifications" element={<NotificationManagement />} />
+          <Route path="faqs" element={<FAQManagement />} />
+        </Route>
+
+        {/* Super Admin Routes */}
+        <Route path="/admin" element={<AdminLayout isSuperAdmin={true} />}>
+          <Route path="admin-management" element={<AdminManagement />} />
+        </Route>
       </Routes>
       <AccModal open={isModalOpen} onClose={() => setModalOpen(false)} />
     </BrowserRouter>

@@ -1,11 +1,11 @@
 import axios from "axios";
-import { CreateUserDto, LoginDto, AuthResponse } from "@/types/user";
+import { CreateUserDto, LoginDto, AuthResponse } from "./types/user";
 
 const API_BASE_URL =  "http://localhost:3000";
 
 export async function createUser(user: CreateUserDto) {
   try {
-   
+   console.log("Creating user:", user); 
     const response = await axios.post(`${API_BASE_URL}/users/`, user);
     return response.data; 
   } catch (error: any) {
