@@ -1,14 +1,18 @@
 import React, { useState } from "react";
+import emailjs from "emailjs-com";
 
 const ContactUs = () => {
   const [formData, setFormData] = useState({
     name: "",
-    email: "",
     subject: "",
     message: "",
+    email: "",
   });
 
   const [submitted, setSubmitted] = useState(false);
+
+  // ✅ Init EmailJS
+  emailjs.init("IMj8XOG521Ow67f3D");
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -18,18 +22,37 @@ const ContactUs = () => {
     }));
   };
 
+  const sendMail = (formData) => {
+    const params = {
+      user_name: formData.name,
+      message: formData.message,
+      user_email: formData.email,
+      subject: formData.subject,
+    };
+
+    emailjs.send("service_1cbr1sj", "template_gz98svp", params).then(
+      function (res) {
+        console.log("Email sent successfully:", res.status, res.text);
+        setFormData({
+          name: "",
+          email: "",
+          subject: "",
+          message: "",
+        });
+      },
+      function (error) {
+        console.error("Failed to send email:", error);
+      }
+    );
+  };
+
   const handleSubmit = (e) => {
     e.preventDefault();
     console.log("Form submitted:", formData);
+    sendMail(formData);
     setSubmitted(true);
 
     setTimeout(() => {
-      setFormData({
-        name: "",
-        email: "",
-        subject: "",
-        message: "",
-      });
       setSubmitted(false);
     }, 3000);
   };
@@ -173,7 +196,6 @@ const ContactUs = () => {
               </div>
             </div>
           </div>
-
           <div className="contact-form">
             {submitted ? (
               <div className="form-success">
