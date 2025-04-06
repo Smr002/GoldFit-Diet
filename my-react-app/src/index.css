@@ -334,6 +334,21 @@ body.dark-mode .hamburger-menu .bar {
   }
 }
 
+/* Ensure hamburger menu is only visible on mobile */
+.hamburger-menu {
+  display: none;
+}
+
+@media (max-width: 768px) {
+  .hamburger-menu {
+    display: flex;
+    position: absolute;
+    top: 20px;
+    right: 20px;
+    z-index: 1100;
+  }
+}
+
 /* Landing Css */
 
 .landing-container {
