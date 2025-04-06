@@ -13,8 +13,15 @@ import {
   Box,
 } from "@mui/material";
 import { Google, PersonAdd, Email, Lock } from "@mui/icons-material";
+// eslint-disable-next-line no-unused-vars
 import { motion } from "framer-motion";
 import logo from "../assets/react.svg";
+import {
+  getAuth,
+  GoogleAuthProvider,
+  signInWithPopup,
+} from "https://www.gstatic.com/firebasejs/11.5.0/firebase-auth.js";
+import { initializeApp } from "https://www.gstatic.com/firebasejs/11.5.0/firebase-app.js";
 
 export default function AccModal({ open, onClose }) {
   const [email, setEmail] = useState("");
@@ -84,6 +91,46 @@ export default function AccModal({ open, onClose }) {
     }
   };
 
+  const firebaseConfig = {
+    apiKey: "AIzaSyCTlgHimTflDjxvLT_imd3ClR791UqTfvo",
+    authDomain: "gold-fit.firebaseapp.com",
+    projectId: "gold-fit",
+    storageBucket: "gold-fit.firebasestorage.app",
+    messagingSenderId: "266468364421",
+    appId: "1:266468364421:web:52b62607c80e52a38559ec",
+    measurementId: "G-35WWV9101J",
+  };
+
+  const app = initializeApp(firebaseConfig);
+  const auth = getAuth(app);
+  const provider = new GoogleAuthProvider();
+
+  const handleGoogleLogin = () => {
+    signInWithPopup(auth, provider)
+      .then((result) => {
+        const user = result.user;
+        console.log("Google login successful:", user);
+
+        // Save user data and token to localStorage
+        localStorage.setItem(
+          "user",
+          JSON.stringify({
+            uid: user.uid,
+            email: user.email,
+            displayName: user.displayName,
+          })
+        );
+        localStorage.setItem("token", user.accessToken || "google-auth-token");
+
+        // Redirect to the initial path after login
+        window.location.href = "/user-home";
+      })
+      .catch((error) => {
+        console.error("Error during Google login:", error.message);
+        setError("Login failed: " + error.message);
+      });
+  };
+
   return (
     <Dialog
       open={open}
@@ -141,6 +188,8 @@ export default function AccModal({ open, onClose }) {
               fontWeight: "bold",
               "&:hover": { background: gradientColor, color: "#fff" },
             }}
+            className="google-login-btn"
+            onClick={handleGoogleLogin}
           >
             Continue with Google
           </Button>
