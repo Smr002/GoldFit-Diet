@@ -230,6 +230,110 @@ body.dark-mode .logo {
   }
 }
 
+
+/* Hamburger Menu Styles */
+
+:root {
+  --primary-color: #3b82f6;
+  --text-color: #333;
+  --hamburger-light: #8a2be2; /* Purple for light mode */
+  --hamburger-dark: #ffd700; /* Gold for dark mode */
+  --background-light: #ffffff;
+  --background-dark: #121212;
+}
+
+
+/* Hamburger Menu Styles */
+.hamburger-menu {
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  width: 64px;
+  height: 40px;
+  background: none; /* Transparent background */
+  border: none;
+  cursor: pointer;
+  z-index: 1100;
+  position: relative;
+}
+
+/* Light mode (default) */
+.hamburger-menu .bar {
+  width: 100%;
+  height: 3px;
+  background-color: var(--hamburger-light); /* Purple in light mode */
+  border-radius: 3px;
+  transition: all 0.3s ease;
+  display: block;
+}
+
+.hamburger-menu .bar {
+  width: 100%;
+  height: 3px;
+  background-color: var(--hamburger-light);
+  transition: all 0.3s ease;
+}
+
+body.dark-mode .hamburger-menu .bar {
+  background-color: #d4af37; /* Gold for dark mode */
+}
+
+.hamburger-menu.open .bar:nth-child(1) {
+  transform: rotate(45deg) translate(7px, 7px);
+}
+
+.hamburger-menu.open .bar:nth-child(2) {
+  opacity: 0;
+}
+
+.hamburger-menu.open .bar:nth-child(3) {
+  transform: rotate(-45deg) translate(7px, -7px);
+}
+
+/* Responsive Styles */
+@media (max-width: 768px) {
+  .mobile-menu-container {
+    display: block;
+  }
+}
+
+.nav-links {
+  display: flex;
+  gap: 30px;
+  align-items: center;
+}
+
+.nav-links.open {
+  display: flex;
+  flex-direction: column;
+  position: absolute;
+  top: 60px;
+  right: 20px;
+  background-color: var(--navbar-bg);
+  box-shadow: 0 4px 10px var(--navbar-shadow);
+  padding: 20px;
+  border-radius: 8px;
+  z-index: 1000;
+}
+
+.nav-links a {
+  margin: 10px 0;
+}
+
+@media (max-width: 768px) {
+  .hamburger-menu {
+    display: flex;
+  }
+
+  .nav-links {
+    display: none;
+  }
+
+  .nav-links.open {
+    display: flex;
+  }
+}
+
 /* Landing Css */
 
 .landing-container {
@@ -6936,5 +7040,22 @@ body.dark-mode .skeleton-instruction-line {
   display: flex;
   justify-content: flex-end;
   gap: 12px;
+}
+
+/* Hide sliding image on mobile */
+@media (max-width: 768px) {
+  .image-container {
+    display: none;
+  }
+
+  /* Ensure hamburger menu button is visible */
+  .hamburger-menu {
+    display: flex;
+    position: absolute;
+    top: 20px;
+    right: 20px;
+    z-index: 1100;
+    
+  }
 }
 

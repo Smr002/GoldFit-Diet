@@ -7,20 +7,20 @@ import ThemeToggle from "../components/ThemeToggle";
 import ContactUs from "../components/ContactUs";
 import Footer from "../components/Footer";
 
-
 function HomePage({ setModalOpen, isModalOpen }) {
     return (
       <>
         <Navbar setModalOpen={setModalOpen} isModalOpen={isModalOpen} />
-        <ThemeToggle/>
+        <ThemeToggle />
         <Landing />
-        <OurVision/>
-        <Workouts/>
-        <Prices/>
-        <ContactUs/>
-        <Footer/>
+        <OurVision />
+        <Workouts />
+        <Prices />
+        <ContactUs />
+        <Footer />
+  
       </>
     );
-  }
+}
 
 export default HomePage;

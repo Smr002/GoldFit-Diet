@@ -4,7 +4,8 @@ import { Link } from "react-router-dom";
 
 export default function Navbar({ setModalOpen }) {
   const [scrolled, setScrolled] = useState(false);
-  
+  const [menuOpen, setMenuOpen] = useState(false);
+
   useEffect(() => {
     const handleScroll = () => {
       if (window.scrollY > 50) {
@@ -13,7 +14,7 @@ export default function Navbar({ setModalOpen }) {
         setScrolled(false);
       }
     };
-    
+
     window.addEventListener('scroll', handleScroll);
     return () => window.removeEventListener('scroll', handleScroll);
   }, []);
@@ -24,15 +25,37 @@ export default function Navbar({ setModalOpen }) {
         <Link to="/" className="logo-container">
           <img src={logo} alt="Logo" className="logo" />
         </Link>
-        
-        <nav className="nav-links">
-          {["Our Vision", "Workouts", "Prices", "Contact Us"].map((item) => (
-            <a href={`#${item.toLowerCase().replace(/\s+/g, '-')}`} key={item} className="nav-link">
+
+        <div className="mobile-menu-container">
+          <button
+            className={`hamburger-menu ${menuOpen ? 'open' : ''}`}
+            onClick={() => setMenuOpen(!menuOpen)}
+            aria-label="Toggle menu"
+          >
+            <span className="bar"></span>
+            <span className="bar"></span>
+            <span className="bar"></span>
+          </button>
+        </div>
+
+        <nav className={`nav-links ${menuOpen ? 'open' : ''}`}>
+          {[
+            "Our Vision",
+            "Workouts",
+            "Prices",
+            "Contact Us"
+          ].map((item) => (
+            <a
+              href={`#${item.toLowerCase().replace(/\s+/g, '-')}`}
+              key={item}
+              className="nav-link"
+              onClick={() => setMenuOpen(false)}
+            >
               {item}
             </a>
           ))}
-          <button 
-            onClick={() => setModalOpen(true)} 
+          <button
+            onClick={() => setModalOpen(true)}
             className="try-now-button"
           >
             Try Now
