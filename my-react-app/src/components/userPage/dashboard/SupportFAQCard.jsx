@@ -21,6 +21,7 @@ function SupportFAQCard() {
         justifyContent: "center",
         alignItems: "center",
         boxShadow: `0 8px 16px rgba(25, 118, 210, 0.2)`,
+        marginBottom:12,
       }}
     >
       <Box

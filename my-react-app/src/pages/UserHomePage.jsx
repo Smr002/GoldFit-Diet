@@ -6,6 +6,7 @@ import {
   CssBaseline,
   ThemeProvider,
   createTheme,
+  useMediaQuery,
 } from "@mui/material";
 
 import ProfileHeader from "../components/userPage/dashboard/ProfileHeader";
@@ -18,6 +19,7 @@ import BadgeSection from "../components/userPage/dashboard/BadgeSection";
 import SupportFAQCard from "../components/userPage/dashboard/SupportFAQCard";
 import WeeklyTrackingChart from "../components/userPage/dashboard/WeeklyTrackingChart";
 import Footer from "@/components/Footer";
+import MobileFooter from "../components/MobileFooter";
 
 const theme = createTheme({
   palette: {
@@ -63,6 +65,9 @@ const theme = createTheme({
 });
 
 const userHomePage = () => {
+  // eslint-disable-next-line react-hooks/rules-of-hooks
+  const isMobileOrTablet = useMediaQuery("(max-width:1024px)");
+
   return (
     <ThemeProvider theme={theme}>
       <CssBaseline />
@@ -74,7 +79,10 @@ const userHomePage = () => {
           {/* Quick Action Buttons */}
           <QuickActions />
           <Grid item xs={12} sx={{ mb: 4 }}>
-            <WeeklyTrackingChart />
+            <WeeklyTrackingChart
+              width={isMobileOrTablet ? 300 : undefined}
+              height={isMobileOrTablet ? 200 : undefined}
+            />
           </Grid>
 
           {/* Main Dashboard Grid */}
@@ -111,7 +119,7 @@ const userHomePage = () => {
           </Grid>
         </Box>
       </Container>
-      <Footer />
+      {isMobileOrTablet ? <MobileFooter /> : <Footer />}
     </ThemeProvider>
   );
 };

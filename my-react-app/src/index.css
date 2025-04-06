@@ -1068,7 +1068,7 @@ body.dark-mode {
 }
 
 .exercises-table td {
-  color: var(--text-color);
+  color: var (--text-color);
   transition: color 0.3s ease;
 }
 
@@ -1743,7 +1743,7 @@ body {
   right: 0;
   background: linear-gradient(
     to right,
-    var(--primary-color),
+    var (--primary-color),
     var(--secondary-color)
   );
   color: white;
@@ -3730,6 +3730,7 @@ body.dark-mode .footer-legal-links a:hover {
 
 .modal-title {
   margin: 0;
+  padding-right: 16px;
 }
 
 .modal-gif-section {
@@ -3774,6 +3775,7 @@ body.dark-mode .footer-legal-links a:hover {
   padding: 10px 0;
   box-shadow: 0 -2px 10px rgba(0,0,0,0.05);
   z-index: 1000;
+
 }
 
 .footer-item {
@@ -3868,7 +3870,7 @@ body.dark-mode .footer-legal-links a:hover {
   cursor: pointer;
   transition: all 0.3s ease;
   opacity: 0.85;
-  min-width: 80px; /* Reduce minimum width further */
+  min-width: 80px;
   text-align: center;
 }
 
@@ -3896,6 +3898,7 @@ body.dark-mode .footer-legal-links a:hover {
 .body-part-item:hover .body-part-icon {
   box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
 }
+
 
 .section-header {
   display: flex;
@@ -5317,7 +5320,7 @@ body, html {
 
 /* Optional: Style the active state */
 .body-part-item.active {
-  background-color: #e0e0e0; /* Example active state styling */
+  background-color: #5756560b; /* Example active state styling */
   border-radius: 8px;
 }
 
@@ -5861,6 +5864,8 @@ body.dark-mode .skeleton-instruction-line {
 /* Tabs */
 .workout-tabs {
   display: flex;
+  justify-content: center;
+  align-items: center;
   border-bottom: 1px solid #e5e7eb;
   margin-bottom: 24px;
   overflow-x: auto;
@@ -5895,7 +5900,19 @@ body.dark-mode .skeleton-instruction-line {
   grid-template-columns: 1fr;
   gap: 24px;
   animation: fadeIn 0.5s ease-out;
+  margin-bottom: 80px; /* Adjusted for spacing with mobile footer */
 }
+
+
+@media (max-width: 768px) {
+  .workouts-grid {
+    justify-content: center;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 20px;
+  }
+}
+
 
 @keyframes fadeIn {
   from {
@@ -5911,12 +5928,14 @@ body.dark-mode .skeleton-instruction-line {
 @media (min-width: 640px) {
   .workouts-grid {
     grid-template-columns: repeat(2, 1fr);
+    margin-bottom: 24px;
   }
 }
 
 @media (min-width: 1024px) {
   .workouts-grid {
     grid-template-columns: repeat(3, 1fr);
+    margin-bottom: 24px;
   }
 }
 
@@ -6340,6 +6359,7 @@ body.dark-mode .skeleton-instruction-line {
 
 .workout-modal-title-section {
   margin-bottom: 16px;
+  margin-top: 24px;
 }
 
 .workout-modal-title {
@@ -6546,8 +6566,12 @@ body.dark-mode .skeleton-instruction-line {
 .workout-modal-footer {
   display: flex;
   gap: 12px;
-  padding: 16px 24px;
+  padding: 16px;
   border-top: 1px solid #f3f4f6;
+  justify-content: flex-end;
+  box-sizing: border-box;
+  max-width: 100%;
+  margin-bottom: 80px;
 }
 
 .modal-edit-button,
@@ -6613,7 +6637,7 @@ body.dark-mode .skeleton-instruction-line {
   font-size: 28px;
   font-weight: 700;
   color: #111827;
-  margin: 0 0 32px 0;
+  margin: 16px 0 32px 0;
   text-align: center;
   position: relative;
 }
@@ -6885,6 +6909,7 @@ body.dark-mode .skeleton-instruction-line {
   justify-content: flex-end;
   gap: 16px;
   margin-top: 32px;
+  margin-bottom: 56px;
 }
 
 .cancel-button,
@@ -7071,6 +7096,50 @@ body.dark-mode .skeleton-instruction-line {
     right: 20px;
     z-index: 1100;
     
+  }
+}
+
+@media (max-width: 768px) {
+  .exercise-item .sets,
+  .exercise-item .reps,
+  .exercise-item .rest,
+   .exercise-meta{
+    display: none;
+  }
+}
+
+@media (max-width: 768px) {
+  .workout-tabs {
+    overflow-x: auto;
+    white-space: nowrap;
+    -webkit-overflow-scrolling: touch;
+    padding-left: 180px; /* Add padding to ensure the first tab is fully visible */
+  }
+
+  .tab-button {
+    display: inline-block;
+    flex-shrink: 0;
+  }
+}
+
+@media (max-width: 768px) {
+  .search-input {
+    width: 100%;
+    padding: 12px 10px;
+  }
+}
+
+@media (max-width: 768px) {
+  .body-parts-scroll {
+    padding-left: 860px;
+  }
+}
+@media (max-width: 768px) {
+  .exercises-grid {
+    justify-content: center;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 20px;
   }
 }
 
