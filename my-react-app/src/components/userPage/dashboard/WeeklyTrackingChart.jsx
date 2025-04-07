@@ -33,6 +33,45 @@ function WeeklyTrackingChart() {
   const theme = useTheme();
   const isMobile = useMediaQuery(theme.breakpoints.down("sm"));
 
+  const CustomTooltip = ({ active, payload, label }) => {
+    if (active && payload && payload.length) {
+      return (
+        <Box
+          sx={{
+            backgroundColor: "rgba(255, 255, 255, 0.95)",
+            p: 2,
+            borderRadius: 2,
+            boxShadow: "0 4px 20px rgba(0,0,0,0.1)",
+            border: "none",
+          }}
+        >
+          <Typography fontWeight="bold" mb={1}>
+            {label}
+          </Typography>
+          {payload.map((entry, index) => (
+            <Box
+              key={index}
+              sx={{ display: "flex", alignItems: "center", gap: 1, mb: 0.5 }}
+            >
+              <Box
+                sx={{
+                  width: 8,
+                  height: 8,
+                  borderRadius: "50%",
+                  backgroundColor: entry.color,
+                }}
+              />
+              <Typography variant="body2">
+                {entry.name}: {entry.value}
+              </Typography>
+            </Box>
+          ))}
+        </Box>
+      );
+    }
+    return null;
+  };
+
   return (
     <Paper
       elevation={3}
@@ -41,99 +80,114 @@ function WeeklyTrackingChart() {
         borderRadius: 3,
         mb: 4,
         backgroundColor: theme.palette.background.paper,
-        boxShadow: `0px 8px 24px -4px rgba(0,0,0,0.06)`,
-        overflowX: isMobile ? "auto" : "visible", // allow scroll if needed
+        boxShadow: "0 10px 40px -10px rgba(0,0,0,0.1)",
+        overflowX: isMobile ? "auto" : "visible",
+        transition: "transform 0.3s ease-in-out",
+        "&:hover": {
+          transform: "translateY(-5px)",
+        },
       }}
     >
       {/* Header */}
       <Box
         display="flex"
         alignItems="center"
-        gap={1}
-        mb={2}
+        gap={2}
+        mb={3}
         justifyContent="flex-start"
-        minWidth={isMobile ? 600 : "auto"} // prevents squished text
+        minWidth={isMobile ? 600 : "auto"}
       >
-        <TrendingUpIcon color="primary" />
-        <Typography
-          variant="h6"
-          fontWeight="bold"
+        <TrendingUpIcon
+          color="primary"
           sx={{
-            fontSize: { xs: 15, sm: 18, md: 20 },
-            textAlign: "left",
+            fontSize: 32,
+            animation: "pulse 2s infinite",
+            "@keyframes pulse": {
+              "0%": { transform: "scale(1)" },
+              "50%": { transform: "scale(1.1)" },
+              "100%": { transform: "scale(1)" },
+            },
+          }}
+        />
+        <Typography
+          variant="h5"
+          fontWeight="800"
+          sx={{
+            fontSize: { xs: 16, sm: 20, md: 24 },
+            background: "linear-gradient(45deg, #2196F3 30%, #FF9800 90%)",
+            backgroundClip: "text",
+            WebkitBackgroundClip: "text",
+            color: "transparent",
           }}
         >
-          WE HAVE BEEN KEEPING{" "}
-          <Box
-            component="span"
-            color="warning.main"
-            fontWeight="bold"
-            display="inline"
-          >
-            TRACK
-          </Box>{" "}
-          OF YOU
+          Weekly Progress Tracker
         </Typography>
       </Box>
 
-      <Divider sx={{ mb: 2 }} />
+      <Divider sx={{ mb: 3, opacity: 0.6 }} />
 
       {/* Chart */}
       <Box sx={{ width: isMobile ? 600 : "100%" }}>
-        <ResponsiveContainer width="100%" height={isMobile ? 240 : 320}>
-          <LineChart data={data}>
+        <ResponsiveContainer width="100%" height={isMobile ? 280 : 380}>
+          <LineChart
+            data={data}
+            margin={{ top: 20, right: 30, left: 20, bottom: 10 }}
+          >
+            <defs>
+              {[
+                { id: "weights", color: "#29b6f6" },
+                { id: "calories", color: "#ff9800" },
+                { id: "reps", color: "#3f51b5" },
+              ].map(({ id, color }) => (
+                <linearGradient key={id} id={id} x1="0" y1="0" x2="0" y2="1">
+                  <stop offset="5%" stopColor={color} stopOpacity={0.8} />
+                  <stop offset="95%" stopColor={color} stopOpacity={0.1} />
+                </linearGradient>
+              ))}
+            </defs>
             <CartesianGrid
               strokeDasharray="3 3"
               vertical={false}
-              stroke={theme.palette.grey[300]}
+              opacity={0.2}
             />
             <XAxis
               dataKey="day"
               stroke={theme.palette.text.secondary}
-              tick={{ fontSize: isMobile ? 10 : 12 }}
+              tick={{ fontSize: isMobile ? 11 : 13 }}
+              tickLine={false}
             />
             <YAxis
               stroke={theme.palette.text.secondary}
-              tick={{ fontSize: isMobile ? 10 : 12 }}
+              tick={{ fontSize: isMobile ? 11 : 13 }}
+              tickLine={false}
+              axisLine={false}
             />
-            <Tooltip
-              contentStyle={{
-                backgroundColor: "#fff",
-                borderRadius: 8,
-                border: "1px solid #e0e0e0",
-                fontSize: 13,
+            <Tooltip content={<CustomTooltip />} />
+            <Legend
+              verticalAlign="top"
+              iconType="circle"
+              height={50}
+              wrapperStyle={{
+                paddingBottom: "20px",
               }}
-              labelStyle={{ fontWeight: 600 }}
-              itemStyle={{ color: theme.palette.text.primary }}
             />
-            <Legend verticalAlign="top" iconType="circle" height={36} />
-            <Line
-              type="monotone"
-              dataKey="weights"
-              name="Weights"
-              stroke="#29b6f6"
-              strokeWidth={2.5}
-              dot={{ r: 4 }}
-              activeDot={{ r: 6 }}
-            />
-            <Line
-              type="monotone"
-              dataKey="calories"
-              name="Calories"
-              stroke="#ff9800"
-              strokeWidth={2.5}
-              dot={{ r: 4 }}
-              activeDot={{ r: 6 }}
-            />
-            <Line
-              type="monotone"
-              dataKey="reps"
-              name="Total Reps"
-              stroke="#3f51b5"
-              strokeWidth={2.5}
-              dot={{ r: 4 }}
-              activeDot={{ r: 6 }}
-            />
+            {[
+              { key: "weights", name: "Weights", stroke: "#29b6f6" },
+              { key: "calories", name: "Calories", stroke: "#ff9800" },
+              { key: "reps", name: "Total Reps", stroke: "#3f51b5" },
+            ].map(({ key, name, stroke }) => (
+              <Line
+                key={key}
+                type="monotoneX"
+                dataKey={key}
+                name={name}
+                stroke={stroke}
+                strokeWidth={3}
+                dot={{ r: 4, strokeWidth: 2 }}
+                activeDot={{ r: 7, strokeWidth: 0 }}
+                fill={`url(#${key})`}
+              />
+            ))}
           </LineChart>
         </ResponsiveContainer>
       </Box>

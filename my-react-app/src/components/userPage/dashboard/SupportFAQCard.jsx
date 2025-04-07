@@ -1,76 +1,131 @@
 import React from "react";
-import { Box, Typography, Paper, Link, Button, useTheme } from "@mui/material";
+import { Box, Typography, Paper, Link } from "@mui/material";
 import HelpOutlineIcon from "@mui/icons-material/HelpOutline";
+import SupportAgentIcon from "@mui/icons-material/SupportAgent";
 
 function SupportFAQCard() {
-  const theme = useTheme();
-
   return (
     <Paper
-      elevation={3}
       sx={{
         height: "100%",
         borderRadius: 3,
-        p: 4,
-        textAlign: "center",
-        background: "rgba(25, 118, 210, 0.1)",
-        backdropFilter: "blur(8px)",
-        color: theme.palette.text.primary,
-        display: "flex",
-        flexDirection: "column",
-        justifyContent: "center",
-        alignItems: "center",
-        boxShadow: `0 8px 16px rgba(25, 118, 210, 0.2)`,
-        marginBottom:12,
+        overflow: "hidden",
+        position: "relative",
+        boxShadow: "0px 4px 20px rgba(0, 0, 0, 0.15)",
       }}
     >
       <Box
         sx={{
-          bgcolor: "primary.main",
-          color: "white",
-          width: 64,
-          height: 64,
-          borderRadius: "50%",
-          mb: 2,
+          position: "absolute",
+          top: 0,
+          left: 0,
+          right: 0,
+          bottom: 0,
+          background: "linear-gradient(135deg, #7E69AB 0%, #9B87F5 100%)",
+          opacity: 0.85,
+          zIndex: 1,
+        }}
+      />
+      <Box
+        sx={{
+          backgroundImage:
+            "url(https://images.unsplash.com/photo-1571019613454-1cb2f99b2d8b?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=1950&q=80)",
+          backgroundPosition: "center",
+          backgroundSize: "cover",
+          position: "absolute",
+          top: 0,
+          left: 0,
+          right: 0,
+          bottom: 0,
+        }}
+      />
+      <Box
+        sx={{
+          px: 4,
+          pt: 5,
+          pb: 4,
           display: "flex",
+          flexDirection: "column",
           alignItems: "center",
           justifyContent: "center",
-          boxShadow: 3,
+          height: "100%",
+          position: "relative",
+          zIndex: 2,
         }}
       >
-        <HelpOutlineIcon fontSize="large" />
-      </Box>
-
-      <Typography variant="h6" fontWeight="bold" gutterBottom>
-        Need Help?
-      </Typography>
-
-      <Typography
-        variant="body2"
-        color="text.secondary"
-        sx={{ mb: 3, maxWidth: 260 }}
-      >
-        We’re here to support your fitness journey. Explore FAQs or get in touch
-        with our support team.
-      </Typography>
-
-      <Box sx={{ display: "flex", gap: 2 }}>
-        <Button
-          variant="contained"
-          size="small"
-          sx={{ textTransform: "none" }}
-          href="#"
+        <Typography
+          variant="h5"
+          fontWeight={700}
+          gutterBottom
+          sx={{ color: "white", textShadow: "0 2px 4px rgba(0,0,0,0.2)" }}
         >
-          FAQs
-        </Button>
-        <Button
-          variant="outlined"
-          size="small"
-          sx={{ textTransform: "none" }}
-          href="#"
+          Need Help?
+        </Typography>
+        <Typography
+          variant="body1"
+          align="center"
+          sx={{
+            mb: 3.5,
+            color: "rgba(255, 255, 255, 0.9)",
+            maxWidth: 300,
+            mx: "auto",
+            textShadow: "0 1px 2px rgba(0,0,0,0.1)",
+          }}
         >
-          Contact Support
-        </Button>
+          Check out our guides or contact support for assistance with your
+          fitness journey.
+        </Typography>
+        <Box sx={{ display: "flex", gap: 2 }}>
+          <Link
+            href="#"
+            sx={{
+              bgcolor: "rgba(255, 255, 255, 0.9)",
+              color: "#7E69AB",
+              fontWeight: 600,
+              py: 1.2,
+              px: 3,
+              borderRadius: 2,
+              display: "flex",
+              alignItems: "center",
+              gap: 1,
+              textDecoration: "none",
+              transition: "all 0.2s",
+              boxShadow: "0 4px 10px rgba(0,0,0,0.1)",
+              "&:hover": {
+                bgcolor: "white",
+                transform: "translateY(-2px)",
+                boxShadow: "0 6px 15px rgba(0,0,0,0.15)",
+              },
+            }}
+          >
+            <HelpOutlineIcon fontSize="small" />
+            FAQs
+          </Link>
+          <Link
+            href="#"
+            sx={{
+              bgcolor: "rgba(0,0,0,0.2)",
+              color: "white",
+              fontWeight: 600,
+              py: 1.2,
+              px: 3,
+              borderRadius: 2,
+              display: "flex",
+              alignItems: "center",
+              gap: 1,
+              textDecoration: "none",
+              border: "1px solid rgba(255,255,255,0.3)",
+              transition: "all 0.2s",
+              "&:hover": {
+                bgcolor: "rgba(0,0,0,0.3)",
+                transform: "translateY(-2px)",
+              },
+            }}
+          >
+            <SupportAgentIcon fontSize="small" />
+            Support
+          </Link>
+        </Box>
       </Box>
     </Paper>
   );

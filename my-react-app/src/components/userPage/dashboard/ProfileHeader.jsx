@@ -19,6 +19,7 @@ import SettingsIcon from "@mui/icons-material/Settings";
 import ThemeToggle from "../ThemeToggle";
 import { useNavigate } from "react-router-dom";
 import LogoutIcon from "@mui/icons-material/Logout";
+import FitnessCenterIcon from "@mui/icons-material/FitnessCenter";
 
 function ProfileHeader() {
   const theme = useTheme();
@@ -31,11 +32,9 @@ function ProfileHeader() {
     const token = localStorage.getItem("token");
     const user = JSON.parse(localStorage.getItem("user") || "{}");
 
-    // Debugging: Log what’s retrieved from localStorage
     console.log("User from localStorage:", user);
     console.log("Token from localStorage:", token);
 
-    // Set username
     if (user?.displayName) {
       setUserName(user.displayName);
     } else if (user?.email) {
@@ -50,10 +49,6 @@ function ProfileHeader() {
       }
     }
 
-    // Set profile picture - Priority:
-    // 1. User-provided photoURL (if available)
-    // 2. Gravatar based on email
-    // 3. Fallback to generated avatar
     if (user?.photoURL) {
       console.log("Using photoURL:", user.photoURL);
       setProfileImage(user.photoURL);
@@ -62,11 +57,13 @@ function ProfileHeader() {
       console.log("Using Gravatar URL:", gravatarUrl);
       setProfileImage(gravatarUrl);
     } else {
-      const fallbackUrl = `https://ui-avatars.com/api/?name=${encodeURIComponent(userName)}&background=random`;
+      const fallbackUrl = `https://ui-avatars.com/api/?name=${encodeURIComponent(
+        userName
+      )}&background=random`;
       console.log("Using fallback URL:", fallbackUrl);
       setProfileImage(fallbackUrl);
     }
-  }, []); // Empty dependency array to run only on mount
+  }, []);
 
   const handleSignOut = () => {
     localStorage.removeItem("token");
@@ -88,127 +85,191 @@ function ProfileHeader() {
     stats: {
       currentWeight: "175 lbs",
       goalWeight: "165 lbs",
+      workoutsCompleted: 24,
+      exerciseStreak: 7,
     },
   };
 
   return (
     <Paper
-      elevation={2}
+      elevation={0}
       sx={{
-        p: 3,
+        p: 4,
         mb: 3,
-        borderRadius: 3,
-        display: "flex",
-        flexDirection: { xs: "column", md: "row" },
-        justifyContent: "space-between",
-        alignItems: { xs: "flex-start", md: "center" },
-        gap: 2,
-        backgroundColor: theme.palette.background.paper,
-        boxShadow: `0px 8px 24px -6px rgba(0,0,0,0.05)`,
+        borderRadius: 4,
+        background:
+          theme.palette.mode === "dark"
+            ? `linear-gradient(145deg, ${theme.palette.background.paper} 0%, ${theme.palette.grey[900]} 100%)`
+            : `linear-gradient(145deg, ${theme.palette.background.paper} 0%, ${theme.palette.grey[100]} 100%)`,
+        boxShadow:
+          theme.palette.mode === "dark"
+            ? "0 8px 32px rgba(0, 0, 0, 0.3)"
+            : "0 8px 32px rgba(0, 0, 0, 0.1)",
+        transition: "all 0.3s ease-in-out",
+        "&:hover": {
+          transform: "translateY(-2px)",
+        },
       }}
     >
-      {/* Profile Info */}
-      <Box sx={{ display: "flex", alignItems: "center", gap: 2 }}>
-        <Box sx={{ position: "relative", width: 72, height: 72 }}>
-          <Avatar
-            src={userData.profileImage}
-            alt="Profile"
+      <Box
+        sx={{
+          display: "flex",
+          flexDirection: { xs: "column", md: "row" },
+          justifyContent: "space-between",
+          alignItems: { xs: "center", md: "flex-start" },
+          gap: 3,
+        }}
+      >
+        <Box
+          sx={{
+            display: "flex",
+            alignItems: "center",
+            gap: 3,
+            flex: 1,
+          }}
+        >
+          <Box
             sx={{
-              width: 72,
-              height: 72,
-              border: `2px solid ${theme.palette.primary.main}`,
-            }}
-            // eslint-disable-next-line no-unused-vars
-            onError={(e) => {
-              console.log("Avatar failed to load:", userData.profileImage);
-              const fallbackUrl = `https://ui-avatars.com/api/?name=${encodeURIComponent(userName)}&background=random`;
-              if (userData.profileImage !== fallbackUrl) {
-                setProfileImage(fallbackUrl);
-              }
-            }}
-          />
-          <Chip
-            label={userData.level}
-            color="primary"
-            size="small"
-            sx={{
-              position: "absolute",
-              bottom: -6,
-              right: -6,
-              fontSize: "0.7rem",
-              borderRadius: 1,
-              boxShadow: 1,
-            }}
-          />
-        </Box>
-
-        <Box>
-          <Typography variant="h5" fontWeight={600}>
-            Welcome back, {userName}!
-          </Typography>
-          <Stack
-            direction="row"
-            spacing={1}
-            sx={{
-              mt: 0.5,
-              fontSize: "0.9rem",
-              color: theme.palette.text.secondary,
+              position: "relative",
+              "&::after": {
+                content: '""',
+                position: "absolute",
+                inset: -2,
+                borderRadius: "50%",
+                background: `linear-gradient(45deg, ${theme.palette.primary.main}, ${theme.palette.secondary.main})`,
+                animation: "rotate 4s linear infinite",
+              },
             }}
           >
-            <Typography variant="body2">
-              Current: {userData.stats.currentWeight}
+            <Avatar
+              src={userData.profileImage}
+              alt="Profile"
+              sx={{
+                width: 90,
+                height: 90,
+                border: `4px solid ${theme.palette.background.paper}`,
+                position: "relative",
+                zIndex: 1,
+              }}
+              onError={(e) => {
+                console.log("Avatar failed to load:", userData.profileImage);
+                const fallbackUrl = `https://ui-avatars.com/api/?name=${encodeURIComponent(
+                  userName
+                )}&background=random`;
+                if (userData.profileImage !== fallbackUrl) {
+                  setProfileImage(fallbackUrl);
+                }
+              }}
+            />
+          </Box>
+
+          <Box sx={{ flex: 1 }}>
+            <Typography
+              variant="h4"
+              fontWeight={700}
+              sx={{
+                background: `linear-gradient(45deg, ${theme.palette.primary.main}, ${theme.palette.secondary.main})`,
+                backgroundClip: "text",
+                WebkitBackgroundClip: "text",
+                WebkitTextFillColor: "transparent",
+                mb: 1,
+                fontSize: { xs: "1.5rem", sm: "2rem", md: "2.125rem" },
+              }}
+            >
+              Welcome back, {userName}!
             </Typography>
-            <Typography variant="body2">•</Typography>
-            <Typography variant="body2">
-              Goal: {userData.stats.goalWeight}
-            </Typography>
-          </Stack>
+            <Box
+              sx={{
+                display: "flex",
+                gap: { xs: 1, sm: 2 },
+                flexWrap: "wrap",
+              }}
+            >
+              <Chip
+                label={userData.level}
+                color="primary"
+                size="small"
+                sx={{
+                  borderRadius: 2,
+                  fontSize: { xs: "0.75rem", sm: "0.875rem" },
+                  height: { xs: "24px", sm: "32px" },
+                }}
+              />
+              <Chip
+                label={`Current: ${userData.stats.currentWeight}`}
+                variant="outlined"
+                size="small"
+                sx={{
+                  borderRadius: 2,
+                  fontSize: { xs: "0.75rem", sm: "0.875rem" },
+                  height: { xs: "24px", sm: "32px" },
+                }}
+              />
+              <Chip
+                label={`Goal: ${userData.stats.goalWeight}`}
+                variant="outlined"
+                size="small"
+                sx={{
+                  borderRadius: 2,
+                  fontSize: { xs: "0.75rem", sm: "0.875rem" },
+                  height: { xs: "24px", sm: "32px" },
+                }}
+              />
+            </Box>
+          </Box>
         </Box>
+
+        <Box
+          sx={{
+            display: "flex",
+            gap: 2,
+            flexWrap: "wrap",
+            alignItems: "center",
+            mt: { xs: 2, md: 0 },
+          }}
+        ></Box>
+
+        <Stack
+          direction="row"
+          spacing={{ xs: 1, sm: 2 }}
+          sx={{
+            "& .MuiIconButton-root": {
+              transition: "all 0.2s ease-in-out",
+              width: { xs: "36px", sm: "48px" },
+              height: { xs: "36px", sm: "48px" },
+              "&:hover": {
+                transform: "scale(1.1)",
+                background: theme.palette.primary.main,
+                color: theme.palette.primary.contrastText,
+              },
+            },
+            "& .MuiSvgIcon-root": {
+              fontSize: { xs: "1.2rem", sm: "1.5rem" },
+            },
+          }}
+        >
+          <IconButton
+            aria-label="settings"
+            sx={{
+              border: `2px solid ${theme.palette.divider}`,
+              borderRadius: 2,
+            }}
+          >
+            <SettingsIcon />
+          </IconButton>
+          <IconButton
+            aria-label="sign out"
+            onClick={handleOpenDialog}
+            sx={{
+              border: `2px solid ${theme.palette.divider}`,
+              borderRadius: 2,
+            }}
+          >
+            <LogoutIcon />
+          </IconButton>
+        </Stack>
       </Box>
 
-      {/* Buttons */}
-      <Stack
-        direction="row"
-        spacing={1}
-        sx={{ alignSelf: { xs: "flex-end", md: "auto" } }}
-      >
-        <ThemeToggle />
-        <IconButton
-          aria-label="settings"
-          size="medium"
-          sx={{
-            border: "1px solid",
-            borderColor: "divider",
-            borderRadius: "50%",
-            bgcolor: "background.default",
-            transition: "all 0.2s ease",
-            "&:hover": {
-              backgroundColor: "action.hover",
-            },
-          }}
-        >
-          <SettingsIcon fontSize="small" />
-        </IconButton>
-        <IconButton
-          aria-label="sign out"
-          size="medium"
-          onClick={handleOpenDialog}
-          sx={{
-            border: "1px solid",
-            borderColor: "divider",
-            borderRadius: "50%",
-            bgcolor: "background.default",
-            transition: "all 0.2s ease",
-            "&:hover": {
-              backgroundColor: "action.hover",
-            },
-          }}
-        >
-          <LogoutIcon fontSize="small" />
-        </IconButton>
-      </Stack>
-
-      {/* Sign Out Confirmation Dialog */}
       <Dialog
         open={openDialog}
         onClose={handleCloseDialog}

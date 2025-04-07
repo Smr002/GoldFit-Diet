@@ -1,50 +1,17 @@
-import React, { useEffect, useState } from "react";
+import React from "react";
 import {
   Box,
   Typography,
   LinearProgress,
   Grid,
   Paper,
-  CircularProgress,
   Divider,
-  useTheme,
 } from "@mui/material";
-import OpacityIcon from "@mui/icons-material/Opacity";
-import HotelIcon from "@mui/icons-material/Hotel";
-import LocalFireDepartmentIcon from "@mui/icons-material/LocalFireDepartment";
-import { motion } from "framer-motion";
-
-// Animated number for % values
-function AnimatedNumber({ value }) {
-  const [displayValue, setDisplayValue] = useState(0);
-
-  useEffect(() => {
-    let start = 0;
-    const duration = 1000;
-    const stepTime = 1000 / 60;
-    const totalSteps = duration / stepTime;
-    let step = 0;
-
-    const interval = setInterval(() => {
-      step++;
-      const progress = step / totalSteps;
-      const current = Math.round(progress * value);
-      setDisplayValue(current);
-
-      if (step >= totalSteps) {
-        clearInterval(interval);
-      }
-    }, stepTime);
-
-    return () => clearInterval(interval);
-  }, [value]);
-
-  return <>{displayValue}%</>;
-}
+import { Droplet, Utensils, Moon } from "lucide-react";
+import CircularProgress from "@mui/material/CircularProgress";
 
 function DailySummaryWidget() {
-  const theme = useTheme();
-
+  // Mock data
   const calories = {
     consumed: 1450,
     goal: 2100,
@@ -52,9 +19,9 @@ function DailySummaryWidget() {
   };
 
   const macros = {
-    protein: { amount: 95, goal: 150, percentage: 63 },
-    carbs: { amount: 130, goal: 220, percentage: 59 },
-    fats: { amount: 40, goal: 70, percentage: 57 },
+    protein: { amount: 95, goal: 150, percentage: 63, color: "#9B87F5" },
+    carbs: { amount: 130, goal: 220, percentage: 59, color: "#6CCFBC" },
+    fats: { amount: 40, goal: 70, percentage: 57, color: "#FF7D55" },
   };
 
   const hydration = {
@@ -71,101 +38,97 @@ function DailySummaryWidget() {
 
   return (
     <Paper
-      elevation={3}
       sx={{
-        p: 3,
-        borderRadius: 3,
+        p: 2.5,
         height: "100%",
-        display: "flex",
-        flexDirection: "column",
-        justifyContent: "space-between",
+        borderRadius: 3,
+        boxShadow: "0px 4px 20px rgba(0, 0, 0, 0.08)",
+        background: "linear-gradient(145deg, #ffffff, #f5f7ff)",
       }}
     >
-      {/* Header */}
-      <Box display="flex" alignItems="center" gap={1} mb={2}>
-        <LocalFireDepartmentIcon color="error" />
-        <Typography variant="h6" fontWeight="bold">
+      <Box sx={{ display: "flex", alignItems: "center", gap: 1, mb: 2 }}>
+        <Utensils size={20} style={{ color: "#7E69AB" }} />
+        <Typography variant="h6" fontWeight={600} sx={{ color: "#1A1F2C" }}>
           Daily Summary
         </Typography>
       </Box>
 
-      {/* Calories */}
-      <Box sx={{ mb: 3 }}>
-        <Box display="flex" justifyContent="space-between" mb={0.5}>
-          <Typography variant="body2" fontWeight={500}>
-            Calories Consumed
+      <Box sx={{ mb: 2.5 }}>
+        <Box sx={{ display: "flex", justifyContent: "space-between", mb: 0.8 }}>
+          <Typography
+            variant="body1"
+            fontWeight={600}
+            sx={{ color: "#403E43" }}
+          >
+            Calories
           </Typography>
-          <Typography variant="body2" fontWeight={500}>
-            {calories.consumed} / {calories.goal} kcal
+          <Typography
+            variant="body1"
+            fontWeight={600}
+            sx={{ color: "#403E43" }}
+          >
+            {calories.consumed}{" "}
+            <span style={{ color: "#8E9196", fontWeight: 400 }}>
+              / {calories.goal} kcal
+            </span>
           </Typography>
         </Box>
-        <motion.div
-          initial={{ width: 0 }}
-          animate={{ width: `${calories.percentage}%` }}
-          transition={{ duration: 1 }}
-        >
-          <LinearProgress
-            variant="determinate"
-            value={100}
-            sx={{
-              height: 10,
-              borderRadius: 5,
-              bgcolor: "grey.200",
-              "& .MuiLinearProgress-bar": {
-                backgroundColor: theme.palette.warning.main,
-              },
-            }}
-          />
-        </motion.div>
+        <LinearProgress
+          variant="determinate"
+          value={calories.percentage}
+          sx={{
+            height: 10,
+            borderRadius: 2,
+            bgcolor: "rgba(155, 135, 245, 0.15)",
+            "& .MuiLinearProgress-bar": {
+              bgcolor: "#9B87F5",
+              borderRadius: 2,
+            },
+          }}
+        />
       </Box>
 
-      <Divider sx={{ mb: 2 }} />
+      <Divider sx={{ my: 2, opacity: 0.6 }} />
 
-      {/* Macros */}
-      <Grid
-        container
-        spacing={2}
-        justifyContent="space-around"
-        textAlign="center"
-        sx={{ mb: 2 }}
-      >
-        {Object.entries(macros).map(([name, data]) => {
-          const color =
-            name === "protein"
-              ? "secondary"
-              : name === "carbs"
-              ? "primary"
-              : "warning";
+      <Box sx={{ mb: 3 }}>
+        <Typography
+          variant="body1"
+          fontWeight={600}
+          sx={{ color: "#403E43", mb: 1.5 }}
+        >
+          Macronutrients
+        </Typography>
 
-          return (
-            <Grid item xs={4} key={name}>
-              <Typography variant="caption" fontWeight={500}>
-                {name.charAt(0).toUpperCase() + name.slice(1)}
+        <Grid container spacing={2}>
+          {Object.entries(macros).map(([name, data]) => (
+            <Grid item xs={4} key={name} sx={{ textAlign: "center" }}>
+              <Typography
+                variant="body2"
+                sx={{ color: "#8E9196", textTransform: "capitalize", mb: 0.5 }}
+              >
+                {name}
               </Typography>
               <Box
-                sx={{
-                  position: "relative",
-                  display: "flex",
-                  justifyContent: "center",
-                  alignItems: "center",
-                  mt: 1,
-                  mb: 0.5,
-                }}
+                sx={{ position: "relative", display: "inline-flex", my: 0.5 }}
               >
                 <CircularProgress
                   variant="determinate"
                   value={data.percentage}
-                  size={60}
-                  thickness={5}
-                  color={color}
+                  size={66}
+                  thickness={4}
+                  sx={{
+                    color: data.color,
+                    "& .MuiCircularProgress-circle": {
+                      strokeLinecap: "round",
+                    },
+                  }}
                 />
-                <motion.div
-                  initial={{ strokeDasharray: "0 100" }}
-                  animate={{ strokeDasharray: "100 0" }}
-                  transition={{ duration: 1 }}
-                ></motion.div>
                 <Box
                   sx={{
+                    top: 0,
+                    left: 0,
+                    bottom: 0,
+                    right: 0,
                     position: "absolute",
                     display: "flex",
                     alignItems: "center",
@@ -174,76 +137,132 @@ function DailySummaryWidget() {
                 >
                   <Typography
                     variant="caption"
+                    component="div"
                     fontWeight={600}
-                    color="text.secondary"
+                    sx={{ color: data.color, fontSize: "0.9rem" }}
                   >
                     {data.percentage}%
                   </Typography>
                 </Box>
               </Box>
-              <Typography variant="body2" fontWeight={600}>
-                {data.amount}g
+              <Typography
+                variant="body1"
+                fontWeight={600}
+                sx={{ color: "#403E43" }}
+              >
+                {data.amount}
+                <span
+                  style={{
+                    fontWeight: 400,
+                    fontSize: "0.8rem",
+                    marginLeft: "1px",
+                  }}
+                >
+                  g
+                </span>
+              </Typography>
+              <Typography
+                variant="caption"
+                sx={{ color: "#8E9196", display: "block" }}
+              >
+                of {data.goal}g
               </Typography>
             </Grid>
-          );
-        })}
-      </Grid>
+          ))}
+        </Grid>
+      </Box>
 
-      <Divider sx={{ mb: 2 }} />
+      <Divider sx={{ my: 2, opacity: 0.6 }} />
 
-      {/* Hydration and Sleep */}
-      <Grid container spacing={2}>
-        {[
-          {
-            label: "Hydration",
-            icon: <OpacityIcon color="primary" fontSize="small" />,
-            ...hydration,
-            color: "primary",
-          },
-          {
-            label: "Sleep",
-            icon: <HotelIcon color="secondary" fontSize="small" />,
-            ...sleep,
-            color: "secondary",
-          },
-        ].map((item, idx) => (
-          <Grid item xs={6} key={idx}>
-            <Typography
-              variant="body2"
-              fontWeight={600}
-              sx={{ display: "flex", alignItems: "center", gap: 0.5 }}
+      <Grid container spacing={3} sx={{ mt: 0.5 }}>
+        <Grid item xs={6}>
+          <Box>
+            <Box
+              sx={{
+                display: "flex",
+                justifyContent: "space-between",
+                alignItems: "center",
+                mb: 0.8,
+              }}
             >
-              {item.icon}
-              {item.label}
-            </Typography>
-            <Typography
-              variant="caption"
-              fontWeight={500}
-              color="text.secondary"
+              <Box sx={{ display: "flex", alignItems: "center", gap: 0.8 }}>
+                <Droplet size={18} style={{ color: "#3B82F6" }} />
+                <Typography
+                  variant="body1"
+                  fontWeight={600}
+                  sx={{ color: "#403E43" }}
+                >
+                  Water
+                </Typography>
+              </Box>
+              <Typography
+                variant="body2"
+                fontWeight={500}
+                sx={{ color: "#3B82F6" }}
+              >
+                {hydration.amount}/{hydration.goal}{" "}
+                <span style={{ fontSize: "0.7rem" }}>L</span>
+              </Typography>
+            </Box>
+            <LinearProgress
+              variant="determinate"
+              value={hydration.percentage}
+              color="primary"
+              sx={{
+                height: 8,
+                borderRadius: 4,
+                bgcolor: "rgba(59, 130, 246, 0.15)",
+                "& .MuiLinearProgress-bar": {
+                  bgcolor: "#3B82F6",
+                  borderRadius: 4,
+                },
+              }}
+            />
+          </Box>
+        </Grid>
+        <Grid item xs={6}>
+          <Box>
+            <Box
+              sx={{
+                display: "flex",
+                justifyContent: "space-between",
+                alignItems: "center",
+                mb: 0.8,
+              }}
             >
-              {item.hours
-                ? `${item.hours} / ${item.goal} hours`
-                : `${item.amount} / ${item.goal} glasses`}
-            </Typography>
-            <motion.div
-              initial={{ width: 0 }}
-              animate={{ width: `${item.percentage}%` }}
-              transition={{ duration: 1 }}
-            >
-              <LinearProgress
-                variant="determinate"
-                value={100}
-                color={item.color}
-                sx={{
-                  height: 8,
-                  borderRadius: 1,
-                  mt: 0.5,
-                  bgcolor: "grey.200",
-                }}
-              />
-            </motion.div>
-          </Grid>
-        ))}
+              <Box sx={{ display: "flex", alignItems: "center", gap: 0.8 }}>
+                <Moon size={18} style={{ color: "#8B5CF6" }} />
+                <Typography
+                  variant="body1"
+                  fontWeight={600}
+                  sx={{ color: "#403E43" }}
+                >
+                  Sleep
+                </Typography>
+              </Box>
+              <Typography
+                variant="body2"
+                fontWeight={500}
+                sx={{ color: "#8B5CF6" }}
+              >
+                {sleep.hours} <span style={{ fontSize: "0.7rem" }}>hrs</span>
+              </Typography>
+            </Box>
+            <LinearProgress
+              variant="determinate"
+              value={sleep.percentage}
+              sx={{
+                height: 8,
+                borderRadius: 4,
+                bgcolor: "rgba(139, 92, 246, 0.15)",
+                "& .MuiLinearProgress-bar": {
+                  bgcolor: "#8B5CF6",
+                  borderRadius: 4,
+                },
+              }}
+            />
+          </Box>
+        </Grid>
       </Grid>
     </Paper>
   );

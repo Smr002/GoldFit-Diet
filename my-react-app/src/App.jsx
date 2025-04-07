@@ -1,4 +1,4 @@
-import { BrowserRouter, Routes, Route, Link, Navigate } from "react-router-dom";
+import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
 import React, { useState } from "react";
 import HomePage from "../src/pages/HomePage";
 import AccModal from "../src/components/AccModal";
@@ -24,41 +24,67 @@ const ProtectedRoute = ({ children }) => {
   return children;
 };
 
+const routes = {
+  public: [
+    { path: "/", element: (props) => <HomePage {...props} /> },
+    { path: "/create-account/*", element: <CreateAccount /> },
+    { path: "/exercises", element: <Exercises /> },
+  ],
+  protected: [
+    { path: "/user-home", element: <UserHomePage /> },
+    { path: "/workouts", element: <Workout /> },
+  ],
+  admin: [
+    { path: "dashboard", element: <Dashboard /> },
+    { path: "users", element: <UserManagement /> },
+    { path: "workouts", element: <WorkoutManagement /> },
+    { path: "notifications", element: <NotificationManagement /> },
+    { path: "faqs", element: <FAQManagement /> },
+  ],
+};
+
 export default function App() {
   const [isModalOpen, setModalOpen] = useState(false);
 
   return (
     <BrowserRouter>
       <Routes>
-        <Route
-          path="/"
-          element={
-            <HomePage isModalOpen={isModalOpen} setModalOpen={setModalOpen} />
-          }
-        />
-        <Route path="/create-account/*" element={<CreateAccount />} />
-        <Route path="/exercises" element={<Exercises />} />
-        <Route
-          path="/user-home"
-          element={
-            <ProtectedRoute>
-              <UserHomePage />
-            </ProtectedRoute>
-          }
-        />
-        <Route path="/workouts" element={<Workout />} />
+        {/* Public Routes */}
+        {routes.public.map(({ path, element: Element }) => (
+          <Route
+            key={path}
+            path={path}
+            element={
+              path === "/" ? (
+                <Element
+                  isModalOpen={isModalOpen}
+                  setModalOpen={setModalOpen}
+                />
+              ) : (
+                Element
+              )
+            }
+          />
+        ))}
+
+        {/* Protected Routes */}
+        {routes.protected.map(({ path, element: Element }) => (
+          <Route
+            key={path}
+            path={path}
+            element={<ProtectedRoute>{Element}</ProtectedRoute>}
+          />
+        ))}
 
         {/* Admin Routes */}
-        <Route path="/admin/*" element={<AdminLayout />}>
+        <Route path="/admin" element={<AdminLayout />}>
           <Route index element={<Navigate to="/admin/dashboard" replace />} />
-          <Route path="dashboard" element={<Dashboard />} />
-          <Route path="users" element={<UserManagement />} />
-          <Route path="workouts" element={<WorkoutManagement />} />
-          <Route path="notifications" element={<NotificationManagement />} />
-          <Route path="faqs" element={<FAQManagement />} />
+          {routes.admin.map(({ path, element: Element }) => (
+            <Route key={path} path={path} element={Element} />
+          ))}
         </Route>
 
-        {/* Super Admin Routes */}
+        {/* Super Admin Route */}
         <Route path="/admin" element={<AdminLayout isSuperAdmin={true} />}>
           <Route path="admin-management" element={<AdminManagement />} />
         </Route>

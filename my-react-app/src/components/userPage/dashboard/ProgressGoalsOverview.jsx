@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React from "react";
 import {
   Box,
   Typography,
@@ -7,38 +7,10 @@ import {
   LinearProgress,
   Divider,
 } from "@mui/material";
-import InsightsIcon from "@mui/icons-material/Insights";
-import FileDownloadIcon from "@mui/icons-material/FileDownload";
-import TrendingDownIcon from "@mui/icons-material/TrendingDown";
-import TrendingUpIcon from "@mui/icons-material/TrendingUp";
-import { motion } from "framer-motion";
-
-// Animated percentage number
-function AnimatedNumber({ value }) {
-  const [displayValue, setDisplayValue] = useState(0);
-
-  useEffect(() => {
-    let start = 0;
-    const duration = 1000;
-    const stepTime = 1000 / 60;
-    const totalSteps = duration / stepTime;
-    let step = 0;
-
-    const interval = setInterval(() => {
-      step++;
-      const progress = step / totalSteps;
-      const current = Math.round(progress * value);
-      setDisplayValue(current);
-      if (step >= totalSteps) clearInterval(interval);
-    }, stepTime);
-
-    return () => clearInterval(interval);
-  }, [value]);
-
-  return <></>;
-}
+import { LineChart, FileDown, TrendingDown, TrendingUp } from "lucide-react";
 
 function ProgressGoalsOverview() {
+  // Mock data
   const goalProgress = {
     current: 175,
     start: 185,
@@ -47,135 +19,218 @@ function ProgressGoalsOverview() {
   };
 
   const recentProgress = [
-    { label: "Weight", value: "175 lbs", trend: "down", change: "2.5 lbs" },
-    { label: "Bench PR", value: "205 lbs", trend: "up", change: "10 lbs" },
+    {
+      label: "Weight",
+      value: "175 lbs",
+      trend: "down",
+      change: "2.5 lbs",
+      color: "#10B981",
+    },
+    {
+      label: "Bench PR",
+      value: "205 lbs",
+      trend: "up",
+      change: "10 lbs",
+      color: "#9B87F5",
+    },
   ];
 
   return (
-    <Paper elevation={3} sx={{ p: 3, borderRadius: 3, height: "100%" }}>
-      {/* Header */}
-      <Box display="flex" alignItems="center" gap={1} mb={2}>
-        <InsightsIcon color="secondary" />
-        <Typography variant="h6" fontWeight="bold">
-          Progress & Goals
-        </Typography>
+    <Paper
+      sx={{
+        p: 2.5,
+        height: "100%",
+        borderRadius: 3,
+        boxShadow: "0px 4px 20px rgba(0, 0, 0, 0.08)",
+        background: "linear-gradient(145deg, #ffffff, #f5f7ff)",
+      }}
+    >
+      <Box
+        sx={{
+          display: "flex",
+          alignItems: "center",
+          justifyContent: "space-between",
+          mb: 2,
+        }}
+      >
+        <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
+          <LineChart size={20} color="#7E69AB" />
+          <Typography variant="h6" fontWeight={600} sx={{ color: "#1A1F2C" }}>
+            Progress & Goals
+          </Typography>
+        </Box>
       </Box>
 
-      {/* Weight Goal */}
-      <Box mb={3}>
-        <Box
-          display="flex"
-          justifyContent="space-between"
-          alignItems="center"
-          mb={0.5}
-        >
-          <Typography variant="body2" fontWeight={500}>
-            Weight Goal
+      <Box sx={{ mb: 3 }}>
+        <Box sx={{ mb: 1 }}>
+          <Typography
+            variant="body1"
+            fontWeight={600}
+            sx={{ color: "#403E43" }}
+          >
+            Weight Goal Progress
           </Typography>
-          <Box display="flex" alignItems="center" gap={1}>
-            <Typography variant="caption" color="text.secondary">
-              {goalProgress.start} lbs
+        </Box>
+
+        <Box
+          sx={{
+            p: 2,
+            borderRadius: 2,
+            bgcolor: "rgba(16, 185, 129, 0.08)",
+            mb: 1.5,
+          }}
+        >
+          <Box
+            sx={{
+              display: "flex",
+              justifyContent: "space-between",
+              mb: 1,
+              alignItems: "baseline",
+            }}
+          >
+            <Typography
+              variant="body2"
+              fontWeight={500}
+              sx={{ color: "#10B981" }}
+            >
+              Start: {goalProgress.start} lbs
             </Typography>
-            <Typography variant="caption">→</Typography>
-            <Typography variant="caption" fontWeight={600}>
+            <Typography
+              variant="body1"
+              fontWeight={600}
+              sx={{ color: "#10B981" }}
+            >
               {goalProgress.current} lbs
             </Typography>
-            <Typography variant="caption">→</Typography>
-            <Typography variant="caption" color="primary" fontWeight={600}>
-              {goalProgress.goal} lbs
+            <Typography
+              variant="body2"
+              fontWeight={500}
+              sx={{ color: "#10B981" }}
+            >
+              Goal: {goalProgress.goal} lbs
             </Typography>
           </Box>
-        </Box>
-
-        <Box position="relative" sx={{ mb: 0.5 }}>
-          <motion.div
-            initial={{ width: 0 }}
-            animate={{ width: `${goalProgress.percentComplete}%` }}
-            transition={{ duration: 1 }}
-          >
-            <LinearProgress
-              variant="determinate"
-              value={100}
-              sx={{
-                height: 10,
-                borderRadius: 5,
-                bgcolor: "grey.200",
-                "& .MuiLinearProgress-bar": {
-                  backgroundColor: "#ff6f00",
-                },
-              }}
-            />
-          </motion.div>
+          <LinearProgress
+            variant="determinate"
+            value={goalProgress.percentComplete}
+            sx={{
+              height: 10,
+              borderRadius: 10,
+              bgcolor: "rgba(16, 185, 129, 0.2)",
+              "& .MuiLinearProgress-bar": {
+                bgcolor: "#10B981",
+                borderRadius: 10,
+              },
+            }}
+          />
           <Typography
             variant="caption"
-            fontWeight={600}
-            color="text.secondary"
-            sx={{ mt: 0.5 }}
+            sx={{
+              color: "#10B981",
+              display: "block",
+              textAlign: "right",
+              mt: 0.5,
+            }}
           >
-            <AnimatedNumber value={goalProgress.percentComplete} />
+            {goalProgress.percentComplete}% complete
           </Typography>
         </Box>
       </Box>
 
-      <Divider sx={{ mb: 2 }} />
+      <Divider sx={{ my: 2, opacity: 0.6 }} />
 
-      {/* Recent Progress */}
-      <Typography variant="subtitle2" fontWeight={600} sx={{ mb: 1 }}>
-        Recent Progress
-      </Typography>
-
-      <Box display="flex" flexDirection="column" gap={1.5} mb={3}>
-        {recentProgress.map((item) => {
-          const isDown = item.trend === "down";
-          return (
+      <Box sx={{ mb: 3 }}>
+        <Typography
+          variant="body1"
+          fontWeight={600}
+          sx={{ color: "#403E43", mb: 1.5 }}
+        >
+          Recent Progress
+        </Typography>
+        <Box sx={{ display: "flex", flexDirection: "column", gap: 1.5 }}>
+          {recentProgress.map((item) => (
             <Box
               key={item.label}
               sx={{
                 display: "flex",
                 justifyContent: "space-between",
                 alignItems: "center",
-                px: 2,
-                py: 1.2,
+                bgcolor: `${item.color}10`,
                 borderRadius: 2,
-                bgcolor: "action.hover",
+                px: 2,
+                py: 1.5,
+                transition: "all 0.2s ease",
+                "&:hover": {
+                  transform: "translateY(-2px)",
+                  boxShadow: `0 4px 10px ${item.color}20`,
+                },
               }}
             >
-              <Typography variant="body2">{item.label}</Typography>
-
-              <Box display="flex" alignItems="center" gap={1}>
-                <Typography variant="body2" fontWeight={600}>
+              <Typography
+                variant="body1"
+                fontWeight={600}
+                sx={{ color: "#403E43" }}
+              >
+                {item.label}
+              </Typography>
+              <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
+                <Typography
+                  variant="body1"
+                  fontWeight={600}
+                  sx={{ color: item.color }}
+                >
                   {item.value}
                 </Typography>
                 <Box
                   sx={{
                     display: "flex",
                     alignItems: "center",
-                    color: isDown ? "success.main" : "secondary.main",
+                    color: item.trend === "down" ? "#10B981" : "#EC4899",
+                    bgcolor:
+                      item.trend === "down"
+                        ? "rgba(16, 185, 129, 0.1)"
+                        : "rgba(236, 72, 153, 0.1)",
+                    typography: "caption",
+                    py: 0.5,
+                    px: 0.8,
+                    borderRadius: 1,
                   }}
                 >
-                  {isDown ? (
-                    <TrendingDownIcon fontSize="small" />
+                  {item.trend === "down" ? (
+                    <TrendingDown size={14} style={{ marginRight: "4px" }} />
                   ) : (
-                    <TrendingUpIcon fontSize="small" />
+                    <TrendingUp size={14} style={{ marginRight: "4px" }} />
                   )}
                   <Typography
                     variant="caption"
-                    sx={{ ml: 0.5, fontWeight: 500 }}
+                    fontWeight={600}
+                    sx={{ color: "inherit" }}
                   >
                     {item.change}
                   </Typography>
                 </Box>
               </Box>
             </Box>
-          );
-        })}
+          ))}
+        </Box>
       </Box>
 
       <Button
         variant="outlined"
-        startIcon={<FileDownloadIcon />}
-        size="small"
+        startIcon={<FileDown size={18} />}
+        size="medium"
         fullWidth
+        sx={{
+          py: 1.2,
+          borderColor: "#7E69AB",
+          color: "#7E69AB",
+          borderRadius: 2,
+          fontWeight: 600,
+          "&:hover": {
+            borderColor: "#6E59A5",
+            bgcolor: "rgba(126, 105, 171, 0.05)",
+          },
+        }}
       >
         Export Progress Report
       </Button>

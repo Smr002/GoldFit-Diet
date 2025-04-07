@@ -113,7 +113,7 @@ const userHomePage = () => {
             </Grid>
 
             {/* Support/FAQ */}
-            <Grid item xs={12} md={6} lg={4}>
+            <Grid item xs={12} md={6} lg={4} sx={{ pb: { xs: 8, sm: 5 } }}>
               <SupportFAQCard />
             </Grid>
           </Grid>
