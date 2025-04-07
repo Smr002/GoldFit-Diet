@@ -258,22 +258,23 @@ const Exercises = () => {
 
   return (
     <>
-    <SecondNavbar/>
       <div
         style={{
           minHeight: "100vh",
           background: "linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%)",
         }}
       >
+        <SecondNavbar />
+        <br />
+        <br />
+        <br />
         <div
           style={{
             maxWidth: "1300px",
             margin: "0 auto",
             padding: "20px",
           }}
-        >
-        
-        </div>
+        ></div>
         <div className="exercises-container">
           {/* Search Bar */}
           <div className="search-container">

@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import logo from "../assets/react.svg";
+import logo from "../assets/goldfitlogo.png";
 import { Link } from "react-router-dom";
 
 export default function Navbar({ setModalOpen }) {
@@ -15,12 +15,12 @@ export default function Navbar({ setModalOpen }) {
       }
     };
 
-    window.addEventListener('scroll', handleScroll);
-    return () => window.removeEventListener('scroll', handleScroll);
+    window.addEventListener("scroll", handleScroll);
+    return () => window.removeEventListener("scroll", handleScroll);
   }, []);
 
   return (
-    <header className={`custom-header ${scrolled ? 'scrolled' : ''}`}>
+    <header className={`custom-header ${scrolled ? "scrolled" : ""}`}>
       <div className="navbar-container">
         <Link to="/" className="logo-container">
           <img src={logo} alt="Logo" className="logo" />
@@ -28,7 +28,7 @@ export default function Navbar({ setModalOpen }) {
 
         <div className="mobile-menu-container">
           <button
-            className={`hamburger-menu ${menuOpen ? 'open' : ''}`}
+            className={`hamburger-menu ${menuOpen ? "open" : ""}`}
             onClick={() => setMenuOpen(!menuOpen)}
             aria-label="Toggle menu"
           >
@@ -38,15 +38,10 @@ export default function Navbar({ setModalOpen }) {
           </button>
         </div>
 
-        <nav className={`nav-links ${menuOpen ? 'open' : ''}`}>
-          {[
-            "Our Vision",
-            "Workouts",
-            "Prices",
-            "Contact Us"
-          ].map((item) => (
+        <nav className={`nav-links ${menuOpen ? "open" : ""}`}>
+          {["OurVision", "Workouts", "Prices", "ContactUs"].map((item) => (
             <a
-              href={`#${item.toLowerCase().replace(/\s+/g, '-')}`}
+              href={`#${item.toLowerCase().replace(/\s+/g, "-")}`}
               key={item}
               className="nav-link"
               onClick={() => setMenuOpen(false)}
@@ -54,11 +49,8 @@ export default function Navbar({ setModalOpen }) {
               {item}
             </a>
           ))}
-          <button
-            onClick={() => setModalOpen(true)}
-            className="try-now-button"
-          >
-            Try Now
+          <button onClick={() => setModalOpen(true)} className="try-now-button">
+            TryNow
           </button>
         </nav>
       </div>

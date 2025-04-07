@@ -79,6 +79,7 @@ function WeeklyTrackingChart() {
         p: { xs: 2, md: 3 },
         borderRadius: 3,
         mb: 4,
+        display: { xs: "none", sm: "flex" },
         backgroundColor: theme.palette.background.paper,
         boxShadow: "0 10px 40px -10px rgba(0,0,0,0.1)",
         overflowX: isMobile ? "auto" : "visible",

@@ -134,10 +134,11 @@ body.dark-mode {
 .logo-container {
   display: flex;
   align-items: center;
+  width: 100%;
 }
 
 .logo {
-  height: 40px;
+  height: 66px;
   width: auto;
   transition: transform 0.3s ease, filter 0.3s ease;
 }
@@ -152,7 +153,7 @@ body.dark-mode .logo {
 
 .nav-links {
   display: flex;
-  gap: 30px;
+  gap: 40px;
   align-items: center;
 }
 
