@@ -13,6 +13,7 @@ import legs from "../assets/legday.jpg";
 import MobileFooter from "./MobileFooter";
 import UserHeader from "../components/userPage/dashboard/ProfileHeader";
 import QuickActions from "./userPage/dashboard/QuickActions";
+import SecondNavbar from "./SecondNavbar";
 
 const UserWorkout = () => {
   const [workouts, setWorkouts] = useState([]);
@@ -368,10 +369,9 @@ const UserWorkout = () => {
   };
 
   return (
+    <>
+    <SecondNavbar/>
     <div className="workout-container">
-      <UserHeader />
-      <QuickActions />
-
       <div className="workout-search-filter">
         <div className="search-container">
           <div className="search-bar">
@@ -552,6 +552,7 @@ const UserWorkout = () => {
       )}
       <MobileFooter />
     </div>
+    </>
   );
 };
 

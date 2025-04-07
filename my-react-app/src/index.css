@@ -113,6 +113,7 @@ body.dark-mode {
   z-index: 1000;
   transition: all 0.3s ease;
   background-color: var(--navbar-transparent);
+  margin-bottom: 32px;
 }
 
 .custom-header.scrolled {
@@ -127,6 +128,7 @@ body.dark-mode {
   align-items: center;
   width: 100%;
   max-width: 1200px;
+  padding: 0 20px;
 }
 
 .logo-container {
@@ -198,6 +200,7 @@ body.dark-mode .logo {
   cursor: pointer;
   transition: transform 0.3s ease, box-shadow 0.3s ease;
   box-shadow: 0 4px 6px var(--button-shadow);
+  text-decoration: none;
 }
 
 .try-now-button:hover {
@@ -3819,6 +3822,7 @@ body.dark-mode .footer-legal-links a:hover {
   border: none;
   box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
   transition: all 0.3s ease;
+  margin-top: 48px;
 }
 
 .search-bar:hover {
@@ -3838,6 +3842,7 @@ body.dark-mode .footer-legal-links a:hover {
   font-size: 16px;
   font-weight: 500;
   background: transparent;
+
 }
 
 .search-input:focus {

@@ -8,6 +8,7 @@ import Navbar from "./Navbar";
 import MobileFooter from "./MobileFooter";
 import UserHeader from "../components/userPage/dashboard/ProfileHeader";
 import QuickActions from "./userPage/dashboard/QuickActions";
+import SecondNavbar from "./SecondNavbar";
 const bodyParts = [
   { name: "Favorites", icon: "favorites" },
   { name: "Cardio", icon: "cardio" },
@@ -257,6 +258,7 @@ const Exercises = () => {
 
   return (
     <>
+    <SecondNavbar/>
       <div
         style={{
           minHeight: "100vh",
@@ -270,8 +272,7 @@ const Exercises = () => {
             padding: "20px",
           }}
         >
-          <UserHeader />
-          <QuickActions />
+        
         </div>
         <div className="exercises-container">
           {/* Search Bar */}
