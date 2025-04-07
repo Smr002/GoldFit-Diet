@@ -11,6 +11,8 @@ import hiit from "../assets/hiitcardio.jpg";
 import beginner from "../assets/beginner.jpg";
 import legs from "../assets/legday.jpg";
 import MobileFooter from "./MobileFooter";
+import UserHeader from "../components/userPage/dashboard/ProfileHeader";
+import QuickActions from "./userPage/dashboard/QuickActions";
 
 const UserWorkout = () => {
   const [workouts, setWorkouts] = useState([]);
@@ -367,29 +369,8 @@ const UserWorkout = () => {
 
   return (
     <div className="workout-container">
-      <div className="workout-header">
-        <h1>Workouts</h1>
-        <button
-          className="create-workout-button"
-          onClick={() => setShowCreateModal(true)}
-        >
-          <svg
-            xmlns="http://www.w3.org/2000/svg"
-            width="20"
-            height="20"
-            viewBox="0 0 24 24"
-            fill="none"
-            stroke="currentColor"
-            strokeWidth="2"
-            strokeLinecap="round"
-            strokeLinejoin="round"
-          >
-            <line x1="12" y1="5" x2="12" y2="19"></line>
-            <line x1="5" y1="12" x2="19" y2="12"></line>
-          </svg>
-          Create Workout
-        </button>
-      </div>
+      <UserHeader />
+      <QuickActions />
 
       <div className="workout-search-filter">
         <div className="search-container">

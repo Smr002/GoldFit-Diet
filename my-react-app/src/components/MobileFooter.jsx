@@ -6,10 +6,11 @@ const MobileFooter = () => {
   useEffect(() => {
     // Add padding to the bottom of the main content
     const updateContentPadding = () => {
-      const footerHeight = document.querySelector('.mobile-footer')?.offsetHeight || 70; // Default to 70px if not yet rendered
-      
+      const footerHeight =
+        document.querySelector(".mobile-footer")?.offsetHeight || 70; // Default to 70px if not yet rendered
+
       // Add padding to exercises container if it exists
-      const exercisesContainer = document.querySelector('.exercises-container');
+      const exercisesContainer = document.querySelector(".exercises-container");
       if (exercisesContainer) {
         exercisesContainer.style.paddingBottom = `${footerHeight + 20}px`; // 20px extra for spacing
       }
@@ -17,23 +18,23 @@ const MobileFooter = () => {
 
     // Call immediately and on resize for responsive support
     updateContentPadding();
-    window.addEventListener('resize', updateContentPadding);
+    window.addEventListener("resize", updateContentPadding);
 
     // Cleanup on unmount
     return () => {
-      window.removeEventListener('resize', updateContentPadding);
-      
+      window.removeEventListener("resize", updateContentPadding);
+
       // Reset padding when component unmounts
-      const exercisesContainer = document.querySelector('.exercises-container');
+      const exercisesContainer = document.querySelector(".exercises-container");
       if (exercisesContainer) {
-        exercisesContainer.style.paddingBottom = '';
+        exercisesContainer.style.paddingBottom = "";
       }
     };
   }, []);
 
   return (
     <div className="mobile-footer">
-      <Link to="/" className="footer-item">
+      <Link to="/user-home" className="footer-item">
         <svg
           xmlns="http://www.w3.org/2000/svg"
           viewBox="0 0 24 24"
@@ -64,7 +65,7 @@ const MobileFooter = () => {
         </svg>
         <span>Exercises</span>
       </Link>
-      <Link to="/workout" className="footer-item">
+      <Link to="/workouts" className="footer-item">
         <svg
           xmlns="http://www.w3.org/2000/svg"
           viewBox="0 0 24 24"
@@ -79,7 +80,7 @@ const MobileFooter = () => {
           <line x1="8" y1="2" x2="8" y2="6"></line>
           <line x1="3" y1="10" x2="21" y2="10"></line>
         </svg>
-        <span>Workout</span>
+        <span>Workouts</span>
       </Link>
       <Link to="/nutrition" className="footer-item">
         <svg

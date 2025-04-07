@@ -1,5 +1,5 @@
 import React from "react";
-import { Grid, Button, Typography, Box } from "@mui/material";
+import { Grid, Button, Typography, Box, Link } from "@mui/material";
 import { styled } from "@mui/material/styles";
 import { motion } from "framer-motion"; // For animations
 import FitnessCenterIcon from "@mui/icons-material/FitnessCenter";
@@ -34,22 +34,25 @@ function QuickActions() {
       label: "Workouts",
       icon: FitnessCenterIcon,
       gradient: "linear-gradient(135deg, #6366F1 0%, #8B5CF6 100%)",
+      path: "/workouts",
     },
-
     {
       label: "Exercises",
       icon: PoolIcon,
       gradient: "linear-gradient(135deg, #06B6D4 0%, #3B82F6 100%)",
+      path: "/exercises",
     },
     {
       label: "Log Nutrition",
       icon: RestaurantIcon,
       gradient: "linear-gradient(135deg, #10B981 0%, #3B82F6 100%)",
+      path: "/nutrition",
     },
     {
       label: "Log Sleep",
       icon: NightsStayIcon,
       gradient: "linear-gradient(135deg, #8B5CF6 0%, #EC4899 100%)",
+      path: "/sleep",
     },
   ];
 
@@ -66,38 +69,40 @@ function QuickActions() {
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.5, delay: index * 0.1 }}
           >
-            <SupremeButton
-              variant="contained"
-              gradient={action.gradient}
-              sx={{ padding: 2 }}
-            >
-              <Box
-                sx={{
-                  display: "flex",
-                  alignItems: "center",
-                  justifyContent: "center",
-                  mb: 1.5,
-                  background: "rgba(255, 255, 255, 0.15)",
-                  borderRadius: "50%",
-                  width: 40,
-                  height: 40,
-                }}
+            <Link href={action.path} sx={{ textDecoration: "none" }}>
+              <SupremeButton
+                variant="contained"
+                gradient={action.gradient}
+                sx={{ padding: 2 }}
               >
-                <action.icon sx={{ fontSize: 26, color: "#fff" }} />
-              </Box>
-              <Typography
-                variant="body1"
-                fontWeight={700}
-                sx={{
-                  color: "#fff",
-                  fontSize: { xs: 14, sm: 16 },
-                  letterSpacing: "0.5px",
-                  textShadow: "0px 2px 4px rgba(0, 0, 0, 0.2)",
-                }}
-              >
-                {action.label}
-              </Typography>
-            </SupremeButton>
+                <Box
+                  sx={{
+                    display: "flex",
+                    alignItems: "center",
+                    justifyContent: "center",
+                    mb: 1.5,
+                    background: "rgba(255, 255, 255, 0.15)",
+                    borderRadius: "50%",
+                    width: 40,
+                    height: 40,
+                  }}
+                >
+                  <action.icon sx={{ fontSize: 26, color: "#fff" }} />
+                </Box>
+                <Typography
+                  variant="body1"
+                  fontWeight={700}
+                  sx={{
+                    color: "#fff",
+                    fontSize: { xs: 14, sm: 16 },
+                    letterSpacing: "0.5px",
+                    textShadow: "0px 2px 4px rgba(0, 0, 0, 0.2)",
+                  }}
+                >
+                  {action.label}
+                </Typography>
+              </SupremeButton>
+            </Link>
           </motion.div>
         </Grid>
       ))}

@@ -6,7 +6,8 @@ import FilterModal from "./FilterModal";
 import CreateExerciseModal from "./CreateExerciseModal";
 import Navbar from "./Navbar";
 import MobileFooter from "./MobileFooter";
-
+import UserHeader from "../components/userPage/dashboard/ProfileHeader";
+import QuickActions from "./userPage/dashboard/QuickActions";
 const bodyParts = [
   { name: "Favorites", icon: "favorites" },
   { name: "Cardio", icon: "cardio" },
@@ -222,7 +223,7 @@ const Exercises = () => {
     setSelectedExercise(exercise);
     setDetailsOpen(true);
     setInstructionsOpen(false);
-    
+
     // Simulate loading time (remove this in production if using real API loading)
     setTimeout(() => {
       setModalLoading(false);
@@ -256,14 +257,22 @@ const Exercises = () => {
 
   return (
     <>
-      <Navbar />
       <div
         style={{
           minHeight: "100vh",
           background: "linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%)",
-          paddingTop: "80px", // Matches navbar height
         }}
       >
+        <div
+          style={{
+            maxWidth: "1300px",
+            margin: "0 auto",
+            padding: "20px",
+          }}
+        >
+          <UserHeader />
+          <QuickActions />
+        </div>
         <div className="exercises-container">
           {/* Search Bar */}
           <div className="search-container">
@@ -302,7 +311,8 @@ const Exercises = () => {
                   key={part.name}
                   onClick={() => handleBodyPartClick(part.name)}
                   className={`body-part-item ${
-                    (part.name === "Favorites" && filterOptions.showFavorites) ||
+                    (part.name === "Favorites" &&
+                      filterOptions.showFavorites) ||
                     bodyPart === part.name.toLowerCase()
                       ? "active"
                       : ""
@@ -461,7 +471,7 @@ const Exercises = () => {
                             <div className="skeleton-detail-row"></div>
                           </div>
                         </div>
-                        
+
                         <div className="skeleton-section">
                           <div className="skeleton-section-header"></div>
                           <div className="skeleton-instructions">
@@ -537,7 +547,9 @@ const Exercises = () => {
                           <div className="info-section instructions-section">
                             <div
                               className="section-header"
-                              onClick={() => setInstructionsOpen(!instructionsOpen)}
+                              onClick={() =>
+                                setInstructionsOpen(!instructionsOpen)
+                              }
                             >
                               <h3>Instructions</h3>
                               <svg

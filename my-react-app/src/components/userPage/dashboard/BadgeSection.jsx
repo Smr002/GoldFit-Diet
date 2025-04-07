@@ -5,68 +5,62 @@ import {
   Paper,
   Grid,
   CircularProgress,
-  useTheme, // Import useTheme to access theme properties
+  useTheme,
 } from "@mui/material";
 import EmojiEventsIcon from "@mui/icons-material/EmojiEvents";
 import StarIcon from "@mui/icons-material/Star";
 import MilitaryTechIcon from "@mui/icons-material/MilitaryTech";
 import WorkspacePremiumIcon from "@mui/icons-material/WorkspacePremium";
 
-// Helper function to lighten/darken colors (optional, but can be useful)
-// You might need a library like `polished` or write a simple version
-// For simplicity, we'll stick to MUI's theme or hardcoded values here.
-
 function BadgeSection() {
-  const theme = useTheme(); // Access the theme
+  const theme = useTheme();
 
-  // Mock data - Added descriptive text
   const badges = [
     {
       name: "7-Day Streak",
       description: "Completed workouts 7 days in a row!",
       icon: EmojiEventsIcon,
       earned: true,
-      color: "#FFC107", // Brighter Gold
+      color: "#FFC107",
     },
     {
       name: "5 Workouts",
       description: "Logged your first 5 workouts.",
       icon: MilitaryTechIcon,
       earned: true,
-      color: "#673AB7", // Deep Purple
+      color: "#673AB7",
     },
     {
       name: "Weight Goal",
       description: "Reach your target weight.",
       icon: StarIcon,
       earned: false,
-      progress: 65, // Changed progress for variety
-      color: "#009688", // Teal
+      progress: 65,
+      color: "#009688",
     },
-    // Add more badges if needed
     {
       name: "Perfect Month",
       description: "Workout every scheduled day in a month.",
-      icon: WorkspacePremiumIcon, // Re-using icon for example
+      icon: WorkspacePremiumIcon,
       earned: false,
       progress: 15,
-      color: "#E91E63", // Pink
+      color: "#E91E63",
     },
   ];
 
-  const badgeSize = { xs: 60, sm: 70, md: 80 }; // Centralized size control
-  const iconSize = { xs: "2rem", sm: "2.2rem", md: "2.5rem" }; // Centralized icon size
+  const badgeSize = { xs: 60, sm: 70, md: 80 };
+  const iconSize = { xs: "2rem", sm: "2.2rem", md: "2.5rem" };
 
   return (
     <Paper
-      elevation={4} // Slightly more pronounced elevation
+      elevation={4}
       sx={{
-        p: { xs: 2, sm: 3 }, // Responsive padding
+        p: { xs: 2, sm: 3 },
         height: "100%",
-        borderRadius: 4, // Softer corners
-        boxShadow: "0px 10px 30px -5px rgba(100, 100, 150, 0.15)", // Softer, deeper shadow
-        background: `linear-gradient(135deg, ${theme.palette.grey[50]} 0%, ${theme.palette.grey[100]} 100%)`, // Subtle gradient using theme colors
-        overflow: "hidden", // Ensure nothing spills out
+        borderRadius: 4,
+        boxShadow: "0px 10px 30px -5px rgba(100, 100, 150, 0.15)",
+        background: `linear-gradient(135deg, ${theme.palette.grey[50]} 0%, ${theme.palette.grey[100]} 100%)`,
+        overflow: "hidden",
       }}
     >
       <Box
@@ -74,45 +68,30 @@ function BadgeSection() {
           display: "flex",
           alignItems: "center",
           justifyContent: "space-between",
-          mb: 3.5, // Increased margin bottom
-          px: 1, // Add some horizontal padding
+          mb: 3.5,
+          px: 1,
         }}
       >
         <Box sx={{ display: "flex", alignItems: "center", gap: 1.5 }}>
           <WorkspacePremiumIcon
-            sx={{
-              fontSize: 36,
-              color: theme.palette.primary.main,
-              filter: "drop-shadow(0px 2px 4px rgba(0, 0, 0, 0.2))",
-            }}
+            fontSize="large"
+            sx={{ color: theme.palette.primary.main }}
           />
-          <Typography
-            variant="h4"
-            fontWeight={700}
-            sx={{
-              background: `linear-gradient(90deg, ${theme.palette.primary.main}, ${theme.palette.secondary.main})`,
-              WebkitBackgroundClip: "text",
-              WebkitTextFillColor: "transparent",
-              letterSpacing: "0.5px",
-            }}
-          >
+          <Typography variant="h5" fontWeight={700} color="text.primary">
             Your Achievements
           </Typography>
         </Box>
-        {/* Optional: Add a "View All" link or button here */}
       </Box>
 
       <Grid container spacing={{ xs: 2, sm: 3 }}>
-        {" "}
-        {/* Responsive spacing */}
         {badges.map((badge, index) => (
           <Grid
             item
-            xs={6} // Show 2 badges per row on extra-small screens
-            sm={6} // Show 2 badges per row on small screens
-            md={3} // Show 4 badges per row on medium screens and up
-            key={badge.name + index} // Use index if names aren't unique
-            sx={{ display: "flex", justifyContent: "center" }} // Center grid item content
+            xs={6}
+            sm={6}
+            md={3}
+            key={badge.name + index}
+            sx={{ display: "flex", justifyContent: "center" }}
           >
             <Box
               sx={{
@@ -121,39 +100,38 @@ function BadgeSection() {
                 alignItems: "center",
                 textAlign: "center",
                 gap: 1,
-                p: { xs: 1, sm: 1.5 }, // Responsive padding
-                borderRadius: 3, // Consistent rounding
-                width: "100%", // Take full width of grid item
-                maxWidth: 180, // Max width for very large screens
+                p: { xs: 1, sm: 1.5 },
+                borderRadius: 3,
+                width: "100%",
+                maxWidth: 180,
                 transition:
                   "transform 0.3s ease-in-out, box-shadow 0.3s ease-in-out",
-                position: "relative", // Needed for potential future absolute elements
-                border: `1px solid ${theme.palette.divider}`, // Subtle border
+                position: "relative",
+                border: `1px solid ${theme.palette.divider}`,
                 backgroundColor: badge.earned
                   ? "transparent"
-                  : theme.palette.action.hover, // Different bg for unearned
-                opacity: badge.earned ? 1 : 0.8, // Slightly fade unearned
+                  : theme.palette.action.hover,
+                opacity: badge.earned ? 1 : 0.8,
                 "&:hover": {
-                  transform: "translateY(-4px) scale(1.03)", // More noticeable hover lift + scale
+                  transform: "translateY(-4px) scale(1.03)",
                   boxShadow: `0px 8px 20px -2px ${
                     badge.earned ? `${badge.color}30` : "rgba(0,0,0,0.1)"
-                  }`, // Dynamic shadow on hover
+                  }`,
                   border: `1px solid ${
                     badge.earned ? badge.color : theme.palette.grey[400]
                   }`,
                 },
               }}
             >
-              {/* Icon Container with Circular Progress */}
               <Box
                 sx={{
-                  position: "relative", // Needed for positioning progress and icon
+                  position: "relative",
                   width: badgeSize,
                   height: badgeSize,
                   display: "flex",
                   alignItems: "center",
                   justifyContent: "center",
-                  mb: 1, // Margin below icon circle
+                  mb: 1,
                 }}
               >
                 {!badge.earned && (
@@ -219,7 +197,7 @@ function BadgeSection() {
                 fontWeight={badge.earned ? 600 : 500}
                 color={badge.earned ? "text.primary" : "text.secondary"}
                 sx={{
-                  lineHeight: 1.3, // Adjust line height
+                  lineHeight: 1.3,
                   fontSize: { xs: "0.85rem", sm: "0.95rem" },
                 }}
               >

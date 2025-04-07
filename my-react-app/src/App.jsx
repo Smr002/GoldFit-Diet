@@ -27,8 +27,8 @@ const ProtectedRoute = ({ children }) => {
 const routes = {
   public: [
     { path: "/", element: (props) => <HomePage {...props} /> },
-    { path: "/create-account/*", element: <CreateAccount /> },
-    { path: "/exercises", element: <Exercises /> },
+    { path: "/create-account/*", element: <CreateAccount />, protected: true },
+    { path: "/exercises", element: <Exercises />, protected: true },
   ],
   protected: [
     { path: "/user-home", element: <UserHomePage /> },
@@ -50,22 +50,26 @@ export default function App() {
     <BrowserRouter>
       <Routes>
         {/* Public Routes */}
-        {routes.public.map(({ path, element: Element }) => (
-          <Route
-            key={path}
-            path={path}
-            element={
-              path === "/" ? (
-                <Element
-                  isModalOpen={isModalOpen}
-                  setModalOpen={setModalOpen}
-                />
-              ) : (
-                Element
-              )
-            }
-          />
-        ))}
+        {routes.public.map(
+          ({ path, element: Element, protected: isProtected }) => (
+            <Route
+              key={path}
+              path={path}
+              element={
+                path === "/" ? (
+                  <Element
+                    isModalOpen={isModalOpen}
+                    setModalOpen={setModalOpen}
+                  />
+                ) : isProtected ? (
+                  <ProtectedRoute>{Element}</ProtectedRoute>
+                ) : (
+                  Element
+                )
+              }
+            />
+          )
+        )}
 
         {/* Protected Routes */}
         {routes.protected.map(({ path, element: Element }) => (
@@ -77,7 +81,14 @@ export default function App() {
         ))}
 
         {/* Admin Routes */}
-        <Route path="/admin" element={<AdminLayout />}>
+        <Route
+          path="/admin"
+          element={
+            <ProtectedRoute>
+              <AdminLayout />
+            </ProtectedRoute>
+          }
+        >
           <Route index element={<Navigate to="/admin/dashboard" replace />} />
           {routes.admin.map(({ path, element: Element }) => (
             <Route key={path} path={path} element={Element} />

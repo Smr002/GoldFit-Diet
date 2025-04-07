@@ -66,9 +66,10 @@ function ProfileHeader() {
   }, []);
 
   const handleSignOut = () => {
-    localStorage.removeItem("token");
-    localStorage.removeItem("user");
-    navigate("/");
+    // Clear all user related data
+    localStorage.clear();
+    // Navigate to home page
+    navigate("/", { replace: true });
   };
 
   const handleOpenDialog = () => {
@@ -77,6 +78,10 @@ function ProfileHeader() {
 
   const handleCloseDialog = () => {
     setOpenDialog(false);
+  };
+
+  const handleProfileClick = () => {
+    navigate("/user-home");
   };
 
   const userData = {
@@ -144,12 +149,14 @@ function ProfileHeader() {
             <Avatar
               src={userData.profileImage}
               alt="Profile"
+              onClick={handleProfileClick}
               sx={{
                 width: 90,
                 height: 90,
                 border: `4px solid ${theme.palette.background.paper}`,
                 position: "relative",
                 zIndex: 1,
+                cursor: "pointer",
               }}
               onError={(e) => {
                 console.log("Avatar failed to load:", userData.profileImage);
