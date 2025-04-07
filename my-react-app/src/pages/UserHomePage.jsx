@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState, useEffect } from "react";
 import {
   Container,
   Grid,
@@ -7,6 +7,11 @@ import {
   ThemeProvider,
   createTheme,
   useMediaQuery,
+  Dialog,
+  DialogContent,
+  DialogTitle,
+  Typography,
+  Fade,
 } from "@mui/material";
 
 import ProfileHeader from "../components/userPage/dashboard/ProfileHeader";
@@ -65,13 +70,97 @@ const theme = createTheme({
 });
 
 const userHomePage = () => {
-  // eslint-disable-next-line react-hooks/rules-of-hooks
+  const [showWelcomeModal, setShowWelcomeModal] = useState(false);
+  const [userName, setUserName] = useState("");
   const isMobileOrTablet = useMediaQuery("(max-width:1024px)");
+
+  useEffect(() => {
+    const isJustLoggedIn = true; // Temporary for testing
+    const user = JSON.parse(localStorage.getItem("user") || "{}");
+    const token = localStorage.getItem("token");
+
+    if (token) {
+      let name = "User";
+      if (user?.displayName) {
+        name = user.displayName;
+      } else if (user?.email) {
+        name = user.email.split("@")[0];
+      } else if (token) {
+        try {
+          const payload = JSON.parse(atob(token.split(".")[1]));
+          name = payload.firstName || payload.username || "User";
+        } catch (error) {
+          console.error("Error decoding token:", error);
+        }
+      }
+      setUserName(name);
+      setShowWelcomeModal(true);
+
+      // Auto close after 3 seconds
+      setTimeout(() => {
+        setShowWelcomeModal(false);
+      }, 3000);
+    }
+  }, []);
 
   return (
     <ThemeProvider theme={theme}>
       <CssBaseline />
       <Container maxWidth="lg" sx={{ py: 4 }}>
+        {/* Welcome Modal */}
+        <Dialog
+          open={showWelcomeModal}
+          onClose={() => setShowWelcomeModal(false)}
+          TransitionComponent={Fade}
+          TransitionProps={{ timeout: 600 }}
+          PaperProps={{
+            sx: {
+              minWidth: { xs: "80%", sm: "400px" },
+              p: 2,
+              background:
+                theme.palette.mode === "dark"
+                  ? "linear-gradient(145deg, #2d2d2d 0%, #1a1a1a 100%)"
+                  : "linear-gradient(145deg, #ffffff 0%, #f5f5f5 100%)",
+              boxShadow: "0 8px 32px rgba(0, 0, 0, 0.2)",
+            },
+          }}
+          BackdropProps={{
+            sx: {
+              backgroundColor: "rgba(0, 0, 0, 0.7)",
+              backdropFilter: "blur(4px)",
+            },
+          }}
+        >
+          <DialogTitle sx={{ textAlign: "center", pb: 0 }}>
+            <Typography
+              variant="h4"
+              component="div"
+              sx={{
+                fontWeight: "bold",
+                background: `linear-gradient(45deg, ${theme.palette.primary.main}, ${theme.palette.secondary.main})`,
+                backgroundClip: "text",
+                WebkitBackgroundClip: "text",
+                WebkitTextFillColor: "transparent",
+                mb: 1,
+              }}
+            >
+              Welcome back!
+            </Typography>
+          </DialogTitle>
+          <DialogContent>
+            <Typography
+              variant="h6"
+              sx={{
+                textAlign: "center",
+                my: 2,
+                animation: "fadeIn 0.5s ease-in",
+              }}
+            >
+              Great to see you again, {userName}! 🎉
+            </Typography>
+          </DialogContent>
+        </Dialog>
+
         <Box sx={{ minHeight: "100vh" }}>
           {/* Profile Header with welcome message */}
           <ProfileHeader />

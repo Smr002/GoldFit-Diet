@@ -42,7 +42,6 @@ function ProfileHeader() {
     } else if (token) {
       try {
         const payload = JSON.parse(atob(token.split(".")[1]));
-        console.log("Token payload:", payload);
         setUserName(payload.firstName || payload.username || "User");
       } catch (error) {
         console.error("Error decoding token:", error);
