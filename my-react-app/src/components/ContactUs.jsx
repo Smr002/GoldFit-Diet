@@ -69,7 +69,7 @@ const ContactUs = () => {
           <div className="contact-info">
             <h3>Get in Touch</h3>
 
-            <div className="info-item">
+            <div className="info-item visible">
               <div className="info-icon">
                 <svg
                   xmlns="http://www.w3.org/2000/svg"
@@ -97,7 +97,7 @@ const ContactUs = () => {
               </div>
             </div>
 
-            <div className="info-item">
+            <div className="info-item visible">
               <div className="info-icon">
                 <svg
                   xmlns="http://www.w3.org/2000/svg"
@@ -119,7 +119,7 @@ const ContactUs = () => {
               </div>
             </div>
 
-            <div className="info-item">
+            <div className="info-item visible">
               <div className="info-icon">
                 <svg
                   xmlns="http://www.w3.org/2000/svg"
@@ -141,7 +141,7 @@ const ContactUs = () => {
               </div>
             </div>
 
-            <div className="info-item">
+            <div className="info-item visible">
               <div className="info-icon">
                 <svg
                   xmlns="http://www.w3.org/2000/svg"
