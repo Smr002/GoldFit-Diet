@@ -1,8 +1,11 @@
 import React, { useState, useRef, useEffect } from 'react';
-import { Bell, User, ChevronDown } from 'lucide-react';
+import { Bell, UserCircle, ChevronDown } from 'lucide-react';
+import { Link } from 'react-router-dom';
 import 'admin.css';
+// Import the default profile picture
+import defaultProfilePic from '../../assets/pfp.jpg';
 
-const Header = ({ username = "Admin User", userRole = "Administrator" }) => {
+const Header = ({ username = "Admin User", userRole = "Administrator", userAvatar = null }) => {
   const [showDropdown, setShowDropdown] = useState(false);
   const dropdownRef = useRef(null);
 
@@ -19,13 +22,9 @@ const Header = ({ username = "Admin User", userRole = "Administrator" }) => {
   return (
     <header className="admin-header">
       <div className="admin-header-content">
-        
         <div className="admin-header-actions">
           {/* Notification Bell */}
-          <button className="admin-notification-btn">
-            <Bell size={20} />
-            <span className="admin-notification-badge"></span>
-          </button>
+          
 
           {/* User Dropdown */}
           <div className="admin-dropdown" ref={dropdownRef}>
@@ -35,9 +34,10 @@ const Header = ({ username = "Admin User", userRole = "Administrator" }) => {
             >
               <div className="admin-avatar">
                 <img
-                  src="https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=facearea&facepad=2&w=256&h=256&q=80"
-                  alt="Admin Avatar"
+                  src={userAvatar || defaultProfilePic}
+                  alt={username}
                   className="admin-avatar-img"
+                  loading="eager" // Force eager loading
                 />
               </div>
               <div className="admin-user-info">
@@ -49,10 +49,21 @@ const Header = ({ username = "Admin User", userRole = "Administrator" }) => {
 
             {showDropdown && (
               <div className="admin-dropdown-menu">
-                <a href="#" className="admin-dropdown-item">Your Profile</a>
-                <a href="#" className="admin-dropdown-item">Settings</a>
+                <Link 
+                  to="/admin/profile" 
+                  className="admin-dropdown-item"
+                  onClick={() => setShowDropdown(false)}
+                >
+                  Your Profile
+                </Link>
                 <div className="admin-dropdown-divider"></div>
-                <a href="#" className="admin-dropdown-item">Sign out</a>
+                <Link 
+                  to="/logout" 
+                  className="admin-dropdown-item"
+                  onClick={() => setShowDropdown(false)}
+                >
+                  Sign out
+                </Link>
               </div>
             )}
           </div>

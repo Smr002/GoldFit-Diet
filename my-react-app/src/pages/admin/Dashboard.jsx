@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Users, Dumbbell, Bell, Crown, UserPlus } from 'lucide-react';
 import { LineChart, Line, BarChart, Bar, PieChart, Pie, Cell, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, Legend } from 'recharts';
 import 'admin.css';
@@ -19,6 +19,11 @@ const DashboardCard = ({ title, value, icon: Icon, description }) => (
 const Dashboard = () => {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [selectedUser, setSelectedUser] = useState(null);
+  const [isDeleteConfirmOpen, setIsDeleteConfirmOpen] = useState(false);
+  const [isPromoteConfirmOpen, setIsPromoteConfirmOpen] = useState(false);
+  const [modalLeavingClass, setModalLeavingClass] = useState('');
+  const [deleteModalLeavingClass, setDeleteModalLeavingClass] = useState('');
+  const [promoteModalLeavingClass, setPromoteModalLeavingClass] = useState('');
 
   const openModal = (user) => {
     setSelectedUser(user);
@@ -26,8 +31,12 @@ const Dashboard = () => {
   };
 
   const closeModal = () => {
-    setSelectedUser(null);
-    setIsModalOpen(false);
+    setModalLeavingClass('leaving');
+    setTimeout(() => {
+      setSelectedUser(null);
+      setIsModalOpen(false);
+      setModalLeavingClass('');
+    }, 300); // Match this with animation duration
   };
 
   const handleDeleteUser = () => {
@@ -44,6 +53,105 @@ const Dashboard = () => {
     console.log(`Promoting user: ${selectedUser.firstName} ${selectedUser.lastName} to admin`);
     closeModal();
   };
+
+  const handleDeleteClick = () => {
+    // Store a reference to the current user before closing the modal
+    const currentUser = selectedUser;
+    
+    setModalLeavingClass('leaving');
+    setTimeout(() => {
+      setIsModalOpen(false);
+      setModalLeavingClass('');
+      
+      // Use the stored reference to ensure we still have the user data
+      if (currentUser) {
+        setSelectedUser(currentUser);
+        setIsDeleteConfirmOpen(true);
+      }
+    }, 300);
+  };
+
+  const handlePromoteClick = () => {
+    // Store a reference to the current user before closing the modal
+    const currentUser = selectedUser;
+    
+    setModalLeavingClass('leaving');
+    setTimeout(() => {
+      setIsModalOpen(false);
+      setModalLeavingClass('');
+      
+      // Use the stored reference to ensure we still have the user data
+      if (currentUser) {
+        setSelectedUser(currentUser);
+        setIsPromoteConfirmOpen(true);
+      }
+    }, 300);
+  };
+
+  const handleDeleteConfirm = () => {
+    setDeleteModalLeavingClass('leaving');
+    setTimeout(() => {
+      console.log(`Deleting user: ${selectedUser.firstName} ${selectedUser.lastName}`);
+      setIsDeleteConfirmOpen(false);
+      setDeleteModalLeavingClass('');
+      setSelectedUser(null);
+    }, 300);
+  };
+
+  const handlePromoteConfirm = () => {
+    setPromoteModalLeavingClass('leaving');
+    setTimeout(() => {
+      console.log(`Promoting user: ${selectedUser.firstName} ${selectedUser.lastName} to admin`);
+      setIsPromoteConfirmOpen(false);
+      setPromoteModalLeavingClass('');
+      setSelectedUser(null);
+    }, 300);
+  };
+
+  // Update the closeDeleteConfirm function
+  const closeDeleteConfirm = () => {
+    setDeleteModalLeavingClass('leaving');
+    setTimeout(() => {
+      setIsDeleteConfirmOpen(false);
+      setDeleteModalLeavingClass('');
+      
+      // Add a small delay before reopening the user modal
+      // This prevents state conflicts during transitions
+      if (selectedUser) {
+        setTimeout(() => {
+          setIsModalOpen(true);
+        }, 50);
+      }
+    }, 300);
+  };
+
+  // Similarly update the closePromoteConfirm function
+  const closePromoteConfirm = () => {
+    setPromoteModalLeavingClass('leaving');
+    setTimeout(() => {
+      setIsPromoteConfirmOpen(false);
+      setPromoteModalLeavingClass('');
+      
+      // Add a small delay before reopening the user modal
+      if (selectedUser) {
+        setTimeout(() => {
+          setIsModalOpen(true);
+        }, 50);
+      }
+    }, 300);
+  };
+
+  useEffect(() => {
+    let timeout;
+    if (isModalOpen || isDeleteConfirmOpen || isPromoteConfirmOpen) {
+      timeout = setTimeout(() => {
+        const overlays = document.querySelectorAll('.modal-overlay');
+        overlays.forEach(overlay => overlay.classList.add('active'));
+      }, 10);
+    }
+    
+    return () => clearTimeout(timeout);
+  }, [isModalOpen, isDeleteConfirmOpen, isPromoteConfirmOpen]);
 
   const stats = {
     totalUsers: 150,
@@ -167,6 +275,18 @@ const Dashboard = () => {
       isPremium: true }
   ];
 
+  // Add this function to your component
+  const closeModalWithAnimation = (setModalState) => {
+    // First add the leaving class
+    document.querySelector('.modal-overlay').classList.add('leaving');
+    document.querySelector('.modal').classList.add('leaving');
+    
+    // After animation completes, close the modal
+    setTimeout(() => {
+      setModalState(false);
+    }, 300); // Match this with your animation duration
+  };
+
   return (
     <div className="admin-page">
       <div className="admin-page-header">
@@ -286,8 +406,8 @@ const Dashboard = () => {
       </div>
 
       {isModalOpen && (
-        <div className="modal-overlay">
-          <div className="modal">
+        <div className={`modal-overlay ${modalLeavingClass}`}>
+          <div className={`modal ${modalLeavingClass}`}>
             <button className="modal-close-btn" onClick={closeModal}>
               &times;
             </button>
@@ -334,10 +454,68 @@ const Dashboard = () => {
               </p>
             </div>
             <div className="modal-actions">
-              <button onClick={handleDeleteUser} className="delete-btn">
+              <button onClick={handleDeleteClick} className="delete-btn">
                 Delete User
               </button>
-              <button onClick={handlePromoteToAdmin} className="promote-btn">
+              <button onClick={handlePromoteClick} className="promote-btn">
+                Promote to Admin
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Delete Confirmation Modal */}
+      {isDeleteConfirmOpen && selectedUser && (
+        <div className={`modal-overlay ${deleteModalLeavingClass}`}>
+          <div className={`modal confirmation-modal ${deleteModalLeavingClass}`}>
+            <h2>Confirm Delete</h2>
+            <p>
+              Are you sure you want to delete this user?<br />
+              <strong className="delete-emphasis">{selectedUser.firstName} {selectedUser.lastName} ({selectedUser.email})</strong>
+              <br />
+              This action cannot be undone.
+            </p>
+            <div className="modal-actions">
+              <button 
+                onClick={() => closeModalWithAnimation(setIsDeleteConfirmOpen)} 
+                className="cancel-btn"
+              >
+                Cancel
+              </button>
+              <button 
+                onClick={handleDeleteConfirm} 
+                className="delete-btn"
+              >
+                Delete User
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Promote Confirmation Modal */}
+      {isPromoteConfirmOpen && selectedUser && (
+        <div className={`modal-overlay ${promoteModalLeavingClass}`}>
+          <div className={`modal confirmation-modal ${promoteModalLeavingClass}`}>
+            <h2>Confirm Promotion</h2>
+            <p>
+              Are you sure you want to promote this user to an admin?<br />
+              <strong className="promote-emphasis">{selectedUser.firstName} {selectedUser.lastName} ({selectedUser.email})</strong>
+              <br />
+              They will have access to the admin dashboard and permissions according to their assigned role.
+            </p>
+            <div className="modal-actions">
+              <button 
+                onClick={() => closeModalWithAnimation(setIsPromoteConfirmOpen)} 
+                className="cancel-btn"
+              >
+                Cancel
+              </button>
+              <button 
+                onClick={handlePromoteConfirm} 
+                className="promote-btn"
+              >
                 Promote to Admin
               </button>
             </div>

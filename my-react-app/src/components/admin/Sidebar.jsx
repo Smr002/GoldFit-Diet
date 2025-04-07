@@ -2,9 +2,11 @@ import React from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import { 
   Users, Dumbbell, Bell, MessageSquare, UserPlus, 
-  Settings, Home, LogOut, ChevronLeft, ChevronRight
+  UserCircle, Home, LogOut, ChevronLeft
 } from 'lucide-react';
 import 'admin.css';
+// Import the logo
+import goldFitLogo from '../../assets/goldfitlogo.png';
 
 const Sidebar = ({ isSuperAdmin, collapsed, toggleCollapse }) => {
   const location = useLocation();
@@ -43,38 +45,35 @@ const Sidebar = ({ isSuperAdmin, collapsed, toggleCollapse }) => {
       icon: UserPlus 
     },
     { 
-          path: '/admin/settings', 
-          name: 'Settings', 
-          icon: Settings 
-        }
+      path: '/admin/profile', 
+      name: 'Profile', 
+      icon: UserCircle 
+    }
   ];
-  
-  // const superAdminItems = [
-  //   { 
-  //     path: '/admin/admin-management', 
-  //     name: 'Admin Management', 
-  //     icon: UserPlus 
-  //   },
-  //   { 
-  //     path: '/admin/settings', 
-  //     name: 'Settings', 
-  //     icon: Settings 
-  //   }
-  // ];
 
   return (
     <div className={`admin-sidebar ${collapsed ? 'collapsed' : ''}`}>
       <div className="admin-sidebar-header">
-        {!collapsed && (
-          <span className="admin-sidebar-logo">GoldFit&Diet Admin</span>
+        {collapsed ? (
+          <div 
+            className="admin-sidebar-logo-small clickable" 
+            onClick={toggleCollapse}
+            title="Expand sidebar"
+          >
+            <img src={goldFitLogo} alt="GoldFit Diet Logo" />
+          </div>
+        ) : (
+          <>
+            <span className="admin-sidebar-logo">GoldFit&Diet Admin</span>
+            <button 
+              className="admin-sidebar-toggle"
+              onClick={toggleCollapse}
+              aria-label="Collapse sidebar"
+            >
+              <ChevronLeft size={20} />
+            </button>
+          </>
         )}
-        <button 
-          className="admin-sidebar-toggle"
-          onClick={toggleCollapse}
-          aria-label={collapsed ? "Expand sidebar" : "Collapse sidebar"}
-        >
-          {collapsed ? <ChevronRight size={20} /> : <ChevronLeft size={20} />}
-        </button>
       </div>
       
       <nav className="admin-flex-1">
@@ -88,37 +87,19 @@ const Sidebar = ({ isSuperAdmin, collapsed, toggleCollapse }) => {
             {!collapsed && <span>{item.name}</span>}
           </Link>
         ))}
-
-        {/* {isSuperAdmin && (
-          <>
-            {!collapsed && (
-              <div className="admin-nav-section-title">
-                Super Admin
-              </div>
-            )}
-            {superAdminItems.map((item) => (
-              <Link
-                key={item.path}
-                to={item.path}
-                className={`admin-nav-item ${isActive(item.path) ? 'active' : ''}`}
-              >
-                <item.icon className="admin-nav-icon" size={collapsed ? 24 : 20} />
-                {!collapsed && <span>{item.name}</span>}
-              </Link>
-            ))}
-          </>
-        )} */}
-      </nav>
-      
-      <div className="admin-sidebar-footer">
+        
+        {/* Spacer div for extra padding */}
+        <div className="sidebar-spacer"></div>
+        
+        {/* Logout link as part of the main navigation */}
         <Link 
           to="/logout" 
-          className="admin-nav-item"
+          className="admin-nav-item logout-item"
         >
           <LogOut className="admin-nav-icon" size={collapsed ? 28 : 24} />
           {!collapsed && <span>Logout</span>}
         </Link>
-      </div>
+      </nav>
     </div>
   );
 };
