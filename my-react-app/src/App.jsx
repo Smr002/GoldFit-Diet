@@ -5,6 +5,7 @@ import AccModal from "../src/components/AccModal";
 import CreateAccount from "./pages/CreateAccount";
 import Exercises from "./components/Exercises";
 import UserHomePage from "./pages/UserHomePage";
+import NutritionPage from "./pages/NutritionPage"; // Add this import
 
 // Admin imports
 import AdminLayout from "./components/admin/AdminLayout";
@@ -16,7 +17,6 @@ import FAQManagement from "./pages/admin/FAQManagement";
 import AdminManagement from "./pages/admin/AdminManagement";
 import Workout from "./components/UserWorkout";
 import AdminProfile from './pages/admin/AdminProfile';
-
 
 const ProtectedRoute = ({ children }) => {
   const token = localStorage.getItem("token");
@@ -35,6 +35,7 @@ const routes = {
   protected: [
     { path: "/user-home", element: <UserHomePage /> },
     { path: "/workouts", element: <Workout /> },
+    { path: "/nutrition", element: <NutritionPage /> }, // Add this route
   ],
   admin: [
     { path: "dashboard", element: <Dashboard /> },
