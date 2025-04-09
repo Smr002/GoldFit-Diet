@@ -8,6 +8,7 @@ import { authenticateJWT } from "./auth/JWT/authMiddleware";
 import workoutRouter from "./workout/workoutRouter";
 import exerciseRouter from "./exercise/exerciseRouter";
 import nutritionRouter from './nutrition/nutritionRouter';
+import adminRoutes from './admin/adminRoutes';
 
 dotenv.config();
 
@@ -27,6 +28,8 @@ app.use("/users", userRoutes);
 app.use("/workouts", workoutRouter);
 app.use("/exercises", exerciseRouter);
 app.use("/nutrition", nutritionRouter);
+app.use("/admin", adminRoutes);
+
 app.use((req, res) => {
   res.status(404).json({ error: "Not found" });
 });
