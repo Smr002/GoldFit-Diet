@@ -7,14 +7,22 @@ import {
   Tooltip, 
   IconButton, 
   Fade,
-  Zoom
+  Zoom,
+  Divider
 } from '@mui/material';
 import InfoOutlinedIcon from '@mui/icons-material/InfoOutlined';
+import WeeklyCalorieChart from './WeeklyCalorieChart';
 
-const CalorieTracker = ({ caloriesConsumed, calorieTarget }) => {
+const CalorieTracker = ({ caloriesConsumed, calorieTarget, weeklyData }) => {
   // Animation states
   const [animateProgress, setAnimateProgress] = useState(0);
   const [showContent, setShowContent] = useState(false);
+  
+  // Default weekly data if none provided
+  const defaultWeeklyData = [1550, 1720, 1840, 1650, 2100, 1790, caloriesConsumed];
+  
+  // Use provided data or default
+  const weeklyCalorieData = weeklyData || defaultWeeklyData;
   
   // Calculate percentage, capped at 100 for the progress bar
   const percentage = Math.min(Math.round((caloriesConsumed / calorieTarget) * 100), 100);
@@ -48,13 +56,22 @@ const CalorieTracker = ({ caloriesConsumed, calorieTarget }) => {
           p: 3,
           borderRadius: 2,
           bgcolor: 'white',
-          transition: 'transform 0.3s ease-in-out, box-shadow 0.3s ease-in-out',
+          // Removed hover transform animation that made it pop up
+          transition: 'box-shadow 0.3s ease-in-out',
           '&:hover': {
-            transform: 'translateY(-4px)',
             boxShadow: '0 8px 16px rgba(0,0,0,0.1)'
           }
         }}
       >
+        {/* Weekly Chart Section */}
+        <WeeklyCalorieChart 
+          calorieData={weeklyCalorieData} 
+          calorieTarget={calorieTarget} 
+        />
+        
+        <Divider sx={{ my: 2 }} />
+        
+        {/* Today's Calorie Section */}
         <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', mb: 2 }}>
           <Zoom in={showContent} timeout={800}>
             <Box>
@@ -101,7 +118,7 @@ const CalorieTracker = ({ caloriesConsumed, calorieTarget }) => {
                   }
                 }}
               >
-                Target: {calorieTarget}
+                Today's Target: {calorieTarget}
               </Typography>
             </Box>
           </Zoom>
@@ -130,6 +147,7 @@ const CalorieTracker = ({ caloriesConsumed, calorieTarget }) => {
                 <IconButton 
                   size="small" 
                   sx={{
+                    color: '#4caf50', // Using the same green color
                     animation: 'pulse 2s infinite',
                     '@keyframes pulse': {
                       '0%': { transform: 'scale(1)' },
