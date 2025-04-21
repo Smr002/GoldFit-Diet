@@ -162,27 +162,28 @@ const WeeklyCalorieChart = ({ calorieData, calorieTarget }) => {
                 <Box
                   sx={{ 
                     position: 'absolute',
-                    top: -24,
+                    top: -28, // Moved closer to the bar (changed from -35)
                     left: '50%',
                     transform: 'translateX(-50%)',
                     bgcolor: getBarColor(calorieData[index]),
                     color: 'white',
-                    px: 1,
-                    py: 0.2,
-                    borderRadius: 1,
-                    boxShadow: '0 2px 4px rgba(0,0,0,0.2)',
+                    px: 1.5,
+                    py: 0.5,
+                    borderRadius: 1.5,
+                    boxShadow: '0 2px 6px rgba(0,0,0,0.25)',
                     zIndex: 10,
-                    minWidth: '60px',
+                    minWidth: '70px',
                     textAlign: 'center',
                     fontSize: '0.75rem',
                     fontWeight: 'bold',
+                    whiteSpace: 'nowrap',
                     '&::after': {
                       content: '""',
                       position: 'absolute',
                       top: '100%',
                       left: '50%',
                       transform: 'translateX(-50%)',
-                      borderWidth: '4px',
+                      borderWidth: '5px',
                       borderStyle: 'solid',
                       borderColor: `${getBarColor(calorieData[index])} transparent transparent transparent`
                     }
@@ -281,21 +282,7 @@ const WeeklyCalorieChart = ({ calorieData, calorieTarget }) => {
                   {day.label}
                 </Typography>
                 
-                {/* Current day value always visible (but small and below) */}
-                {day.isToday && (
-                  <Typography 
-                    variant="caption" 
-                    sx={{ 
-                      color: getBarColor(calorieData[index]),
-                      fontWeight: 'bold',
-                      fontSize: '0.7rem',
-                      mt: 0.5,
-                      opacity: 0.9
-                    }}
-                  >
-                    {formatCalories(calorieData[index])}
-                  </Typography>
-                )}
+               
               </Box>
             </Box>
           ))}
