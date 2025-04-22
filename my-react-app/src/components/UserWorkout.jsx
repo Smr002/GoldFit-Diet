@@ -335,12 +335,27 @@ const UserWorkout = () => {
   };
 
   const handleEditWorkout = (updatedWorkout) => {
-    const updatedUserWorkouts = userWorkouts.map((workout) =>
-      workout.id === updatedWorkout.id ? updatedWorkout : workout
-    );
+    // For recommended workouts, create a new non-recommended copy
+    if (updatedWorkout.isRecommended) {
+      const newUserWorkout = {
+        ...updatedWorkout,
+        id: `user-${Date.now()}`,
+        isRecommended: false,
+        title: `My ${updatedWorkout.title}`, // Add "My" to title to indicate it's a custom version
+      };
+      
+      setUserWorkouts([...userWorkouts, newUserWorkout]);
+      setWorkouts([...recommendedWorkouts, ...userWorkouts, newUserWorkout]);
+    } else {
+      // For user workouts, update the existing workout
+      const updatedUserWorkouts = userWorkouts.map((workout) =>
+        workout.id === updatedWorkout.id ? updatedWorkout : workout
+      );
 
-    setUserWorkouts(updatedUserWorkouts);
-    setWorkouts([...recommendedWorkouts, ...updatedUserWorkouts]);
+      setUserWorkouts(updatedUserWorkouts);
+      setWorkouts([...recommendedWorkouts, ...updatedUserWorkouts]);
+    }
+    
     setEditingWorkout(null);
     setShowCreateModal(false);
   };
@@ -394,8 +409,6 @@ const UserWorkout = () => {
   };
 
   const startEditWorkout = (workout) => {
-    if (workout.isRecommended) return; // Don't allow editing recommended workouts
-
     // Make sure we're getting a full copy of the workout to edit
     const workoutToEdit = {
       ...workout,
@@ -570,9 +583,7 @@ const UserWorkout = () => {
                       toggleNotification(workout.id)
                     }
                     onClick={() => openWorkoutDetail(workout)}
-                    onEdit={() =>
-                      !workout.isRecommended && startEditWorkout(workout)
-                    }
+                    onEdit={() => startEditWorkout(workout)}
                     onLog={() => startLogWorkout(workout)}
                     logs={getWorkoutLogs(workout.id)}
                     style={{ animationDelay: `${0.1 * (index % 10)}s` }}

@@ -67,6 +67,18 @@ const WorkoutDetailModal = ({
     }
   };
 
+  const handleEditClick = (e) => {
+    e.preventDefault();
+    e.stopPropagation();
+    
+    // Call onEdit function if it exists
+    if (typeof onEdit === 'function') {
+      onEdit();
+    } else {
+      console.error("onEdit is not a function:", onEdit);
+    }
+  };
+
   return (
     <div className="workout-modal-overlay" onClick={onClose} style={modalStyles.overlay}>
       <div className="workout-modal" onClick={(e) => e.stopPropagation()} style={modalStyles.modal}>
@@ -192,18 +204,10 @@ const WorkoutDetailModal = ({
         </div>
         
         <div className="workout-modal-footer">
-        <button
+          <button
             className="edit-button"
-            onClick={(e) => {
-              console.log("Edit button clicked");
-              e.preventDefault();
-              e.stopPropagation();
-              if (typeof onEdit === 'function') {
-                onEdit();
-              } else {
-                console.error("onEdit is not a function:", onEdit);
-              }
-            }}
+            onClick={handleEditClick}
+            title="Edit workout"
           >
             <svg
               xmlns="http://www.w3.org/2000/svg"
