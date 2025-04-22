@@ -270,7 +270,13 @@ const Exercises = () => {
     setMyExercises((prev) => [...prev, customExercise]);
     setShowCreateModal(false);
   };
-
+  const exerciseCardStyle = {
+    background: darkMode
+      ? "linear-gradient(to right, #d4af37, #ffd700)"
+      : "white",
+    color: darkMode ? "black" : "inherit",
+    transition: "all 0.3s ease",
+  };
   return (
     <ThemeProvider theme={customTheme}>
       <CssBaseline />
