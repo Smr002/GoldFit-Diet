@@ -1,4 +1,4 @@
-"use client"
+"use client";
 import { useState } from "react";
 import ExerciseDetailModal from "./ExerciseDetailModal";
 
@@ -12,13 +12,14 @@ const WorkoutDetailModal = ({
   onEdit,
   onDelete,
   onLog,
-  logs = []
+  logs = [],
+  token,
 }) => {
   const [showExerciseDetail, setShowExerciseDetail] = useState(false);
   const [selectedExercise, setSelectedExercise] = useState(null);
 
-  const handleExerciseClick = (exercise) => {
-    setSelectedExercise(exercise);
+  const handleExerciseClick = (exerciseId) => {
+    setSelectedExercise(exerciseId);
     setShowExerciseDetail(true);
   };
 
@@ -28,71 +29,80 @@ const WorkoutDetailModal = ({
 
   const getDifficultyColor = (difficulty) => {
     switch (difficulty) {
-      case "beginner": return "#4ade80";
-      case "intermediate": return "#facc15";
-      case "advanced": return "#ef4444";
-      default: return "#a3a3a3";
+      case "beginner":
+        return "#4ade80";
+      case "intermediate":
+        return "#facc15";
+      case "advanced":
+        return "#ef4444";
+      default:
+        return "#a3a3a3";
     }
   };
 
   const formatDate = (dateString) => {
-    const options = { year: 'numeric', month: 'short', day: 'numeric' };
+    const options = { year: "numeric", month: "short", day: "numeric" };
     return new Date(dateString).toLocaleDateString(undefined, options);
   };
 
-  // Enhanced modal styles for better centering on small screens like iPhone SE
   const modalStyles = {
     overlay: {
-      position: 'fixed',
+      position: "fixed",
       top: 0,
       left: 0,
       right: 0,
       bottom: 0,
-      display: 'flex',
-      alignItems: 'center',
-      justifyContent: 'center',
-      padding: '10px',
-      overflowY: 'auto',
+      display: "flex",
+      alignItems: "center",
+      justifyContent: "center",
+      padding: "10px",
+      overflowY: "auto",
       zIndex: 1000,
     },
     modal: {
-      margin: '0 auto',
-      maxHeight: '100vh',
-      overflowY: 'auto',
-      width: '100%',
-      maxWidth: '700px',
-      position: 'relative',
+      margin: "0 auto",
+      maxHeight: "100vh",
+      overflowY: "auto",
+      width: "100%",
+      maxWidth: "700px",
+      position: "relative",
       top: 0,
-      transform: 'none',
-    }
+      transform: "none",
+    },
   };
 
   const handleEditClick = (e) => {
     e.preventDefault();
     e.stopPropagation();
-    
-    // Call onEdit function if it exists
-    if (typeof onEdit === 'function') {
+    if (typeof onEdit === "function") {
       onEdit();
-    } else {
-      console.error("onEdit is not a function:", onEdit);
     }
   };
 
   return (
-    <div className="workout-modal-overlay" onClick={onClose} style={modalStyles.overlay}>
-      <div className="workout-modal" onClick={(e) => e.stopPropagation()} style={modalStyles.modal}>
-        <button className="close-modal" onClick={onClose}>×</button>
-        
+    <div
+      className="workout-modal-overlay"
+      onClick={onClose}
+      style={modalStyles.overlay}
+    >
+      <div
+        className="workout-modal"
+        onClick={(e) => e.stopPropagation()}
+        style={modalStyles.modal}
+      >
+        <button className="close-modal" onClick={onClose}>
+          ×
+        </button>
+
         <div className="workout-modal-header">
           <div className="workout-modal-title-section">
             <h3 className="workout-modal-title">{workout.title}</h3>
             <p className="workout-modal-description">{workout.description}</p>
           </div>
-          
+
           <div className="workout-modal-actions">
             <button
-              className={`modal-action-button ${isFavorite ? 'active' : ''}`}
+              className={`modal-action-button ${isFavorite ? "active" : ""}`}
               onClick={onToggleFavorite}
             >
               <svg
@@ -110,9 +120,11 @@ const WorkoutDetailModal = ({
               </svg>
               Favorite
             </button>
-            
+
             <button
-              className={`modal-action-button ${hasNotification ? 'active' : ''}`}
+              className={`modal-action-button ${
+                hasNotification ? "active" : ""
+              }`}
               onClick={onToggleNotification}
             >
               <svg
@@ -133,22 +145,31 @@ const WorkoutDetailModal = ({
             </button>
           </div>
         </div>
-        
+
         <div className="workout-modal-content">
           <div className="workout-modal-info">
             <div className="workout-modal-badges">
-              <span className="difficulty-badge large" style={{ backgroundColor: getDifficultyColor(workout.difficulty) }}>
+              <span
+                className="difficulty-badge large"
+                style={{
+                  backgroundColor: getDifficultyColor(workout.difficulty),
+                }}
+              >
                 {workout.difficulty}
               </span>
-              <span className="duration-badge large">{workout.duration} min</span>
+              <span className="duration-badge large">
+                {workout.duration} min
+              </span>
               <span className="goal-badge large">{workout.goal}</span>
             </div>
-            
+
             <div className="workout-info-section">
               <h3>Workout Information</h3>
               <div className="workout-detail-item">
                 <span className="detail-label">Created</span>
-                <span className="detail-value">{formatDate(workout.createdAt)}</span>
+                <span className="detail-value">
+                  {formatDate(workout.createdAt)}
+                </span>
               </div>
               <div className="workout-detail-item">
                 <span className="detail-label">Target</span>
@@ -160,16 +181,16 @@ const WorkoutDetailModal = ({
               </div>
             </div>
           </div>
-          
+
           <div className="workout-exercises-section">
             <h3>Exercises</h3>
             <div className="exercise-list">
               {workout.exercises.map((exercise, index) => (
-                <div 
-                  key={exercise.id} 
-                  className="exercise-item" 
-                  onClick={() => handleExerciseClick(exercise)}
-                  style={{ cursor: 'pointer' }}
+                <div
+                  key={exercise.id}
+                  className="exercise-item"
+                  onClick={() => handleExerciseClick(exercise.id)}
+                  style={{ cursor: "pointer" }}
                 >
                   <div className="exercise-number">{index + 1}</div>
                   <div className="exercise-details">
@@ -184,12 +205,12 @@ const WorkoutDetailModal = ({
               ))}
             </div>
           </div>
-          
+
           {logs && logs.length > 0 && (
             <div className="workout-history-section">
               <h3>History</h3>
               <div className="workout-logs">
-                {logs.map(log => (
+                {logs.map((log) => (
                   <div key={log.id} className="workout-log-item">
                     <div className="log-date-time">
                       <span className="log-date">{formatDate(log.date)}</span>
@@ -202,13 +223,9 @@ const WorkoutDetailModal = ({
             </div>
           )}
         </div>
-        
+
         <div className="workout-modal-footer">
-          <button
-            className="edit-button"
-            onClick={handleEditClick}
-            title="Edit workout"
-          >
+          <button className="edit-button" onClick={handleEditClick}>
             <svg
               xmlns="http://www.w3.org/2000/svg"
               width="16"
@@ -225,7 +242,7 @@ const WorkoutDetailModal = ({
             </svg>
             Edit
           </button>
-          
+
           <button className="modal-delete-button" onClick={onDelete}>
             <svg
               xmlns="http://www.w3.org/2000/svg"
@@ -243,7 +260,7 @@ const WorkoutDetailModal = ({
             </svg>
             Delete
           </button>
-          
+
           <button className="modal-log-button" onClick={onLog}>
             <svg
               xmlns="http://www.w3.org/2000/svg"
@@ -265,10 +282,11 @@ const WorkoutDetailModal = ({
             Log Workout
           </button>
         </div>
-        
+
         {showExerciseDetail && selectedExercise && (
           <ExerciseDetailModal
-            exercise={selectedExercise}
+            exerciseId={selectedExercise}
+            token={token}
             onClose={closeExerciseDetail}
           />
         )}
@@ -278,4 +296,3 @@ const WorkoutDetailModal = ({
 };
 
 export default WorkoutDetailModal;
-

@@ -1,42 +1,56 @@
 import { useState, useEffect } from "react";
+import { getExercisesById } from "@/api"; // Adjust path as needed
 
-const ExerciseDetailModal = ({ exercise, onClose }) => {
+const ExerciseDetailModal = ({ exerciseId, token, onClose }) => {
   const [exerciseDetails, setExerciseDetails] = useState(null);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    // Simulate fetching exercise details
-    // In a real app, you would make an API call here
-    const simulateFetch = async () => {
+    const fetchAndEnrichExercise = async () => {
       setLoading(true);
-      // Simulate API delay
-      await new Promise((resolve) => setTimeout(resolve, 800));
+      try {
+        // Step 1: Fetch from your local API by ID
+        const localExercise = await getExercisesById(exerciseId, token);
 
-      // Mock data that would come from your API
-      const mockDetails = {
-        id: exercise.id,
-        name: exercise.name,
-        gifUrl: `/assets/exercise-${Math.floor(Math.random() * 5) + 1}.gif`,
-        target: ["Core", "Abs", "Lower back"][Math.floor(Math.random() * 3)],
-        bodyPart: ["Waist", "Back", "Chest"][Math.floor(Math.random() * 3)],
-        equipment: ["Body weight", "Dumbbell", "Barbell"][
-          Math.floor(Math.random() * 3)
-        ],
-        instructions: [
-          "Stand with feet hip-width apart",
-          `Perform the ${exercise.name} with proper form`,
-          "Keep your core engaged throughout the movement",
-          "Breathe steadily and don't hold your breath",
-          "Return to starting position in a controlled manner",
-        ],
-      };
+        // Step 2: Fetch metadata from ExerciseDB using the name
+        const res = await fetch(
+          `https://exercisedb.p.rapidapi.com/exercises/name/${encodeURIComponent(
+            localExercise.name.toLowerCase()
+          )}`,
+          {
+            headers: {
+              "X-RapidAPI-Key": import.meta.env.VITE_RAPID_API_KEY || "",
+              "X-RapidAPI-Host": "exercisedb.p.rapidapi.com",
+            },
+          }
+        );
 
-      setExerciseDetails(mockDetails);
-      setLoading(false);
+        const dbData = (await res.json())[0] || {};
+
+        const enrichedExercise = {
+          ...localExercise,
+          gifUrl: dbData?.gifUrl || "/placeholder.svg",
+          bodyPart: dbData?.bodyPart || "other",
+          target: dbData?.target || "general",
+          equipment: dbData?.equipment || "body weight",
+          instructions: dbData?.instructions || [
+            "Follow the animation",
+            `Perform ${localExercise.name} with good form.`,
+          ],
+        };
+
+        setExerciseDetails(enrichedExercise);
+      } catch (error) {
+        console.error("Failed to fetch and enrich exercise:", error);
+      } finally {
+        setLoading(false);
+      }
     };
 
-    simulateFetch();
-  }, [exercise.id, exercise.name]);
+    fetchAndEnrichExercise();
+  }, [exerciseId, token]);
+
+  if (!exerciseDetails) return null;
 
   return (
     <div
@@ -52,30 +66,7 @@ const ExerciseDetailModal = ({ exercise, onClose }) => {
         </button>
 
         {loading ? (
-          <div className="modal-skeleton">
-            <div className="skeleton-header">
-              <div className="skeleton-title"></div>
-            </div>
-            <div className="skeleton-gif"></div>
-            <div className="skeleton-content">
-              <div className="skeleton-section">
-                <div className="skeleton-section-header"></div>
-                <div className="skeleton-details">
-                  <div className="skeleton-detail-row"></div>
-                  <div className="skeleton-detail-row"></div>
-                  <div className="skeleton-detail-row"></div>
-                </div>
-              </div>
-              <div className="skeleton-section">
-                <div className="skeleton-section-header"></div>
-                <div className="skeleton-instructions">
-                  <div className="skeleton-instruction-line"></div>
-                  <div className="skeleton-instruction-line"></div>
-                  <div className="skeleton-instruction-line"></div>
-                </div>
-              </div>
-            </div>
-          </div>
+          <div className="modal-skeleton">{/* skeleton UI */}</div>
         ) : (
           <>
             <div className="modal-header">
@@ -85,7 +76,7 @@ const ExerciseDetailModal = ({ exercise, onClose }) => {
             <div className="modal-content">
               <div className="modal-gif-container">
                 <img
-                  src={exerciseDetails.gifUrl || "/assets/fullbody.jpg"}
+                  src={exerciseDetails.gifUrl}
                   alt={exerciseDetails.name}
                   className="modal-gif"
                 />
@@ -111,14 +102,14 @@ const ExerciseDetailModal = ({ exercise, onClose }) => {
                     </span>
 
                     <span className="detail-label">Sets:</span>
-                    <span className="detail-value">{exercise.sets}</span>
+                    <span className="detail-value">{exerciseDetails.sets}</span>
 
                     <span className="detail-label">Reps:</span>
-                    <span className="detail-value">{exercise.reps}</span>
+                    <span className="detail-value">{exerciseDetails.reps}</span>
 
                     <span className="detail-label">Rest:</span>
                     <span className="detail-value">
-                      {exercise.rest} seconds
+                      {exerciseDetails.rest} seconds
                     </span>
                   </div>
                 </div>
