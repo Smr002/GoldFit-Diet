@@ -6,10 +6,14 @@ import {
   Button,
   LinearProgress,
   Divider,
+  useTheme,
 } from "@mui/material";
 import { LineChart, FileDown, TrendingDown, TrendingUp } from "lucide-react";
 
 function ProgressGoalsOverview() {
+  const theme = useTheme();
+  const isDarkMode = theme.palette.mode === 'dark';
+
   // Mock data
   const goalProgress = {
     current: 175,
@@ -41,8 +45,12 @@ function ProgressGoalsOverview() {
         p: 2.5,
         height: "100%",
         borderRadius: 3,
-        boxShadow: "0px 4px 20px rgba(0, 0, 0, 0.08)",
-        background: "linear-gradient(145deg, #ffffff, #f5f7ff)",
+        boxShadow: isDarkMode 
+          ? "0px 4px 20px rgba(0, 0, 0, 0.3)" 
+          : "0px 4px 20px rgba(0, 0, 0, 0.08)",
+        background: isDarkMode
+          ? "linear-gradient(145deg, #1e1e1e, #2a2a2a)"
+          : "linear-gradient(145deg, #ffffff, #f5f7ff)",
       }}
     >
       <Box
@@ -54,8 +62,8 @@ function ProgressGoalsOverview() {
         }}
       >
         <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
-          <LineChart size={20} color="#7E69AB" />
-          <Typography variant="h6" fontWeight={600} sx={{ color: "#1A1F2C" }}>
+          <LineChart size={20} color={isDarkMode ? theme.palette.primary.main : "#7E69AB"} />
+          <Typography variant="h6" fontWeight={600} sx={{ color: theme.palette.text.primary }}>
             Progress & Goals
           </Typography>
         </Box>
@@ -66,7 +74,7 @@ function ProgressGoalsOverview() {
           <Typography
             variant="body1"
             fontWeight={600}
-            sx={{ color: "#403E43" }}
+            sx={{ color: theme.palette.text.primary }}
           >
             Weight Goal Progress
           </Typography>
@@ -76,7 +84,7 @@ function ProgressGoalsOverview() {
           sx={{
             p: 2,
             borderRadius: 2,
-            bgcolor: "rgba(16, 185, 129, 0.08)",
+            bgcolor: isDarkMode ? "rgba(16, 185, 129, 0.05)" : "rgba(16, 185, 129, 0.08)",
             mb: 1.5,
           }}
         >
@@ -116,7 +124,7 @@ function ProgressGoalsOverview() {
             sx={{
               height: 10,
               borderRadius: 10,
-              bgcolor: "rgba(16, 185, 129, 0.2)",
+              bgcolor: isDarkMode ? "rgba(16, 185, 129, 0.1)" : "rgba(16, 185, 129, 0.2)",
               "& .MuiLinearProgress-bar": {
                 bgcolor: "#10B981",
                 borderRadius: 10,
@@ -137,13 +145,13 @@ function ProgressGoalsOverview() {
         </Box>
       </Box>
 
-      <Divider sx={{ my: 2, opacity: 0.6 }} />
+      <Divider sx={{ my: 2, opacity: isDarkMode ? 0.2 : 0.6 }} />
 
       <Box sx={{ mb: 3 }}>
         <Typography
           variant="body1"
           fontWeight={600}
-          sx={{ color: "#403E43", mb: 1.5 }}
+          sx={{ color: theme.palette.text.primary, mb: 1.5 }}
         >
           Recent Progress
         </Typography>
@@ -155,21 +163,23 @@ function ProgressGoalsOverview() {
                 display: "flex",
                 justifyContent: "space-between",
                 alignItems: "center",
-                bgcolor: `${item.color}10`,
+                bgcolor: isDarkMode ? `${item.color}08` : `${item.color}10`,
                 borderRadius: 2,
                 px: 2,
                 py: 1.5,
                 transition: "all 0.2s ease",
                 "&:hover": {
                   transform: "translateY(-2px)",
-                  boxShadow: `0 4px 10px ${item.color}20`,
+                  boxShadow: isDarkMode 
+                    ? `0 4px 10px ${item.color}15` 
+                    : `0 4px 10px ${item.color}20`,
                 },
               }}
             >
               <Typography
                 variant="body1"
                 fontWeight={600}
-                sx={{ color: "#403E43" }}
+                sx={{ color: theme.palette.text.primary }}
               >
                 {item.label}
               </Typography>
@@ -188,8 +198,8 @@ function ProgressGoalsOverview() {
                     color: item.trend === "down" ? "#10B981" : "#EC4899",
                     bgcolor:
                       item.trend === "down"
-                        ? "rgba(16, 185, 129, 0.1)"
-                        : "rgba(236, 72, 153, 0.1)",
+                        ? isDarkMode ? "rgba(16, 185, 129, 0.08)" : "rgba(16, 185, 129, 0.1)"
+                        : isDarkMode ? "rgba(236, 72, 153, 0.08)" : "rgba(236, 72, 153, 0.1)",
                     typography: "caption",
                     py: 0.5,
                     px: 0.8,
@@ -222,13 +232,15 @@ function ProgressGoalsOverview() {
         fullWidth
         sx={{
           py: 1.2,
-          borderColor: "#7E69AB",
-          color: "#7E69AB",
+          borderColor: isDarkMode ? theme.palette.primary.main : "#7E69AB",
+          color: isDarkMode ? theme.palette.primary.main : "#7E69AB",
           borderRadius: 2,
           fontWeight: 600,
           "&:hover": {
-            borderColor: "#6E59A5",
-            bgcolor: "rgba(126, 105, 171, 0.05)",
+            borderColor: isDarkMode ? "#DAA520" : "#6E59A5",
+            bgcolor: isDarkMode 
+              ? "rgba(255, 215, 0, 0.05)" 
+              : "rgba(126, 105, 171, 0.05)",
           },
         }}
       >

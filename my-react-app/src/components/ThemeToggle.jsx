@@ -28,6 +28,13 @@ const ThemeToggle = () => {
       document.body.classList.remove("dark-mode");
       localStorage.setItem("theme", "light");
     }
+    
+    // Dispatch a custom event to notify other components of theme change
+    const themeChangedEvent = new CustomEvent('themeChanged', {
+      detail: { theme: newDarkModeState ? 'dark' : 'light' }
+    });
+    document.dispatchEvent(themeChangedEvent);
+    
     setIsMenuOpen(false);
   };
 

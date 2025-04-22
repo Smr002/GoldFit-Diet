@@ -22,54 +22,74 @@ import Footer from "@/components/Footer";
 import MobileFooter from "../components/MobileFooter";
 import SecondNavbar from "@/components/SecondNavbar";
 import WelcomeModal from "../components/userPage/dashboard/WelcomeModal";
-
-const theme = createTheme({
-  palette: {
-    primary: {
-      main: "#1976d2",
-    },
-    secondary: {
-      main: "#9c27b0",
-    },
-  },
-  typography: {
-    fontFamily: [
-      "Inter",
-      "-apple-system",
-      "BlinkMacSystemFont",
-      '"Segoe UI"',
-      "Roboto",
-      '"Helvetica Neue"',
-      "Arial",
-      "sans-serif",
-    ].join(","),
-  },
-  components: {
-    MuiPaper: {
-      defaultProps: {
-        elevation: 1,
-      },
-      styleOverrides: {
-        root: {
-          borderRadius: 8,
-        },
-      },
-    },
-    MuiButton: {
-      styleOverrides: {
-        root: {
-          borderRadius: 8,
-          textTransform: "none",
-        },
-      },
-    },
-  },
-});
+import ThemeToggle from "@/components/ThemeToggle";
 
 const UserHomePage = () => {
   const [showWelcomeModal, setShowWelcomeModal] = useState(false);
   const [userName, setUserName] = useState("");
+  const [isDarkMode, setIsDarkMode] = useState(false);
   const isMobileOrTablet = useMediaQuery("(max-width:1024px)");
+  
+  // Check for dark mode preference on component mount
+  useEffect(() => {
+    const savedTheme = localStorage.getItem("theme");
+    if (savedTheme === "dark") {
+      setIsDarkMode(true);
+      document.body.classList.add("dark-mode");
+    } else {
+      setIsDarkMode(false);
+      document.body.classList.remove("dark-mode");
+    }
+  }, []);
+
+  // Create a theme based on the current mode
+  const theme = createTheme({
+    palette: {
+      mode: isDarkMode ? 'dark' : 'light',
+      primary: {
+        main: isDarkMode ? "#FFD700" : "#1976d2", // Gold in dark mode, blue in light mode
+      },
+      secondary: {
+        main: isDarkMode ? "#DAA520" : "#9c27b0", // Goldenrod in dark mode, purple in light mode
+      },
+      background: {
+        default: isDarkMode ? '#121212' : '#fff',
+        paper: isDarkMode ? '#1e1e1e' : '#fff',
+      },
+    },
+    typography: {
+      fontFamily: [
+        "Inter",
+        "-apple-system",
+        "BlinkMacSystemFont",
+        '"Segoe UI"',
+        "Roboto",
+        '"Helvetica Neue"',
+        "Arial",
+        "sans-serif",
+      ].join(","),
+    },
+    components: {
+      MuiPaper: {
+        defaultProps: {
+          elevation: 1,
+        },
+        styleOverrides: {
+          root: {
+            borderRadius: 8,
+          },
+        },
+      },
+      MuiButton: {
+        styleOverrides: {
+          root: {
+            borderRadius: 8,
+            textTransform: "none",
+          },
+        },
+      },
+    },
+  });
 
   useEffect(() => {
     const hasSeenWelcome = sessionStorage.getItem("hasSeenWelcome");
@@ -100,6 +120,22 @@ const UserHomePage = () => {
         setShowWelcomeModal(false);
       }, 3000);
     }
+  }, []);
+
+  // Handler for theme changes from ThemeToggle
+  useEffect(() => {
+    const handleThemeChange = () => {
+      const currentTheme = localStorage.getItem("theme");
+      setIsDarkMode(currentTheme === "dark");
+    };
+
+    window.addEventListener('storage', handleThemeChange);
+    document.addEventListener('themeChanged', handleThemeChange);
+
+    return () => {
+      window.removeEventListener('storage', handleThemeChange);
+      document.removeEventListener('themeChanged', handleThemeChange);
+    };
   }, []);
 
   return (
@@ -156,6 +192,7 @@ const UserHomePage = () => {
         </Box>
       </Container>
       {isMobileOrTablet ? <MobileFooter /> : <Footer />}
+      <ThemeToggle/>
     </ThemeProvider>
   );
 };
