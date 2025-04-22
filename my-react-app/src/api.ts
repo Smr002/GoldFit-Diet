@@ -109,3 +109,19 @@ export async function updateWorkout(id: number, data: any, token: string) {
     throw new Error("Unexpected error");
   }
 }
+
+export async function deleteWorkout(id: number, token: string) {
+  try {
+    const response = await axios.delete(`${API_BASE_URL}/workouts/${id}`, {
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    });
+    return response.data;
+  } catch (error: any) {
+    if (axios.isAxiosError(error)) {
+      throw new Error(error.response?.data?.error || "Failed to delete workout");
+    }
+    throw new Error("Unexpected error");
+  }
+}

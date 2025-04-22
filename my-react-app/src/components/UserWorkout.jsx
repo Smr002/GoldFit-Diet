@@ -37,11 +37,10 @@ const UserWorkout = () => {
     duration: "all",
     goal: "all",
   });
+  const [token, setToken] = useState(localStorage.getItem("accessToken") || "");
 
   // Dark mode setup
   const theme = useTheme();
-  // eslint-disable-next-line no-unused-vars
-  const isDarkMode = theme.palette.mode === "dark";
   const [darkMode, setDarkMode] = useState(false);
 
   useEffect(() => {
@@ -93,33 +92,31 @@ const UserWorkout = () => {
     const fetchWorkouts = async () => {
       setLoading(true);
       try {
-        const token = localStorage.getItem("accessToken") || "";
-        const data = await getWorkouts(token); // JSON from your backend
+        const data = await getWorkouts(token); // Use state token
 
-        // Transform into shape expected by WorkoutCard (add mock src and derived fields)
+        // Transform into shape expected by WorkoutCard
         const transformed = data.map((w) => ({
           id: w.id,
           title: w.name,
           description: `${w.level} workout for ${w.timesPerWeek}x/week`,
           difficulty: w.level.toLowerCase(),
-          duration: w.workoutExercises.length * 10, // simple estimate
-          goal: "general fitness", // or derive from user goal
+          duration: w.workoutExercises.length * 10, // Simple estimate
+          goal: "general fitness", // Or derive from user goal
           exercises: w.workoutExercises.map((we) => ({
             id: we.exerciseId,
             name: we.exercise.name,
             sets: we.sets,
             reps: we.reps,
           })),
-          isRecommended: w.premium, // treat premium as "recommended"
+          isRecommended: w.premium, // Treat premium as "recommended"
           createdAt: w.createdAt,
-          src: legs, // fallback image (optionally randomize)
+          src: legs, // Fallback image
         }));
 
         setRecommendedWorkouts(transformed.filter((w) => w.isRecommended));
         const userCreated = transformed.filter((w) => !w.isRecommended);
         setUserWorkouts(userCreated);
         setWorkouts(transformed);
-
         setFavorites([]); // Or extract if API provides
       } catch (error) {
         console.error("Error fetching workouts:", error);
@@ -129,6 +126,16 @@ const UserWorkout = () => {
     };
 
     fetchWorkouts();
+  }, [token]);
+
+  // Listen for token changes in localStorage
+  useEffect(() => {
+    const handleStorageChange = () => {
+      setToken(localStorage.getItem("accessToken") || "");
+    };
+
+    window.addEventListener("storage", handleStorageChange);
+    return () => window.removeEventListener("storage", handleStorageChange);
   }, []);
 
   const filteredWorkouts = workouts.filter((workout) => {
@@ -181,19 +188,17 @@ const UserWorkout = () => {
   };
 
   const handleEditWorkout = (updatedWorkout) => {
-    // For recommended workouts, create a new non-recommended copy
     if (updatedWorkout.isRecommended) {
       const newUserWorkout = {
         ...updatedWorkout,
         id: `user-${Date.now()}`,
         isRecommended: false,
-        title: `My ${updatedWorkout.title}`, // Add "My" to title to indicate it's a custom version
+        title: `My ${updatedWorkout.title}`,
       };
 
       setUserWorkouts([...userWorkouts, newUserWorkout]);
       setWorkouts([...recommendedWorkouts, ...userWorkouts, newUserWorkout]);
     } else {
-      // For user workouts, update the existing workout
       const updatedUserWorkouts = userWorkouts.map((workout) =>
         workout.id === updatedWorkout.id ? updatedWorkout : workout
       );
@@ -255,7 +260,6 @@ const UserWorkout = () => {
   };
 
   const startEditWorkout = (workout) => {
-    // Make sure we're getting a full copy of the workout to edit
     const workoutToEdit = {
       ...workout,
       exercises: workout.exercises.map((ex) => ({ ...ex })),
@@ -479,6 +483,7 @@ const UserWorkout = () => {
               }}
               onLog={() => startLogWorkout(selectedWorkout)}
               logs={getWorkoutLogs(selectedWorkout.id)}
+              token={token} // Pass the state token
             />
           )}
 

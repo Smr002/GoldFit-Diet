@@ -1,6 +1,9 @@
 "use client";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import ExerciseDetailModal from "./ExerciseDetailModal";
+import { deleteWorkout } from "@/api";
+import UpdateStatusModal from "./UpdateStatusModal";
+import { getUserIdFromToken } from "@/helper";
 
 const WorkoutDetailModal = ({
   workout,
@@ -17,14 +20,65 @@ const WorkoutDetailModal = ({
 }) => {
   const [showExerciseDetail, setShowExerciseDetail] = useState(false);
   const [selectedExercise, setSelectedExercise] = useState(null);
+  const [showConfirmDelete, setShowConfirmDelete] = useState(false);
+  const [isDeleting, setIsDeleting] = useState(false); // Track deletion state
+  const [error, setError] = useState(null); // Track deletion errors
+  const [isOwner, setIsOwner] = useState(true);
 
   const handleExerciseClick = (exerciseId) => {
     setSelectedExercise(exerciseId);
     setShowExerciseDetail(true);
   };
 
+  const handleDeleteWorkout = () => {
+    setShowConfirmDelete(true);
+    setError(null); // Reset error state
+  };
+
+  useEffect(() => {
+    // Use the passed token prop instead of an environment variable
+    if (!token) {
+      setIsOwner(false);
+      return;
+    }
+
+    const loggedInUserId = getUserIdFromToken(token);
+
+    if (workout?.userId && loggedInUserId) {
+      setIsOwner(workout.userId === loggedInUserId);
+    } else {
+      setIsOwner(false);
+    }
+  }, [workout, token]);
+
+  const confirmDelete = async () => {
+    if (!workout || !workout.id || !token) {
+      setError("Missing workout ID or authentication token.");
+      setShowConfirmDelete(false);
+      return;
+    }
+
+    setIsDeleting(true); // Show loading state
+    try {
+      await deleteWorkout(workout.id, token); // Call API
+
+      if (typeof onDelete === "function") {
+        onDelete(workout.id); // Notify parent
+      }
+
+      setShowConfirmDelete(false); // Close confirm modal
+      onClose(); // Close detail modal
+    } catch (err) {
+      console.error("Failed to delete workout:", err);
+      setError("Failed to delete workout. Please try again.");
+    } finally {
+      setIsDeleting(false); // Reset state
+    }
+  };
+
   const closeExerciseDetail = () => {
     setShowExerciseDetail(false);
+    setSelectedExercise(null);
   };
 
   const getDifficultyColor = (difficulty) => {
@@ -224,6 +278,15 @@ const WorkoutDetailModal = ({
           )}
         </div>
 
+        {error && (
+          <div
+            className="error-message"
+            style={{ color: "#ef4444", marginBottom: "10px" }}
+          >
+            {error}
+          </div>
+        )}
+
         <div className="workout-modal-footer">
           <button className="edit-button" onClick={handleEditClick}>
             <svg
@@ -243,7 +306,14 @@ const WorkoutDetailModal = ({
             Edit
           </button>
 
-          <button className="modal-delete-button" onClick={onDelete}>
+          <button
+            className="modal-delete-button"
+            onClick={handleDeleteWorkout}
+            disabled={!isOwner || isDeleting}
+            style={{
+              cursor: !isOwner || isDeleting ? "not-allowed" : "pointer",
+            }}
+          >
             <svg
               xmlns="http://www.w3.org/2000/svg"
               width="16"
@@ -282,6 +352,15 @@ const WorkoutDetailModal = ({
             Log Workout
           </button>
         </div>
+
+        {showConfirmDelete && (
+          <UpdateStatusModal
+            mode="confirm"
+            message="This action cannot be undone."
+            onClose={() => setShowConfirmDelete(false)}
+            onConfirm={confirmDelete}
+          />
+        )}
 
         {showExerciseDetail && selectedExercise && (
           <ExerciseDetailModal

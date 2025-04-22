@@ -505,6 +505,12 @@ const CreateWorkoutModal = ({ onClose, onSave, workout = null }) => {
             className="save-button"
             onClick={handleSave}
             disabled={!title || exercises.length === 0 || !isOwner}
+            style={{
+              cursor:
+                !title || exercises.length === 0 || !isOwner
+                  ? "not-allowed"
+                  : "pointer",
+            }}
           >
             {workout ? "Update Workout" : "Create Workout"}
           </button>

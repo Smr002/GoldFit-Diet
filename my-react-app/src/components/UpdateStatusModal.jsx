@@ -1,10 +1,17 @@
 "use client";
 import React from "react";
-import { CheckCircle, XCircle } from "lucide-react";
+import { CheckCircle, XCircle, Trash2 } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 
-const UpdateStatusModal = ({ status, message, onClose }) => {
+const UpdateStatusModal = ({
+  status = "success",
+  message = "",
+  onClose,
+  onConfirm,
+  mode = "status",
+}) => {
   const isSuccess = status === "success";
+  const isConfirm = mode === "confirm";
 
   const modalStyle = {
     overlay: {
@@ -44,11 +51,17 @@ const UpdateStatusModal = ({ status, message, onClose }) => {
     button: {
       padding: "10px 20px",
       fontSize: "16px",
-      backgroundColor: isSuccess ? "#4ade80" : "#ef4444",
       color: "#fff",
       border: "none",
       borderRadius: "6px",
       cursor: "pointer",
+    },
+    confirmButton: {
+      backgroundColor: "#ef4444",
+      marginRight: "12px",
+    },
+    cancelButton: {
+      backgroundColor: "#9ca3af",
     },
   };
 
@@ -70,19 +83,53 @@ const UpdateStatusModal = ({ status, message, onClose }) => {
           onClick={(e) => e.stopPropagation()}
         >
           <div style={modalStyle.icon}>
-            {isSuccess ? (
+            {isConfirm ? (
+              <Trash2 size={48} color="#ef4444" />
+            ) : isSuccess ? (
               <CheckCircle size={48} color="#4ade80" />
             ) : (
               <XCircle size={48} color="#ef4444" />
             )}
           </div>
+
           <div style={modalStyle.title}>
-            {isSuccess ? "Workout Updated!" : "Update Failed"}
+            {isConfirm
+              ? "Are you sure?"
+              : isSuccess
+              ? "Workout Updated!"
+              : "Update Failed"}
           </div>
-          <div style={modalStyle.message}>{message}</div>
-          <button style={modalStyle.button} onClick={onClose}>
-            Close
-          </button>
+
+          <div style={modalStyle.message}>
+            {isConfirm ? "This action cannot be undone." : message}
+          </div>
+
+          {isConfirm ? (
+            <div style={{ display: "flex", justifyContent: "center" }}>
+              <button
+                style={{ ...modalStyle.button, ...modalStyle.confirmButton }}
+                onClick={onConfirm}
+              >
+                Yes, Delete
+              </button>
+              <button
+                style={{ ...modalStyle.button, ...modalStyle.cancelButton }}
+                onClick={onClose}
+              >
+                Cancel
+              </button>
+            </div>
+          ) : (
+            <button
+              style={{
+                ...modalStyle.button,
+                backgroundColor: isSuccess ? "#4ade80" : "#ef4444",
+              }}
+              onClick={onClose}
+            >
+              Close
+            </button>
+          )}
         </motion.div>
       </motion.div>
     </AnimatePresence>
