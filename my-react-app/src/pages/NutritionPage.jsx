@@ -1,11 +1,74 @@
 import React, { useState, useEffect } from 'react';
-import { Box, Container, Typography, Fade, Grid } from '@mui/material';
+import { 
+  Box, 
+  Container, 
+  Typography, 
+  Fade, 
+  Grid, 
+  CssBaseline, 
+  ThemeProvider,
+  createTheme,
+  useMediaQuery 
+} from '@mui/material';
 import { CalorieTracker, MacronutrientBreakdown, MealLogger, WaterTracker } from '../components/nutrition';
 import SleepTracker from '../components/nutrition/SleepTracker';
+import NutritionPageSkeleton from '../components/nutrition/NutritionSkeletons';
+import Footer from '@/components/Footer';
+import MobileFooter from '../components/MobileFooter';
+import SecondNavbar from '@/components/SecondNavbar';
+
+// Use the same theme as UserHomePage
+const theme = createTheme({
+  palette: {
+    primary: {
+      main: "#1976d2",
+    },
+    secondary: {
+      main: "#9c27b0",
+    },
+  },
+  typography: {
+    fontFamily: [
+      "Inter",
+      "-apple-system",
+      "BlinkMacSystemFont",
+      '"Segoe UI"',
+      "Roboto",
+      '"Helvetica Neue"',
+      "Arial",
+      "sans-serif",
+    ].join(","),
+  },
+  components: {
+    MuiPaper: {
+      defaultProps: {
+        elevation: 1,
+      },
+      styleOverrides: {
+        root: {
+          borderRadius: 8,
+        },
+      },
+    },
+    MuiButton: {
+      styleOverrides: {
+        root: {
+          borderRadius: 8,
+          textTransform: "none",
+        },
+      },
+    },
+  },
+});
 
 const NutritionPage = () => {
+  // Check for mobile/tablet view
+  const isMobileOrTablet = useMediaQuery("(max-width:1024px)");
+  
   // Animation state
   const [pageLoaded, setPageLoaded] = useState(false);
+  // Loading state
+  const [isLoading, setIsLoading] = useState(true);
   
   // State for water intake
   const [waterIntake, setWaterIntake] = useState(750);
@@ -63,9 +126,21 @@ const NutritionPage = () => {
     ]
   });
   
-  // Trigger page load animation
+  // Sample weekly data
+  const weeklyCalorieData = [1550, 1720, 1840, 1650, 2100, 1790, nutritionData.calories.consumed];
+
+  // Trigger loading and page animation
   useEffect(() => {
-    setPageLoaded(true);
+    // First show the skeleton
+    setIsLoading(true);
+    
+    // Simulate loading data from API
+    const loadingTimer = setTimeout(() => {
+      setIsLoading(false);
+      setPageLoaded(true);
+    }, 1500); // Show skeleton for 1.5 seconds
+    
+    return () => clearTimeout(loadingTimer);
   }, []);
   
   // Handle adding water
@@ -103,76 +178,95 @@ const NutritionPage = () => {
     console.log(`Logged ${hours} hours of sleep`);
   };
 
+  // Layout rendering with ThemeProvider
   return (
-    <Fade in={pageLoaded} timeout={500}>
-      <Container 
-        maxWidth="lg" 
-        sx={{ 
-          py: 4,
-          animation: 'fadeIn 0.8s ease-in-out',
-          '@keyframes fadeIn': {
-            from: { opacity: 0 },
-            to: { opacity: 1 }
-          }
-        }}
-      >
-        <Typography 
-          variant="h4" 
-          component="h1" 
-          fontWeight="bold" 
-          gutterBottom
-          sx={{
-            position: 'relative',
-            display: 'inline-block',
-            '@keyframes growWidth': {
-              from: { width: '0%' },
-              to: { width: '100%' }
-            }
-          }}
-        >
-          Nutrition Tracker
-        </Typography>
-        
-        <Box sx={{ mb: 4 }}>
-          <CalorieTracker 
-            caloriesConsumed={nutritionData.calories.consumed} 
-            calorieTarget={nutritionData.calories.target} 
-          />
-        </Box>
-        
-        <Box sx={{ mb: 4 }}>
-          <MacronutrientBreakdown macros={nutritionData.macros} />
-        </Box>
-        
-        {/* Meal Logger and Water Tracker Section */}
-        <Grid container spacing={3} sx={{ mb: 5 }}>
-          {/* Meal Logger - Left Side */}
-          <Grid item xs={12} md={6}>
-            <MealLogger 
-              meals={nutritionData.meals} 
-              onAddFood={handleAddFood}
-            />
-          </Grid>
-          
-          {/* Water Tracker - Right Side */}
-          <Grid item xs={12} md={6}>
-            <WaterTracker 
-              current={waterIntake} 
-              target={waterTarget} 
-              onAddWater={handleAddWater} 
-            />
-          </Grid>
-        </Grid>
-        
-        {/* Sleep Tracker - Bottom Section */}
-        <Box sx={{ my: 5 }}>
-          <SleepTracker 
-            currentHours={sleepHours}
-            onLogSleep={handleLogSleep}
-          />
-        </Box>
-      </Container>
-    </Fade>
+    <ThemeProvider theme={theme}>
+      <CssBaseline />
+
+      {/* Navigation Bar */}
+      <SecondNavbar />
+      
+      <Box sx={{ minHeight: "100vh" }}>
+        {/* Show skeleton during loading */}
+        {isLoading ? (
+          <Container maxWidth="lg" sx={{ mt: 12 }}> {/* Added top margin for navbar */}
+            <NutritionPageSkeleton />
+          </Container>
+        ) : (
+          <Fade in={pageLoaded} timeout={500}>
+            <Container 
+              maxWidth="lg" 
+              sx={{ 
+                py: 4,
+                mt: 8, // Added top margin for navbar
+                animation: 'fadeIn 0.8s ease-in-out',
+                '@keyframes fadeIn': {
+                  from: { opacity: 0 },
+                  to: { opacity: 1 }
+                }
+              }}
+            >
+              <Typography 
+                variant="h4" 
+                component="h1" 
+                fontWeight="bold" 
+                gutterBottom
+                sx={{
+                  position: 'relative',
+                  display: 'inline-block',
+                  mt: 4, // Added top margin for better spacing below navbar
+                }}
+              >
+                Nutrition Tracker
+              </Typography>
+              
+              <Box sx={{ mb: 4 }}>
+                <CalorieTracker 
+                  caloriesConsumed={nutritionData.calories.consumed} 
+                  calorieTarget={nutritionData.calories.target} 
+                  weeklyData={weeklyCalorieData}
+                />
+              </Box>
+              
+              <Box sx={{ mb: 4 }}>
+                <MacronutrientBreakdown macros={nutritionData.macros} />
+              </Box>
+              
+              {/* Meal Logger and Water Tracker Section */}
+              <Grid container spacing={3} sx={{ mb: 5 }}>
+                {/* Meal Logger - Left Side */}
+                <Grid item xs={12} md={6}>
+                  <MealLogger 
+                    meals={nutritionData.meals} 
+                    onAddFood={handleAddFood}
+                  />
+                </Grid>
+                
+                {/* Water Tracker - Right Side */}
+                <Grid item xs={12} md={6}>
+                  <WaterTracker 
+                    current={waterIntake} 
+                    target={waterTarget} 
+                    onAddWater={handleAddWater} 
+                  />
+                </Grid>
+              </Grid>
+              
+              {/* Sleep Tracker - Bottom Section */}
+              <Box sx={{ my: 5, pb: { xs: 8, sm: 5 } }}> {/* Added padding bottom for mobile footer */}
+                <SleepTracker 
+                  currentHours={sleepHours}
+                  onLogSleep={handleLogSleep}
+                />
+              </Box>
+            </Container>
+          </Fade>
+        )}
+      </Box>
+      
+      {/* Footer based on screen size */}
+      {isMobileOrTablet ? <MobileFooter /> : <Footer />}
+    </ThemeProvider>
   );
 };
 

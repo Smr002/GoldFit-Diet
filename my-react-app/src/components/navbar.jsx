@@ -39,7 +39,7 @@ export default function Navbar({ setModalOpen }) {
         </div>
 
         <nav className={`nav-links ${menuOpen ? "open" : ""}`}>
-          {["OurVision", "Workouts", "Prices", "ContactUs"].map((item) => (
+          {["Our Vision", "Workouts", "Prices", "Contact Us"].map((item) => (
             <a
               href={`#${item.toLowerCase().replace(/\s+/g, "-")}`}
               key={item}
@@ -50,7 +50,7 @@ export default function Navbar({ setModalOpen }) {
             </a>
           ))}
           <button onClick={() => setModalOpen(true)} className="try-now-button">
-            TryNow
+            Try Now
           </button>
         </nav>
       </div>

@@ -68,7 +68,7 @@ export default function AccModal({ open, onClose }) {
     : "rgba(0, 0, 0, 0.6)";
   const dividerColor = isDarkMode
     ? "rgba(255, 255, 255, 0.12)"
-    : "rgba(0, 0, 0, 0.12)";
+    : "rgba(0, 0, 0, 0)";
   const gradientColor = isDarkMode
     ? "linear-gradient(90deg, #ffd700, #ffb700)" // Gold gradient for dark mode
     : "linear-gradient(90deg, #6c63ff, #4834d4)"; // Purple gradient for light mode

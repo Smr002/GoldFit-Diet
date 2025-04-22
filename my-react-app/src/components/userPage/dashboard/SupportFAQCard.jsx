@@ -1,9 +1,12 @@
 import React from "react";
-import { Box, Typography, Paper, Link } from "@mui/material";
+import { Box, Typography, Paper, Link, useTheme } from "@mui/material";
 import HelpOutlineIcon from "@mui/icons-material/HelpOutline";
 import SupportAgentIcon from "@mui/icons-material/SupportAgent";
 
 function SupportFAQCard() {
+  const theme = useTheme();
+  const isDarkMode = theme.palette.mode === 'dark';
+
   return (
     <Paper
       sx={{
@@ -11,7 +14,9 @@ function SupportFAQCard() {
         borderRadius: 3,
         overflow: "hidden",
         position: "relative",
-        boxShadow: "0px 4px 20px rgba(0, 0, 0, 0.15)",
+        boxShadow: isDarkMode 
+          ? "0px 4px 20px rgba(0, 0, 0, 0.3)" 
+          : "0px 4px 20px rgba(0, 0, 0, 0.15)",
       }}
     >
       <Box
@@ -21,7 +26,9 @@ function SupportFAQCard() {
           left: 0,
           right: 0,
           bottom: 0,
-          background: "linear-gradient(135deg, #7E69AB 0%, #9B87F5 100%)",
+          background: isDarkMode 
+            ? "linear-gradient(135deg, #4A3B7A 0%, #6F5AAD 100%)" 
+            : "linear-gradient(135deg, #7E69AB 0%, #9B87F5 100%)",
           opacity: 0.85,
           zIndex: 1,
         }}
@@ -37,6 +44,7 @@ function SupportFAQCard() {
           left: 0,
           right: 0,
           bottom: 0,
+          filter: isDarkMode ? "brightness(0.7)" : "none",
         }}
       />
       <Box
@@ -80,7 +88,7 @@ function SupportFAQCard() {
             href="#"
             sx={{
               bgcolor: "rgba(255, 255, 255, 0.9)",
-              color: "#7E69AB",
+              color: isDarkMode ? "#6F5AAD" : "#7E69AB",
               fontWeight: 600,
               py: 1.2,
               px: 3,

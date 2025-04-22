@@ -6,11 +6,15 @@ import {
   Grid,
   Paper,
   Divider,
+  useTheme,
 } from "@mui/material";
 import { Droplet, Utensils, Moon } from "lucide-react";
 import CircularProgress from "@mui/material/CircularProgress";
 
 function DailySummaryWidget() {
+  const theme = useTheme();
+  const isDarkMode = theme.palette.mode === 'dark';
+
   // Mock data
   const calories = {
     consumed: 1450,
@@ -19,9 +23,24 @@ function DailySummaryWidget() {
   };
 
   const macros = {
-    protein: { amount: 95, goal: 150, percentage: 63, color: "#9B87F5" },
-    carbs: { amount: 130, goal: 220, percentage: 59, color: "#6CCFBC" },
-    fats: { amount: 40, goal: 70, percentage: 57, color: "#FF7D55" },
+    protein: { 
+      amount: 95, 
+      goal: 150, 
+      percentage: 63, 
+      color: isDarkMode ? "#BB86FC" : "#9B87F5" 
+    },
+    carbs: { 
+      amount: 130, 
+      goal: 220, 
+      percentage: 59, 
+      color: isDarkMode ? "#03DAC6" : "#6CCFBC" 
+    },
+    fats: { 
+      amount: 40, 
+      goal: 70, 
+      percentage: 57, 
+      color: isDarkMode ? "#CF6679" : "#FF7D55" 
+    },
   };
 
   const hydration = {
@@ -42,13 +61,17 @@ function DailySummaryWidget() {
         p: 2.5,
         height: "100%",
         borderRadius: 3,
-        boxShadow: "0px 4px 20px rgba(0, 0, 0, 0.08)",
-        background: "linear-gradient(145deg, #ffffff, #f5f7ff)",
+        boxShadow: isDarkMode 
+          ? "0px 4px 20px rgba(0, 0, 0, 0.3)" 
+          : "0px 4px 20px rgba(0, 0, 0, 0.08)",
+        background: isDarkMode
+          ? "linear-gradient(145deg, #1e1e1e, #2a2a2a)"
+          : "linear-gradient(145deg, #ffffff, #f5f7ff)",
       }}
     >
       <Box sx={{ display: "flex", alignItems: "center", gap: 1, mb: 2 }}>
-        <Utensils size={20} style={{ color: "#7E69AB" }} />
-        <Typography variant="h6" fontWeight={600} sx={{ color: "#1A1F2C" }}>
+        <Utensils size={20} style={{ color: isDarkMode ? theme.palette.primary.main : "#7E69AB" }} />
+        <Typography variant="h6" fontWeight={600} sx={{ color: theme.palette.text.primary }}>
           Daily Summary
         </Typography>
       </Box>
@@ -58,17 +81,17 @@ function DailySummaryWidget() {
           <Typography
             variant="body1"
             fontWeight={600}
-            sx={{ color: "#403E43" }}
+            sx={{ color: theme.palette.text.primary }}
           >
             Calories
           </Typography>
           <Typography
             variant="body1"
             fontWeight={600}
-            sx={{ color: "#403E43" }}
+            sx={{ color: theme.palette.text.primary }}
           >
             {calories.consumed}{" "}
-            <span style={{ color: "#8E9196", fontWeight: 400 }}>
+            <span style={{ color: theme.palette.text.secondary, fontWeight: 400 }}>
               / {calories.goal} kcal
             </span>
           </Typography>
@@ -79,22 +102,22 @@ function DailySummaryWidget() {
           sx={{
             height: 10,
             borderRadius: 2,
-            bgcolor: "rgba(155, 135, 245, 0.15)",
+            bgcolor: isDarkMode ? "rgba(187, 134, 252, 0.15)" : "rgba(155, 135, 245, 0.15)",
             "& .MuiLinearProgress-bar": {
-              bgcolor: "#9B87F5",
+              bgcolor: isDarkMode ? "#BB86FC" : "#9B87F5",
               borderRadius: 2,
             },
           }}
         />
       </Box>
 
-      <Divider sx={{ my: 2, opacity: 0.6 }} />
+      <Divider sx={{ my: 2, opacity: isDarkMode ? 0.2 : 0.6 }} />
 
       <Box sx={{ mb: 3 }}>
         <Typography
           variant="body1"
           fontWeight={600}
-          sx={{ color: "#403E43", mb: 1.5 }}
+          sx={{ color: theme.palette.text.primary, mb: 1.5 }}
         >
           Macronutrients
         </Typography>
@@ -104,7 +127,7 @@ function DailySummaryWidget() {
             <Grid item xs={4} key={name} sx={{ textAlign: "center" }}>
               <Typography
                 variant="body2"
-                sx={{ color: "#8E9196", textTransform: "capitalize", mb: 0.5 }}
+                sx={{ color: theme.palette.text.secondary, textTransform: "capitalize", mb: 0.5 }}
               >
                 {name}
               </Typography>
@@ -148,7 +171,7 @@ function DailySummaryWidget() {
               <Typography
                 variant="body1"
                 fontWeight={600}
-                sx={{ color: "#403E43" }}
+                sx={{ color: theme.palette.text.primary }}
               >
                 {data.amount}
                 <span
@@ -156,6 +179,7 @@ function DailySummaryWidget() {
                     fontWeight: 400,
                     fontSize: "0.8rem",
                     marginLeft: "1px",
+                    color: theme.palette.text.secondary,
                   }}
                 >
                   g
@@ -163,7 +187,7 @@ function DailySummaryWidget() {
               </Typography>
               <Typography
                 variant="caption"
-                sx={{ color: "#8E9196", display: "block" }}
+                sx={{ color: theme.palette.text.secondary, display: "block" }}
               >
                 of {data.goal}g
               </Typography>
@@ -172,7 +196,7 @@ function DailySummaryWidget() {
         </Grid>
       </Box>
 
-      <Divider sx={{ my: 2, opacity: 0.6 }} />
+      <Divider sx={{ my: 2, opacity: isDarkMode ? 0.2 : 0.6 }} />
 
       <Grid container spacing={3} sx={{ mt: 0.5 }}>
         <Grid item xs={6}>
@@ -186,11 +210,11 @@ function DailySummaryWidget() {
               }}
             >
               <Box sx={{ display: "flex", alignItems: "center", gap: 0.8 }}>
-                <Droplet size={18} style={{ color: "#3B82F6" }} />
+                <Droplet size={18} style={{ color: isDarkMode ? "#90CAF9" : "#3B82F6" }} />
                 <Typography
                   variant="body1"
                   fontWeight={600}
-                  sx={{ color: "#403E43" }}
+                  sx={{ color: theme.palette.text.primary }}
                 >
                   Water
                 </Typography>
@@ -198,7 +222,7 @@ function DailySummaryWidget() {
               <Typography
                 variant="body2"
                 fontWeight={500}
-                sx={{ color: "#3B82F6" }}
+                sx={{ color: isDarkMode ? "#90CAF9" : "#3B82F6" }}
               >
                 {hydration.amount}/{hydration.goal}{" "}
                 <span style={{ fontSize: "0.7rem" }}>L</span>
@@ -211,9 +235,9 @@ function DailySummaryWidget() {
               sx={{
                 height: 8,
                 borderRadius: 4,
-                bgcolor: "rgba(59, 130, 246, 0.15)",
+                bgcolor: isDarkMode ? "rgba(144, 202, 249, 0.15)" : "rgba(59, 130, 246, 0.15)",
                 "& .MuiLinearProgress-bar": {
-                  bgcolor: "#3B82F6",
+                  bgcolor: isDarkMode ? "#90CAF9" : "#3B82F6",
                   borderRadius: 4,
                 },
               }}
@@ -231,11 +255,11 @@ function DailySummaryWidget() {
               }}
             >
               <Box sx={{ display: "flex", alignItems: "center", gap: 0.8 }}>
-                <Moon size={18} style={{ color: "#8B5CF6" }} />
+                <Moon size={18} style={{ color: isDarkMode ? "#BB86FC" : "#8B5CF6" }} />
                 <Typography
                   variant="body1"
                   fontWeight={600}
-                  sx={{ color: "#403E43" }}
+                  sx={{ color: theme.palette.text.primary }}
                 >
                   Sleep
                 </Typography>
@@ -243,7 +267,7 @@ function DailySummaryWidget() {
               <Typography
                 variant="body2"
                 fontWeight={500}
-                sx={{ color: "#8B5CF6" }}
+                sx={{ color: isDarkMode ? "#BB86FC" : "#8B5CF6" }}
               >
                 {sleep.hours} <span style={{ fontSize: "0.7rem" }}>hrs</span>
               </Typography>
@@ -254,9 +278,9 @@ function DailySummaryWidget() {
               sx={{
                 height: 8,
                 borderRadius: 4,
-                bgcolor: "rgba(139, 92, 246, 0.15)",
+                bgcolor: isDarkMode ? "rgba(187, 134, 252, 0.15)" : "rgba(139, 92, 246, 0.15)",
                 "& .MuiLinearProgress-bar": {
-                  bgcolor: "#8B5CF6",
+                  bgcolor: isDarkMode ? "#BB86FC" : "#8B5CF6",
                   borderRadius: 4,
                 },
               }}

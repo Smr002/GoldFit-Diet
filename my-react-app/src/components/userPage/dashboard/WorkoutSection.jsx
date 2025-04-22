@@ -8,10 +8,14 @@ import {
   List,
   ListItem,
   ListItemText,
+  useTheme,
 } from "@mui/material";
 import { Dumbbell, Flame, Calendar, PlayCircle } from "lucide-react";
 
 function WorkoutSection() {
+  const theme = useTheme();
+  const isDarkMode = theme.palette.mode === 'dark';
+
   // Mock data
   const hasWorkout = true;
   const workout = {
@@ -31,8 +35,12 @@ function WorkoutSection() {
         p: 2.5,
         height: "100%",
         borderRadius: 3,
-        boxShadow: "0px 4px 20px rgba(0, 0, 0, 0.08)",
-        background: "linear-gradient(145deg, #ffffff, #f5f7ff)",
+        boxShadow: isDarkMode 
+          ? "0px 4px 20px rgba(0, 0, 0, 0.3)" 
+          : "0px 4px 20px rgba(0, 0, 0, 0.08)",
+        background: isDarkMode
+          ? "linear-gradient(145deg, #1e1e1e, #2a2a2a)"
+          : "linear-gradient(145deg, #ffffff, #f5f7ff)",
         overflow: "hidden",
       }}
     >
@@ -45,18 +53,18 @@ function WorkoutSection() {
         }}
       >
         <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
-          <Dumbbell size={20} color="#7E69AB" />
-          <Typography variant="h6" fontWeight={600} sx={{ color: "#1A1F2C" }}>
+          <Dumbbell size={20} color={isDarkMode ? theme.palette.primary.main : "#7E69AB"} />
+          <Typography variant="h6" fontWeight={600} sx={{ color: theme.palette.text.primary }}>
             Workout Plan
           </Typography>
         </Box>
         <Chip
-          icon={<Flame size={16} color="#FF7D55" />}
+          icon={<Flame size={16} color={isDarkMode ? "#CF6679" : "#FF7D55"} />}
           label={`${streak}-day streak`}
           size="small"
           sx={{
-            bgcolor: "rgba(255, 125, 85, 0.1)",
-            color: "#FF7D55",
+            bgcolor: isDarkMode ? "rgba(207, 102, 121, 0.1)" : "rgba(255, 125, 85, 0.1)",
+            color: isDarkMode ? "#CF6679" : "#FF7D55",
             fontWeight: 600,
             borderRadius: 5,
             "& .MuiChip-label": {
@@ -74,20 +82,20 @@ function WorkoutSection() {
               justifyContent: "space-between",
               alignItems: "center",
               p: 1.5,
-              bgcolor: "rgba(126, 105, 171, 0.1)",
+              bgcolor: isDarkMode ? "rgba(187, 134, 252, 0.1)" : "rgba(126, 105, 171, 0.1)",
               borderRadius: 2,
             }}
           >
             <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
-              <Calendar size={16} color="#7E69AB" />
-              <Typography fontWeight={600} sx={{ color: "#1A1F2C" }}>
+              <Calendar size={16} color={isDarkMode ? theme.palette.primary.main : "#7E69AB"} />
+              <Typography fontWeight={600} sx={{ color: theme.palette.text.primary }}>
                 {workout.name}
               </Typography>
             </Box>
             <Typography
               variant="body2"
               fontWeight={500}
-              sx={{ color: "#8E9196" }}
+              sx={{ color: theme.palette.text.secondary }}
             >
               {workout.duration}
             </Typography>
@@ -101,7 +109,7 @@ function WorkoutSection() {
                   component="span"
                   sx={{
                     mr: 1.5,
-                    color: "#7E69AB",
+                    color: isDarkMode ? theme.palette.primary.main : "#7E69AB",
                     fontWeight: 600,
                     fontSize: 18,
                   }}
@@ -113,7 +121,7 @@ function WorkoutSection() {
                   primaryTypographyProps={{
                     variant: "body1",
                     fontWeight: 500,
-                    color: "#403E43",
+                    color: theme.palette.text.primary,
                   }}
                 />
               </ListItem>
@@ -127,15 +135,18 @@ function WorkoutSection() {
             sx={{
               mt: 1,
               py: 1.2,
-              bgcolor: "#7E69AB",
+              bgcolor: isDarkMode ? theme.palette.primary.main : "#7E69AB",
               borderRadius: 2,
               textTransform: "none",
               fontWeight: 600,
               fontSize: 16,
-              boxShadow: "0 4px 12px rgba(126, 105, 171, 0.3)",
+              boxShadow: isDarkMode 
+                ? "0 4px 12px rgba(255, 215, 0, 0.3)" 
+                : "0 4px 12px rgba(126, 105, 171, 0.3)",
               "&:hover": {
-                bgcolor: "#6E59A5",
+                bgcolor: isDarkMode ? "#DAA520" : "#6E59A5",
               },
+              color: isDarkMode ? "#000" : "#fff",
             }}
           >
             Start Workout
@@ -153,12 +164,12 @@ function WorkoutSection() {
               sx={{
                 borderRadius: 2,
                 textTransform: "none",
-                borderColor: "#7E69AB",
-                color: "#7E69AB",
+                borderColor: isDarkMode ? theme.palette.primary.main : "#7E69AB",
+                color: isDarkMode ? theme.palette.primary.main : "#7E69AB",
                 fontWeight: 600,
                 "&:hover": {
-                  borderColor: "#6E59A5",
-                  bgcolor: "rgba(126, 105, 171, 0.05)",
+                  borderColor: isDarkMode ? "#DAA520" : "#6E59A5",
+                  bgcolor: isDarkMode ? "rgba(255, 215, 0, 0.05)" : "rgba(126, 105, 171, 0.05)",
                 },
               }}
             >
@@ -170,10 +181,11 @@ function WorkoutSection() {
               sx={{
                 borderRadius: 2,
                 textTransform: "none",
-                bgcolor: "#7E69AB",
+                bgcolor: isDarkMode ? theme.palette.primary.main : "#7E69AB",
+                color: isDarkMode ? "#000" : "#fff",
                 fontWeight: 600,
                 "&:hover": {
-                  bgcolor: "#6E59A5",
+                  bgcolor: isDarkMode ? "#DAA520" : "#6E59A5",
                 },
               }}
             >

@@ -1,5 +1,5 @@
 import React from "react";
-import { Box, Typography, Paper, Divider, Button, Chip } from "@mui/material";
+import { Box, Typography, Paper, Divider, Button, Chip, useTheme } from "@mui/material";
 import NotificationsIcon from "@mui/icons-material/Notifications";
 import AccessTimeIcon from "@mui/icons-material/AccessTime";
 import EventAvailableIcon from "@mui/icons-material/EventAvailable";
@@ -8,6 +8,9 @@ import FitnessCenterIcon from "@mui/icons-material/FitnessCenter";
 import RestaurantIcon from "@mui/icons-material/Restaurant";
 
 function NotificationsReminders() {
+  const theme = useTheme();
+  const isDarkMode = theme.palette.mode === 'dark';
+
   // Mock data
   const reminders = [
     {
@@ -15,16 +18,16 @@ function NotificationsReminders() {
       message: "Workout reminder for 7 PM today",
       time: "2 hours from now",
       icon: FitnessCenterIcon,
-      color: "#7E69AB",
-      bgColor: "rgba(126, 105, 171, 0.1)",
+      color: isDarkMode ? "#BB86FC" : "#7E69AB",
+      bgColor: isDarkMode ? "rgba(187, 134, 252, 0.1)" : "rgba(126, 105, 171, 0.1)",
     },
     {
       type: "nutrition",
       message: "Don't forget to log your lunch",
       time: "Just now",
       icon: RestaurantIcon,
-      color: "#6CCFBC",
-      bgColor: "rgba(108, 207, 188, 0.1)",
+      color: isDarkMode ? "#03DAC6" : "#6CCFBC",
+      bgColor: isDarkMode ? "rgba(3, 218, 198, 0.1)" : "rgba(108, 207, 188, 0.1)",
     },
   ];
 
@@ -32,8 +35,8 @@ function NotificationsReminders() {
     {
       title: "New HIIT Workout Added",
       description: "15-minute fat burner",
-      color: "#FF7D55",
-      bgColor: "rgba(255, 125, 85, 0.1)",
+      color: isDarkMode ? "#CF6679" : "#FF7D55",
+      bgColor: isDarkMode ? "rgba(207, 102, 121, 0.1)" : "rgba(255, 125, 85, 0.1)",
     },
   ];
 
@@ -43,8 +46,12 @@ function NotificationsReminders() {
         p: 2.5,
         height: "100%",
         borderRadius: 3,
-        boxShadow: "0px 4px 20px rgba(0, 0, 0, 0.08)",
-        background: "linear-gradient(145deg, #ffffff, #f5f7ff)",
+        boxShadow: isDarkMode 
+          ? "0px 4px 20px rgba(0, 0, 0, 0.3)" 
+          : "0px 4px 20px rgba(0, 0, 0, 0.08)",
+        background: isDarkMode
+          ? "linear-gradient(145deg, #1e1e1e, #2a2a2a)"
+          : "linear-gradient(145deg, #ffffff, #f5f7ff)",
       }}
     >
       <Box
@@ -56,8 +63,8 @@ function NotificationsReminders() {
         }}
       >
         <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
-          <NotificationsIcon fontSize="medium" sx={{ color: "#7E69AB" }} />
-          <Typography variant="h6" fontWeight={600} sx={{ color: "#1A1F2C" }}>
+          <NotificationsIcon fontSize="medium" sx={{ color: isDarkMode ? theme.palette.primary.main : "#7E69AB" }} />
+          <Typography variant="h6" fontWeight={600} sx={{ color: theme.palette.text.primary }}>
             Reminders & Updates
           </Typography>
         </Box>
@@ -65,8 +72,8 @@ function NotificationsReminders() {
           label="3 New"
           size="small"
           sx={{
-            bgcolor: "rgba(155, 135, 245, 0.15)",
-            color: "#9B87F5",
+            bgcolor: isDarkMode ? "rgba(187, 134, 252, 0.15)" : "rgba(155, 135, 245, 0.15)",
+            color: isDarkMode ? theme.palette.primary.main : "#9B87F5",
             fontWeight: 600,
             fontSize: "0.75rem",
           }}
@@ -77,7 +84,7 @@ function NotificationsReminders() {
         <Typography
           variant="subtitle1"
           fontWeight={600}
-          sx={{ mb: 1.5, color: "#403E43" }}
+          sx={{ mb: 1.5, color: theme.palette.text.primary }}
         >
           Today
         </Typography>
@@ -104,12 +111,14 @@ function NotificationsReminders() {
                 display: "flex",
                 alignItems: "center",
                 justifyContent: "center",
-                bgcolor: "white",
+                bgcolor: isDarkMode ? 'rgba(255, 255, 255, 0.05)' : 'white',
                 borderRadius: "50%",
                 width: 36,
                 height: 36,
                 flexShrink: 0,
-                boxShadow: "0 2px 8px rgba(0,0,0,0.06)",
+                boxShadow: isDarkMode 
+                  ? "0 2px 8px rgba(0,0,0,0.3)" 
+                  : "0 2px 8px rgba(0,0,0,0.06)",
               }}
             >
               <reminder.icon fontSize="small" sx={{ color: reminder.color }} />
@@ -118,13 +127,13 @@ function NotificationsReminders() {
               <Typography
                 variant="body1"
                 fontWeight={600}
-                sx={{ color: "#1A1F2C" }}
+                sx={{ color: theme.palette.text.primary }}
               >
                 {reminder.message}
               </Typography>
               <Typography
                 variant="caption"
-                sx={{ color: "#8E9196", display: "block", mt: 0.3 }}
+                sx={{ color: theme.palette.text.secondary, display: "block", mt: 0.3 }}
               >
                 {reminder.time}
               </Typography>
@@ -141,7 +150,7 @@ function NotificationsReminders() {
         <Typography
           variant="subtitle1"
           fontWeight={600}
-          sx={{ mb: 1.5, color: "#403E43" }}
+          sx={{ mb: 1.5, color: theme.palette.text.primary }}
         >
           Recommendations
         </Typography>
@@ -167,12 +176,14 @@ function NotificationsReminders() {
                 display: "flex",
                 alignItems: "center",
                 justifyContent: "center",
-                bgcolor: "white",
+                bgcolor: isDarkMode ? 'rgba(255, 255, 255, 0.05)' : 'white',
                 borderRadius: "50%",
                 width: 36,
                 height: 36,
                 flexShrink: 0,
-                boxShadow: "0 2px 8px rgba(0,0,0,0.06)",
+                boxShadow: isDarkMode 
+                  ? "0 2px 8px rgba(0,0,0,0.3)" 
+                  : "0 2px 8px rgba(0,0,0,0.06)",
               }}
             >
               <EventAvailableIcon fontSize="small" sx={{ color: rec.color }} />
@@ -181,13 +192,13 @@ function NotificationsReminders() {
               <Typography
                 variant="body1"
                 fontWeight={600}
-                sx={{ color: "#1A1F2C" }}
+                sx={{ color: theme.palette.text.primary }}
               >
                 {rec.title}
               </Typography>
               <Typography
                 variant="caption"
-                sx={{ color: "#8E9196", display: "block", mt: 0.3 }}
+                sx={{ color: theme.palette.text.secondary, display: "block", mt: 0.3 }}
               >
                 {rec.description}
               </Typography>
@@ -210,12 +221,14 @@ function NotificationsReminders() {
             borderRadius: 8,
             px: 3,
             py: 1,
-            background:
-              "linear-gradient(90deg, rgba(155, 135, 245, 0.1) 0%, rgba(126, 105, 171, 0.2) 100%)",
-            color: "#7E69AB",
+            background: isDarkMode
+              ? "linear-gradient(90deg, rgba(187, 134, 252, 0.1) 0%, rgba(187, 134, 252, 0.2) 100%)"
+              : "linear-gradient(90deg, rgba(155, 135, 245, 0.1) 0%, rgba(126, 105, 171, 0.2) 100%)",
+            color: isDarkMode ? theme.palette.primary.main : "#7E69AB",
             "&:hover": {
-              background:
-                "linear-gradient(90deg, rgba(155, 135, 245, 0.2) 0%, rgba(126, 105, 171, 0.3) 100%)",
+              background: isDarkMode
+                ? "linear-gradient(90deg, rgba(187, 134, 252, 0.2) 0%, rgba(187, 134, 252, 0.3) 100%)"
+                : "linear-gradient(90deg, rgba(155, 135, 245, 0.2) 0%, rgba(126, 105, 171, 0.3) 100%)",
             },
           }}
         >

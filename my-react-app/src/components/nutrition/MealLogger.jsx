@@ -12,7 +12,6 @@ import {
   Chip,
   Collapse,
   Stack,
-  Zoom,
   Fade,
   Avatar,
   Grow,
@@ -44,12 +43,8 @@ const MealLogger = ({ meals = [], onAddFood }) => {
   // State for expansion of meals that have foods
   const [expandedMeal, setExpandedMeal] = useState(null);
   
-  // Animation states
-  const [animatedItems, setAnimatedItems] = useState(0);
-  const [showComponent, setShowComponent] = useState(false);
-  const [showHeader, setShowHeader] = useState(false);
-  const [showDivider, setShowDivider] = useState(false);
-  const [showMeals, setShowMeals] = useState(false);
+  // Simplified animation states - reduced number of states
+  const [isLoaded, setIsLoaded] = useState(false);
   
   // Food search modal state
   const [foodSearchOpen, setFoodSearchOpen] = useState(false);
@@ -114,37 +109,11 @@ const MealLogger = ({ meals = [], onAddFood }) => {
       return matchedMeal || defaultMeal;
     }) : defaultMeals;
   
-  // Sequential animations
+  // Simplified animation effect - single timeout instead of multiple
   useEffect(() => {
-    const timer1 = setTimeout(() => setShowComponent(true), 100);
-    const timer2 = setTimeout(() => setShowHeader(true), 400);
-    const timer3 = setTimeout(() => setShowDivider(true), 700);
-    const timer4 = setTimeout(() => setShowMeals(true), 900);
-    
-    return () => {
-      clearTimeout(timer1);
-      clearTimeout(timer2);
-      clearTimeout(timer3);
-      clearTimeout(timer4);
-    };
+    const timer = setTimeout(() => setIsLoaded(true), 300);
+    return () => clearTimeout(timer);
   }, []);
-  
-  // Animate meals sequentially
-  useEffect(() => {
-    if (!showMeals) return;
-    
-    const intervalId = setInterval(() => {
-      setAnimatedItems(prev => {
-        if (prev < mealsToShow.length) {
-          return prev + 1;
-        }
-        clearInterval(intervalId);
-        return prev;
-      });
-    }, 150);
-    
-    return () => clearInterval(intervalId);
-  }, [mealsToShow.length, showMeals]);
   
   // Handler for expanding meal details
   const handleExpandMeal = (id) => {
@@ -181,7 +150,7 @@ const MealLogger = ({ meals = [], onAddFood }) => {
   
   return (
     <>
-      <Fade in={showComponent} timeout={600}>
+      <Fade in={isLoaded} timeout={600}>
         <Paper
           elevation={1}
           sx={{
@@ -199,46 +168,27 @@ const MealLogger = ({ meals = [], onAddFood }) => {
           }}
         >
           <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', mb: 2 }}>
-            <Fade in={showHeader} timeout={600}>
-              <Typography 
-                variant="h6" 
-                component="h2" 
-                fontWeight="bold" 
-                sx={{ 
-                  display: 'flex',
-                  alignItems: 'center',
-                  animation: 'slideRight 0.7s ease-out',
-                  '@keyframes slideRight': {
-                    from: { opacity: 0, transform: 'translateX(-20px)' },
-                    to: { opacity: 1, transform: 'translateX(0)' }
-                  }
-                }}
-              >
-                <MenuIcon sx={{ mr: 1, color: '#673ab7' }} />
-                Meals
-              </Typography>
-            </Fade>
+            <Typography 
+              variant="h6" 
+              component="h2" 
+              fontWeight="bold" 
+              sx={{ 
+                display: 'flex',
+                alignItems: 'center',
+              }}
+            >
+              <MenuIcon sx={{ mr: 1, color: '#673ab7' }} />
+              Meals
+            </Typography>
             
             <Tooltip title="Log your meals throughout the day to track your nutritional intake">
-              <IconButton 
-                size="small" 
-                sx={{
-                  animation: 'pulse 2s infinite',
-                  '@keyframes pulse': {
-                    '0%': { transform: 'scale(1)' },
-                    '50%': { transform: 'scale(1.05)' },
-                    '100%': { transform: 'scale(1)' }
-                  }
-                }}
-              >
+              <IconButton size="small">
                 <InfoIcon fontSize="small" />
               </IconButton>
             </Tooltip>
           </Box>
           
-          <Grow in={showDivider} timeout={500}>
-            <Divider sx={{ mb: 2 }} />
-          </Grow>
+          <Divider sx={{ mb: 2 }} />
           
           <Box sx={{ flexGrow: 1, overflow: 'auto' }}>
             <Stack spacing={2}>
@@ -250,12 +200,10 @@ const MealLogger = ({ meals = [], onAddFood }) => {
                   : meal.calories || 0;
                   
                 return (
-                  <Zoom 
-                    in={showMeals && index < animatedItems} 
-                    timeout={500} 
-                    style={{ 
-                      transitionDelay: `${index * 70}ms`,
-                    }}
+                  <Fade 
+                    in={isLoaded} 
+                    timeout={400}
+                    style={{ transitionDelay: `${index * 50}ms` }}
                     key={meal.id}
                   >
                     <Card
@@ -266,21 +214,21 @@ const MealLogger = ({ meals = [], onAddFood }) => {
                         transition: 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)',
                         '&:hover': {
                           boxShadow: '0 4px 12px rgba(0,0,0,0.15)',
-                          transform: 'translateY(-3px) scale(1.01)',
+                          transform: 'translateY(-3px)',
                         },
                         position: 'relative',
                         overflow: 'hidden',
                         '&.pulse': {
-                          animation: 'pulse 0.6s ease-out',
+                          animation: 'pulse 0.4s ease-out',
                         },
                         '@keyframes pulse': {
                           '0%': { transform: 'scale(1)' },
-                          '50%': { transform: 'scale(1.03)' },
+                          '50%': { transform: 'scale(1.02)' },
                           '100%': { transform: 'scale(1)' }
                         }
                       }}
                     >
-                      {/* Meal image in background */}
+                      {/* Meal image in background - simplified styling */}
                       <Box
                         sx={{
                           position: 'absolute',
@@ -293,7 +241,6 @@ const MealLogger = ({ meals = [], onAddFood }) => {
                           backgroundSize: 'cover',
                           backgroundPosition: 'center',
                           zIndex: 1,
-                          transition: 'all 0.5s ease',
                           '&::after': {
                             content: '""',
                             position: 'absolute',
@@ -302,10 +249,6 @@ const MealLogger = ({ meals = [], onAddFood }) => {
                             width: '100%',
                             height: '100%',
                             background: `linear-gradient(to right, white, transparent)`,
-                          },
-                          '&:hover': {
-                            opacity: 0.15,
-                            width: '100px',
                           }
                         }}
                       />
@@ -322,17 +265,6 @@ const MealLogger = ({ meals = [], onAddFood }) => {
                                 mr: 1.5,
                                 border: `2px solid ${getMealColor(meal.id)}`,
                                 boxShadow: '0 2px 4px rgba(0,0,0,0.1)',
-                                transition: 'all 0.3s ease',
-                                '&:hover': {
-                                  transform: 'scale(1.1)',
-                                  boxShadow: `0 0 0 2px ${getMealColor(meal.id)}50`
-                                },
-                                animation: `${showMeals ? 'avatarPulse 3s infinite ease' : 'none'}`,
-                                '@keyframes avatarPulse': {
-                                  '0%': { transform: 'scale(1)' },
-                                  '50%': { transform: 'scale(1.05)' },
-                                  '100%': { transform: 'scale(1)' }
-                                }
                               }}
                             >
                               {meal.icon}
@@ -344,9 +276,7 @@ const MealLogger = ({ meals = [], onAddFood }) => {
                                 sx={{ 
                                   fontWeight: 600, 
                                   lineHeight: 1.2,
-                                  position: 'relative',
-                                  display: 'inline-block',
-                                  mb: 0.5, // Add bottom margin for spacing
+                                  mb: 0.5,
                                   '&::after': {
                                     content: '""',
                                     position: 'absolute',
@@ -367,15 +297,7 @@ const MealLogger = ({ meals = [], onAddFood }) => {
                               <Typography 
                                 variant="caption" 
                                 color="text.secondary"
-                                sx={{
-                                  display: 'block', // Make it a block element
-                                  opacity: 0,
-                                  animation: `fadeSlideIn 0.5s ease forwards ${index * 0.1 + 0.3}s`,
-                                  '@keyframes fadeSlideIn': {
-                                    from: { opacity: 0, transform: 'translateY(5px)' },
-                                    to: { opacity: 1, transform: 'translateY(0)' }
-                                  }
-                                }}
+                                sx={{ display: 'block' }}
                               >
                                 {meal.time}
                               </Typography>
@@ -388,15 +310,6 @@ const MealLogger = ({ meals = [], onAddFood }) => {
                               fontWeight="bold"
                               sx={{
                                 color: totalCalories > 0 ? getMealColor(meal.id) : 'text.secondary',
-                                transition: 'color 0.3s ease, transform 0.3s ease',
-                                '&:hover': {
-                                  transform: 'scale(1.05)'
-                                },
-                                animation: totalCalories > 0 ? `${index * 0.2 + 0.5}s countUp ease-out forwards` : 'none',
-                                '@keyframes countUp': {
-                                  from: { opacity: 0, transform: 'translateY(10px)' },
-                                  to: { opacity: 1, transform: 'translateY(0)' }
-                                }
                               }}
                             >
                               {totalCalories}
@@ -404,14 +317,6 @@ const MealLogger = ({ meals = [], onAddFood }) => {
                             <Typography 
                               variant="caption" 
                               color="text.secondary"
-                              sx={{
-                                opacity: 0,
-                                animation: `fadeIn 0.5s ease forwards ${index * 0.1 + 0.5}s`,
-                                '@keyframes fadeIn': {
-                                  from: { opacity: 0 },
-                                  to: { opacity: 1 }
-                                }
-                              }}
                             >
                               kcal
                             </Typography>
@@ -421,11 +326,11 @@ const MealLogger = ({ meals = [], onAddFood }) => {
                         {hasFoods && (
                           <Collapse 
                             in={isExpanded} 
-                            timeout={{ enter: 500, exit: 300 }}
+                            timeout={300}
                             unmountOnExit
                           >
                             <Box sx={{ mt: 2, ml: 5, mb: 1 }}>
-                              {meal.foods.map((food, foodIndex) => (
+                              {meal.foods.map((food) => (
                                 <Box 
                                   key={food.id} 
                                   sx={{ 
@@ -433,12 +338,6 @@ const MealLogger = ({ meals = [], onAddFood }) => {
                                     justifyContent: 'space-between',
                                     py: 0.75,
                                     borderBottom: '1px dashed rgba(0, 0, 0, 0.1)',
-                                    opacity: 0,
-                                    animation: `fadeSlideUp 0.4s ease forwards ${foodIndex * 0.1}s`,
-                                    '@keyframes fadeSlideUp': {
-                                      from: { opacity: 0, transform: 'translateY(10px)' },
-                                      to: { opacity: 1, transform: 'translateY(0)' }
-                                    }
                                   }}
                                 >
                                   <Box>
@@ -452,10 +351,6 @@ const MealLogger = ({ meals = [], onAddFood }) => {
                                     sx={{ 
                                       fontWeight: 500,
                                       color: getMealColor(meal.id),
-                                      transition: 'transform 0.2s ease',
-                                      '&:hover': {
-                                        transform: 'scale(1.05)'
-                                      }
                                     }}
                                   >
                                     {food.calories} kcal
@@ -477,26 +372,9 @@ const MealLogger = ({ meals = [], onAddFood }) => {
                             bgcolor: `${getMealColor(meal.id)}20`,
                             color: getMealColor(meal.id),
                             boxShadow: 'none',
-                            position: 'relative',
-                            overflow: 'hidden',
-                            transition: 'all 0.3s ease',
                             '&:hover': {
                               bgcolor: `${getMealColor(meal.id)}40`,
                               boxShadow: '0 2px 8px rgba(0,0,0,0.1)',
-                              transform: 'translateY(-2px)'
-                            },
-                            '&::after': {
-                              content: '""',
-                              position: 'absolute',
-                              top: 0,
-                              left: '-100%',
-                              width: '100%',
-                              height: '100%',
-                              background: `linear-gradient(90deg, transparent, ${getMealColor(meal.id)}30, transparent)`,
-                              transition: 'all 0.6s ease',
-                            },
-                            '&:hover::after': {
-                              left: '100%'
                             }
                           }}
                         >
@@ -508,7 +386,7 @@ const MealLogger = ({ meals = [], onAddFood }) => {
                             size="small" 
                             onClick={() => handleExpandMeal(meal.id)}
                             sx={{ 
-                              transition: 'all 0.3s ease-in-out',
+                              transition: 'transform 0.3s ease-in-out',
                               bgcolor: isExpanded ? `${getMealColor(meal.id)}10` : 'transparent',
                               '&:hover': {
                                 bgcolor: `${getMealColor(meal.id)}20`,
@@ -526,26 +404,19 @@ const MealLogger = ({ meals = [], onAddFood }) => {
                         )}
                       </CardActions>
                     </Card>
-                  </Zoom>
+                  </Fade>
                 );
               })}
             </Stack>
           </Box>
           
-          {/* Nutrition Tip Box */}
+          {/* Nutrition Tip Box - simplified animation */}
           <Box 
             sx={{ 
               mt: 3,
               p: 2,
               borderRadius: 2,
               bgcolor: 'rgba(103, 58, 183, 0.05)',
-              opacity: 0,
-              animation: 'fadeIn 1s ease-in-out forwards',
-              animationDelay: '1.2s',
-              '@keyframes fadeIn': {
-                from: { opacity: 0 },
-                to: { opacity: 1 }
-              }
             }}
           >
             <Typography variant="body2" color="text.secondary">
