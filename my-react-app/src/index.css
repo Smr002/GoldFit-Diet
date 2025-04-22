@@ -137,7 +137,7 @@ body.dark-mode {
   display: flex;
   justify-content: center;
   width: 100%;
-  padding: 20px 40px;
+  padding: 8px 40px;
   z-index: 1000;
   transition: all 0.3s ease;
   background-color: var(--navbar-transparent);
@@ -3344,7 +3344,8 @@ body.dark-mode .footer-legal-links a:hover {
 
 .modal-title {
   margin: 0;
-  padding-right: 16px;
+  padding-right: 32px;
+
 }
 
 .modal-gif-section {
@@ -3467,16 +3468,16 @@ body.dark-mode .footer-legal-links a:hover {
   margin-bottom: 40px;
   display: flex;
   justify-content: center;
-  width: 100%;
+  width: 90%;
 }
 
 .body-parts-scroll {
   display: flex;
-  gap: 15px; /* Reduce gap slightly */
+  gap: 10px; /* Reduce gap slightly */
   padding: 0 20px;
   justify-content: center;
   width: 100%;
-  max-width: 1200px;
+  max-width: 1280px;
 }
 
 .body-part-item {
@@ -4637,7 +4638,7 @@ body.dark-mode .exercises-container {
   padding-bottom: 60px; /* Matches footer height */
   margin-bottom: 60px; /* Matches footer height */
   border-radius: 2rem 2rem 2rem 2rem;
-  margin-top: 32px;
+  /* margin-top: 32px; */
 }
 
 body.dark-mode .exercises-main-content {

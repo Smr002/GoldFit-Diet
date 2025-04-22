@@ -39,6 +39,7 @@ const bodyPartMapping = {
 
 const Exercises = () => {
   const theme = useTheme();
+  // eslint-disable-next-line no-unused-vars
   const isDarkMode = theme.palette.mode === "dark";
   const [darkMode, setDarkMode] = useState(false);
 
@@ -339,7 +340,7 @@ const Exercises = () => {
                     viewBox="0 0 24 24"
                     fill="none"
                     stroke={
-                      darkMode ? "rgba(255, 255, 255, 0.7)" : "currentColor"
+                      darkMode ? "rgba(0, 0, 0, 0.7)" : "currentColor"
                     }
                     strokeWidth="2"
                     strokeLinecap="round"
