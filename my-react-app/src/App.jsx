@@ -16,7 +16,7 @@ import NotificationManagement from "./pages/admin/NotificationManagement";
 import FAQManagement from "./pages/admin/FAQManagement";
 import AdminManagement from "./pages/admin/AdminManagement";
 import Workout from "./components/UserWorkout";
-import AdminProfile from './pages/admin/AdminProfile';
+import AdminProfile from "./pages/admin/AdminProfile";
 
 const ProtectedRoute = ({ children }) => {
   const token = localStorage.getItem("token");
@@ -29,10 +29,10 @@ const ProtectedRoute = ({ children }) => {
 const routes = {
   public: [
     { path: "/", element: (props) => <HomePage {...props} /> },
-    { path: "/create-account/*", element: <CreateAccount />, protected: true },
-    { path: "/exercises", element: <Exercises />, protected: true },
+    { path: "/create-account/*", element: <CreateAccount /> },
   ],
   protected: [
+    { path: "/exercises", element: <Exercises /> },
     { path: "/user-home", element: <UserHomePage /> },
     { path: "/workouts", element: <Workout /> },
     { path: "/nutrition", element: <NutritionPage /> }, // Add this route
@@ -43,7 +43,7 @@ const routes = {
     { path: "workouts", element: <WorkoutManagement /> },
     { path: "notifications", element: <NotificationManagement /> },
     { path: "faqs", element: <FAQManagement /> },
-    { path: "profile", element: <AdminProfile />}
+    { path: "profile", element: <AdminProfile /> },
   ],
 };
 
