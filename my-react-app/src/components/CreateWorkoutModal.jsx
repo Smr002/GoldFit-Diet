@@ -2,6 +2,7 @@
 import { updateWorkout, getExercises } from "@/api";
 import { useState, useEffect } from "react";
 import UpdateStatusModal from "./UpdateStatusModal";
+import { getUserIdFromToken } from "@/helper";
 
 const CreateWorkoutModal = ({ onClose, onSave, workout = null }) => {
   const [title, setTitle] = useState("");
@@ -12,6 +13,7 @@ const CreateWorkoutModal = ({ onClose, onSave, workout = null }) => {
   const [showStatus, setShowStatus] = useState(false);
   const [updateSuccess, setUpdateSuccess] = useState(false);
   const [statusMessage, setStatusMessage] = useState("");
+  const [isOwner, setIsOwner] = useState(true);
 
   const [exercises, setExercises] = useState([]);
   const [currentExercise, setCurrentExercise] = useState({
@@ -79,6 +81,14 @@ const CreateWorkoutModal = ({ onClose, onSave, workout = null }) => {
   };
 
   useEffect(() => {
+    const token = import.meta.env.VITE_AUTH_TOKEN;
+    const loggedInUserId = getUserIdFromToken(token);
+
+    if (workout?.userId && loggedInUserId) {
+      setIsOwner(workout.userId === loggedInUserId);
+    } else {
+      setIsOwner(false);
+    }
     if (workout) {
       setTitle(workout.title);
       setDescription(workout.description);
@@ -494,7 +504,7 @@ const CreateWorkoutModal = ({ onClose, onSave, workout = null }) => {
           <button
             className="save-button"
             onClick={handleSave}
-            disabled={!title || exercises.length === 0}
+            disabled={!title || exercises.length === 0 || !isOwner}
           >
             {workout ? "Update Workout" : "Create Workout"}
           </button>
