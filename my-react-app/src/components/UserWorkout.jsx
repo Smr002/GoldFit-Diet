@@ -11,9 +11,8 @@ import hiit from "../assets/hiitcardio.jpg";
 import beginner from "../assets/beginner.jpg";
 import legs from "../assets/legday.jpg";
 import MobileFooter from "./MobileFooter";
-import UserHeader from "../components/userPage/dashboard/ProfileHeader";
-import QuickActions from "./userPage/dashboard/QuickActions";
 import SecondNavbar from "./SecondNavbar";
+import { getWorkouts } from "../api";
 
 const UserWorkout = () => {
   const [workouts, setWorkouts] = useState([]);
@@ -40,187 +39,34 @@ const UserWorkout = () => {
     const fetchWorkouts = async () => {
       setLoading(true);
       try {
-        const mockRecommendedWorkouts = [
-          {
-            id: "rec-1",
-            title: "Full Body Strength",
-            description:
-              "A complete full body workout focusing on strength and muscle building",
-            difficulty: "intermediate",
-            duration: 45,
-            goal: "strength",
-            exercises: [
-              { id: "ex-1", name: "Bench Press", sets: 3, reps: 10, rest: 60 },
-              { id: "ex-2", name: "Squats", sets: 3, reps: 12, rest: 60 },
-              { id: "ex-3", name: "Pull-ups", sets: 3, reps: 8, rest: 60 },
-              { id: "ex-4", name: "Deadlifts", sets: 3, reps: 10, rest: 90 },
-            ],
-            src: fullbody,
-            createdAt: new Date().toISOString(),
-            isRecommended: true,
-          },
-          {
-            id: "rec-2",
-            title: "HIIT Cardio Blast",
-            description:
-              "High intensity interval training to burn calories and improve cardiovascular health",
-            difficulty: "advanced",
-            duration: 30,
-            goal: "cardio",
-            exercises: [
-              { id: "ex-5", name: "Burpees", sets: 4, reps: 15, rest: 30 },
-              {
-                id: "ex-6",
-                name: "Mountain Climbers",
-                sets: 4,
-                reps: 20,
-                rest: 30,
-              },
-              { id: "ex-7", name: "Jump Squats", sets: 4, reps: 15, rest: 30 },
-              { id: "ex-8", name: "High Knees", sets: 4, reps: 30, rest: 30 },
-            ],
-            src: hiit,
-            createdAt: new Date().toISOString(),
-            isRecommended: true,
-          },
-          {
-            id: "rec-3",
-            title: "Beginner Fitness",
-            description:
-              "Perfect for beginners looking to start their fitness journey",
-            difficulty: "beginner",
-            duration: 30,
-            goal: "general fitness",
-            exercises: [
-              {
-                id: "ex-9",
-                name: "Push-ups (Modified)",
-                sets: 2,
-                reps: 10,
-                rest: 60,
-              },
-              {
-                id: "ex-10",
-                name: "Bodyweight Squats",
-                sets: 2,
-                reps: 12,
-                rest: 60,
-              },
-              { id: "ex-11", name: "Plank", sets: 2, reps: "30 sec", rest: 60 },
-              {
-                id: "ex-12",
-                name: "Walking Lunges",
-                sets: 2,
-                reps: 10,
-                rest: 60,
-              },
-            ],
-            src: beginner,
-            createdAt: new Date().toISOString(),
-            isRecommended: true,
-          },
-        ];
+        const token = localStorage.getItem("accessToken") || "";
+        const data = await getWorkouts(token); // JSON from your backend
 
-        const mockUserWorkouts = [
-          {
-            id: "user-1",
-            title: "My Leg Day",
-            description:
-              "Personal leg workout focusing on quads and hamstrings",
-            difficulty: "intermediate",
-            duration: 50,
-            goal: "strength",
-            exercises: [
-              {
-                id: "ex-13",
-                name: "Barbell Squats",
-                sets: 4,
-                reps: 8,
-                rest: 90,
-              },
-              {
-                id: "ex-14",
-                name: "Romanian Deadlifts",
-                sets: 3,
-                reps: 10,
-                rest: 60,
-              },
-              { id: "ex-15", name: "Leg Press", sets: 3, reps: 12, rest: 60 },
-              { id: "ex-16", name: "Calf Raises", sets: 4, reps: 15, rest: 45 },
-            ],
-            src: legs,
-            createdAt: new Date().toISOString(),
-            isRecommended: false,
-          },
-        ];
+        // Transform into shape expected by WorkoutCard (add mock src and derived fields)
+        const transformed = data.map((w) => ({
+          id: w.id,
+          title: w.name,
+          description: `${w.level} workout for ${w.timesPerWeek}x/week`,
+          difficulty: w.level.toLowerCase(),
+          duration: w.workoutExercises.length * 10, // simple estimate
+          goal: "general fitness", // or derive from user goal
+          exercises: w.workoutExercises.map((we) => ({
+            id: we.exerciseId,
+            name: we.exercise.name,
+            sets: we.sets,
+            reps: we.reps,
+          })),
+          isRecommended: w.premium, // treat premium as "recommended"
+          createdAt: w.createdAt,
+          src: legs, // fallback image (optionally randomize)
+        }));
 
-        setRecommendedWorkouts(mockRecommendedWorkouts);
-        setUserWorkouts(mockUserWorkouts);
-        setWorkouts([...mockRecommendedWorkouts, ...mockUserWorkouts]);
+        setRecommendedWorkouts(transformed.filter((w) => w.isRecommended));
+        const userCreated = transformed.filter((w) => !w.isRecommended);
+        setUserWorkouts(userCreated);
+        setWorkouts(transformed);
 
-        setFavorites(["rec-1"]);
-        setNotificationSettings({
-          "rec-1": true,
-          "user-1": false,
-        });
-        setWorkoutLogs([
-          {
-            id: "log-1",
-            workoutId: "rec-1",
-            date: new Date(Date.now() - 2 * 24 * 60 * 60 * 1000).toISOString(),
-            duration: 48,
-            notes: "Felt good, increased weight on bench press",
-            exercises: [
-              {
-                id: "ex-1",
-                name: "Bench Press",
-                sets: 3,
-                reps: 10,
-                weight: 135,
-              },
-              { id: "ex-2", name: "Squats", sets: 3, reps: 12, weight: 185 },
-              { id: "ex-3", name: "Pull-ups", sets: 3, reps: 8, weight: 0 },
-              { id: "ex-4", name: "Deadlifts", sets: 3, reps: 10, weight: 225 },
-            ],
-          },
-          {
-            id: "log-2",
-            workoutId: "user-1",
-            date: new Date(Date.now() - 5 * 24 * 60 * 60 * 1000).toISOString(),
-            duration: 55,
-            notes: "Legs were sore after, need to stretch more next time",
-            exercises: [
-              {
-                id: "ex-13",
-                name: "Barbell Squats",
-                sets: 4,
-                reps: 8,
-                weight: 175,
-              },
-              {
-                id: "ex-14",
-                name: "Romanian Deadlifts",
-                sets: 3,
-                reps: 10,
-                weight: 155,
-              },
-              {
-                id: "ex-15",
-                name: "Leg Press",
-                sets: 3,
-                reps: 12,
-                weight: 270,
-              },
-              {
-                id: "ex-16",
-                name: "Calf Raises",
-                sets: 4,
-                reps: 15,
-                weight: 100,
-              },
-            ],
-          },
-        ]);
+        setFavorites([]); // Or extract if API provides
       } catch (error) {
         console.error("Error fetching workouts:", error);
       } finally {

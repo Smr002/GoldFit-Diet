@@ -16,10 +16,8 @@ import {
   DialogTitle,
 } from "@mui/material";
 import SettingsIcon from "@mui/icons-material/Settings";
-import ThemeToggle from "../ThemeToggle";
 import { useNavigate } from "react-router-dom";
 import LogoutIcon from "@mui/icons-material/Logout";
-import FitnessCenterIcon from "@mui/icons-material/FitnessCenter";
 
 function ProfileHeader() {
   const theme = useTheme();

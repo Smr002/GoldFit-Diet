@@ -1,14 +1,11 @@
-"use client";
-
 import { useState, useEffect, useRef } from "react";
 import BodyPartIcons from "./BodyPartIcons";
 import FilterModal from "./FilterModal";
 import CreateExerciseModal from "./CreateExerciseModal";
-import Navbar from "./Navbar";
 import MobileFooter from "./MobileFooter";
-import UserHeader from "../components/userPage/dashboard/ProfileHeader";
-import QuickActions from "./userPage/dashboard/QuickActions";
+import { getExercises } from "../api";
 import SecondNavbar from "./SecondNavbar";
+
 const bodyParts = [
   { name: "Favorites", icon: "favorites" },
   { name: "Cardio", icon: "cardio" },
@@ -23,18 +20,7 @@ const bodyParts = [
   { name: "Neck", icon: "neck" },
 ];
 
-const bodyPartMapping = {
-  "upper legs": "upper legs",
-  "lower legs": "lower legs",
-  "upper arms": "upper arms",
-  "lower arms": "lower arms",
-  waist: "waist",
-  chest: "chest",
-  back: "back",
-  shoulders: "shoulders",
-  neck: "neck",
-  cardio: "cardio",
-};
+const cacheKey = "enrichedExercisesCache";
 
 const Exercises = () => {
   const [allExercises, setAllExercises] = useState([]);
@@ -60,14 +46,107 @@ const Exercises = () => {
     showMyExercises: false,
   });
   const [equipmentList, setEquipmentList] = useState([]);
-  const [detailsOpen, setDetailsOpen] = useState(true); // Changed to true
+  const [detailsOpen, setDetailsOpen] = useState(true);
   const [instructionsOpen, setInstructionsOpen] = useState(false);
   const [modalLoading, setModalLoading] = useState(false);
-
-  // Add a ref to control the body parts scroll container
   const scrollRef = useRef(null);
 
-  // Persist favorites and custom exercises to localStorage
+  const enrichWithExternalData = async (localData) => {
+    return await Promise.all(
+      localData.map(async (ex) => {
+        try {
+          const res = await fetch(
+            `https://exercisedb.p.rapidapi.com/exercises/name/${encodeURIComponent(
+              ex.name.toLowerCase()
+            )}`,
+            {
+              headers: {
+                "X-RapidAPI-Key": import.meta.env.VITE_RAPID_API_KEY || "",
+                "X-RapidAPI-Host": "exercisedb.p.rapidapi.com",
+              },
+            }
+          );
+          if (!res.ok) throw new Error(`Status ${res.status}`);
+          const data = await res.json();
+          const m = Array.isArray(data) ? data[0] : null;
+          return {
+            ...ex,
+            gifUrl: m?.gifUrl || "/placeholder.svg",
+            bodyPart: m?.bodyPart || "other",
+            target: m?.target || "general",
+            equipment: m?.equipment || "body weight",
+            instructions: m?.instructions || ["Follow the animation"],
+          };
+        } catch {
+          return {
+            ...ex,
+            gifUrl: "/placeholder.svg",
+            bodyPart: "other",
+            target: "general",
+            equipment: "body weight",
+            instructions: ["Follow the animation"],
+          };
+        }
+      })
+    );
+  };
+
+  // 1️⃣ Fetch & enrich once on mount
+  useEffect(() => {
+    (async () => {
+      setLoading(true);
+      try {
+        const token = localStorage.getItem("accessToken") || "";
+        const localData = await getExercises(token);
+        const enriched = await enrichWithExternalData(localData);
+        setAllExercises(enriched);
+        setExercises(enriched);
+      } catch (err) {
+        console.error(err);
+        setError("Failed to fetch exercises. Please try again.");
+      } finally {
+        setLoading(false);
+      }
+    })();
+  }, []);
+
+  useEffect(() => {
+    let filtered = [...allExercises];
+    if (filterOptions.showMyExercises) filtered = [...filtered, ...myExercises];
+
+    if (search.trim()) {
+      const query = search.toLowerCase();
+      filtered = filtered.filter(
+        (e) =>
+          e.name?.toLowerCase().includes(query) ||
+          e.target?.toLowerCase().includes(query) ||
+          e.equipment?.toLowerCase().includes(query) ||
+          e.bodyPart?.toLowerCase().includes(query)
+      );
+    }
+
+    if (filterOptions.bodyPart)
+      filtered = filtered.filter(
+        (e) =>
+          e.bodyPart?.toLowerCase() === filterOptions.bodyPart.toLowerCase()
+      );
+
+    if (
+      filterOptions.equipment &&
+      filterOptions.equipment.toLowerCase() !== "all equipment"
+    ) {
+      filtered = filtered.filter(
+        (e) =>
+          e.equipment?.toLowerCase() === filterOptions.equipment.toLowerCase()
+      );
+    }
+
+    if (filterOptions.showFavorites)
+      filtered = filtered.filter((e) => favorites.includes(e.id));
+
+    setExercises(filtered);
+  }, [search, filterOptions, allExercises, myExercises, favorites]);
+
   useEffect(() => {
     localStorage.setItem("favorites", JSON.stringify(favorites));
   }, [favorites]);
@@ -76,117 +155,8 @@ const Exercises = () => {
     localStorage.setItem("myExercises", JSON.stringify(myExercises));
   }, [myExercises]);
 
-  // Disable background scrolling when modal is open
   useEffect(() => {
-    if (selectedExercise) {
-      document.body.style.overflow = "hidden";
-    } else {
-      document.body.style.overflow = "";
-    }
-    return () => {
-      document.body.style.overflow = "";
-    };
-  }, [selectedExercise]);
-
-  // Fetch equipment list from API
-  useEffect(() => {
-    const fetchEquipment = async () => {
-      try {
-        const options = {
-          method: "GET",
-          headers: {
-            "X-RapidAPI-Key": import.meta.env.VITE_RAPID_API_KEY || "",
-            "X-RapidAPI-Host": "exercisedb.p.rapidapi.com",
-          },
-        };
-        const response = await fetch(
-          "https://exercisedb.p.rapidapi.com/exercises/equipmentList",
-          options
-        );
-        const data = await response.json();
-        setEquipmentList(["All Equipment", ...data]);
-      } catch (error) {
-        console.error("Error fetching equipment:", error);
-        setError("Failed to fetch equipment list. Please try again.");
-      }
-    };
-    fetchEquipment();
-  }, []);
-
-  // Fetch exercises based on body part or equipment
-  useEffect(() => {
-    const fetchExercises = async () => {
-      setLoading(true);
-      setError(null);
-      try {
-        let url = "https://exercisedb.p.rapidapi.com/exercises";
-        if (bodyPart && bodyPart !== "favorites") {
-          const apiBodyPart = bodyPartMapping[bodyPart] || bodyPart;
-          url = `https://exercisedb.p.rapidapi.com/exercises/bodyPart/${apiBodyPart}`;
-        }
-        if (equipment && equipment !== "All Equipment") {
-          url = `https://exercisedb.p.rapidapi.com/exercises/equipment/${equipment}`;
-        }
-
-        const options = {
-          method: "GET",
-          headers: {
-            "X-RapidAPI-Key": import.meta.env.VITE_RAPID_API_KEY || "",
-            "X-RapidAPI-Host": "exercisedb.p.rapidapi.com",
-          },
-        };
-        const response = await fetch(url, options);
-        if (!response.ok) {
-          throw new Error("Failed to fetch exercises");
-        }
-        const data = await response.json();
-        setAllExercises(data);
-      } catch (error) {
-        console.error("Error fetching exercises:", error);
-        setError("Failed to fetch exercises. Please try again.");
-      } finally {
-        setLoading(false);
-      }
-    };
-    fetchExercises();
-  }, [bodyPart, equipment]);
-
-  // Apply filters and search to exercises
-  useEffect(() => {
-    let filteredData = [...allExercises, ...myExercises];
-
-    if (search.trim()) {
-      filteredData = filteredData.filter(
-        (exercise) =>
-          exercise.name?.toLowerCase().includes(search.trim().toLowerCase()) ||
-          exercise.target
-            ?.toLowerCase()
-            .includes(search.trim().toLowerCase()) ||
-          exercise.equipment
-            ?.toLowerCase()
-            .includes(search.trim().toLowerCase()) ||
-          exercise.bodyPart?.toLowerCase().includes(search.trim().toLowerCase())
-      );
-    }
-
-    if (filterOptions.showFavorites) {
-      filteredData = filteredData.filter((exercise) =>
-        favorites.includes(exercise.id)
-      );
-    }
-
-    if (filterOptions.showMyExercises) {
-      filteredData = [...filteredData, ...myExercises];
-    }
-
-    setExercises(filteredData);
-  }, [allExercises, myExercises, search, filterOptions, favorites]);
-
-  // Reset scroll position to the left when bodyPart changes
-  useEffect(() => {
-    if (scrollRef.current) {
-      scrollRef.current.scrollLeft = 0;
-    }
+    if (scrollRef.current) scrollRef.current.scrollLeft = 0;
   }, [bodyPart]);
 
   const handleSearchChange = (e) => setSearch(e.target.value);
@@ -194,27 +164,19 @@ const Exercises = () => {
   const toggleFavorite = (e, id) => {
     e.stopPropagation();
     setFavorites((prev) =>
-      prev.includes(id) ? prev.filter((favId) => favId !== id) : [...prev, id]
+      prev.includes(id) ? prev.filter((x) => x !== id) : [...prev, id]
     );
   };
 
   const handleBodyPartClick = (part) => {
     if (part === "Favorites") {
-      setFilterOptions({
-        ...filterOptions,
-        showFavorites: true,
-        showMyExercises: false,
-      });
-      setBodyPart("");
-    } else if (part === "Filters") {
-      setShowFilterModal(true);
+      setFilterOptions({ bodyPart: "", equipment: "", showFavorites: true });
     } else {
       setBodyPart(part.toLowerCase());
       setFilterOptions({
         ...filterOptions,
         bodyPart: part.toLowerCase(),
         showFavorites: false,
-        showMyExercises: false,
       });
     }
   };
@@ -224,11 +186,7 @@ const Exercises = () => {
     setSelectedExercise(exercise);
     setDetailsOpen(true);
     setInstructionsOpen(false);
-
-    // Simulate loading time (remove this in production if using real API loading)
-    setTimeout(() => {
-      setModalLoading(false);
-    }, 1000);
+    setTimeout(() => setModalLoading(false), 1000);
   };
 
   const closeExerciseDetails = () => {
@@ -245,17 +203,18 @@ const Exercises = () => {
   };
 
   const handleCreateExercise = (newExercise) => {
-    const exerciseWithId = {
+    const customExercise = {
       ...newExercise,
       id: `custom-${Date.now()}`,
       bodyPart: filterOptions.bodyPart || "custom",
       equipment: "body weight",
       target: "custom",
+      gifUrl: "/placeholder.svg",
+      instructions: ["Custom created"],
     };
-    setMyExercises((prev) => [...prev, exerciseWithId]);
+    setMyExercises((prev) => [...prev, customExercise]);
     setShowCreateModal(false);
   };
-
   return (
     <>
       <div
