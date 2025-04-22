@@ -2,7 +2,7 @@ import React, { useState, useEffect } from "react";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faEllipsisH, faMoon, faSun } from "@fortawesome/free-solid-svg-icons";
 
-const Prices = () => {
+const Prices = ({setModalOpen}) => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [isDarkMode, setIsDarkMode] = useState(false);
   
@@ -52,6 +52,15 @@ const Prices = () => {
   
   const togglePlan = (plan) => {
     setSelectedPlan(plan);
+  };
+  
+  // Function to handle CTA button clicks - opens the modal
+  const handleCTAClick = () => {
+    if (typeof setModalOpen === 'function') {
+      setModalOpen(true);
+    } else {
+      console.error("setModalOpen is not a function");
+    }
   };
   
   const plans = {
@@ -236,6 +245,7 @@ const Prices = () => {
                 <button 
                   className="pricing-cta" 
                   style={{ background: `linear-gradient(to right, ${plan.color}, ${plan.popular ? "var(--secondary-color)" : "var(--primary-color)"})` }}
+                  onClick={handleCTAClick}
                 >
                   {plan.cta}
                 </button>

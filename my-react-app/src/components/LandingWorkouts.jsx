@@ -5,7 +5,7 @@ import hiit from "../assets/hiitcardio.jpg";
 import lowerbody from "../assets/lowerbody.webp";
 import upperbody from "../assets/upperbody.jpg";
 
-const Workouts = () => {
+const Workouts = ({setModalOpen}) => {
   const [activeWorkout, setActiveWorkout] = useState(null);
   const [isVisible, setIsVisible] = useState(false);
   const carouselRef = useRef(null);
@@ -213,7 +213,7 @@ const Workouts = () => {
               </table>
             </div>
             <div className="modal-footer">
-              <button className="start-workout-btn">Start Workout</button>
+              <button onClick={() => setModalOpen(true)} className="start-workout-btn">Start Workout</button>
             </div>
           </div>
         </div>

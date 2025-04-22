@@ -12,10 +12,10 @@ function HomePage({ setModalOpen, isModalOpen }) {
       <>
         <Navbar setModalOpen={setModalOpen} isModalOpen={isModalOpen} />
         <ThemeToggle />
-        <Landing />
+        <Landing setModalOpen={setModalOpen} isModalOpen={isModalOpen}/>
         <OurVision />
-        <Workouts />
-        <Prices />
+        <Workouts setModalOpen={setModalOpen} isModalOpen={isModalOpen} />
+        <Prices setModalOpen={setModalOpen} isModalOpen={isModalOpen}/>
         <ContactUs />
         <Footer />
   
