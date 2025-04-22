@@ -5,6 +5,8 @@ import WorkoutCard from "./WorkoutCard";
 import CreateWorkoutModal from "./CreateWorkoutModal";
 import WorkoutDetailModal from "./WorkoutDetailModal";
 import LogWorkoutModal from "./LogWorkoutModal";
+import { useTheme } from "@mui/material/styles";
+import { Box, CssBaseline, ThemeProvider, createTheme } from "@mui/material";
 
 import fullbody from "../assets/fullbody.jpg";
 import hiit from "../assets/hiitcardio.jpg";
@@ -14,6 +16,7 @@ import MobileFooter from "./MobileFooter";
 import UserHeader from "../components/userPage/dashboard/ProfileHeader";
 import QuickActions from "./userPage/dashboard/QuickActions";
 import SecondNavbar from "./SecondNavbar";
+import ThemeToggle from "./ThemeToggle";
 
 const UserWorkout = () => {
   const [workouts, setWorkouts] = useState([]);
@@ -34,6 +37,57 @@ const UserWorkout = () => {
     difficulty: "all",
     duration: "all",
     goal: "all",
+  });
+
+  // Dark mode setup
+  const theme = useTheme();
+  // eslint-disable-next-line no-unused-vars
+  const isDarkMode = theme.palette.mode === "dark";
+  const [darkMode, setDarkMode] = useState(false);
+
+  useEffect(() => {
+    const handleThemeChange = (e) => {
+      if (e.detail) {
+        setDarkMode(e.detail.theme === "dark");
+      } else {
+        const savedTheme = localStorage.getItem("theme");
+        setDarkMode(savedTheme === "dark");
+      }
+    };
+
+    const savedTheme = localStorage.getItem("theme");
+    setDarkMode(savedTheme === "dark");
+
+    document.addEventListener("themeChanged", handleThemeChange);
+    window.addEventListener("storage", () => {
+      const currentTheme = localStorage.getItem("theme");
+      setDarkMode(currentTheme === "dark");
+    });
+
+    return () => {
+      document.removeEventListener("themeChanged", handleThemeChange);
+      window.removeEventListener("storage", handleThemeChange);
+    };
+  }, []);
+
+  const customTheme = createTheme({
+    palette: {
+      mode: darkMode ? "dark" : "light",
+      primary: {
+        main: darkMode ? "#FFD700" : "#6200ea",
+      },
+      secondary: {
+        main: darkMode ? "#DAA520" : "#3f51b5",
+      },
+      background: {
+        default: darkMode ? "#121212" : "#f5f7fa",
+        paper: darkMode ? "#1e1e1e" : "#ffffff",
+      },
+      text: {
+        primary: darkMode ? "#ffffff" : "rgba(0, 0, 0, 0.87)",
+        secondary: darkMode ? "rgba(255, 255, 255, 0.7)" : "rgba(0, 0, 0, 0.6)",
+      },
+    },
   });
 
   useEffect(() => {
@@ -369,197 +423,219 @@ const UserWorkout = () => {
   };
 
   return (
-    <>
-      <SecondNavbar />
-      <br />
-      <br />
-      <br />
-      <div className="workout-container">
-        <div className="workout-search-filter">
-          <div className="search-container">
-            <div className="search-bar">
-              <div className="search-icon">
-                <svg
-                  xmlns="http://www.w3.org/2000/svg"
-                  width="20"
-                  height="20"
-                  viewBox="0 0 24 24"
-                  fill="none"
-                  stroke="currentColor"
-                  strokeWidth="2"
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                >
-                  <circle cx="11" cy="11" r="8"></circle>
-                  <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
-                </svg>
+    <ThemeProvider theme={customTheme}>
+      <CssBaseline />
+      <Box
+        sx={{
+          minHeight: "100vh",
+          background: darkMode
+            ? "linear-gradient(135deg, #121212 0%, #1e1e1e 100%)"
+            : "linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%)",
+          color: darkMode ? "#ffffff" : "inherit",
+          transition: "background 0.3s ease, color 0.3s ease",
+        }}
+      >
+        <SecondNavbar />
+        <Box sx={{ paddingTop: "80px" }}>
+          <div className={`workout-container ${darkMode ? "dark-mode" : ""}`}>
+            <div className={`workout-search-filter ${darkMode ? "dark-mode" : ""}`}>
+              <div className={`search-container ${darkMode ? "dark-mode" : ""}`}>
+                <div className={`search-bar ${darkMode ? "dark-mode" : ""}`}>
+                  <div className="search-icon">
+                    <svg
+                      xmlns="http://www.w3.org/2000/svg"
+                      width="20"
+                      height="20"
+                      viewBox="0 0 24 24"
+                      fill="none"
+                      stroke={darkMode ? "#000" : "currentColor"}
+                      strokeWidth="2"
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                    >
+                      <circle cx="11" cy="11" r="8"></circle>
+                      <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+                    </svg>
+                  </div>
+                  <input
+                    type="text"
+                    placeholder="Search workouts"
+                    className={`search-input ${darkMode ? "dark-mode" : ""}`}
+                    value={searchTerm}
+                    onChange={(e) => setSearchTerm(e.target.value)}
+                    style={{
+                      color: darkMode ? "#ffffff" : "inherit",
+                      background: darkMode ? "#1e1e1e" : "white",
+                    }}
+                  />
+                </div>
               </div>
-              <input
-                type="text"
-                placeholder="Search workouts"
-                className="search-input"
-                value={searchTerm}
-                onChange={(e) => setSearchTerm(e.target.value)}
-              />
-            </div>
-          </div>
-
-          <div className="filter-container">
-            <div className="filter-group">
-              <label>Difficulty:</label>
-              <select
-                value={filterOptions.difficulty}
-                onChange={(e) =>
-                  handleFilterChange("difficulty", e.target.value)
-                }
-              >
-                <option value="all">All Levels</option>
-                <option value="beginner">Beginner</option>
-                <option value="intermediate">Intermediate</option>
-                <option value="advanced">Advanced</option>
-              </select>
             </div>
 
-            <div className="filter-group">
-              <label>Duration:</label>
-              <select
-                value={filterOptions.duration}
-                onChange={(e) => handleFilterChange("duration", e.target.value)}
-              >
-                <option value="all">Any Duration</option>
-                <option value="short">Short (≤ 30 min)</option>
-                <option value="medium">Medium (31-60 min)</option>
-                <option value="long">Long (60 min)</option>
-              </select>
-            </div>
-
-            <div className="filter-group">
-              <label>Goal:</label>
-              <select
-                value={filterOptions.goal}
-                onChange={(e) => handleFilterChange("goal", e.target.value)}
-              >
-                <option value="all">All Goals</option>
-                <option value="strength">Strength</option>
-                <option value="cardio">Cardio</option>
-                <option value="flexibility">Flexibility</option>
-                <option value="general fitness">General Fitness</option>
-              </select>
-            </div>
-          </div>
-        </div>
-
-        <div className="workout-tabs">
-          <button
-            className={`tab-button ${activeTab === "all" ? "active" : ""}`}
-            onClick={() => setActiveTab("all")}
-          >
-            All Workouts
-          </button>
-          <button
-            className={`tab-button ${
-              activeTab === "recommended" ? "active" : ""
-            }`}
-            onClick={() => setActiveTab("recommended")}
-          >
-            Recommended
-          </button>
-          <button
-            className={`tab-button ${
-              activeTab === "my-workouts" ? "active" : ""
-            }`}
-            onClick={() => setActiveTab("my-workouts")}
-          >
-            My Workouts
-          </button>
-          <button
-            className={`tab-button ${
-              activeTab === "favorites" ? "active" : ""
-            }`}
-            onClick={() => setActiveTab("favorites")}
-          >
-            Favorites
-          </button>
-        </div>
-
-        {loading ? (
-          <div className="loading-container">
-            <div className="loading-spinner"></div>
-          </div>
-        ) : (
-          <div className="workouts-grid">
-            {filteredWorkouts.length > 0 ? (
-              filteredWorkouts.map((workout, index) => (
-                <WorkoutCard
-                  key={workout.id}
-                  workout={workout}
-                  isFavorite={favorites.includes(workout.id)}
-                  hasNotification={notificationSettings[workout.id]}
-                  onToggleFavorite={() => toggleFavorite(workout.id)}
-                  onToggleNotification={() => toggleNotification(workout.id)}
-                  onClick={() => openWorkoutDetail(workout)}
-                  onEdit={() =>
-                    !workout.isRecommended && startEditWorkout(workout)
+            <div className="filter-container">
+              <div className="filter-group">
+                <label>Difficulty:</label>
+                <select
+                  value={filterOptions.difficulty}
+                  onChange={(e) =>
+                    handleFilterChange("difficulty", e.target.value)
                   }
-                  onLog={() => startLogWorkout(workout)}
-                  logs={getWorkoutLogs(workout.id)}
-                  style={{ animationDelay: `${0.1 * (index % 10)}s` }}
-                />
-              ))
-            ) : (
-              <div className="no-results">
-                <h3>No workouts found</h3>
-                <p>Try adjusting your filters or create a new workout</p>
+                >
+                  <option value="all">All Levels</option>
+                  <option value="beginner">Beginner</option>
+                  <option value="intermediate">Intermediate</option>
+                  <option value="advanced">Advanced</option>
+                </select>
               </div>
-            )}
+
+              <div className="filter-group">
+                <label>Duration:</label>
+                <select
+                  value={filterOptions.duration}
+                  onChange={(e) =>
+                    handleFilterChange("duration", e.target.value)
+                  }
+                >
+                  <option value="all">Any Duration</option>
+                  <option value="short">Short (≤ 30 min)</option>
+                  <option value="medium">Medium (31-60 min)</option>
+                  <option value="long">Long (60 min)</option>
+                </select>
+              </div>
+
+              <div className="filter-group">
+                <label>Goal:</label>
+                <select
+                  value={filterOptions.goal}
+                  onChange={(e) => handleFilterChange("goal", e.target.value)}
+                >
+                  <option value="all">All Goals</option>
+                  <option value="strength">Strength</option>
+                  <option value="cardio">Cardio</option>
+                  <option value="flexibility">Flexibility</option>
+                  <option value="general fitness">General Fitness</option>
+                </select>
+              </div>
+            </div>
           </div>
-        )}
 
-        {/* Create/Edit Workout Modal */}
-        {showCreateModal && (
-          <CreateWorkoutModal
-            onClose={() => {
-              setShowCreateModal(false);
-              setEditingWorkout(null);
-            }}
-            onSave={editingWorkout ? handleEditWorkout : handleCreateWorkout}
-            workout={editingWorkout}
-          />
-        )}
+          <div className="workout-tabs">
+            <button
+              className={`tab-button ${activeTab === "all" ? "active" : ""}`}
+              onClick={() => setActiveTab("all")}
+            >
+              All Workouts
+            </button>
+            <button
+              className={`tab-button ${
+                activeTab === "recommended" ? "active" : ""
+              }`}
+              onClick={() => setActiveTab("recommended")}
+            >
+              Recommended
+            </button>
+            <button
+              className={`tab-button ${
+                activeTab === "my-workouts" ? "active" : ""
+              }`}
+              onClick={() => setActiveTab("my-workouts")}
+            >
+              My Workouts
+            </button>
+            <button
+              className={`tab-button ${
+                activeTab === "favorites" ? "active" : ""
+              }`}
+              onClick={() => setActiveTab("favorites")}
+            >
+              Favorites
+            </button>
+          </div>
 
-        {/* Workout Detail Modal */}
-        {showDetailModal && selectedWorkout && (
-          <WorkoutDetailModal
-            workout={selectedWorkout}
-            onClose={() => setShowDetailModal(false)}
-            isFavorite={favorites.includes(selectedWorkout.id)}
-            hasNotification={notificationSettings[selectedWorkout.id]}
-            onToggleFavorite={() => toggleFavorite(selectedWorkout.id)}
-            onToggleNotification={() => toggleNotification(selectedWorkout.id)}
-            onEdit={() => {
-              setShowDetailModal(false);
-              startEditWorkout(selectedWorkout);
-            }}
-            onDelete={() => {
-              handleDeleteWorkout(selectedWorkout.id);
-              setShowDetailModal(false);
-            }}
-            onLog={() => startLogWorkout(selectedWorkout)}
-            logs={getWorkoutLogs(selectedWorkout.id)}
-          />
-        )}
+          {loading ? (
+            <div className="loading-container">
+              <div className="loading-spinner"></div>
+            </div>
+          ) : (
+            <div className="workouts-grid">
+              {filteredWorkouts.length > 0 ? (
+                filteredWorkouts.map((workout, index) => (
+                  <WorkoutCard
+                    key={workout.id}
+                    workout={workout}
+                    isFavorite={favorites.includes(workout.id)}
+                    hasNotification={notificationSettings[workout.id]}
+                    onToggleFavorite={() => toggleFavorite(workout.id)}
+                    onToggleNotification={() =>
+                      toggleNotification(workout.id)
+                    }
+                    onClick={() => openWorkoutDetail(workout)}
+                    onEdit={() =>
+                      !workout.isRecommended && startEditWorkout(workout)
+                    }
+                    onLog={() => startLogWorkout(workout)}
+                    logs={getWorkoutLogs(workout.id)}
+                    style={{ animationDelay: `${0.1 * (index % 10)}s` }}
+                  />
+                ))
+              ) : (
+                <div className="no-results">
+                  <h3>No workouts found</h3>
+                  <p>Try adjusting your filters or create a new workout</p>
+                </div>
+              )}
+            </div>
+          )}
 
-        {/* Log Workout Modal */}
-        {showLogModal && selectedWorkout && (
-          <LogWorkoutModal
-            workout={selectedWorkout}
-            onClose={() => setShowLogModal(false)}
-            onSave={handleLogWorkout}
-          />
-        )}
-        <MobileFooter />
-      </div>
-    </>
+          {/* Create/Edit Workout Modal */}
+          {showCreateModal && (
+            <CreateWorkoutModal
+              onClose={() => {
+                setShowCreateModal(false);
+                setEditingWorkout(null);
+              }}
+              onSave={editingWorkout ? handleEditWorkout : handleCreateWorkout}
+              workout={editingWorkout}
+            />
+          )}
+
+          {/* Workout Detail Modal */}
+          {showDetailModal && selectedWorkout && (
+            <WorkoutDetailModal
+              workout={selectedWorkout}
+              onClose={() => setShowDetailModal(false)}
+              isFavorite={favorites.includes(selectedWorkout.id)}
+              hasNotification={notificationSettings[selectedWorkout.id]}
+              onToggleFavorite={() => toggleFavorite(selectedWorkout.id)}
+              onToggleNotification={() =>
+                toggleNotification(selectedWorkout.id)
+              }
+              onEdit={() => {
+                setShowDetailModal(false);
+                startEditWorkout(selectedWorkout);
+              }}
+              onDelete={() => {
+                handleDeleteWorkout(selectedWorkout.id);
+                setShowDetailModal(false);
+              }}
+              onLog={() => startLogWorkout(selectedWorkout)}
+              logs={getWorkoutLogs(selectedWorkout.id)}
+            />
+          )}
+
+          {/* Log Workout Modal */}
+          {showLogModal && selectedWorkout && (
+            <LogWorkoutModal
+              workout={selectedWorkout}
+              onClose={() => setShowLogModal(false)}
+              onSave={handleLogWorkout}
+            />
+          )}
+          <ThemeToggle />
+          <MobileFooter />
+        </Box>
+      </Box>
+    </ThemeProvider>
   );
 };
 

@@ -1,0 +1,18 @@
+/* General styles for labels */
+label {
+  font-size: 14px;
+  color: #333;
+}
+
+/* Filter group styles */
+.filter-group label {
+  font-weight: bold;
+  color: #555;
+}
+
+/* Dark mode styles for labels */
+body.dark-mode label,
+body.dark-mode .label,
+body.dark-mode .filter-group label {
+  color: #d4af37 !important; /* Gold color with !important to override other styles */
+}

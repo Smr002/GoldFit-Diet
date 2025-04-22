@@ -2699,6 +2699,10 @@ code {
   margin-bottom: 8px;
 }
 
+body.dark-mode .label {
+  color: #d4af37 !important ; /* Gold */
+}
+
 .form-group input,
 .form-group textarea {
   padding: 12px 16px;
@@ -5459,6 +5463,11 @@ body.dark-mode .skeleton-instruction-line {
   background-color: white;
   border-radius: 12px;
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+  transition: all 0.3s ease;
+  border: 1px solid #e5e7eb;
+  border-radius: 12px;
+  padding: 20px;
+  background-color: #fff;
 }
 
 .filter-group {
@@ -5475,6 +5484,10 @@ body.dark-mode .skeleton-instruction-line {
   margin-bottom: 8px;
   text-transform: uppercase;
   letter-spacing: 0.05em;
+}
+
+body.dark-mode .filter-group label {
+  color: #000;
 }
 
 .filter-group select {
@@ -5530,9 +5543,18 @@ body.dark-mode .skeleton-instruction-line {
   white-space: nowrap;
 }
 
+body.dark-mode .tab-button{
+  color: #fff;
+}
+
 .tab-button.active {
   color: #0070f3;
   border-bottom-color: #0070f3;
+}
+
+body.dark-mode .tab-button.active {
+  color: #d4af37;
+  border-bottom-color: #d4af37;
 }
 
 /* Workouts Grid */
@@ -5543,6 +5565,7 @@ body.dark-mode .skeleton-instruction-line {
   gap: 24px;
   animation: fadeIn 0.5s ease-out;
   margin-bottom: 80px; /* Adjusted for spacing with mobile footer */
+  margin-left: 32px;
 }
 
 
