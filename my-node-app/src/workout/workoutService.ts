@@ -27,12 +27,20 @@ export class WorkoutService {
   }
 
   async updateWorkout(id: number, workoutData: any): Promise<Workout> {
-    const workout = new WorkoutModel(workoutData);
-    if (!workout.isValid()) {
-      throw new Error('Invalid workout data');
+    try {
+      const workout = new WorkoutModel(workoutData);
+  
+      if (!workout.isValid()) {
+        throw new Error("Invalid workout data");
+      }
+  
+      return await this.repository.updateWorkout(id, workout);
+    } catch (error) {
+      console.error("Error in updateWorkout:", error); // Log the error for debugging
+      throw new Error("Workout update failed");
     }
-    return this.repository.updateWorkout(id, workout);
   }
+  
 
   async deleteWorkout(id: number): Promise<Workout> {
     return this.repository.deleteWorkout(id);
