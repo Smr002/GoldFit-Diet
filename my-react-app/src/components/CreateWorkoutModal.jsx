@@ -1,102 +1,107 @@
-"use client"
-
-import { useState, useEffect } from "react"
+"use client";
+import { updateWorkout, getExercises } from "@/api";
+import { useState, useEffect } from "react";
+import UpdateStatusModal from "./UpdateStatusModal";
 
 const CreateWorkoutModal = ({ onClose, onSave, workout = null }) => {
-  const [title, setTitle] = useState("")
-  const [description, setDescription] = useState("")
-  const [difficulty, setDifficulty] = useState("beginner")
-  const [duration, setDuration] = useState(30)
-  const [goal, setGoal] = useState("general fitness")
-  const [exercises, setExercises] = useState([])
+  const [title, setTitle] = useState("");
+  const [description, setDescription] = useState("");
+  const [difficulty, setDifficulty] = useState("beginner");
+  const [duration, setDuration] = useState(30);
+  const [goal, setGoal] = useState("general fitness");
+  const [showStatus, setShowStatus] = useState(false);
+  const [updateSuccess, setUpdateSuccess] = useState(false);
+  const [statusMessage, setStatusMessage] = useState("");
+
+  const [exercises, setExercises] = useState([]);
   const [currentExercise, setCurrentExercise] = useState({
     name: "",
     sets: 3,
     reps: 10,
     rest: 60,
-  })
-  const [src, setSrc] = useState("/placeholder.svg") // Changed from imageUrl to src, using placeholder as default
-  const [isEditing, setIsEditing] = useState(false)
-  const [editingIndex, setEditingIndex] = useState(-1)
+  });
+  const [src, setSrc] = useState("/placeholder.svg"); // Changed from imageUrl to src, using placeholder as default
+  const [isEditing, setIsEditing] = useState(false);
+  const [editingIndex, setEditingIndex] = useState(-1);
 
   // Add custom styles for the edit and remove buttons
   const buttonStyles = {
     editButton: {
-      backgroundColor: '#4ade80', // green
-      color: 'white',
-      borderRadius: '4px',
-      padding: '4px',
-      display: 'flex',
-      alignItems: 'center',
-      justifyContent: 'center',
-      border: 'none',
-      cursor: 'pointer',
-      marginRight: '5px',
+      backgroundColor: "#4ade80", // green
+      color: "white",
+      borderRadius: "4px",
+      padding: "4px",
+      display: "flex",
+      alignItems: "center",
+      justifyContent: "center",
+      border: "none",
+      cursor: "pointer",
+      marginRight: "5px",
     },
     removeButton: {
-      backgroundColor: '#ef4444', // red
-      color: 'white',
-      borderRadius: '4px',
-      padding: '4px',
-      display: 'flex',
-      alignItems: 'center',
-      justifyContent: 'center',
-      border: 'none',
-      cursor: 'pointer',
-    }
-  }
+      backgroundColor: "#ef4444", // red
+      color: "white",
+      borderRadius: "4px",
+      padding: "4px",
+      display: "flex",
+      alignItems: "center",
+      justifyContent: "center",
+      border: "none",
+      cursor: "pointer",
+    },
+  };
 
   // Enhanced modal styles for better centering on small screens like iPhone SE
   const modalStyles = {
     overlay: {
-      position: 'fixed',
+      position: "fixed",
       top: 0,
       left: 0,
       right: 0,
       bottom: 0,
-      display: 'flex',
-      alignItems: 'center',
-      justifyContent: 'center',
-      padding: '10px',
-      overflowY: 'auto',
+      display: "flex",
+      alignItems: "center",
+      justifyContent: "center",
+      padding: "10px",
+      overflowY: "auto",
       zIndex: 1000,
     },
     modal: {
-      margin: '0 auto',
-      maxHeight: '100vh',
-      overflowY: 'auto',
-      width: '100%',
-      maxWidth: '700px',
-      position: 'relative',
+      margin: "0 auto",
+      maxHeight: "100vh",
+      overflowY: "auto",
+      width: "100%",
+      maxWidth: "700px",
+      position: "relative",
       top: 0,
-      transform: 'none',
-    }
+      transform: "none",
+    },
   };
 
   useEffect(() => {
     if (workout) {
-      setTitle(workout.title)
-      setDescription(workout.description)
-      setDifficulty(workout.difficulty)
-      setDuration(workout.duration)
-      setGoal(workout.goal)
-      setExercises(workout.exercises)
-      setSrc(workout.src || "/placeholder.svg") // Changed to src
+      setTitle(workout.title);
+      setDescription(workout.description);
+      setDifficulty(workout.difficulty);
+      setDuration(workout.duration);
+      setGoal(workout.goal);
+      setExercises(workout.exercises);
+      setSrc(workout.src || "/placeholder.svg"); // Changed to src
     }
-  }, [workout])
+  }, [workout]);
 
   const handleAddExercise = () => {
-    if (!currentExercise.name) return
+    if (!currentExercise.name) return;
 
     if (isEditing && editingIndex >= 0) {
-      const updatedExercises = [...exercises]
+      const updatedExercises = [...exercises];
       updatedExercises[editingIndex] = {
         ...currentExercise,
         id: exercises[editingIndex].id,
-      }
-      setExercises(updatedExercises)
-      setIsEditing(false)
-      setEditingIndex(-1)
+      };
+      setExercises(updatedExercises);
+      setIsEditing(false);
+      setEditingIndex(-1);
     } else {
       setExercises([
         ...exercises,
@@ -104,7 +109,7 @@ const CreateWorkoutModal = ({ onClose, onSave, workout = null }) => {
           ...currentExercise,
           id: `temp-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`,
         },
-      ])
+      ]);
     }
 
     setCurrentExercise({
@@ -112,70 +117,127 @@ const CreateWorkoutModal = ({ onClose, onSave, workout = null }) => {
       sets: 3,
       reps: 10,
       rest: 60,
-    })
-  }
+    });
+  };
 
   const handleEditExercise = (index) => {
-    setCurrentExercise(exercises[index])
-    setIsEditing(true)
-    setEditingIndex(index)
-  }
+    setCurrentExercise(exercises[index]);
+    setIsEditing(true);
+    setEditingIndex(index);
+  };
 
   const handleRemoveExercise = (index) => {
-    const updatedExercises = [...exercises]
-    updatedExercises.splice(index, 1)
-    setExercises(updatedExercises)
+    const updatedExercises = [...exercises];
+    updatedExercises.splice(index, 1);
+    setExercises(updatedExercises);
 
     if (isEditing && editingIndex === index) {
-      setIsEditing(false)
-      setEditingIndex(-1)
+      setIsEditing(false);
+      setEditingIndex(-1);
       setCurrentExercise({
         name: "",
         sets: 3,
         reps: 10,
         rest: 60,
-      })
+      });
     }
-  }
+  };
 
-  const handleSave = () => {
-    if (!title || exercises.length === 0) return
+  const handleSave = async () => {
+    if (!title.trim()) return alert("Workout title is required.");
+    if (exercises.length === 0) return alert("Add at least one exercise.");
 
-    const newWorkout = {
-      title,
-      description,
-      difficulty,
-      duration: Number.parseInt(duration),
-      goal,
-      exercises,
-      src, // Changed to src
+    try {
+      const all = await getExercises(import.meta.env.VITE_AUTH_TOKEN);
+      const resolved = exercises.map((ex) => {
+        const match = all.find(
+          (e) => e.name.toLowerCase() === ex.name.toLowerCase()
+        );
+        return {
+          name: ex.name,
+          sets: ex.sets,
+          reps: ex.reps,
+          rest: ex.rest,
+          exerciseId: match?.id,
+        };
+      });
+
+      if (resolved.some((ex) => typeof ex.exerciseId !== "number")) {
+        setUpdateSuccess(false);
+        setStatusMessage("Some exercises could not be matched with an ID.");
+        setShowStatus(true);
+        return;
+      }
+
+      const data = {
+        name: title,
+        description,
+        difficulty,
+        duration: Number(duration),
+        goal,
+        exercises: resolved,
+        src,
+      };
+
+      if (workout) {
+        await updateWorkout(workout.id, data, import.meta.env.VITE_AUTH_TOKEN);
+        setUpdateSuccess(true);
+        setStatusMessage("Workout updated successfully!");
+      } else {
+        setUpdateSuccess(true);
+        setStatusMessage("Workout created successfully!");
+      }
+
+      setShowStatus(true);
+
+      // Delay onSave so modal is visible
+      setTimeout(() => {
+        onSave(workout ? { ...workout, ...data } : data);
+      }, 1500);
+    } catch (err) {
+      console.error(err);
+      setUpdateSuccess(false);
+      setStatusMessage("Something went wrong while saving.");
+      setShowStatus(true);
     }
-
-    if (workout) {
-      newWorkout.id = workout.id
-      newWorkout.createdAt = workout.createdAt
-      newWorkout.isRecommended = workout.isRecommended
-    }
-
-    onSave(newWorkout)
-  }
+  };
 
   const handleImageUpload = (e) => {
-    const file = e.target.files[0]
-    if (!file) return
-    const objectUrl = URL.createObjectURL(file)
-    setSrc(objectUrl) // Changed to setSrc
-  }
+    const file = e.target.files[0];
+    if (!file) return;
+    const objectUrl = URL.createObjectURL(file);
+    setSrc(objectUrl); // Changed to setSrc
+  };
 
   return (
-    <div className="workout-modal-overlay" onClick={onClose} style={modalStyles.overlay}>
-      <div className="create-workout-modal" onClick={(e) => e.stopPropagation()} style={modalStyles.modal}>
+    <div
+      className="workout-modal-overlay"
+      onClick={onClose}
+      style={modalStyles.overlay}
+    >
+      <div
+        className="create-workout-modal"
+        onClick={(e) => e.stopPropagation()}
+        style={modalStyles.modal}
+      >
         <button className="close-modal" onClick={onClose}>
           ×
         </button>
 
-        <h2 className="create-modal-title">{workout ? "Edit Workout" : "Create New Workout"}</h2>
-
+        <h2 className="create-modal-title">
+          {workout ? "Edit Workout" : "Create New Workout"}
+        </h2>
+        {showStatus && (
+          <UpdateStatusModal
+            status={updateSuccess ? "success" : "error"}
+            message={
+              updateSuccess
+                ? "Workout saved successfully!"
+                : "Something went wrong while saving."
+            }
+            onClose={() => setShowStatus(false)}
+          />
+        )}
         <div className="create-modal-content">
           <div className="create-modal-form">
             {/* Basic workout information form */}
@@ -205,7 +267,11 @@ const CreateWorkoutModal = ({ onClose, onSave, workout = null }) => {
             <div className="form-row">
               <div className="form-group half">
                 <label htmlFor="workout-difficulty">Difficulty</label>
-                <select id="workout-difficulty" value={difficulty} onChange={(e) => setDifficulty(e.target.value)}>
+                <select
+                  id="workout-difficulty"
+                  value={difficulty}
+                  onChange={(e) => setDifficulty(e.target.value)}
+                >
                   <option value="beginner">Beginner</option>
                   <option value="intermediate">Intermediate</option>
                   <option value="advanced">Advanced</option>
@@ -227,7 +293,11 @@ const CreateWorkoutModal = ({ onClose, onSave, workout = null }) => {
 
             <div className="form-group">
               <label htmlFor="workout-goal">Goal</label>
-              <select id="workout-goal" value={goal} onChange={(e) => setGoal(e.target.value)}>
+              <select
+                id="workout-goal"
+                value={goal}
+                onChange={(e) => setGoal(e.target.value)}
+              >
                 <option value="strength">Strength</option>
                 <option value="cardio">Cardio</option>
                 <option value="flexibility">Flexibility</option>
@@ -238,10 +308,17 @@ const CreateWorkoutModal = ({ onClose, onSave, workout = null }) => {
             <div className="form-group">
               <label>Workout Image</label>
               <div className="image-upload-container">
-                <img src={src || "/placeholder.svg"} alt="Workout" className="workout-image-preview" /> {/* Changed to src */}
+                <img
+                  src={src || "/placeholder.svg"}
+                  alt="Workout"
+                  className="workout-image-preview"
+                />{" "}
+                {/* Changed to src */}
                 <button
                   className="change-image-button"
-                  onClick={() => document.getElementById("workout-image").click()}
+                  onClick={() =>
+                    document.getElementById("workout-image").click()
+                  }
                 >
                   Change Image
                 </button>
@@ -267,7 +344,12 @@ const CreateWorkoutModal = ({ onClose, onSave, workout = null }) => {
                   type="text"
                   id="exercise-name"
                   value={currentExercise.name}
-                  onChange={(e) => setCurrentExercise({ ...currentExercise, name: e.target.value })}
+                  onChange={(e) =>
+                    setCurrentExercise({
+                      ...currentExercise,
+                      name: e.target.value,
+                    })
+                  }
                   placeholder="Enter exercise name"
                 />
               </div>
@@ -280,7 +362,10 @@ const CreateWorkoutModal = ({ onClose, onSave, workout = null }) => {
                     id="exercise-sets"
                     value={currentExercise.sets}
                     onChange={(e) =>
-                      setCurrentExercise({ ...currentExercise, sets: Number.parseInt(e.target.value) || 1 })
+                      setCurrentExercise({
+                        ...currentExercise,
+                        sets: Number.parseInt(e.target.value) || 1,
+                      })
                     }
                     min="1"
                     max="10"
@@ -294,7 +379,10 @@ const CreateWorkoutModal = ({ onClose, onSave, workout = null }) => {
                     id="exercise-reps"
                     value={currentExercise.reps}
                     onChange={(e) =>
-                      setCurrentExercise({ ...currentExercise, reps: Number.parseInt(e.target.value) || 1 })
+                      setCurrentExercise({
+                        ...currentExercise,
+                        reps: Number.parseInt(e.target.value) || 1,
+                      })
                     }
                     min="1"
                     max="100"
@@ -308,7 +396,10 @@ const CreateWorkoutModal = ({ onClose, onSave, workout = null }) => {
                     id="exercise-rest"
                     value={currentExercise.rest}
                     onChange={(e) =>
-                      setCurrentExercise({ ...currentExercise, rest: Number.parseInt(e.target.value) || 0 })
+                      setCurrentExercise({
+                        ...currentExercise,
+                        rest: Number.parseInt(e.target.value) || 0,
+                      })
                     }
                     min="0"
                     max="300"
@@ -316,7 +407,11 @@ const CreateWorkoutModal = ({ onClose, onSave, workout = null }) => {
                 </div>
               </div>
 
-              <button className="add-exercise-button" onClick={handleAddExercise} disabled={!currentExercise.name}>
+              <button
+                className="add-exercise-button"
+                onClick={handleAddExercise}
+                disabled={!currentExercise.name}
+              >
                 {isEditing ? "Update Exercise" : "Add Exercise"}
               </button>
             </div>
@@ -382,7 +477,10 @@ const CreateWorkoutModal = ({ onClose, onSave, workout = null }) => {
                 ))
               ) : (
                 <div className="no-exercises">
-                  <p>No exercises added yet. Add at least one exercise to create a workout.</p>
+                  <p>
+                    No exercises added yet. Add at least one exercise to create
+                    a workout.
+                  </p>
                 </div>
               )}
             </div>
@@ -393,13 +491,17 @@ const CreateWorkoutModal = ({ onClose, onSave, workout = null }) => {
           <button className="cancel-button" onClick={onClose}>
             Cancel
           </button>
-          <button className="save-button" onClick={handleSave} disabled={!title || exercises.length === 0}>
+          <button
+            className="save-button"
+            onClick={handleSave}
+            disabled={!title || exercises.length === 0}
+          >
             {workout ? "Update Workout" : "Create Workout"}
           </button>
         </div>
       </div>
     </div>
-  )
-}
+  );
+};
 
-export default CreateWorkoutModal
+export default CreateWorkoutModal;

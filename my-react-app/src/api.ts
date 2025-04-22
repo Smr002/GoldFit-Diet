@@ -92,3 +92,20 @@ export async function getWorkouts(token: string) {
     throw new Error("Unexpected error");
   }
 }
+
+export async function updateWorkout(id: number, data: any, token: string) {
+  try {
+    const response = await axios.put(`${API_BASE_URL}/workouts/${id}`, data, {
+      headers: {
+        Authorization: `Bearer ${token}`,
+        "Content-Type": "application/json",
+      },
+    });
+    return response.data;
+  } catch (error: any) {
+    if (axios.isAxiosError(error)) {
+      throw new Error(error.response?.data?.error || "Failed to update workout");
+    }
+    throw new Error("Unexpected error");
+  }
+}
