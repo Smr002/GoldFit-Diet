@@ -1,0 +1,35 @@
+/* General styling for body part cards */
+.bodyPart-card {
+  background-color: var(--light-background);
+  border-radius: 8px;
+  padding: 16px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.bodyPart-card h3 {
+  font-size: 1.5rem;
+  margin-bottom: 8px;
+}
+
+.bodyPart-card .bodyPart-name {
+  font-size: 1rem;
+  color: var(--light-text-primary);
+}
+
+/* Styling for body part names */
+.body-part-name {
+  font-size: 15px;
+  font-weight: 600;
+  color: #1f2937;
+  text-align: center;
+}
+
+/* Dark mode styling for body part names */
+body.dark-mode .bodyPart-card h3,
+body.dark-mode .bodyPart-card .bodyPart-name {
+  color: var(--dark-text-primary);
+}
+
+body.dark-mode .body-part-name {
+  color: #ffffff;
+}

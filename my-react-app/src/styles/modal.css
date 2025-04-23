@@ -1,0 +1,47 @@
+/* Modal centering styles that work on all devices, including iPhone SE */
+.workout-modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: rgba(0, 0, 0, 0.5);
+  display: flex;
+  justify-content: center;
+  align-items: flex-start;
+  overflow-y: auto;
+  z-index: 1000;
+  padding: 10px;
+  box-sizing: border-box;
+}
+
+/* Ensure modals are properly centered on small screens */
+@media screen and (max-width: 375px) {
+  /* iPhone SE width */
+  .create-workout-modal,
+  .workout-modal,
+  .log-workout-modal {
+    width: 100% !important;
+    margin: 10px auto !important;
+    max-height: calc(100vh - 20px) !important;
+    overflow-y: auto !important;
+  }
+  
+  /* Adjust padding for small screens */
+  .create-modal-content,
+  .workout-modal-content,
+  .log-exercises-section {
+    padding: 10px !important;
+  }
+  
+  /* Make form inputs and controls better fit small screens */
+  .form-row {
+    flex-direction: column;
+  }
+  
+  .form-group.half,
+  .form-group.third {
+    width: 100%;
+    padding-right: 0;
+  }
+}

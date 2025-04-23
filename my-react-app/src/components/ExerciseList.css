@@ -1,0 +1,44 @@
+.exercises-container {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+  gap: 20px;
+  padding: 20px;
+  max-width: 100%;
+  overflow-x: hidden;
+  margin: 0 auto;
+}
+
+/* Responsive adjustments for smaller screens */
+@media (max-width: 768px) {
+  .exercises-container {
+    grid-template-columns: 1fr;
+    padding: 15px;
+  }
+}
+
+/* Dark mode styles */
+body.dark-mode .exercises-container {
+  background-color: var(--dark-bg-secondary);
+  border-color: var(--dark-border);
+}
+
+/* Handle empty state gracefully */
+.exercises-container:empty {
+  min-height: 200px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  border: 2px dashed var(--light-border);
+  border-radius: 8px;
+}
+
+body.dark-mode .exercises-container:empty {
+  border-color: var(--dark-border);
+}
+
+/* Prevent items from overflowing */
+.exercises-container > * {
+  max-width: 100%;
+  overflow: hidden;
+  word-wrap: break-word;
+}
