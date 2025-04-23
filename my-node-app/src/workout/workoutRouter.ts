@@ -20,7 +20,7 @@ router.get('/premade',  controller.getPreMadeWorkouts.bind(controller));
 router.get('/exercises/search',  controller.searchExercises.bind(controller));
 
 // Workout Session Routes
-router.post('/sessions',  controller.logWorkoutSession.bind(controller));
+router.post('/sessions', authenticateJWT, controller.logWorkoutSession.bind(controller));
 
 // Progress Tracking Routes
 router.get('/:workoutId/progress',  controller.getWorkoutProgress.bind(controller));
