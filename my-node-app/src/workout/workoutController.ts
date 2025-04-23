@@ -94,52 +94,35 @@ export class WorkoutController {
     }
   }
 
-  // Workout Session Operations
-  async logWorkoutSession(req: Request, res: Response) {
-    try {
-      const userId = Number(req.user?.id);
-      const { workoutId, date } = req.body;
-      const session = await this.service.logWorkoutSession(
-        userId,
-        workoutId,
-        new Date(date)
-      );
-      res.status(201).json(session);
-    } catch (error) {
-      res.status(400).json({ error: 'Failed to log workout session' });
-    }
-  }
+  
 
-  async createWorkoutSession(req: AuthenticatedRequest, res: Response) {
+  async logWorkoutSession(req: AuthenticatedRequest, res: Response) {
     try {
+      if (!req.user || !req.user.id) {
+        return res.status(401).json({ error: 'User not authenticated' });
+      }
       
-      const { workoutId, date, exercises } = (req as Request).body as {
+      const userId = Number(req.user.id);
+      const { workoutId, date, exercises } = req.body as {
         workoutId: number;
         date: string;
-        exercises: {
-          exerciseId: number;
-          weightUsed?: number;
-          setsCompleted?: number;
-          repsCompleted?: number;
-        }[];
+        exercises?: { exerciseId: number; setsCompleted?: number; repsCompleted?: number; weightUsed?: number }[];
       };
-
-      // Then still retrieve user from the AuthenticatedRequest
-      const userId = Number(req.user?.id);
-
-      const session = await this.service.createWorkoutSession(
+      
+      const session = await this.service.logWorkoutSession(
         userId,
         workoutId,
         new Date(date),
         exercises
       );
-
       res.status(201).json(session);
     } catch (error) {
-      console.error("Error creating workout session:", error);
-      res.status(400).json({ error: "Failed to create workout session" });
+      console.error("Error logging workout session:", error);
+      res.status(400).json({ error: 'Failed to log workout session' });
     }
   }
+
+    
 
   async getSessionById(req: AuthenticatedRequest, res: Response) {
     try {

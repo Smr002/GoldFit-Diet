@@ -58,15 +58,7 @@ export class WorkoutService {
     return this.repository.searchExercises(query, muscleGroup);
   }
 
-  async logWorkoutSession(userId: number, workoutId: number, date: Date): Promise<WorkoutSession> {
-    const sessionModel = new WorkoutSessionModel({
-      userId,
-      workoutId,
-      date
-    });
-
-    return this.repository.logWorkoutSession(sessionModel);
-  }
+  
 
   async getWorkoutStreak(userId: number): Promise<number> {
     return this.repository.getWorkoutStreak(userId);
@@ -76,24 +68,21 @@ export class WorkoutService {
     return this.repository.getPersonalBests(userId);
   }
 
-  async createWorkoutSession(
+  async logWorkoutSession(
     userId: number,
     workoutId: number,
     date: Date,
-    exercises: {
-      exerciseId: number;
-      weightUsed?: number;
-      setsCompleted?: number;
-      repsCompleted?: number;
-    }[]
-  ): Promise<WorkoutSession> {
+    exercises?: { exerciseId: number; setsCompleted?: number; repsCompleted?: number; weightUsed?: number }[]
+  ): Promise<WorkoutSession & { sessionExercises: SessionExercise[] }> {
+    // Create the session model
     const sessionModel = new WorkoutSessionModel({
       userId,
       workoutId,
       date,
-      exercises,
+      exercises: exercises || []
     });
-    if (!sessionModel.isValid()) throw new Error("Invalid session data");
+    
+    // Use the repository to store the workout session
     return this.repository.logWorkoutSession(sessionModel);
   }
 
