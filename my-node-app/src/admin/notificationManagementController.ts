@@ -162,12 +162,12 @@ export const createNotification = async (req: Request, res: Response) => {
   try {
     const { type, message, isAutomated, frequency, targetUsers, specificUserIds } = req.body;
   
-    const adminId = req.user?.adminId; // Assuming adminId is available in the request after authentication
+    // const adminId = req.user?.adminId; // Assuming adminId is available in the request after authentication
 
-    if (!adminId) {
+    // if (!adminId) {
 
-      return res.status(403).json({ error: 'Only admins can create notifications' });
-    }
+    //   return res.status(403).json({ error: 'Only admins can create notifications' });
+    // }
 
     // Validate target users
     if (!Object.values(NotificationAudience).includes(targetUsers)) {
@@ -182,7 +182,7 @@ export const createNotification = async (req: Request, res: Response) => {
         isAutomated: isAutomated === true || isAutomated === 'true',
         frequency,
         targetUsers,
-        createdBy: adminId
+        createdBy: req.user?.id
       }
     });
 

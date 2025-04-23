@@ -9,6 +9,7 @@ import workoutRouter from "./workout/workoutRouter";
 import exerciseRouter from "./exercise/exerciseRouter";
 import nutritionRouter from './nutrition/nutritionRouter';
 import adminRoutes from './admin/adminRoutes';
+import notificationRouter from './notifications/notificationRouter';
 
 dotenv.config();
 
@@ -29,6 +30,8 @@ app.use("/workouts", workoutRouter);
 app.use("/exercises", exerciseRouter);
 app.use("/nutrition", nutritionRouter);
 app.use("/admin", adminRoutes);
+app.use("/notifications", notificationRouter);
+
 
 app.use((req, res) => {
   res.status(404).json({ error: "Not found" });
