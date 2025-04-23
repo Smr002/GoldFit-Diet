@@ -17,10 +17,15 @@ export class NutritionService {
       );
 
       if (!response.ok) {
-        throw new Error(`USDA API error: ${response.statusText}`);
+        throw new Error(`USDA API error: ${response.status} ${response.statusText}`);
       }
+      
 
       const data = await response.json();
+      if (!data.foods || !Array.isArray(data.foods)) {
+        console.warn("USDA API response did not contain expected 'foods' array:", data);
+        return [];
+      }
       return data.foods.slice(0, 10).map((food: any) => ({
         fdcId: food.fdcId,
         description: food.description,
@@ -49,7 +54,21 @@ export class NutritionService {
   }
 
   async deleteNutritionLog(logId: number) {
-    return this.repository.deleteNutritionLog(logId);
+    try {
+      const logToDelete = await this.repository.getNutritionLogById(logId); 
+
+      if (!logToDelete) {
+          const notFoundError = new Error(`Nutrition log with ID ${logId} not found.`);
+          (notFoundError as any).status = 404; 
+          throw notFoundError;
+      }
+      
+
+      return await this.repository.deleteNutritionLog(logId);
+    } catch (error) {
+      console.error(`Error in NutritionService.deleteNutritionLog for log ID ${logId}`, error);
+      throw error;
+    }
   }
 
   calculateNutrients(foodItems: any[]) {
