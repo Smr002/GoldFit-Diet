@@ -92,13 +92,34 @@ export class WorkoutService {
     return session;
   }
 
+  async getUserBadge(userId: number): Promise<{
+    totalSessions: number;
+    badge: "Noob" | "Intermediate" | "Pro" | "Master";
+  }> {
+    
+    const totalSessions = await this.repository.countSessionsByUserId(userId);
+    let badge: "Noob" | "Intermediate" | "Pro" | "Master";
+
+    if (totalSessions < 10) {
+      badge = "Noob";
+    } else if (totalSessions < 20) {
+      badge = "Intermediate";
+    } else if (totalSessions < 50) {
+      badge = "Pro";
+    } else {
+      badge = "Master";
+    }
+
+    return { totalSessions, badge };
+  }
+
   async updateSessionExercise(
     sessionExerciseId: number,
     userId: number,
     data: { weightUsed?: number; setsCompleted?: number; repsCompleted?: number }
   ): Promise<SessionExercise> {
     // Verify ownership
-    const existing = await this.repository.prisma.sessionExercise.findUnique({
+    const existing = await this.repository.sessionExercise.findUnique({
       where: { id: sessionExerciseId },
       include: { session: true },
     });

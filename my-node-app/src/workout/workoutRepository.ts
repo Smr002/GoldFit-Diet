@@ -299,4 +299,13 @@ export class WorkoutRepository {
       },
     });
   }
+
+
+  async countSessionsByUserId(userId: number): Promise<number> {  
+    return this.prisma.workoutSession.count({
+      where: { userId },
+    });
+  }
+
+
 }
