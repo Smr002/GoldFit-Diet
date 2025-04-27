@@ -175,7 +175,7 @@ const WorkoutDetailModal = ({
               Favorite
             </button>
 
-          </div>
+          </div>   
         </div>
 
         <div className="workout-modal-content">
