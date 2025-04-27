@@ -38,6 +38,7 @@ model User {
   height                Float
   weight                Float
   goal                  Goal
+  nutritionGoal         Int?
   activeWorkoutId       Int?      @map("active_workout_id")
   notifyWorkoutSessions Boolean   @default(false) @map("notify_workout_sessions")
   notifyMotivational    Boolean   @default(false) @map("notify_motivational")
