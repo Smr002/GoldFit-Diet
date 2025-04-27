@@ -1,17 +1,54 @@
-import React, { useState, useEffect, useRef } from 'react';
-import { X, Calendar, Clock, User, Target, LayoutTemplate, Dumbbell, ChevronDown, Plus, Trash2, Save, AlertCircle, Info, Image, Upload } from 'lucide-react';
+import React, { useState, useEffect, useRef } from "react";
+import {
+  X,
+  Calendar,
+  Clock,
+  User,
+  Target,
+  LayoutTemplate,
+  Dumbbell,
+  ChevronDown,
+  Plus,
+  Trash2,
+  Save,
+  AlertCircle,
+  Info,
+  Image,
+  Upload,
+} from "lucide-react";
 
 // Mapping for common exercise name variations
 const exerciseNameMapping = {
-  "Alternate Lateral Pulldown": ["alternate lateral pulldown", "lateral pulldown", "pulldown"],
-  "Assisted Parallel Close Grip Pull-up": ["assisted parallel close grip pull-up", "close grip pull-up", "assisted pull-up"],
-  "Assisted Pull-up": ["assisted pull-up", "assisted pullup", "pull-up", "pullup"],
-  "Barbell Pullover To Press": ["barbell pullover to press", "barbell pullover", "pullover press"],
-  "Barbell Bent Over Row": ["barbell bent over row", "bent over row", "barbell row"]
+  "Alternate Lateral Pulldown": [
+    "alternate lateral pulldown",
+    "lateral pulldown",
+    "pulldown",
+  ],
+  "Assisted Parallel Close Grip Pull-up": [
+    "assisted parallel close grip pull-up",
+    "close grip pull-up",
+    "assisted pull-up",
+  ],
+  "Assisted Pull-up": [
+    "assisted pull-up",
+    "assisted pullup",
+    "pull-up",
+    "pullup",
+  ],
+  "Barbell Pullover To Press": [
+    "barbell pullover to press",
+    "barbell pullover",
+    "pullover press",
+  ],
+  "Barbell Bent Over Row": [
+    "barbell bent over row",
+    "bent over row",
+    "barbell row",
+  ],
 };
 
 const normalizeExerciseName = (name) => {
-  return name.toLowerCase().replace(/\s+/g, ' ').trim();
+  return name.toLowerCase().replace(/\s+/g, " ").trim();
 };
 
 const WorkoutEditModal = ({ workout, onClose, onSave, isCreating = false }) => {
@@ -24,12 +61,12 @@ const WorkoutEditModal = ({ workout, onClose, onSave, isCreating = false }) => {
   const [formErrors, setFormErrors] = useState({});
   const [exerciseLibrary, setExerciseLibrary] = useState([]);
   const [showExerciseSelector, setShowExerciseSelector] = useState(false);
-  const [searchTerm, setSearchTerm] = useState('');
+  const [searchTerm, setSearchTerm] = useState("");
   const [exerciseDetails, setExerciseDetails] = useState({});
   const [selectedListExercise, setSelectedListExercise] = useState(null);
   const [detailsOpen, setDetailsOpen] = useState(true);
   const [instructionsOpen, setInstructionsOpen] = useState(false);
-  
+
   // Fetch exercise library for adding new exercises
   useEffect(() => {
     const fetchExerciseLibrary = async () => {
@@ -42,41 +79,46 @@ const WorkoutEditModal = ({ workout, onClose, onSave, isCreating = false }) => {
             "X-RapidAPI-Host": "exercisedb.p.rapidapi.com",
           },
         };
-        
+
         const response = await fetch(
           "https://exercisedb.p.rapidapi.com/exercises",
           options
         );
-        
+
         if (!response.ok) {
           throw new Error("Failed to fetch exercise library");
         }
-        
+
         const data = await response.json();
-        
+
         // Process the data to include GIFs, instructions, etc.
-        const processedExercises = data.slice(0, 100).map(exercise => ({
+        const processedExercises = data.slice(0, 100).map((exercise) => ({
           ...exercise,
-          instructions: exercise.instructions || ["Follow the animation carefully.", "Maintain proper form throughout the exercise."]
+          instructions: exercise.instructions || [
+            "Follow the animation carefully.",
+            "Maintain proper form throughout the exercise.",
+          ],
         }));
-        
+
         setExerciseLibrary(processedExercises);
       } catch (error) {
         console.error("Error fetching exercise library:", error);
-        setError("Failed to load exercise library. You can still edit existing exercises.");
+        setError(
+          "Failed to load exercise library. You can still edit existing exercises."
+        );
       } finally {
         setLoading(false);
       }
     };
-    
+
     fetchExerciseLibrary();
   }, []);
-  
+
   // Fetch details for existing exercises in the workout
   useEffect(() => {
     const fetchExerciseDetails = async () => {
       if (!workout.exercises || workout.exercises.length === 0) return;
-      
+
       try {
         const options = {
           method: "GET",
@@ -87,16 +129,18 @@ const WorkoutEditModal = ({ workout, onClose, onSave, isCreating = false }) => {
         };
 
         // Fetch exercises by their approximate names
-        const exercisePromises = workout.exercises.map(exercise => {
-          const searchTerm = exerciseNameMapping[exercise.name]?.[0] || normalizeExerciseName(exercise.name);
+        const exercisePromises = workout.exercises.map((exercise) => {
+          const searchTerm =
+            exerciseNameMapping[exercise.name]?.[0] ||
+            normalizeExerciseName(exercise.name);
           return fetch(
             `https://exercisedb.p.rapidapi.com/exercises/name/${searchTerm}`,
             options
-          ).then(response => response.json());
+          ).then((response) => response.json());
         });
 
         const results = await Promise.all(exercisePromises);
-        
+
         // Create a mapping of exercise ID to complete exercise details
         const exerciseData = {};
         results.forEach((result, index) => {
@@ -106,45 +150,50 @@ const WorkoutEditModal = ({ workout, onClose, onSave, isCreating = false }) => {
               bodyPart: result[0].bodyPart,
               target: result[0].target,
               equipment: result[0].equipment,
-              instructions: result[0].instructions || ["Follow the animation carefully.", "Maintain proper form throughout the exercise."]
+              instructions: result[0].instructions || [
+                "Follow the animation carefully.",
+                "Maintain proper form throughout the exercise.",
+              ],
             };
           }
         });
-        
+
         setExerciseDetails(exerciseData);
       } catch (error) {
         console.error("Error fetching exercises:", error);
-        setError("Failed to fetch exercise details. Some visual elements may be missing.");
+        setError(
+          "Failed to fetch exercise details. Some visual elements may be missing."
+        );
       }
     };
 
     fetchExerciseDetails();
   }, [workout.exercises]);
-  
+
   // Handle form field changes
   const handleInputChange = (e) => {
     const { name, value, type, checked } = e.target;
-    setEditedWorkout(prev => ({
+    setEditedWorkout((prev) => ({
       ...prev,
-      [name]: type === 'checkbox' ? checked : value
+      [name]: type === "checkbox" ? checked : value,
     }));
-    
+
     // Clear error for this field if it exists
     if (formErrors[name]) {
-      setFormErrors(prev => ({ ...prev, [name]: null }));
+      setFormErrors((prev) => ({ ...prev, [name]: null }));
     }
   };
-  
+
   // Handle exercise changes
   const handleExerciseChange = (index, field, value) => {
     const updatedExercises = [...editedWorkout.exercises];
     updatedExercises[index] = {
       ...updatedExercises[index],
-      [field]: value
+      [field]: value,
     };
-    setEditedWorkout(prev => ({ ...prev, exercises: updatedExercises }));
+    setEditedWorkout((prev) => ({ ...prev, exercises: updatedExercises }));
   };
-  
+
   // Add new exercise
   const addExercise = (exercise) => {
     const newExercise = {
@@ -154,97 +203,105 @@ const WorkoutEditModal = ({ workout, onClose, onSave, isCreating = false }) => {
       gifUrl: exercise.gifUrl,
       bodyPart: exercise.bodyPart,
       target: exercise.target,
-      equipment: exercise.equipment
+      equipment: exercise.equipment,
     };
-    
+
     // Also add to exerciseDetails for rendering
-    setExerciseDetails(prev => ({
+    setExerciseDetails((prev) => ({
       ...prev,
       [newExercise.id]: {
         gifUrl: exercise.gifUrl,
         bodyPart: exercise.bodyPart,
         target: exercise.target,
         equipment: exercise.equipment,
-        instructions: exercise.instructions
-      }
+        instructions: exercise.instructions,
+      },
     }));
-    
-    setEditedWorkout(prev => ({
+
+    setEditedWorkout((prev) => ({
       ...prev,
-      exercises: [...prev.exercises, newExercise]
+      exercises: [...prev.exercises, newExercise],
     }));
-    
+
     setShowExerciseSelector(false);
-    setSearchTerm('');
+    setSearchTerm("");
     setSelectedListExercise(null);
   };
-  
+
   // Remove exercise
   const removeExercise = (index) => {
     const updatedExercises = [...editedWorkout.exercises];
     updatedExercises.splice(index, 1);
-    setEditedWorkout(prev => ({ ...prev, exercises: updatedExercises }));
+    setEditedWorkout((prev) => ({ ...prev, exercises: updatedExercises }));
   };
-  
+
   // Toggle exercise expansion
   const handleExerciseClick = (id) => {
     setExpandedExercise(expandedExercise === id ? null : id);
   };
-  
+
   // View details of an exercise in the list
   const viewExerciseDetails = (exercise) => {
     setSelectedListExercise(exercise);
   };
-  
+
   // Validate form before saving
   const validateForm = () => {
     const errors = {};
-    
+
     if (!editedWorkout.name.trim()) {
       errors.name = "Workout name is required";
     }
-    
+
     if (!editedWorkout.level) {
       errors.level = "Level is required";
     }
-    
+
     if (!editedWorkout.timesPerWeek) {
       errors.timesPerWeek = "Frequency is required";
-    } else if (isNaN(editedWorkout.timesPerWeek) || editedWorkout.timesPerWeek < 1 || editedWorkout.timesPerWeek > 7) {
+    } else if (
+      isNaN(editedWorkout.timesPerWeek) ||
+      editedWorkout.timesPerWeek < 1 ||
+      editedWorkout.timesPerWeek > 7
+    ) {
       errors.timesPerWeek = "Frequency must be between 1-7";
     }
-    
+
     if (editedWorkout.exercises.length === 0) {
       errors.exercises = "At least one exercise is required";
     }
-    
+
     setFormErrors(errors);
     return Object.keys(errors).length === 0;
   };
-  
+
   // Save workout
   const handleSave = () => {
     if (!validateForm()) return;
-    
+
     onSave({
       ...workout,
       ...editedWorkout,
-      timesPerWeek: Number(editedWorkout.timesPerWeek)
+      timesPerWeek: Number(editedWorkout.timesPerWeek),
     });
   };
-  
+
   // Format date for display
-  const formattedDate = new Date(workout.createdAt).toLocaleDateString('en-US', {
-    year: 'numeric',
-    month: 'long',
-    day: 'numeric',
-  });
-  
+  const formattedDate = new Date(workout.createdAt).toLocaleDateString(
+    "en-US",
+    {
+      year: "numeric",
+      month: "long",
+      day: "numeric",
+    }
+  );
+
   // Filter exercises for search
-  const filteredExercises = exerciseLibrary.filter(exercise => 
-    exercise.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    exercise.bodyPart?.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    exercise.equipment?.toLowerCase().includes(searchTerm.toLowerCase())
+  const filteredExercises = exerciseLibrary.filter(
+    (exercise) =>
+      exercise.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      exercise.bodyPart?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      exercise.equipment?.toLowerCase().includes(searchTerm.toLowerCase())
   );
 
   // Toggle sections in the exercise details view
@@ -259,24 +316,24 @@ const WorkoutEditModal = ({ workout, onClose, onSave, isCreating = false }) => {
       reader.onload = (event) => {
         const imageUrl = event.target.result;
         setCoverImage(imageUrl);
-        setEditedWorkout(prev => ({
+        setEditedWorkout((prev) => ({
           ...prev,
-          coverImage: imageUrl
+          coverImage: imageUrl,
         }));
       };
       reader.readAsDataURL(file);
     }
   };
-  
+
   const handleRemoveImage = () => {
     setCoverImage(null);
-    setEditedWorkout(prev => ({
+    setEditedWorkout((prev) => ({
       ...prev,
-      coverImage: null
+      coverImage: null,
     }));
     // Clear file input
     if (fileInputRef.current) {
-      fileInputRef.current.value = '';
+      fileInputRef.current.value = "";
     }
   };
 
@@ -300,24 +357,28 @@ const WorkoutEditModal = ({ workout, onClose, onSave, isCreating = false }) => {
               name="name"
               value={editedWorkout.name}
               onChange={handleInputChange}
-              className={`form-control ${formErrors.name ? 'error' : ''}`}
+              className={`form-control ${formErrors.name ? "error" : ""}`}
               placeholder="Enter workout name"
             />
-            {formErrors.name && <div className="form-error">{formErrors.name}</div>}
+            {formErrors.name && (
+              <div className="form-error">{formErrors.name}</div>
+            )}
           </div>
-          
+
           {/* Cover Image Upload Section */}
           <div className="form-group cover-image-upload">
-            <label>Cover Image {isCreating && <span className="required">*</span>}</label>
+            <label>
+              Cover Image {isCreating && <span className="required">*</span>}
+            </label>
             <div className="image-upload-container">
               {coverImage ? (
                 <div className="image-preview-container">
-                  <img 
-                    src={coverImage} 
-                    alt="Workout cover" 
-                    className="image-preview" 
+                  <img
+                    src={coverImage}
+                    alt="Workout cover"
+                    className="image-preview"
                   />
-                  <button 
+                  <button
                     className="remove-image-btn"
                     onClick={handleRemoveImage}
                     type="button"
@@ -326,7 +387,7 @@ const WorkoutEditModal = ({ workout, onClose, onSave, isCreating = false }) => {
                   </button>
                 </div>
               ) : (
-                <div 
+                <div
                   className="upload-placeholder"
                   onClick={() => fileInputRef.current.click()}
                 >
@@ -340,7 +401,7 @@ const WorkoutEditModal = ({ workout, onClose, onSave, isCreating = false }) => {
                 ref={fileInputRef}
                 onChange={handleFileChange}
                 accept="image/*"
-                style={{ display: 'none' }}
+                style={{ display: "none" }}
               />
             </div>
           </div>
@@ -355,17 +416,19 @@ const WorkoutEditModal = ({ workout, onClose, onSave, isCreating = false }) => {
                   name="level"
                   value={editedWorkout.level}
                   onChange={handleInputChange}
-                  className={`form-select ${formErrors.level ? 'error' : ''}`}
+                  className={`form-select ${formErrors.level ? "error" : ""}`}
                 >
                   <option value="">Select Level</option>
                   <option value="Beginner">Beginner</option>
                   <option value="Intermediate">Intermediate</option>
                   <option value="Advanced">Advanced</option>
                 </select>
-                {formErrors.level && <div className="form-error">{formErrors.level}</div>}
+                {formErrors.level && (
+                  <div className="form-error">{formErrors.level}</div>
+                )}
               </div>
             </div>
-            
+
             <div className="meta-item">
               <Clock size={18} />
               <div className="form-group compact">
@@ -378,12 +441,16 @@ const WorkoutEditModal = ({ workout, onClose, onSave, isCreating = false }) => {
                   max="7"
                   value={editedWorkout.timesPerWeek}
                   onChange={handleInputChange}
-                  className={`form-control ${formErrors.timesPerWeek ? 'error' : ''}`}
+                  className={`form-control ${
+                    formErrors.timesPerWeek ? "error" : ""
+                  }`}
                 />
-                {formErrors.timesPerWeek && <div className="form-error">{formErrors.timesPerWeek}</div>}
+                {formErrors.timesPerWeek && (
+                  <div className="form-error">{formErrors.timesPerWeek}</div>
+                )}
               </div>
             </div>
-            
+
             <div className="meta-item">
               <User size={18} />
               <div className="form-group compact">
@@ -399,7 +466,7 @@ const WorkoutEditModal = ({ workout, onClose, onSave, isCreating = false }) => {
                 />
               </div>
             </div>
-            
+
             <div className="meta-item">
               <LayoutTemplate size={18} />
               <div className="form-group compact checkbox-group">
@@ -415,7 +482,7 @@ const WorkoutEditModal = ({ workout, onClose, onSave, isCreating = false }) => {
                 </label>
               </div>
             </div>
-            
+
             <div className="meta-item">
               <Calendar size={18} />
               <span>Created: {formattedDate}</span>
@@ -433,7 +500,7 @@ const WorkoutEditModal = ({ workout, onClose, onSave, isCreating = false }) => {
             <div className="admin-exercises-header">
               <h3>Exercises</h3>
               <div className="admin-exercises-actions">
-                <button 
+                <button
                   className="add-exercise-btn"
                   onClick={() => setShowExerciseSelector(!showExerciseSelector)}
                 >
@@ -444,7 +511,11 @@ const WorkoutEditModal = ({ workout, onClose, onSave, isCreating = false }) => {
                   {editedWorkout.exercises?.length || 0} exercises
                 </span>
               </div>
-              {formErrors.exercises && <div className="form-error exercise-list-error">{formErrors.exercises}</div>}
+              {formErrors.exercises && (
+                <div className="form-error exercise-list-error">
+                  {formErrors.exercises}
+                </div>
+              )}
             </div>
 
             {showExerciseSelector && (
@@ -468,25 +539,37 @@ const WorkoutEditModal = ({ workout, onClose, onSave, isCreating = false }) => {
                     <X size={16} />
                   </button>
                 </div>
-                
+
                 <div className="exercise-selector-content">
                   <div className="exercise-selector-list">
                     {filteredExercises.length > 0 ? (
-                      filteredExercises.map(exercise => (
-                        <div 
-                          key={exercise.id} 
-                          className={`exercise-selector-item ${selectedListExercise?.id === exercise.id ? 'selected' : ''}`}
+                      filteredExercises.map((exercise) => (
+                        <div
+                          key={exercise.id}
+                          className={`exercise-selector-item ${
+                            selectedListExercise?.id === exercise.id
+                              ? "selected"
+                              : ""
+                          }`}
                           onClick={() => viewExerciseDetails(exercise)}
                         >
                           <div className="exercise-selector-icon">
                             <Dumbbell size={16} />
                           </div>
                           <div className="exercise-selector-info">
-                            <span className="exercise-selector-name">{exercise.name}</span>
+                            <span className="exercise-selector-name">
+                              {exercise.name}
+                            </span>
                             <div className="exercise-selector-tags">
-                              <span className="exercise-tag">{exercise.bodyPart}</span>
-                              <span className="exercise-tag">{exercise.target}</span>
-                              <span className="exercise-tag">{exercise.equipment}</span>
+                              <span className="exercise-tag">
+                                {exercise.bodyPart}
+                              </span>
+                              <span className="exercise-tag">
+                                {exercise.target}
+                              </span>
+                              <span className="exercise-tag">
+                                {exercise.equipment}
+                              </span>
                             </div>
                           </div>
                         </div>
@@ -494,16 +577,18 @@ const WorkoutEditModal = ({ workout, onClose, onSave, isCreating = false }) => {
                     ) : (
                       <div className="exercise-selector-empty">
                         <AlertCircle size={20} />
-                        <span>No exercises found. Try a different search term.</span>
+                        <span>
+                          No exercises found. Try a different search term.
+                        </span>
                       </div>
                     )}
                   </div>
-                  
+
                   {selectedListExercise && (
                     <div className="exercise-selector-details">
                       <div className="exercise-preview-header">
                         <h4>{selectedListExercise.name}</h4>
-                        <button 
+                        <button
                           className="add-selected-exercise-btn"
                           onClick={() => addExercise(selectedListExercise)}
                         >
@@ -511,7 +596,7 @@ const WorkoutEditModal = ({ workout, onClose, onSave, isCreating = false }) => {
                           <span>Add to Workout</span>
                         </button>
                       </div>
-                      
+
                       <div className="exercise-preview-content">
                         <div className="exercise-preview-video">
                           <img
@@ -520,48 +605,66 @@ const WorkoutEditModal = ({ workout, onClose, onSave, isCreating = false }) => {
                             loading="lazy"
                           />
                         </div>
-                        
+
                         <div className="exercise-preview-info">
                           <div className="exercise-info-section">
-                            <div className="exercise-info-header" onClick={toggleDetails}>
+                            <div
+                              className="exercise-info-header"
+                              onClick={toggleDetails}
+                            >
                               <h4>Details</h4>
                               <ChevronDown
                                 size={16}
-                                className={`info-chevron ${detailsOpen ? 'rotated' : ''}`}
+                                className={`info-chevron ${
+                                  detailsOpen ? "rotated" : ""
+                                }`}
                               />
                             </div>
-                            
+
                             {detailsOpen && (
                               <div className="exercise-info-content">
                                 <div className="exercise-info-grid">
                                   <span className="info-label">Body Part:</span>
-                                  <span className="info-value">{selectedListExercise.bodyPart}</span>
-                                  
+                                  <span className="info-value">
+                                    {selectedListExercise.bodyPart}
+                                  </span>
+
                                   <span className="info-label">Target:</span>
-                                  <span className="info-value">{selectedListExercise.target}</span>
-                                  
+                                  <span className="info-value">
+                                    {selectedListExercise.target}
+                                  </span>
+
                                   <span className="info-label">Equipment:</span>
-                                  <span className="info-value">{selectedListExercise.equipment}</span>
+                                  <span className="info-value">
+                                    {selectedListExercise.equipment}
+                                  </span>
                                 </div>
                               </div>
                             )}
                           </div>
-                          
+
                           <div className="exercise-info-section">
-                            <div className="exercise-info-header" onClick={toggleInstructions}>
+                            <div
+                              className="exercise-info-header"
+                              onClick={toggleInstructions}
+                            >
                               <h4>Instructions</h4>
                               <ChevronDown
                                 size={16}
-                                className={`info-chevron ${instructionsOpen ? 'rotated' : ''}`}
+                                className={`info-chevron ${
+                                  instructionsOpen ? "rotated" : ""
+                                }`}
                               />
                             </div>
-                            
+
                             {instructionsOpen && (
                               <div className="exercise-info-content">
                                 <ol className="exercise-instructions-list">
-                                  {selectedListExercise.instructions?.map((instruction, i) => (
-                                    <li key={i}>{instruction}</li>
-                                  ))}
+                                  {selectedListExercise.instructions?.map(
+                                    (instruction, i) => (
+                                      <li key={i}>{instruction}</li>
+                                    )
+                                  )}
                                 </ol>
                               </div>
                             )}
@@ -578,7 +681,9 @@ const WorkoutEditModal = ({ workout, onClose, onSave, isCreating = false }) => {
               {editedWorkout.exercises.map((exercise, index) => (
                 <div key={exercise.id} className="admin-exercise-item-wrapper">
                   <div
-                    className={`admin-exercise-item ${expandedExercise === exercise.id ? 'expanded' : ''}`}
+                    className={`admin-exercise-item ${
+                      expandedExercise === exercise.id ? "expanded" : ""
+                    }`}
                     onClick={() => handleExerciseClick(exercise.id)}
                   >
                     <div className="exercise-drag-handle">
@@ -591,7 +696,9 @@ const WorkoutEditModal = ({ workout, onClose, onSave, isCreating = false }) => {
                       <input
                         type="text"
                         value={exercise.name}
-                        onChange={(e) => handleExerciseChange(index, 'name', e.target.value)}
+                        onChange={(e) =>
+                          handleExerciseChange(index, "name", e.target.value)
+                        }
                         onClick={(e) => e.stopPropagation()}
                         className="admin-exercise-name-input"
                         placeholder="Exercise name"
@@ -599,13 +706,15 @@ const WorkoutEditModal = ({ workout, onClose, onSave, isCreating = false }) => {
                       <input
                         type="text"
                         value={exercise.reps}
-                        onChange={(e) => handleExerciseChange(index, 'reps', e.target.value)}
+                        onChange={(e) =>
+                          handleExerciseChange(index, "reps", e.target.value)
+                        }
                         onClick={(e) => e.stopPropagation()}
                         className="admin-exercise-reps-input"
                         placeholder="e.g. 3 sets x 10 reps"
                       />
                     </div>
-                    <button 
+                    <button
                       className="remove-exercise-btn"
                       onClick={(e) => {
                         e.stopPropagation();
@@ -616,7 +725,9 @@ const WorkoutEditModal = ({ workout, onClose, onSave, isCreating = false }) => {
                     </button>
                     <ChevronDown
                       size={20}
-                      className={`admin-exercise-chevron ${expandedExercise === exercise.id ? 'rotated' : ''}`}
+                      className={`admin-exercise-chevron ${
+                        expandedExercise === exercise.id ? "rotated" : ""
+                      }`}
                     />
                   </div>
                   {expandedExercise === exercise.id && (
@@ -630,7 +741,7 @@ const WorkoutEditModal = ({ workout, onClose, onSave, isCreating = false }) => {
                               loading="lazy"
                             />
                           </div>
-                          
+
                           {/* Exercise Body Part, Target, Equipment Info */}
                           <div className="exercise-info-section">
                             <div className="exercise-info-header">
@@ -643,31 +754,36 @@ const WorkoutEditModal = ({ workout, onClose, onSave, isCreating = false }) => {
                             <div className="exercise-info-content">
                               <div className="exercise-info-grid">
                                 <span className="info-label">Body Part:</span>
-                                <span className="info-value">{exerciseDetails[exercise.id].bodyPart}</span>
-                                
+                                <span className="info-value">
+                                  {exerciseDetails[exercise.id].bodyPart}
+                                </span>
+
                                 <span className="info-label">Target:</span>
-                                <span className="info-value">{exerciseDetails[exercise.id].target}</span>
-                                
+                                <span className="info-value">
+                                  {exerciseDetails[exercise.id].target}
+                                </span>
+
                                 <span className="info-label">Equipment:</span>
-                                <span className="info-value">{exerciseDetails[exercise.id].equipment}</span>
+                                <span className="info-value">
+                                  {exerciseDetails[exercise.id].equipment}
+                                </span>
                               </div>
                             </div>
                           </div>
-                          
+
                           {/* Exercise Instructions */}
                           <div className="exercise-info-section">
                             <div className="exercise-info-header">
                               <h4>Instructions</h4>
-                              <ChevronDown
-                                size={16}
-                                className="info-chevron"
-                              />
+                              <ChevronDown size={16} className="info-chevron" />
                             </div>
                             <div className="exercise-info-content">
                               <ol className="exercise-instructions-list">
-                                {exerciseDetails[exercise.id].instructions?.map((instruction, i) => (
-                                  <li key={i}>{instruction}</li>
-                                ))}
+                                {exerciseDetails[exercise.id].instructions?.map(
+                                  (instruction, i) => (
+                                    <li key={i}>{instruction}</li>
+                                  )
+                                )}
                               </ol>
                             </div>
                           </div>
@@ -685,11 +801,13 @@ const WorkoutEditModal = ({ workout, onClose, onSave, isCreating = false }) => {
             </div>
           </div>
         )}
-        
+
         <div className="modal-footer">
-          <button className="cancel-btn" onClick={onClose}>Cancel</button>
-          <button 
-            className="save-btn" 
+          <button className="cancel-btn" onClick={onClose}>
+            Cancel
+          </button>
+          <button
+            className="save-btn"
             onClick={handleSave}
             disabled={isCreating && !coverImage} // Disable save if creating without image
           >

@@ -7,6 +7,8 @@ import {
   ThemeProvider,
   createTheme,
   useMediaQuery,
+  Typography,
+  Button,
 } from "@mui/material";
 
 import ProfileHeader from "../components/userPage/dashboard/ProfileHeader";
@@ -28,10 +30,13 @@ const UserHomePage = () => {
   const [showWelcomeModal, setShowWelcomeModal] = useState(false);
   const [userName, setUserName] = useState("");
   const [isDarkMode, setIsDarkMode] = useState(false);
+  const [token, setToken] = useState(null);
+  const [userId, setUserId] = useState(null);
   const isMobileOrTablet = useMediaQuery("(max-width:1024px)");
-  
-  // Check for dark mode preference on component mount
+
+  // Check for dark mode preference and user data on component mount
   useEffect(() => {
+    // Theme setup
     const savedTheme = localStorage.getItem("theme");
     if (savedTheme === "dark") {
       setIsDarkMode(true);
@@ -40,12 +45,34 @@ const UserHomePage = () => {
       setIsDarkMode(false);
       document.body.classList.remove("dark-mode");
     }
+
+    // User and token setup
+    const storedToken = localStorage.getItem("token");
+    const user = JSON.parse(localStorage.getItem("user") || "{}");
+
+    if (storedToken) {
+      setToken(storedToken);
+      try {
+        const payload = JSON.parse(atob(storedToken.split(".")[1]));
+        const id = payload.id || payload.userId || user.id || null; // Adjust based on token payload
+        setUserId(id);
+        const name =
+          payload.firstName ||
+          payload.username ||
+          user.displayName ||
+          user.email?.split("@")[0] ||
+          "User";
+        setUserName(name);
+      } catch (error) {
+        console.error("Error decoding token:", error);
+      }
+    }
   }, []);
 
   // Create a theme based on the current mode
   const theme = createTheme({
     palette: {
-      mode: isDarkMode ? 'dark' : 'light',
+      mode: isDarkMode ? "dark" : "light",
       primary: {
         main: isDarkMode ? "#FFD700" : "#1976d2", // Gold in dark mode, blue in light mode
       },
@@ -53,8 +80,8 @@ const UserHomePage = () => {
         main: isDarkMode ? "#DAA520" : "#9c27b0", // Goldenrod in dark mode, purple in light mode
       },
       background: {
-        default: isDarkMode ? '#121212' : '#fff',
-        paper: isDarkMode ? '#1e1e1e' : '#fff',
+        default: isDarkMode ? "#121212" : "#fff",
+        paper: isDarkMode ? "#1e1e1e" : "#fff",
       },
     },
     typography: {
@@ -91,28 +118,10 @@ const UserHomePage = () => {
     },
   });
 
+  // Handle welcome modal
   useEffect(() => {
     const hasSeenWelcome = sessionStorage.getItem("hasSeenWelcome");
-    const user = JSON.parse(localStorage.getItem("user") || "{}");
-    const token = localStorage.getItem("token");
-
     if (token && !hasSeenWelcome) {
-      let name = "User";
-
-      if (user?.displayName) {
-        name = user.displayName;
-      } else if (user?.email) {
-        name = user.email.split("@")[0];
-      } else {
-        try {
-          const payload = JSON.parse(atob(token.split(".")[1]));
-          name = payload.firstName || payload.username || "User";
-        } catch (error) {
-          console.error("Error decoding token:", error);
-        }
-      }
-
-      setUserName(name);
       setShowWelcomeModal(true);
       sessionStorage.setItem("hasSeenWelcome", "true");
 
@@ -120,7 +129,7 @@ const UserHomePage = () => {
         setShowWelcomeModal(false);
       }, 3000);
     }
-  }, []);
+  }, [token]);
 
   // Handler for theme changes from ThemeToggle
   useEffect(() => {
@@ -129,12 +138,12 @@ const UserHomePage = () => {
       setIsDarkMode(currentTheme === "dark");
     };
 
-    window.addEventListener('storage', handleThemeChange);
-    document.addEventListener('themeChanged', handleThemeChange);
+    window.addEventListener("storage", handleThemeChange);
+    document.addEventListener("themeChanged", handleThemeChange);
 
     return () => {
-      window.removeEventListener('storage', handleThemeChange);
-      document.removeEventListener('themeChanged', handleThemeChange);
+      window.removeEventListener("storage", handleThemeChange);
+      document.removeEventListener("themeChanged", handleThemeChange);
     };
   }, []);
 
@@ -157,9 +166,6 @@ const UserHomePage = () => {
           <br />
           <br />
 
-          {/* Quick Action Buttons (if needed) */}
-          {/* <QuickActions /> */}
-
           {/* Weekly Chart */}
           <Grid item xs={12} sx={{ mb: 4 }}>
             <WeeklyTrackingChart
@@ -171,7 +177,19 @@ const UserHomePage = () => {
           {/* Main Dashboard Grid */}
           <Grid container spacing={3}>
             <Grid item xs={12} md={6} lg={4}>
-              <DailySummaryWidget />
+              {token && userId ? (
+                <DailySummaryWidget
+                  token={token}
+                  userId={userId}
+                  date={new Date()}
+                />
+              ) : (
+                <Box sx={{ p: 2.5, textAlign: "center" }}>
+                  <Typography color="error">
+                    Please log in to view your daily summary
+                  </Typography>
+                </Box>
+              )}
             </Grid>
             <Grid item xs={12} md={6} lg={4}>
               <WorkoutSection />
@@ -192,7 +210,7 @@ const UserHomePage = () => {
         </Box>
       </Container>
       {isMobileOrTablet ? <MobileFooter /> : <Footer />}
-      <ThemeToggle/>
+      <ThemeToggle />
     </ThemeProvider>
   );
 };
