@@ -27,7 +27,7 @@ router.get("/search", controller.searchFoods.bind(controller));
 router.post("/logs", controller.createNutritionLog.bind(controller));
 
 // Get nutrition logs (with optional date filter)
-router.get("/logs", controller.getNutritionLogs.bind(controller));
+router.get("/logs/:id", controller.getNutritionLogs.bind(controller));
 
 // Delete a nutrition log
 router.delete("/logs/:logId", controller.deleteNutritionLog.bind(controller));

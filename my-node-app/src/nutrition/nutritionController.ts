@@ -64,8 +64,9 @@ export class NutritionController {
 
       if (date) {
         logs = await this.service.getNutritionLogsByDate(userId, new Date(date as string));
+        console.log("Logs for date:", date, logs);
       } else {
-        logs = await this.service.getNutritionLogsByUserId(userId);
+        logs = await this.service.getNutritionLogsByDate(userId,new Date());
       }
 
       res.json(logs);
