@@ -1,7 +1,7 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import { 
   Box, Button, TextField, Typography, MenuItem, IconButton, Divider, 
-  Autocomplete, CircularProgress, Chip 
+  Autocomplete, CircularProgress, Chip, Popper 
 } from "@mui/material";
 import AddIcon from "@mui/icons-material/Add";
 import DeleteIcon from "@mui/icons-material/Delete";
@@ -9,7 +9,7 @@ import CloseIcon from "@mui/icons-material/Close";
 import { getExercises } from "../api"; // Import your API function to fetch exercises
 
 const CreateWorkoutModal = ({ onClose, onSave, onDelete, workout }) => {
-  // Your existing workout state
+  // Workout state
   const [workoutData, setWorkoutData] = useState(
     workout || {
       title: "",
@@ -20,7 +20,7 @@ const CreateWorkoutModal = ({ onClose, onSave, onDelete, workout }) => {
     }
   );
   
-  // New state for available exercises from API
+  // State for available exercises from API
   const [availableExercises, setAvailableExercises] = useState([]);
   const [loading, setLoading] = useState(false);
   const [selectedExercise, setSelectedExercise] = useState(null);
@@ -28,6 +28,11 @@ const CreateWorkoutModal = ({ onClose, onSave, onDelete, workout }) => {
     sets: 3,
     reps: 10,
   });
+
+  // State for search and filtering
+  const [searchQuery, setSearchQuery] = useState("");
+  const searchTimeoutRef = useRef(null);
+  const [filteredExercises, setFilteredExercises] = useState([]);
 
   // Fetch exercises from the API on component mount
   useEffect(() => {
@@ -45,6 +50,38 @@ const CreateWorkoutModal = ({ onClose, onSave, onDelete, workout }) => {
 
     fetchExercises();
   }, []);
+
+  // Filter exercises as the user types (only match exercise name)
+  useEffect(() => {
+    // Clear the previous timeout
+    if (searchTimeoutRef.current) {
+      clearTimeout(searchTimeoutRef.current);
+    }
+
+    // If search query is empty, show no exercises
+    if (!searchQuery.trim()) {
+      setFilteredExercises([]);
+      return;
+    }
+
+    // Set a new timeout for filtering (debounce)
+    searchTimeoutRef.current = setTimeout(() => {
+      const lowercaseQuery = searchQuery.toLowerCase().trim();
+      const filtered = availableExercises.filter((exercise) =>
+        exercise.name?.toLowerCase().includes(lowercaseQuery)
+      );
+      setFilteredExercises(filtered);
+      // Debug: Log filtered results (remove in production)
+      console.log("Search Query:", lowercaseQuery, "Filtered Exercises:", filtered);
+    }, 150); // 150ms debounce for responsiveness
+
+    // Cleanup function
+    return () => {
+      if (searchTimeoutRef.current) {
+        clearTimeout(searchTimeoutRef.current);
+      }
+    };
+  }, [searchQuery, availableExercises]);
 
   // Handle exercise changes
   const handleExerciseChange = (index, field, value) => {
@@ -67,10 +104,8 @@ const CreateWorkoutModal = ({ onClose, onSave, onDelete, workout }) => {
           {
             id: selectedExercise.id,
             name: selectedExercise.name,
-            // Include any relevant fields from the selected exercise
             muscle: selectedExercise.muscle,
             equipment: selectedExercise.equipment,
-            // Add user-specified sets and reps
             sets: newExerciseDetails.sets,
             reps: newExerciseDetails.reps,
           }
@@ -78,6 +113,8 @@ const CreateWorkoutModal = ({ onClose, onSave, onDelete, workout }) => {
       });
       setSelectedExercise(null);
       setNewExerciseDetails({ sets: 3, reps: 10 });
+      setSearchQuery(""); // Clear search query after adding
+      setFilteredExercises([]); // Clear filtered exercises after adding
     }
   };
 
@@ -86,6 +123,11 @@ const CreateWorkoutModal = ({ onClose, onSave, onDelete, workout }) => {
     const updatedExercises = [...workoutData.exercises];
     updatedExercises.splice(index, 1);
     setWorkoutData({ ...workoutData, exercises: updatedExercises });
+  };
+
+  // Custom Popper to ensure dropdown (not dropup)
+  const CustomPopper = (props) => {
+    return <Popper {...props} placement="bottom-start" />;
   };
 
   return (
@@ -262,21 +304,22 @@ const CreateWorkoutModal = ({ onClose, onSave, onDelete, workout }) => {
             <Box sx={{ display: "flex", alignItems: "flex-start", gap: 1 }}>
               <Autocomplete
                 id="exercise-select"
-                options={availableExercises}
-                getOptionLabel={(option) => option.name}
+                options={filteredExercises}
+                getOptionLabel={(option) => option.name || ""}
                 loading={loading}
                 value={selectedExercise}
                 onChange={(event, newValue) => {
                   setSelectedExercise(newValue);
                 }}
+                onInputChange={(event, newInputValue) => {
+                  setSearchQuery(newInputValue);
+                }}
+                filterOptions={(x) => x} // Rely on custom filtering
+                noOptionsText={searchQuery.trim() ? "No matching exercises found" : "Start typing to search"}
+                PopperComponent={CustomPopper} // Ensure dropdown below input
                 renderOption={(props, option) => (
                   <li {...props}>
-                    <Box>
-                      <Typography variant="body1">{option.name}</Typography>
-                      <Typography variant="body2" color="text.secondary">
-                        {option.muscle} - {option.equipment}
-                      </Typography>
-                    </Box>
+                    <Typography variant="body1">{option.name}</Typography>
                   </li>
                 )}
                 renderInput={(params) => (
