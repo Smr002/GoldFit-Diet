@@ -6,6 +6,7 @@ import { motion, AnimatePresence } from "framer-motion";
 const UpdateStatusModal = ({
   status = "success",
   message = "",
+  title = "", // Add this new prop
   onClose,
   onConfirm,
   mode = "status",
@@ -95,9 +96,7 @@ const UpdateStatusModal = ({
           <div style={modalStyle.title}>
             {isConfirm
               ? "Are you sure?"
-              : isSuccess
-              ? "Workout Updated!"
-              : "Update Failed"}
+              : title || (isSuccess ? "Workout Updated!" : "Update Failed")}
           </div>
 
           <div style={modalStyle.message}>

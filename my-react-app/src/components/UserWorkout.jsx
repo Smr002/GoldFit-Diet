@@ -7,6 +7,7 @@ import WorkoutDetailModal from "./WorkoutDetailModal";
 import LogWorkoutModal from "./LogWorkoutModal";
 import { useTheme } from "@mui/material/styles";
 import { Box, CssBaseline, ThemeProvider, createTheme } from "@mui/material";
+import { useNavigate } from "react-router-dom";
 
 import fullbody from "../assets/fullbody.jpg";
 import hiit from "../assets/hiitcardio.jpg";
@@ -42,6 +43,8 @@ const UserWorkout = () => {
   // Dark mode setup
   const theme = useTheme();
   const [darkMode, setDarkMode] = useState(false);
+
+  const navigate = useNavigate();
 
   useEffect(() => {
     const handleThemeChange = (e) => {
@@ -174,17 +177,39 @@ const UserWorkout = () => {
     return true;
   });
 
-  const handleCreateWorkout = (newWorkout) => {
-    const workoutWithId = {
-      ...newWorkout,
-      id: `user-${Date.now()}`,
-      createdAt: new Date().toISOString(),
-      isRecommended: false,
-    };
+  const handleCreateWorkout = async (newWorkout) => {
+    try {
+      console.log("Creating new workout:", newWorkout);
 
-    setUserWorkouts([...userWorkouts, workoutWithId]);
-    setWorkouts([...recommendedWorkouts, ...userWorkouts, workoutWithId]);
-    setShowCreateModal(false);
+      // Add fields needed for display and compatibility with your UI
+      const workoutWithId = {
+        ...newWorkout,
+        id: `user-${Date.now()}`,
+        createdAt: new Date().toISOString(),
+        isRecommended: false, // Explicitly set this to false for user workouts
+        // Make sure these fields exist as the WorkoutCard expects them
+        difficulty: newWorkout.difficulty || "beginner",
+        duration: newWorkout.exercises.length * 10, // Simple estimate
+        goal: newWorkout.goal || "general fitness",
+        // Add a default image if none provided
+        src: newWorkout.src || legs,
+      };
+
+      console.log("Creating workout with data:", workoutWithId); // Debug
+
+      // If you need to save to an API, do it here
+      // const response = await createWorkout(workoutWithId, token);
+
+      // Add to local state - ensure we're creating new arrays, not mutating
+      setUserWorkouts((prevWorkouts) => [...prevWorkouts, workoutWithId]);
+      setWorkouts((prevWorkouts) => [...prevWorkouts, workoutWithId]);
+
+      // Close the modal and reset state
+      setShowCreateModal(false);
+      console.log("Workout created successfully:", workoutWithId);
+    } catch (error) {
+      console.error("Error creating workout:", error);
+    }
   };
 
   const handleEditWorkout = (updatedWorkout) => {
@@ -269,6 +294,14 @@ const UserWorkout = () => {
     setShowCreateModal(true);
   };
 
+  // Add this new function to handle the delete action from the edit modal
+  const handleDeleteFromEdit = (workoutId) => {
+    console.log("Deleting workout:", workoutId); // Add this for debugging
+    handleDeleteWorkout(workoutId);
+    setShowCreateModal(false);
+    setEditingWorkout(null);
+  };
+
   const startLogWorkout = (workout) => {
     setSelectedWorkout(workout);
     setShowLogModal(true);
@@ -283,6 +316,10 @@ const UserWorkout = () => {
 
   const getWorkoutLogs = (workoutId) => {
     return workoutLogs.filter((log) => log.workoutId === workoutId);
+  };
+
+  const handleCreateNewWorkout = () => {
+    setShowCreateModal(true);
   };
 
   return (
@@ -324,18 +361,45 @@ const UserWorkout = () => {
                       <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
                     </svg>
                   </div>
-                  <input
-                    type="text"
-                    placeholder="Search workouts"
-                    className={`search-input ${darkMode ? "dark-mode" : ""}`}
-                    value={searchTerm}
-                    onChange={(e) => setSearchTerm(e.target.value)}
-                    style={{
-                      color: darkMode ? "#ffffff" : "inherit",
-                      background: darkMode ? "#1e1e1e" : "white",
-                    }}
-                  />
+                  <div className="search-input-container">
+                    <input
+                      type="text"
+                      placeholder="Search workouts"
+                      className={`search-input ${darkMode ? "dark-mode" : ""}`}
+                      value={searchTerm}
+                      onChange={(e) => setSearchTerm(e.target.value)}
+                      style={{
+                        color: darkMode ? "#ffffff" : "inherit",
+                        background: darkMode ? "#1e1e1e" : "white",
+                      }}
+                    />
+                       <button
+                  className="create-workout-button"
+                  onClick={handleCreateNewWorkout}
+                  style={{
+                    background: darkMode ? "#FFD700" : "#6200ea",
+                    color: darkMode ? "#121212" : "white",
+                  }}
+                >
+                  <svg
+                    xmlns="http://www.w3.org/2000/svg"
+                    width="20"
+                    height="20"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="currentColor"
+                    strokeWidth="2"
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                  >
+                    <line x1="12" y1="5" x2="12" y2="19"></line>
+                    <line x1="5" y1="12" x2="19" y2="12"></line>
+                  </svg>
+                  Create Workout
+                </button>
+                  </div>
                 </div>
+             
               </div>
             </div>
 
@@ -458,6 +522,11 @@ const UserWorkout = () => {
                 setEditingWorkout(null);
               }}
               onSave={editingWorkout ? handleEditWorkout : handleCreateWorkout}
+              onDelete={
+                editingWorkout && !editingWorkout.isRecommended
+                  ? () => handleDeleteFromEdit(editingWorkout.id)
+                  : null
+              }
               workout={editingWorkout}
             />
           )}

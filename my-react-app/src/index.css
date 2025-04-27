@@ -7,7 +7,8 @@
   padding: 0;
   box-sizing: border-box;
   font-family: "Poppins", sans-serif !important;
-  transition: background-color 0.3s ease, border-color 0.3s ease, color 0.3s ease, box-shadow 0.3s ease;
+  transition: background-color 0.3s ease, border-color 0.3s ease,
+    color 0.3s ease, box-shadow 0.3s ease;
 }
 
 html {
@@ -31,7 +32,8 @@ body.dark-mode {
 }
 
 code {
-  font-family: source-code-pro, Menlo, Monaco, Consolas, 'Courier New', monospace;
+  font-family: source-code-pro, Menlo, Monaco, Consolas, "Courier New",
+    monospace;
 }
 
 :root {
@@ -48,7 +50,7 @@ code {
   --dark-text-primary: #ffffff;
   --dark-text-secondary: rgba(255, 255, 255, 0.7);
   --dark-border: #444;
-  --dark-accent: #FFD700;
+  --dark-accent: #ffd700;
 
   --gold-gradient: linear-gradient(to right, #d4af37, #ffd700);
 
@@ -181,7 +183,7 @@ body.dark-mode .logo {
 
 .nav-links {
   display: flex;
-  gap:40px;
+  gap: 40px;
   align-items: center;
 }
 
@@ -263,7 +265,6 @@ body.dark-mode .logo {
   }
 }
 
-
 /* Hamburger Menu Styles */
 
 :root {
@@ -274,7 +275,6 @@ body.dark-mode .logo {
   --background-light: #ffffff;
   --background-dark: #121212;
 }
-
 
 /* Hamburger Menu Styles */
 .hamburger-menu {
@@ -2625,7 +2625,6 @@ code {
   height: 100%;
 }
 
-
 /* Social media */
 .social-media {
   margin-top: 40px;
@@ -3349,7 +3348,6 @@ body.dark-mode .footer-legal-links a:hover {
 .modal-title {
   margin: 0;
   padding-right: 32px;
-
 }
 
 .modal-gif-section {
@@ -3392,9 +3390,8 @@ body.dark-mode .footer-legal-links a:hover {
   justify-content: space-around;
   align-items: center;
   padding: 10px 0;
-  box-shadow: 0 -2px 10px rgba(0,0,0,0.05);
+  box-shadow: 0 -2px 10px rgba(0, 0, 0, 0.05);
   z-index: 1000;
-
 }
 
 .footer-item {
@@ -3460,7 +3457,6 @@ body.dark-mode .footer-legal-links a:hover {
   font-size: 16px;
   font-weight: 500;
   background: transparent;
-
 }
 
 .search-input:focus {
@@ -3519,7 +3515,6 @@ body.dark-mode .footer-legal-links a:hover {
 .body-part-item:hover .body-part-icon {
   box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
 }
-
 
 .section-header {
   display: flex;
@@ -3653,7 +3648,7 @@ body.dark-mode .footer-legal-links a:hover {
   text-align: center;
 }
 
-body.dark-mode .body-part-name   {
+body.dark-mode .body-part-name {
   font-size: 15px;
   font-weight: 600;
   color: #ffffff;
@@ -4663,7 +4658,6 @@ body.dark-mode .exercises-main-content {
   }
 }
 
-
 /*MOBILE FOOTER CSS*/
 /* Responsive Exercises Grid */
 .exercises-grid {
@@ -4746,9 +4740,11 @@ body.dark-mode .footer-item.active {
 @media (max-width: 767px) {
   .exercises-container {
     /* Base padding-bottom managed by JS for dynamic sizing */
-    min-height: calc(100vh - 80px); /* Ensure container is tall enough to scroll */
+    min-height: calc(
+      100vh - 80px
+    ); /* Ensure container is tall enough to scroll */
   }
-  
+
   /* Last item in the grid should have extra margin to ensure visibility */
   .exercises-grid > *:last-child {
     margin-bottom: 20px;
@@ -4782,7 +4778,6 @@ body.dark-mode .footer-item.active {
     width: 100%;
   }
 }
-
 
 /* Style the modal overlay to cover the screen and center the modal */
 .exercise-modal-overlay,
@@ -4841,7 +4836,7 @@ body.dark-mode .footer-item.active {
     /* Ensure centering is preserved */
     margin: 0 auto;
   }
-  
+
   /* Specifically remove the right margin that was causing the issue */
   .exercise-modal {
     margin-right: auto;
@@ -4881,7 +4876,7 @@ body.dark-mode .footer-item.active {
     /* Ensure consistent padding */
     padding: 15px;
   }
-  
+
   .exercise-modal,
   .filter-modal,
   .create-exercise-modal {
@@ -4912,9 +4907,9 @@ body.dark-mode .footer-item.active {
   padding-left: 20px;
 }
 
-
 /* Prevent horizontal scrolling on the entire page */
-body, html {
+body,
+html {
   overflow-x: hidden; /* Blocks horizontal scrolling */
   width: 100%;
   margin: 0;
@@ -5064,11 +5059,13 @@ body, html {
   margin-bottom: 15px;
 }
 
-.skeleton-details, .skeleton-instructions {
+.skeleton-details,
+.skeleton-instructions {
   padding: 5px 0;
 }
 
-.skeleton-detail-row, .skeleton-instruction-line {
+.skeleton-detail-row,
+.skeleton-instruction-line {
   height: 16px;
   margin: 10px 0;
   background: linear-gradient(90deg, #f0f0f0 25%, #e0e0e0 50%, #f0f0f0 75%);
@@ -5182,11 +5179,11 @@ body.dark-mode .skeleton-instruction-line {
     margin: auto;
     max-height: 80vh;
   }
-  
+
   .modal-header {
     padding: 10px 0;
   }
-  
+
   .modal-title {
     font-size: 20px;
   }
@@ -5201,7 +5198,7 @@ body.dark-mode .skeleton-instruction-line {
     padding: 16px;
     margin: auto;
   }
-  
+
   .modal-gif {
     max-width: 85%;
   }
@@ -5271,11 +5268,11 @@ body.dark-mode .skeleton-instruction-line {
     margin: auto;
     max-height: 85vh;
   }
-  
+
   .modal-title {
     font-size: 18px;
   }
-  
+
   .modal-content-section {
     padding: 0 8px 8px;
   }
@@ -5295,7 +5292,8 @@ body.dark-mode .skeleton-instruction-line {
   .exercise-modal-overlay,
   .filter-modal-overlay,
   .create-exercise-modal-overlay {
-    padding: env(safe-area-inset-top) env(safe-area-inset-right) env(safe-area-inset-bottom) env(safe-area-inset-left);
+    padding: env(safe-area-inset-top) env(safe-area-inset-right)
+      env(safe-area-inset-bottom) env(safe-area-inset-left);
   }
 }
 
@@ -5307,7 +5305,7 @@ body.dark-mode .skeleton-instruction-line {
   align-items: center;
 }
 
-.modal-header, 
+.modal-header,
 .modal-title {
   width: 100%;
   text-align: center;
@@ -5354,7 +5352,6 @@ body.dark-mode .skeleton-instruction-line {
   outline: 2px solid #3b82f6;
   outline-offset: 2px;
 }
-
 
 /*WORKOUT CSS*/
 
@@ -5543,7 +5540,7 @@ body.dark-mode .filter-group label {
   white-space: nowrap;
 }
 
-body.dark-mode .tab-button{
+body.dark-mode .tab-button {
   color: #fff;
 }
 
@@ -5565,9 +5562,8 @@ body.dark-mode .tab-button.active {
   gap: 24px;
   animation: fadeIn 0.5s ease-out;
   margin-bottom: 80px; /* Adjusted for spacing with mobile footer */
-  margin-left: 32px;
+  margin-left: 64px;
 }
-
 
 @media (max-width: 768px) {
   .workouts-grid {
@@ -5577,7 +5573,6 @@ body.dark-mode .tab-button.active {
     gap: 20px;
   }
 }
-
 
 @keyframes fadeIn {
   from {
@@ -5647,7 +5642,8 @@ body.dark-mode .tab-button.active {
   border-radius: 16px;
   overflow: hidden;
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
-  transition: transform 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275), box-shadow 0.4s ease;
+  transition: transform 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275),
+    box-shadow 0.4s ease;
   display: flex;
   flex-direction: column;
   position: relative;
@@ -6238,7 +6234,7 @@ body.dark-mode .tab-button.active {
   max-width: 100%;
   margin-bottom: 80px;
 }
-.workout-modal-footer .edit-button{
+.workout-modal-footer .edit-button {
   background-color: #f3f4f6;
   color: #4b5563;
 }
@@ -6766,7 +6762,6 @@ body.dark-mode .tab-button.active {
     top: 20px;
     right: 20px;
     z-index: 1100;
-    
   }
 }
 
@@ -6774,7 +6769,7 @@ body.dark-mode .tab-button.active {
   .exercise-item .sets,
   .exercise-item .reps,
   .exercise-item .rest,
-   .exercise-meta{
+  .exercise-meta {
     display: none;
   }
 }
@@ -6814,8 +6809,120 @@ body.dark-mode .tab-button.active {
   }
 }
 
-body.dark-mode{
-  label{
+body.dark-mode {
+  label {
     color: #e5e7eb;
   }
+}
+
+/* Exercise Selection Section */
+.exercise-selection-section {
+  margin-top: 24px;
+  padding: 20px;
+  background-color: #f9fafb;
+  border-radius: 12px;
+}
+
+body.dark-mode .exercise-selection-section {
+  background-color: #2d2d2d;
+}
+
+.exercise-search {
+  margin-bottom: 15px;
+}
+
+.exercise-search-input {
+  width: 100%;
+  padding: 12px 16px;
+  border: 1px solid #e5e7eb;
+  border-radius: 8px;
+  font-size: 15px;
+  transition: all 0.3s ease;
+}
+
+body.dark-mode .exercise-search-input {
+  background-color: #1e1e1e;
+  border-color: #444;
+  color: #e0e0e0;
+}
+
+.exercise-list-scrollable {
+  max-height: 300px;
+  overflow-y: auto;
+  padding-right: 8px;
+}
+
+.exercise-item-selectable {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 12px 16px;
+  background-color: white;
+  border-radius: 8px;
+  margin-bottom: 8px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+body.dark-mode .exercise-item-selectable {
+  background-color: #1e1e1e;
+  color: #e0e0e0;
+}
+
+.exercise-item-selectable:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+}
+
+.exercise-item-content {
+  display: flex;
+  flex-direction: column;
+}
+
+.exercise-item-name {
+  font-weight: 500;
+  font-size: 15px;
+}
+
+.exercise-item-body-part {
+  font-size: 13px;
+  color: #6b7280;
+}
+
+body.dark-mode .exercise-item-body-part {
+  color: #aaa;
+}
+
+.add-exercise-btn {
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background-color: #e5e7eb;
+  border: none;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.add-exercise-btn:hover {
+  background-color: #6200ea;
+  color: white;
+}
+
+body.dark-mode .add-exercise-btn:hover {
+  background-color: #ffd700;
+  color: #121212;
+}
+
+.edit-button.disabled {
+  pointer-events: none;
+}
+
+.search-input-container {
+  display: flex;
+  align-items: center;
+  position: relative;
+  width: 100%;
 }

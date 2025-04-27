@@ -36,3 +36,8 @@ dist-ssr
 *.njsproj
 *.sln
 *.sw?
+
+scripts/
+docker-compose.yml
+goldfit_postgres_data/
+

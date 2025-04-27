@@ -113,18 +113,33 @@ const WorkoutCard = ({
           <span className="duration-badge">{workout.duration} min</span>
         </div>
         <div className="workout-actions-footer">
+          {/* Edit button - shown for all, but disabled for recommended workouts */}
           <button
-            className="edit-button"
+            className={`edit-button ${workout.isRecommended ? 'disabled' : ''}`}
             onClick={(e) => {
-              console.log("Edit button clicked");
               e.preventDefault();
               e.stopPropagation();
-              if (typeof onEdit === 'function') {
+              
+              console.log("Edit button clicked for workout:", workout); // Debug
+              
+              // Only execute if not a recommended workout
+              if (!workout.isRecommended && typeof onEdit === 'function') {
+                console.log("Edit button active for user workout:", workout.id);
                 onEdit();
+              } else if (workout.isRecommended) {
+                console.log("Cannot edit recommended workout:", workout.id);
               } else {
                 console.error("onEdit is not a function:", onEdit);
               }
             }}
+            style={{
+              cursor: workout.isRecommended ? 'not-allowed' : 'pointer',
+              opacity: workout.isRecommended ? 0.5 : 1,
+              display: 'flex',
+              alignItems: 'center',
+              gap: '4px'
+            }}
+            title={workout.isRecommended ? "Cannot edit recommended workouts" : "Edit workout"}
           >
             <svg
               xmlns="http://www.w3.org/2000/svg"
@@ -142,6 +157,7 @@ const WorkoutCard = ({
             </svg>
             Edit
           </button>
+          
           <button
             className="log-button"
             onClick={(e) => {
@@ -152,6 +168,7 @@ const WorkoutCard = ({
               }
             }}
           >
+            {/* Log button SVG and text - unchanged */}
             <svg
               xmlns="http://www.w3.org/2000/svg"
               width="16"
