@@ -104,7 +104,7 @@ const ExportPDFModal = ({ open, onClose }) => {
       
       <DialogContent sx={{ p: 3, mt: 1 }}>
         <Typography variant="body1">
-          Would you like to download a PDF report of your progress? This report will include weight trends, fitness achievements, and goal tracking.
+          Would you like to download a PDF report of your progress? This report will include fitness achievements, nutrition data, and goal tracking metrics.
         </Typography>
         
         <Box 
@@ -122,9 +122,8 @@ const ExportPDFModal = ({ open, onClose }) => {
               PDF Report includes:
             </Typography>
             <Typography variant="body2" component="div" mt={1}>
-              • Weight changes & trends<br />
               • Fitness achievements<br />
-              • Goal progress metrics<br />
+              • Nutrition and calorie data<br />
               • Daily activity summary
             </Typography>
           </Box>
