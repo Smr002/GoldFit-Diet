@@ -15,7 +15,6 @@ import ModalHeader from './ModalHeader';
 import CalorieSection from './sections/CalorieSection';
 import WorkoutSection from './sections/WorkoutSection';
 import NutritionSection from './sections/NutritionSection';
-import WeightSection from './sections/WeightSection';
 
 // Utilities
 import { defaultSummaryData } from './utils/constants';
@@ -63,9 +62,6 @@ const WeeklySummaryModal = ({ open, onClose, data }) => {
           
           {/* Nutrition Section */}
           <NutritionSection nutritionData={weekData.nutrition} />
-          
-          {/* Weight Progress Section */}
-          <WeightSection progressData={weekData.progress} />
         </Grid>
       </DialogContent>
     </Dialog>
