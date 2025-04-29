@@ -1,13 +1,13 @@
 import axios from "axios";
 import { CreateUserDto, LoginDto, AuthResponse } from "./types/user";
 
-const API_BASE_URL =  "http://localhost:3000";
+const API_BASE_URL = "http://localhost:3000";
 
 export async function createUser(user: CreateUserDto) {
   try {
-   console.log("Creating user:", user); 
+    console.log("Creating user:", user);
     const response = await axios.post(`${API_BASE_URL}/users/`, user);
-    return response.data; 
+    return response.data;
   } catch (error: any) {
     if (axios.isAxiosError(error)) {
       throw new Error(error.response?.data?.error || "Failed to create user");
@@ -28,14 +28,29 @@ export async function loginUser(credentials: LoginDto): Promise<AuthResponse> {
   }
 }
 
-export async function getUsers(token: string) {
+export async function updateUser(id: number, user: Partial<CreateUserDto>, token: string) {
   try {
-    const response = await axios.get(`${API_BASE_URL}/users`, {
+    const response = await axios.put(`${API_BASE_URL}/users/${id}`, user, {
       headers: {
         Authorization: `Bearer ${token}`,
       },
     });
-    return response.data; 
+    return response.data;
+  } catch (error: any) {
+    if (axios.isAxiosError(error)) {
+      console.error("Update user error:", error.response?.data);
+      throw new Error(error.response?.data?.error || "Failed to update user");
+    }
+    throw new Error("Unexpected error");
+  }
+}
+
+export async function getUsers(token: string) {
+  try {
+    const response = await axios.get(`${API_BASE_URL}/users`, {
+      headers: { Authorization: `Bearer ${token}` },
+    });
+    return response.data;
   } catch (error: any) {
     if (axios.isAxiosError(error)) {
       throw new Error(error.response?.data?.error || "Failed to fetch users");
@@ -47,11 +62,9 @@ export async function getUsers(token: string) {
 export async function getExercises(token: string) {
   try {
     const response = await axios.get(`${API_BASE_URL}/exercises`, {
-      headers: {
-        Authorization: `Bearer ${token}`,
-      },
+      headers: { Authorization: `Bearer ${token}` },
     });
-    return response.data; 
+    return response.data;
   } catch (error: any) {
     if (axios.isAxiosError(error)) {
       throw new Error(error.response?.data?.error || "Failed to fetch exercises");
@@ -63,11 +76,9 @@ export async function getExercises(token: string) {
 export async function getExercisesById(id: number, token: string) {
   try {
     const response = await axios.get(`${API_BASE_URL}/exercises/${id}`, {
-      headers: {
-        Authorization: `Bearer ${token}`,
-      },
+      headers: { Authorization: `Bearer ${token}` },
     });
-    return response.data; 
+    return response.data;
   } catch (error: any) {
     if (axios.isAxiosError(error)) {
       throw new Error(error.response?.data?.error || "Failed to fetch exercises");
@@ -76,18 +87,35 @@ export async function getExercisesById(id: number, token: string) {
   }
 }
 
-
 export async function getWorkouts(token: string) {
   try {
     const response = await axios.get(`${API_BASE_URL}/workouts`, {
-      headers: {
-        Authorization: `Bearer ${token}`,
-      },
+      headers: { Authorization: `Bearer ${token}` },
     });
-    return response.data; 
+    return response.data;
   } catch (error: any) {
     if (axios.isAxiosError(error)) {
       throw new Error(error.response?.data?.error || "Failed to fetch workouts");
+    }
+    throw new Error("Unexpected error");
+  }
+}
+
+export async function createWorkout(data: any, token: string) {
+  try {
+    console.log("Sending create workout request:", data);
+    const response = await axios.post(`${API_BASE_URL}/workouts`, data, {
+      headers: {
+        Authorization: `Bearer ${token}`,
+        "Content-Type": "application/json",
+      },
+    });
+    console.log("Create workout response:", response.data);
+    return response.data;
+  } catch (error: any) {
+    if (axios.isAxiosError(error)) {
+      console.error("Create workout error:", error.response?.data);
+      throw new Error(error.response?.data?.error || "Failed to create workout");
     }
     throw new Error("Unexpected error");
   }
@@ -113,9 +141,7 @@ export async function updateWorkout(id: number, data: any, token: string) {
 export async function deleteWorkout(id: number, token: string) {
   try {
     const response = await axios.delete(`${API_BASE_URL}/workouts/${id}`, {
-      headers: {
-        Authorization: `Bearer ${token}`,
-      },
+      headers: { Authorization: `Bearer ${token}` },
     });
     return response.data;
   } catch (error: any) {
@@ -126,16 +152,11 @@ export async function deleteWorkout(id: number, token: string) {
   }
 }
 
-
 export async function getNutritionLog(token: string, userId: number, date: Date) {
   try {
     const response = await axios.get(`${API_BASE_URL}/nutrition/logs/${userId}`, {
-      headers: {
-        Authorization: `Bearer ${token}`,
-      },
-      params: {
-        date: date.toISOString().split("T")[0], // Format as YYYY-MM-DD
-      },
+      headers: { Authorization: `Bearer ${token}` },
+      params: { date: date.toISOString().split("T")[0] },
     });
     return response.data;
   } catch (error: any) {
@@ -143,5 +164,31 @@ export async function getNutritionLog(token: string, userId: number, date: Date)
       throw new Error(error.response?.data?.error || "Failed to fetch nutrition logs");
     }
     throw new Error("Unexpected error");
+  }
+}
+
+
+export async function getUserById(id: number, token: string) {
+  try {
+    const response = await axios.get(`${API_BASE_URL}/users/${id}`, {
+      headers: { Authorization: `Bearer ${token}` },
+    });
+    return response.data;
+  } catch (error: any) {
+    if (axios.isAxiosError(error)) {
+      throw new Error(error.response?.data?.error || "Failed to fetch user");
+    }
+    throw new Error("Unexpected error");
+  }
+}
+
+export function getUserIdFromToken(token: string): number | null {
+  try {
+    const payload = JSON.parse(atob(token.split(".")[1]));
+    console.log("Decoded token payload:", payload);
+    return payload.id || null;
+  } catch (error) {
+    console.error("Error decoding token:", error);
+    return null;
   }
 }

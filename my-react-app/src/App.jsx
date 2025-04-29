@@ -17,6 +17,7 @@ import FAQManagement from "./pages/admin/FAQManagement";
 import AdminManagement from "./pages/admin/AdminManagement";
 import Workout from "./components/UserWorkout";
 import AdminProfile from "./pages/admin/AdminProfile";
+import Profile from "./components/Profile";
 
 const ProtectedRoute = ({ children }) => {
   const token = localStorage.getItem("token");
@@ -35,7 +36,8 @@ const routes = {
     { path: "/exercises", element: <Exercises /> },
     { path: "/user-home", element: <UserHomePage /> },
     { path: "/workouts", element: <Workout /> },
-    { path: "/nutrition", element: <NutritionPage /> }, // Add this route
+    { path: "/nutrition", element: <NutritionPage /> },
+    { path: "/user-profile", element: <Profile /> },
   ],
   admin: [
     { path: "dashboard", element: <Dashboard /> },
