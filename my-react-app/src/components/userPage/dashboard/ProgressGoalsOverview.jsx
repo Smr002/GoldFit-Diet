@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState } from "react";
 import {
   Box,
   Typography,
@@ -9,10 +9,23 @@ import {
   useTheme,
 } from "@mui/material";
 import { LineChart, FileDown, TrendingDown, TrendingUp } from "lucide-react";
+import ExportPDFModal from "./ExportPDFModal";
 
 function ProgressGoalsOverview() {
   const theme = useTheme();
   const isDarkMode = theme.palette.mode === 'dark';
+  
+  // Add state for modal visibility
+  const [exportModalOpen, setExportModalOpen] = useState(false);
+
+  // Modal handlers
+  const handleOpenExportModal = () => {
+    setExportModalOpen(true);
+  };
+  
+  const handleCloseExportModal = () => {
+    setExportModalOpen(false);
+  };
 
   // Mock data
   const goalProgress = {
@@ -53,6 +66,7 @@ function ProgressGoalsOverview() {
           : "linear-gradient(145deg, #ffffff, #f5f7ff)",
       }}
     >
+      {/* Content remains unchanged */}
       <Box
         sx={{
           display: "flex",
@@ -230,6 +244,7 @@ function ProgressGoalsOverview() {
         startIcon={<FileDown size={18} />}
         size="medium"
         fullWidth
+        onClick={handleOpenExportModal} // Add onClick handler
         sx={{
           py: 1.2,
           borderColor: isDarkMode ? theme.palette.primary.main : "#7E69AB",
@@ -246,6 +261,12 @@ function ProgressGoalsOverview() {
       >
         Export Progress Report
       </Button>
+      
+      {/* Use the separate ExportPDFModal component */}
+      <ExportPDFModal
+        open={exportModalOpen}
+        onClose={handleCloseExportModal}
+      />
     </Paper>
   );
 }
