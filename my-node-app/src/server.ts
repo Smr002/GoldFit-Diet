@@ -10,6 +10,7 @@ import exerciseRouter from "./exercise/exerciseRouter";
 import nutritionRouter from './nutrition/nutritionRouter';
 import adminRoutes from './admin/adminRoutes';
 import notificationRouter from './notifications/notificationRouter';
+import weeklySummary from "./summary/weeklySummaryRouter";
 
 dotenv.config();
 
@@ -31,6 +32,7 @@ app.use("/exercises", exerciseRouter);
 app.use("/nutrition", nutritionRouter);
 app.use("/admin", adminRoutes);
 app.use("/notifications", notificationRouter);
+app.use("/summary",weeklySummary);
 
 
 app.use((req, res) => {
