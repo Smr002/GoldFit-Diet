@@ -30,10 +30,11 @@ export class UsersRepository {
   }
 
   async update(id: number, data: Partial<User>): Promise<User> {
-    return this.prisma.user.update({
-      where: { id },
+    const updatedUser = await this.prisma.user.update({
+      where: { id }, // Use 'id' to match the schema
       data,
     });
+    return updatedUser;
   }
 
   async delete(id: number): Promise<User> {

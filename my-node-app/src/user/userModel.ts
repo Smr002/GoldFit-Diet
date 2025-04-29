@@ -32,8 +32,20 @@ export const UserSchema = z.object({
   deletedAt: z.date().optional().nullable(),
 });
 
+export const UpdateUserSchema = z.object({
+  email: z.string().email(),
+  password: z.string().min(8),
+  fullName: z.string().min(1),
+  selectedAgeGroup: z.string().min(1),
+  selectedGender: z.string().min(1),
+  selectedHeight: z.number().min(0),
+  selectedWeight: z.number().min(0),
+  selectedGoal: GoalSchema,
+});
 
+export const toUpdateUserSchema = UpdateUserSchema.partial();
 export type User = z.infer<typeof UserSchema>;
+export type toUpdateUserInput = z.infer<typeof toUpdateUserSchema>;
 
 
 export class UserModel {
