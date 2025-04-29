@@ -1,13 +1,13 @@
 import { Request, Response } from 'express';
 import { NotificationService } from './notificationService';
-import { CreateNotificationDto, WorkoutReminderNotification, ProgressNotification, AdminNotification } from './notificationModel';
+import { NotificationModel, Notification, WorkoutReminderNotification, ProgressNotification, AdminNotification } from './notificationModel';
 
 const notificationService = new NotificationService();
 
 export class NotificationController {
   async createNotification(req: Request, res: Response) {
     try {
-      const data: CreateNotificationDto = req.body;
+      const data: Partial<Notification> = req.body;
       const notification = await notificationService.createNotification(data);
       res.status(201).json(notification);
     } catch (error) {

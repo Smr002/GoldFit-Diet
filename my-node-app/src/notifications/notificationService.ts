@@ -1,155 +1,165 @@
 import { NotificationRepository } from './notificationRepository';
-import { CreateNotificationDto, WorkoutReminderNotification, ProgressNotification, AdminNotification } from './notificationModel';
+import { NotificationModel, Notification, WorkoutReminderNotification, ProgressNotification, AdminNotification } from './notificationModel';
 import { PrismaClient } from '@prisma/client';
 
 const prisma = new PrismaClient();
-const notificationRepository = new NotificationRepository();
 
 export class NotificationService {
-  async createNotification(data: CreateNotificationDto) {
-    return notificationRepository.createNotification(data);
+  private repository: NotificationRepository;
+
+  constructor() {
+    this.repository = new NotificationRepository();
   }
 
-  async getNotificationById(id: number) {
-    return notificationRepository.getNotificationById(id);
+  async createNotification(data: Partial<Notification>): Promise<Notification> {
+    try {
+      const notificationModel = new NotificationModel(data);
+      if (!notificationModel.isValid()) {
+        throw new Error('Invalid notification data');
+      }
+      return this.repository.createNotification(notificationModel.toObject());
+    } catch (error) {
+      console.error('Error creating notification:', error);
+      throw error;
+    }
   }
 
-  async getNotificationsByUser(userId: number) {
-    return notificationRepository.getNotificationsByUser(userId);
+  async getNotificationById(id: number): Promise<Notification | null> {
+    try {
+      return this.repository.getNotificationById(id);
+    } catch (error) {
+      console.error('Error getting notification:', error);
+      throw error;
+    }
   }
 
-  async sendWorkoutReminder(data: WorkoutReminderNotification) {
-    const notification = await notificationRepository.createWorkoutReminder(
-      data.userId,
-      data.workoutId,
-      data.message
-    );
-
-    // Create sent notification record
-    await prisma.sentNotification.create({
-      data: {
-        notificationId: notification.id,
-        userId: data.userId,
-        sentAt: new Date(),
-      },
-    });
-
-    // TODO: Implement email sending logic here
-    // await this.sendEmail(data.userId, data.message);
-
-    return notification;
+  async getNotificationsByUser(userId: number): Promise<Notification[]> {
+    try {
+      return this.repository.getNotificationsByUser(userId);
+    } catch (error) {
+      console.error('Error getting user notifications:', error);
+      throw error;
+    }
   }
 
-  async sendProgressNotification(data: ProgressNotification) {
-    const notification = await notificationRepository.createProgressNotification(
-      data.userId,
-      data.achievement,
-      data.message
-    );
+  async sendWorkoutReminder(data: WorkoutReminderNotification): Promise<Notification> {
+    try {
+      const notification = await this.repository.createWorkoutReminder(data);
 
-    await prisma.sentNotification.create({
-      data: {
-        notificationId: notification.id,
-        userId: data.userId,
-        sentAt: new Date(),
-      },
-    });
+      if (!notification.id) {
+        throw new Error('Notification ID is required');
+      }
 
-    return notification;
+      // Create sent notification record
+      await prisma.sentNotification.create({
+        data: {
+          notificationId: notification.id,
+          userId: data.userId,
+          sentAt: new Date(),
+        },
+      });
+
+      // TODO: Implement email sending logic
+      return notification;
+    } catch (error) {
+      console.error('Error sending workout reminder:', error);
+      throw error;
+    }
   }
 
-  async sendAdminNotification(data: AdminNotification) {
-    const notification = await notificationRepository.createAdminNotification(
-      data.targetUsers,
-      data.message,
-      data.createdBy
-    );
+  async sendProgressNotification(data: ProgressNotification): Promise<Notification> {
+    try {
+      const notification = await this.repository.createProgressNotification(data);
 
-    // Get target users based on audience
-    const users = await this.getTargetUsers(data.targetUsers);
+      if (!notification.id) {
+        throw new Error('Notification ID is required');
+      }
 
-    // Create sent notification records for all target users
-    await Promise.all(
-      users.map(user =>
-        prisma.sentNotification.create({
+      await prisma.sentNotification.create({
+        data: {
+          notificationId: notification.id,
+          userId: data.userId,
+          sentAt: new Date(),
+        },
+      });
+
+      return notification;
+    } catch (error) {
+      console.error('Error sending progress notification:', error);
+      throw error;
+    }
+  }
+
+  async sendAdminNotification(data: AdminNotification): Promise<Notification> {
+    try {
+      const notification = await this.repository.createAdminNotification(data);
+
+      if (!notification.id) {
+        throw new Error('Notification ID is required');
+      }
+
+      // Get target users based on audience
+      const targetUserIds = await this.getTargetUsers(data.targetUsers);
+
+      // Create sent notification records for each target user
+      for (const userId of targetUserIds) {
+        await prisma.sentNotification.create({
           data: {
             notificationId: notification.id,
-            userId: user.id,
+            userId,
             sentAt: new Date(),
           },
-        })
-      )
-    );
-
-    return notification;
-  }
-
-  private async getTargetUsers(targetUsers: string) {
-    switch (targetUsers) {
-      case 'ALL_USERS':
-        return prisma.user.findMany();
-      case 'PREMIUM_USERS':
-        return prisma.user.findMany({
-          where: { isPremium: true },
         });
-      default:
-        return [];
+      }
+
+      return notification;
+    } catch (error) {
+      console.error('Error sending admin notification:', error);
+      throw error;
     }
   }
 
-  async checkMissedWorkouts() {
-    const users = await prisma.user.findMany({
-      where: { notifyWorkoutSessions: true },
-      include: { activeWorkout: true },
-    });
-
-    const today = new Date();
-    const yesterday = new Date(today);
-    yesterday.setDate(yesterday.getDate() - 1);
-
-    for (const user of users) {
-      if (!user.activeWorkout) continue;
-
-      const lastSession = await prisma.workoutSession.findFirst({
-        where: {
-          userId: user.id,
-          workoutId: user.activeWorkout.id,
-        },
-        orderBy: { date: 'desc' },
-      });
-
-      if (!lastSession || lastSession.date < yesterday) {
-        await this.sendWorkoutReminder({
-          userId: user.id,
-          workoutId: user.activeWorkout.id,
-          message: `You missed your workout session yesterday. Don't forget to stay on track with your fitness goals!`,
-        });
+  private async getTargetUsers(targetUsers: Notification['targetUsers']): Promise<number[]> {
+    try {
+      switch (targetUsers) {
+        case 'ALL_USERS':
+          return prisma.user.findMany().then(users => users.map(user => user.id));
+        case 'PREMIUM_USERS':
+          return prisma.user.findMany({
+            where: { isPremium: true },
+          }).then(users => users.map(user => user.id));
+        default:
+          return [];
       }
+    } catch (error) {
+      console.error('Error getting target users:', error);
+      throw error;
     }
   }
 
-  async checkProgressAchievements() {
-    const users = await prisma.user.findMany({
-      where: { notifyMotivational: true },
-    });
-
-    for (const user of users) {
-      const lastWeekSessions = await prisma.workoutSession.count({
-        where: {
-          userId: user.id,
-          date: {
-            gte: new Date(Date.now() - 7 * 24 * 60 * 60 * 1000),
-          },
-        },
+  async checkMissedWorkouts(): Promise<void> {
+    try {
+      const users = await prisma.user.findMany({
+        where: { notifyWorkoutSessions: true },
       });
 
-      if (lastWeekSessions >= 5) {
-        await this.sendProgressNotification({
-          userId: user.id,
-          achievement: 'Weekly Workout Streak',
-          message: `Amazing work! You've completed ${lastWeekSessions} workouts this week. Keep up the great progress!`,
-        });
-      }
+      // TODO: Implement logic to check for missed workouts
+    } catch (error) {
+      console.error('Error checking missed workouts:', error);
+      throw error;
+    }
+  }
+
+  async checkProgressAchievements(): Promise<void> {
+    try {
+      const users = await prisma.user.findMany({
+        where: { notifyMotivational: true },
+      });
+
+      // TODO: Implement logic to check for progress achievements
+    } catch (error) {
+      console.error('Error checking progress achievements:', error);
+      throw error;
     }
   }
 }

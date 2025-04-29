@@ -1,40 +1,86 @@
-import { PrismaClient, Notification, NotificationAudience, User } from '@prisma/client';
-import { CreateNotificationDto, UpdateNotificationDto } from './notificationModel';
+import { PrismaClient, Notification as PrismaNotification, Prisma } from '@prisma/client';
+import { NotificationModel, Notification, WorkoutReminderNotification, ProgressNotification, AdminNotification } from './notificationModel';
 
 const prisma = new PrismaClient();
 
+type FullPrismaNotification = PrismaNotification & {
+  deletedAt: Date | null;
+};
+
+const mapPrismaToNotification = (prismaNotification: FullPrismaNotification): Notification => {
+  return {
+    id: prismaNotification.id,
+    type: prismaNotification.type as Notification['type'],
+    message: prismaNotification.message,
+    isAutomated: prismaNotification.isAutomated,
+    frequency: (prismaNotification.frequency as Notification['frequency']) || undefined,
+    targetUsers: prismaNotification.targetUsers as Notification['targetUsers'],
+    createdBy: prismaNotification.createdBy || undefined,
+    createdAt: prismaNotification.createdAt,
+    updatedAt: prismaNotification.updatedAt,
+    deletedAt: prismaNotification.deletedAt || undefined,
+  };
+};
+
 export class NotificationRepository {
-  async createNotification(data: CreateNotificationDto): Promise<Notification> {
-    return prisma.notification.create({
+  async createNotification(data: Partial<Notification>): Promise<Notification> {
+    const notificationModel = new NotificationModel(data);
+    if (!notificationModel.isValid()) {
+      throw new Error('Invalid notification data');
+    }
+
+    const notificationData = notificationModel.toObject();
+    const prismaNotification = await prisma.notification.create({
       data: {
-        type: data.type,
-        message: data.message,
-        isAutomated: data.isAutomated,
-        frequency: data.frequency,
-        targetUsers: data.targetUsers,
-        createdBy: data.createdBy,
+        type: notificationData.type,
+        message: notificationData.message,
+        isAutomated: notificationData.isAutomated,
+        frequency: notificationData.frequency,
+        targetUsers: notificationData.targetUsers,
+        createdBy: notificationData.createdBy,
       },
-    });
+    }) as FullPrismaNotification;
+
+    return mapPrismaToNotification(prismaNotification);
   }
 
   async getNotificationById(id: number): Promise<Notification | null> {
-    return prisma.notification.findUnique({
+    const prismaNotification = await prisma.notification.findUnique({
       where: { id },
       include: { creator: true },
-    });
+    }) as FullPrismaNotification | null;
+
+    return prismaNotification ? mapPrismaToNotification(prismaNotification) : null;
   }
 
-  async updateNotification(id: number, data: UpdateNotificationDto): Promise<Notification> {
-    return prisma.notification.update({
+  async updateNotification(id: number, data: Partial<Notification>): Promise<Notification> {
+    const notificationModel = new NotificationModel(data);
+    if (!notificationModel.isValid()) {
+      throw new Error('Invalid notification data');
+    }
+
+    const notificationData = notificationModel.toObject();
+    const prismaNotification = await prisma.notification.update({
       where: { id },
-      data,
-    });
+      data: {
+        type: notificationData.type,
+        message: notificationData.message,
+        isAutomated: notificationData.isAutomated,
+        frequency: notificationData.frequency,
+        targetUsers: notificationData.targetUsers,
+        createdBy: notificationData.createdBy,
+      },
+    }) as FullPrismaNotification;
+
+    return mapPrismaToNotification(prismaNotification);
   }
 
   async deleteNotification(id: number): Promise<Notification> {
-    return prisma.notification.delete({
+    const prismaNotification = await prisma.notification.delete({
       where: { id },
-    });
+    }) as FullPrismaNotification;
+
+    return mapPrismaToNotification(prismaNotification);
   }
 
   async getNotificationsByUser(userId: number): Promise<Notification[]> {
@@ -49,45 +95,51 @@ export class NotificationRepository {
 
     const notificationIds = user.sentNotifications.map(sn => sn.notificationId);
     
-    return prisma.notification.findMany({
+    const prismaNotifications = await prisma.notification.findMany({
       where: {
         OR: [
           { id: { in: notificationIds } },
-          { targetUsers: NotificationAudience.ALL_USERS },
-          { targetUsers: NotificationAudience.PREMIUM_USERS, ...(user.isPremium ? {} : { id: -1 }) },
+          { targetUsers: 'ALL_USERS' },
+          { targetUsers: 'PREMIUM_USERS', ...(user.isPremium ? {} : { id: -1 }) },
         ],
       },
       orderBy: { createdAt: 'desc' },
-    });
+    }) as FullPrismaNotification[];
+
+    return prismaNotifications.map(mapPrismaToNotification);
   }
 
-  async createWorkoutReminder(userId: number, workoutId: number, message: string): Promise<Notification> {
-    return this.createNotification({
+  async createWorkoutReminder(data: WorkoutReminderNotification): Promise<Notification> {
+    const notificationData: Partial<Notification> = {
       type: 'WORKOUT_REMINDER',
-      message,
+      message: data.message,
       isAutomated: true,
-      targetUsers: NotificationAudience.SPECIFIC_USERS,
-      createdBy: undefined,
-    });
+      targetUsers: 'SPECIFIC_USERS',
+    };
+
+    return this.createNotification(notificationData);
   }
 
-  async createProgressNotification(userId: number, achievement: string, message: string): Promise<Notification> {
-    return this.createNotification({
-      type: 'PROGRESS',
-      message,
+  async createProgressNotification(data: ProgressNotification): Promise<Notification> {
+    const notificationData: Partial<Notification> = {
+      type: 'PROGRESS_UPDATE',
+      message: data.message,
       isAutomated: true,
-      targetUsers: NotificationAudience.SPECIFIC_USERS,
-      createdBy: undefined,
-    });
+      targetUsers: 'SPECIFIC_USERS',
+    };
+
+    return this.createNotification(notificationData);
   }
 
-  async createAdminNotification(targetUsers: NotificationAudience, message: string, createdBy: number): Promise<Notification> {
-    return this.createNotification({
-      type: 'ADMIN',
-      message,
+  async createAdminNotification(data: AdminNotification): Promise<Notification> {
+    const notificationData: Partial<Notification> = {
+      type: 'ADMIN_MESSAGE',
+      message: data.message,
       isAutomated: false,
-      targetUsers,
-      createdBy,
-    });
+      targetUsers: data.targetUsers,
+      createdBy: data.createdBy,
+    };
+
+    return this.createNotification(notificationData);
   }
 }

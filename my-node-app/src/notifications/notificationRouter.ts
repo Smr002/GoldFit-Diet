@@ -1,8 +1,8 @@
-import express from 'express';
+import { Router } from 'express';
 import { NotificationController } from './notificationController';
 import { authenticateJWT } from '../auth/JWT/authMiddleware';
 
-const router = express.Router();
+const router = Router();
 const notificationController = new NotificationController();
 
 router.use(authenticateJWT);
@@ -18,8 +18,8 @@ router.post('/check-missed-workouts', notificationController.checkMissedWorkouts
 router.post('/check-progress', notificationController.checkProgressAchievements.bind(notificationController));
 
 // User routes
-router.get('/:userId', notificationController.getNotificationsByUser.bind(notificationController));
-router.get('/notification/:id', notificationController.getNotificationById.bind(notificationController));
+router.get('/user/:userId', notificationController.getNotificationsByUser.bind(notificationController));
+router.get('/:id', notificationController.getNotificationById.bind(notificationController));
 router.post('/', notificationController.createNotification.bind(notificationController));
 
 export default router;
