@@ -167,7 +167,6 @@ export async function getNutritionLog(token: string, userId: number, date: Date)
   }
 }
 
-
 export async function getUserById(id: number, token: string) {
   try {
     const response = await axios.get(`${API_BASE_URL}/users/${id}`, {
@@ -190,5 +189,20 @@ export function getUserIdFromToken(token: string): number | null {
   } catch (error) {
     console.error("Error decoding token:", error);
     return null;
+  }
+}
+
+export async function getWeeklySummary(token: string, weekStart: string) {
+  try {
+    const response = await axios.get(`${API_BASE_URL}/summary`, {
+      headers: { Authorization: `Bearer ${token}` },
+      params: { weekStart }
+    });
+    return response.data;
+  } catch (error: any) {
+    if (axios.isAxiosError(error)) {
+      throw new Error(error.response?.data?.error || "Failed to fetch weekly summary");
+    }
+    throw new Error("Unexpected error");
   }
 }

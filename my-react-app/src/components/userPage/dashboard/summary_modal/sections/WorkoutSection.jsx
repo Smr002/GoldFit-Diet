@@ -29,8 +29,43 @@ const WorkoutSection = ({ workoutData }) => {
   const themeColors = getThemeColors(isDarkMode);
   const COLORS = themeColors.colors;
 
+  // Create a reusable stat box component
+  const StatBox = ({ icon: Icon, label, value, unit }) => (
+    <Box sx={{ 
+      height: '100%',
+      textAlign: 'center',
+      p: 1.5,
+      borderRadius: 2,
+      background: themeColors.workout.stat.bg,
+      display: 'flex',
+      flexDirection: 'column',
+      justifyContent: 'center'
+    }}>
+      <Typography variant="body2" color="text.secondary">
+        <Box component="span" display="flex" alignItems="center" justifyContent="center" mb={0.5}>
+          <Icon fontSize="small" />
+        </Box>
+        {label}
+      </Typography>
+      <Typography 
+        variant="h6" 
+        fontWeight="bold" 
+        color={themeColors.workout.primary}
+        sx={{
+          fontSize: {
+            xs: '1rem',
+            sm: '1.25rem'
+          },
+          mt: 0.5
+        }}
+      >
+        {value}{unit}
+      </Typography>
+    </Box>
+  );
+
   return (
-    <Grid item xs={12} md={6}>
+    <Grid item xs={12} sm={6} md={6}>
       <Paper 
         elevation={0} 
         sx={{ 
@@ -68,60 +103,31 @@ const WorkoutSection = ({ workoutData }) => {
         </Typography>
         <Divider sx={{ mb: 2, opacity: 0.6 }} />
         
+        {/* Update the Grid container section */}
         <Grid container spacing={2} sx={{ mb: 2 }}>
           <Grid item xs={4}>
-            <Box sx={{ 
-              textAlign: 'center',
-              p: 1.5,
-              borderRadius: 2,
-              background: themeColors.workout.stat.bg
-            }}>
-              <Typography variant="body2" color="text.secondary">
-                <Box component="span" display="flex" alignItems="center" justifyContent="center" mb={0.5}>
-                  <FitnessCenterIcon fontSize="small" />
-                </Box>
-                Sessions
-              </Typography>
-              <Typography variant="h6" fontWeight="bold" color={themeColors.workout.primary}>
-                {workoutData.completed}
-              </Typography>
-            </Box>
+            <StatBox 
+              icon={FitnessCenterIcon}
+              label="Sessions"
+              value={workoutData.completed}
+              unit=""
+            />
           </Grid>
           <Grid item xs={4}>
-            <Box sx={{ 
-              textAlign: 'center',
-              p: 1.5,
-              borderRadius: 2,
-              background: themeColors.workout.stat.bg
-            }}>
-              <Typography variant="body2" color="text.secondary">
-                <Box component="span" display="flex" alignItems="center" justifyContent="center" mb={0.5}>
-                  <TimerIcon fontSize="small" />
-                </Box>
-                Duration
-              </Typography>
-              <Typography variant="h6" fontWeight="bold" color={themeColors.workout.primary}>
-                {workoutData.duration} min
-              </Typography>
-            </Box>
+            <StatBox 
+              icon={TimerIcon}
+              label="Duration"
+              value={workoutData.duration}
+              unit=" min"
+            />
           </Grid>
           <Grid item xs={4}>
-            <Box sx={{ 
-              textAlign: 'center',
-              p: 1.5,
-              borderRadius: 2,
-              background: themeColors.workout.stat.bg
-            }}>
-              <Typography variant="body2" color="text.secondary">
-                <Box component="span" display="flex" alignItems="center" justifyContent="center" mb={0.5}>
-                  <LocalFireDepartmentIcon fontSize="small" />
-                </Box>
-                Burned
-              </Typography>
-              <Typography variant="h6" fontWeight="bold" color={themeColors.workout.primary}>
-                {workoutData.caloriesBurned} kcal
-              </Typography>
-            </Box>
+            <StatBox 
+              icon={LocalFireDepartmentIcon}
+              label="Burned"
+              value={workoutData.caloriesBurned}
+              unit=" kcal"
+            />
           </Grid>
         </Grid>
         

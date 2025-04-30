@@ -11,24 +11,46 @@ import {
 } from '@mui/material';
 import RestaurantIcon from '@mui/icons-material/Restaurant';
 import WaterDropIcon from '@mui/icons-material/WaterDrop';
-import EggIcon from '@mui/icons-material/Egg';
+import KebabDiningIcon from '@mui/icons-material/KebabDining'; // for protein
+import LocalPizzaIcon from '@mui/icons-material/LocalPizza'; // for carbs
+import IcecreamIcon from '@mui/icons-material/Icecream'; // for fat
 import GrainIcon from '@mui/icons-material/Grain';
 import OilBarrelIcon from '@mui/icons-material/OilBarrel';
 import { getThemeColors } from '../utils/constants';
+
+const calculateMacroPercentages = (protein, carbs, fat) => {
+  // Convert macros to calories
+  const proteinCals = protein * 4;
+  const carbsCals = carbs * 4;
+  const fatCals = fat * 9;
+  
+  // Calculate total calories
+  const totalCals = proteinCals + carbsCals + fatCals;
+  
+  // Prevent division by zero
+  if (totalCals === 0) return { protein: 0, carbs: 0, fat: 0 };
+  
+  return {
+    protein: Math.round((proteinCals / totalCals) * 100),
+    carbs: Math.round((carbsCals / totalCals) * 100),
+    fat: Math.round((fatCals / totalCals) * 100)
+  };
+};
 
 const NutritionSection = ({ nutritionData }) => {
   const theme = useTheme();
   const isDarkMode = theme.palette.mode === 'dark';
   const themeColors = getThemeColors(isDarkMode);
 
-  // Calculate total macros for percentage
-  const totalMacros = nutritionData.averages.protein + nutritionData.averages.carbs + nutritionData.averages.fat;
-  const proteinPercentage = Math.round((nutritionData.averages.protein * 4 / (totalMacros * 4)) * 100);
-  const carbsPercentage = Math.round((nutritionData.averages.carbs * 4 / (totalMacros * 4)) * 100);
-  const fatPercentage = Math.round((nutritionData.averages.fat * 9 / (totalMacros * 4)) * 100);
+  // Calculate percentages using the new function
+  const { protein: proteinPercentage, carbs: carbsPercentage, fat: fatPercentage } = calculateMacroPercentages(
+    nutritionData.averages.protein,
+    nutritionData.averages.carbs,
+    nutritionData.averages.fat
+  );
 
   return (
-    <Grid item xs={12} md={6}>
+    <Grid item xs={12} sm={6} md={6}>
       <Paper 
         elevation={0} 
         sx={{ 
@@ -109,13 +131,19 @@ const NutritionSection = ({ nutritionData }) => {
                       mb: 0.5
                     }}
                   >
-                    <EggIcon fontSize="small" sx={{ color: isDarkMode ? themeColors.nutrition.protein.text : 'white' }} />
+                    <KebabDiningIcon fontSize="small" sx={{ color: isDarkMode ? themeColors.nutrition.protein.text : 'white' }} />
                   </Avatar>
                 </Box>
                 <Typography variant="body2" color="text.secondary" gutterBottom>
                   Protein
                 </Typography>
-                <Typography variant="h6" fontWeight="bold" color={themeColors.nutrition.protein.text}>
+                <Typography variant="h6" fontWeight="bold" color={themeColors.nutrition.protein.text}
+                sx={{
+                  fontSize: {
+                    xs: '1rem',     
+                    sm: '1.25rem'   
+                  }
+                }}>
                   {nutritionData.averages.protein}g
                 </Typography>
                 <Typography variant="caption" color="text.secondary" sx={{ mt: 0.5 }}>
@@ -149,13 +177,19 @@ const NutritionSection = ({ nutritionData }) => {
                       mb: 0.5
                     }}
                   >
-                    <GrainIcon fontSize="small" sx={{ color: isDarkMode ? themeColors.nutrition.carbs.text : 'white' }} />
+                    <LocalPizzaIcon fontSize="small" sx={{ color: isDarkMode ? themeColors.nutrition.carbs.text : 'white' }} />
                   </Avatar>
                 </Box>
                 <Typography variant="body2" color="text.secondary" gutterBottom>
                   Carbs
                 </Typography>
-                <Typography variant="h6" fontWeight="bold" color={themeColors.nutrition.carbs.text}>
+                <Typography variant="h6" fontWeight="bold" color={themeColors.nutrition.carbs.text}
+                sx={{
+                  fontSize: {
+                    xs: '1rem',     
+                    sm: '1.25rem'   
+                  }
+                }}>
                   {nutritionData.averages.carbs}g
                 </Typography>
                 <Typography variant="caption" color="text.secondary" sx={{ mt: 0.5 }}>
@@ -189,13 +223,19 @@ const NutritionSection = ({ nutritionData }) => {
                       mb: 0.5
                     }}
                   >
-                    <OilBarrelIcon fontSize="small" sx={{ color: isDarkMode ? themeColors.nutrition.fat.text : 'white' }} />
+                    <IcecreamIcon fontSize="small" sx={{ color: isDarkMode ? themeColors.nutrition.fat.text : 'white' }} />
                   </Avatar>
                 </Box>
                 <Typography variant="body2" color="text.secondary" gutterBottom>
                   Fat
                 </Typography>
-                <Typography variant="h6" fontWeight="bold" color={themeColors.nutrition.fat.text}>
+                <Typography variant="h6" fontWeight="bold" color={themeColors.nutrition.fat.text}
+                sx={{
+                  fontSize: {
+                    xs: '1rem',     
+                    sm: '1.25rem'   
+                  }
+                }}>
                   {nutritionData.averages.fat}g
                 </Typography>
                 <Typography variant="caption" color="text.secondary" sx={{ mt: 0.5 }}>

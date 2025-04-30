@@ -15,6 +15,16 @@ function NotificationsReminders() {
   // Add state for modal visibility
   const [summaryModalOpen, setSummaryModalOpen] = useState(false);
 
+  const [currentWeekStart, setCurrentWeekStart] = useState(() => {
+    const today = new Date();
+    const monday = new Date(today);
+    monday.setDate(today.getDate() - today.getDay() + 1);
+    return monday.toISOString().split('T')[0];
+  });
+
+  //Testing start date for my database
+  // const [currentWeekStart, setCurrentWeekStart] = useState("2024-04-22");
+
   // Modal handlers
   const handleOpenSummary = () => {
     setSummaryModalOpen(true);
@@ -286,10 +296,10 @@ function NotificationsReminders() {
       
       {/* Add the Weekly Summary Modal */}
       <WeeklySummaryModal 
-        open={summaryModalOpen}
-        onClose={handleCloseSummary}
-        data={weeklyData}
-      />
+  open={summaryModalOpen}
+  onClose={handleCloseSummary}
+  weekStart={currentWeekStart}
+/>
     </>
   );
 }
