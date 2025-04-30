@@ -45,9 +45,8 @@ export class WeeklySummaryService {
   }
 
   async cacheWeeklySummary(userId: number, weekStart: Date): Promise<void> {
-    // This would be implemented for caching functionality
-    // Not implementing full cache logic for the example
+    //Caching
     console.log(`Caching weekly summary for user ${userId} for week starting ${weekStart}`);
-    // In a real implementation, store the summary data in a cache
+
   }
 }

@@ -38,8 +38,13 @@ export class WeeklySummaryRepository {
         },
       },
       include: {
-        workout: true,
-        sessionExercises: true,
+        workout: {
+          select: {
+            name: true,
+            level: true
+          }
+        },
+        sessionExercises: true
       },
       orderBy: {
         date: "asc",
@@ -187,26 +192,23 @@ export class WeeklySummaryRepository {
   }
 
   private calculateWorkoutTypeDistribution(workoutSessions: any[]): WorkoutTypeDistribution[] {
-    const typeDistribution: Record<string, { count: number; minutes: number }> = {};
-    
+    const typeStats = new Map<string, { count: number; minutes: number }>();
+
     workoutSessions.forEach(session => {
-      const workoutType = session.workout?.level || 'Unknown';
-      
-      if (!typeDistribution[workoutType]) {
-        typeDistribution[workoutType] = { count: 0, minutes: 0 };
-      }
-      
-      // Estimate workout duration based on exercises
-      const sessionDuration = session.sessionExercises.length * 5; // Assume 5 minutes per exercise
-      
-      typeDistribution[workoutType].count += 1;
-      typeDistribution[workoutType].minutes += sessionDuration;
+        const workoutType = session.workout?.name || 'No Type';
+        const sessionMinutes = (session.sessionExercises?.length || 0) * 5; // 5 minutes per exercise
+
+        const current = typeStats.get(workoutType) || { count: 0, minutes: 0 };
+        typeStats.set(workoutType, {
+            count: current.count + 1,
+            minutes: current.minutes + sessionMinutes
+        });
     });
-    
-    return Object.entries(typeDistribution).map(([type, data]) => ({
-      type,
-      count: data.count,
-      minutes: data.minutes
+
+    return Array.from(typeStats.entries()).map(([type, stats]) => ({
+        type,
+        count: stats.count,
+        minutes: stats.minutes
     }));
   }
 }
