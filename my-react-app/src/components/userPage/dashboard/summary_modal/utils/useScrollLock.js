@@ -1,45 +1,45 @@
 import { useEffect } from 'react';
 
 /**
- * Custom hook to prevent body scrolling when modal is open
+ * Custom hook to prevent content scrolling when modal is open
+ * without affecting the fixed header
  */
 const useScrollLock = (isLocked) => {
   useEffect(() => {
-    // Get scrollbar width to prevent content shift
-    const scrollBarWidth = window.innerWidth - document.documentElement.clientWidth;
-    
     if (isLocked) {
-      // Save the current scroll position
+      // Store current scroll position
       const scrollY = window.scrollY;
       
-      // Add styles to fix the body in place and prevent content shift
+      // Add padding to prevent content shift when scrollbar disappears
+      const scrollbarWidth = window.innerWidth - document.documentElement.clientWidth;
+      document.body.style.paddingRight = `${scrollbarWidth}px`;
+      
+      // Save current position and lock scroll
       document.body.style.position = 'fixed';
       document.body.style.top = `-${scrollY}px`;
       document.body.style.width = '100%';
-      document.body.style.paddingRight = `${scrollBarWidth}px`; // Compensate for scrollbar
-      document.body.style.overflow = 'hidden'; // Prevent any potential scrolling
     } else {
-      // Get the scroll position from the body's top property
+      // Get the scroll position from body's top property
       const scrollY = document.body.style.top;
       
-      // Remove all the fixed position styles
+      // Reset body styles
       document.body.style.position = '';
       document.body.style.top = '';
-      document.body.style.width = '';
       document.body.style.paddingRight = '';
-      document.body.style.overflow = '';
+      document.body.style.width = '';
       
       // Restore scroll position
-      window.scrollTo(0, parseInt(scrollY || '0', 10) * -1);
+      if (scrollY) {
+        window.scrollTo(0, parseInt(scrollY.replace('px', ''), 10) * -1);
+      }
     }
-    
+
     return () => {
-      // Cleanup: restore all styles if component unmounts
+      // Cleanup function to reset styles
       document.body.style.position = '';
       document.body.style.top = '';
-      document.body.style.width = '';
       document.body.style.paddingRight = '';
-      document.body.style.overflow = '';
+      document.body.style.width = '';
     };
   }, [isLocked]);
 };
