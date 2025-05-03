@@ -3870,14 +3870,14 @@ body.dark-mode .body-part-name {
 /* No Results */
 .no-results {
   text-align: center;
-  padding: 60px 0;
-  width: 100%;
+  padding: 30px 0;
+  width: 90%;
   display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: center;
   margin: 0 auto;
-  grid-column: 1 / -1; /* This makes it span across all columns in the grid */
+  grid-column: 1 / -1; 
 }
 
 .no-results h3 {
@@ -5574,18 +5574,33 @@ body.dark-mode .tab-button.active {
 /* Workouts Grid Animation */
 .workouts-grid {
   display: grid;
-  grid-template-columns: 1fr;
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  max-width: 1200px;
   gap: 24px;
+  padding: 0 24px;
   animation: fadeIn 0.5s ease-out;
-  margin-bottom: 80px; /* Adjusted for spacing with mobile footer */
-  margin-left: 64px;
+  margin: 0 auto 80px auto;
+  justify-content: center;
 }
 
+@media (min-width: 640px) {
+  .workouts-grid {
+    grid-template-columns: repeat(auto-fill, minmax(280px, 320px));
+  }
+}
+
+/* Ensure the workout cards themselves are centered */
+.workouts-grid .workout-card {
+  margin: 0 auto;
+  width: 100%;
+  max-width: 320px;
+}
 @media (max-width: 768px) {
   .workouts-grid {
     justify-content: center;
     display: flex;
     flex-wrap: wrap;
+    margin: 0 auto;
     gap: 20px;
   }
 }
@@ -5961,30 +5976,7 @@ body.dark-mode .tab-button.active {
   }
 }
 
-/* No Results */
-.no-results {
-  text-align: center;
-  padding: 60px 0;
-  width: 100%;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  margin: 0 auto;
-}
 
-.no-results h3 {
-  font-size: 24px;
-  font-weight: 600;
-  color: var(--card-text);
-  margin: 0 0 12px 0;
-}
-
-.no-results p {
-  color: var(--card-description);
-  font-size: 16px;
-  max-width: 400px;
-}
 
 /* Workout Detail Modal */
 .workout-modal-overlay {
@@ -7046,11 +7038,7 @@ body.dark-mode .add-exercise-btn:hover {
   background-color: var(--secondary-color, #10b981);
 }
 
-.no-results {
-  padding: 16px;
-  text-align: center;
-  color: var(--text-secondary, #6b7280);
-}
+
 
 .add-exercise-btn-dropdown {
   display: flex;

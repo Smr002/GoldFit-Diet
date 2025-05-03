@@ -5,18 +5,13 @@ import WorkoutCard from "./WorkoutCard";
 import CreateWorkoutModal from "./CreateWorkoutModal";
 import WorkoutDetailModal from "./WorkoutDetailModal";
 import LogWorkoutModal from "./LogWorkoutModal";
-import { useTheme } from "@mui/material/styles";
-import { Box, CssBaseline, ThemeProvider, createTheme } from "@mui/material";
+import { Box, CssBaseline, ThemeProvider, createTheme, Snackbar, Alert } from "@mui/material";
 import { useNavigate } from "react-router-dom";
-
-import fullbody from "../assets/fullbody.jpg";
-import hiit from "../assets/hiitcardio.jpg";
-import beginner from "../assets/beginner.jpg";
+import { getWorkouts, createWorkout, updateWorkout, deleteWorkout, getUserIdFromToken } from "../api";
 import legs from "../assets/legday.jpg";
 import MobileFooter from "./MobileFooter";
 import SecondNavbar from "./SecondNavbar";
 import ThemeToggle from "./ThemeToggle";
-import { getWorkouts } from "../api";
 
 const UserWorkout = () => {
   const [workouts, setWorkouts] = useState([]);
@@ -38,14 +33,34 @@ const UserWorkout = () => {
     duration: "all",
     goal: "all",
   });
-  const [token, setToken] = useState(localStorage.getItem("accessToken") || "");
+  const [snackbar, setSnackbar] = useState({ open: false, message: "", severity: "error" });
 
-  // Dark mode setup
-  const theme = useTheme();
-  const [darkMode, setDarkMode] = useState(false);
+  // Token initialization with correct key
+  const [token, setToken] = useState(() => {
+    const storedToken = localStorage.getItem("token") || "";
+    console.log("Initial token during state initialization:", storedToken ? "Present" : "Missing");
+    return storedToken;
+  });
+
+  // User ID extraction
+  const [loggedInUserId, setLoggedInUserId] = useState(() => {
+    const storedToken = localStorage.getItem("token");
+    if (storedToken) {
+      try {
+        const id = getUserIdFromToken(storedToken);
+        console.log("Extracted userId during initialization:", id);
+        return id ? String(id) : null;
+      } catch (error) {
+        console.error("Error getting user ID during state initialization:", error);
+        return null;
+      }
+    }
+    return null;
+  });
 
   const navigate = useNavigate();
 
+  // Theme handling
   useEffect(() => {
     const handleThemeChange = (e) => {
       if (e.detail) {
@@ -71,15 +86,13 @@ const UserWorkout = () => {
     };
   }, []);
 
+  const [darkMode, setDarkMode] = useState(false);
+
   const customTheme = createTheme({
     palette: {
       mode: darkMode ? "dark" : "light",
-      primary: {
-        main: darkMode ? "#FFD700" : "#6200ea",
-      },
-      secondary: {
-        main: darkMode ? "#DAA520" : "#3f51b5",
-      },
+      primary: { main: darkMode ? "#FFD700" : "#6200ea" },
+      secondary: { main: darkMode ? "#DAA520" : "#3f51b5" },
       background: {
         default: darkMode ? "#121212" : "#f5f7fa",
         paper: darkMode ? "#1e1e1e" : "#ffffff",
@@ -91,61 +104,106 @@ const UserWorkout = () => {
     },
   });
 
+  // Fetch workouts
   useEffect(() => {
     const fetchWorkouts = async () => {
+      if (!token) {
+        setSnackbar({ open: true, message: "Please log in to view workouts", severity: "error" });
+        navigate("/login");
+        return;
+      }
       setLoading(true);
       try {
-        const data = await getWorkouts(token); // Use state token
-
-        // Transform into shape expected by WorkoutCard
+        const data = await getWorkouts(token);
+        console.log("Fetched workouts raw data:", data);
         const transformed = data.map((w) => ({
           id: w.id,
           title: w.name,
           description: `${w.level} workout for ${w.timesPerWeek}x/week`,
           difficulty: w.level.toLowerCase(),
-          duration: w.workoutExercises.length * 10, // Simple estimate
-          goal: "general fitness", // Or derive from user goal
+          duration: w.workoutExercises.length * 10,
+          goal: "general fitness",
           exercises: w.workoutExercises.map((we) => ({
             id: we.exerciseId,
             name: we.exercise.name,
             sets: we.sets,
             reps: we.reps,
           })),
-          isRecommended: w.premium, // Treat premium as "recommended"
+          isRecommended: w.premium,
           createdAt: w.createdAt,
-          src: legs, // Fallback image
+          userId: w.createdByUser ? String(w.createdByUser) : null,
+          src: legs,
         }));
-
         setRecommendedWorkouts(transformed.filter((w) => w.isRecommended));
         const userCreated = transformed.filter((w) => !w.isRecommended);
         setUserWorkouts(userCreated);
         setWorkouts(transformed);
-        setFavorites([]); // Or extract if API provides
+        setFavorites([]);
       } catch (error) {
-        console.error("Error fetching workouts:", error);
+        console.error("Error fetching workouts:", error.message, error.stack);
+        if (error.message.includes("401") || error.message.includes("403")) {
+          setSnackbar({ open: true, message: "Session expired. Please log in again.", severity: "error" });
+          localStorage.removeItem("token");
+          navigate("/login");
+        } else {
+          setSnackbar({ open: true, message: "Failed to fetch workouts", severity: "error" });
+        }
       } finally {
         setLoading(false);
       }
     };
-
     fetchWorkouts();
-  }, [token]);
+  }, [token, navigate]);
 
-  // Listen for token changes in localStorage
+  // Handle storage changes
   useEffect(() => {
     const handleStorageChange = () => {
-      setToken(localStorage.getItem("accessToken") || "");
+      const newToken = localStorage.getItem("token") || "";
+      console.log("Storage change detected - New token:", newToken);
+      setToken(newToken);
+      if (newToken) {
+        try {
+          const id = getUserIdFromToken(newToken);
+          console.log("Storage change detected - New userId:", id);
+          setLoggedInUserId(id ? String(id) : null);
+        } catch (error) {
+          console.error("Error extracting userId from token:", error);
+        }
+      } else {
+        setLoggedInUserId(null);
+      }
     };
 
     window.addEventListener("storage", handleStorageChange);
     return () => window.removeEventListener("storage", handleStorageChange);
   }, []);
 
+  // Update user ID when token changes
+  useEffect(() => {
+    if (token) {
+      try {
+        const id = getUserIdFromToken(token);
+        console.log("Updating userId from token:", id);
+        if (id) {
+          setLoggedInUserId(String(id));
+        }
+      } catch (error) {
+        console.error("Error extracting userId from token:", error);
+      }
+    } else {
+      setLoggedInUserId(null);
+    }
+  }, [token]);
+
+  const isWorkoutOwner = (workout) => {
+    if (!loggedInUserId || !workout?.userId) return false;
+    return String(workout.userId) === String(loggedInUserId);
+  };
+
   const filteredWorkouts = workouts.filter((workout) => {
     if (activeTab === "recommended" && !workout.isRecommended) return false;
     if (activeTab === "my-workouts" && workout.isRecommended) return false;
-    if (activeTab === "favorites" && !favorites.includes(workout.id))
-      return false;
+    if (activeTab === "favorites" && !favorites.includes(workout.id)) return false;
 
     if (
       searchTerm &&
@@ -155,102 +213,184 @@ const UserWorkout = () => {
       return false;
     }
 
-    if (
-      filterOptions.difficulty !== "all" &&
-      workout.difficulty !== filterOptions.difficulty
-    )
+    if (filterOptions.difficulty !== "all" && workout.difficulty !== filterOptions.difficulty)
       return false;
     if (filterOptions.duration !== "all") {
-      if (filterOptions.duration === "short" && workout.duration > 30)
+      if (filterOptions.duration === "short" && workout.duration > 30) return false;
+      if (filterOptions.duration === "medium" && (workout.duration <= 30 || workout.duration > 60))
         return false;
-      if (
-        filterOptions.duration === "medium" &&
-        (workout.duration <= 30 || workout.duration > 60)
-      )
-        return false;
-      if (filterOptions.duration === "long" && workout.duration <= 60)
-        return false;
+      if (filterOptions.duration === "long" && workout.duration <= 60) return false;
     }
-    if (filterOptions.goal !== "all" && workout.goal !== filterOptions.goal)
-      return false;
+    if (filterOptions.goal !== "all" && workout.goal !== filterOptions.goal) return false;
 
     return true;
   });
 
   const handleCreateWorkout = async (newWorkout) => {
-    try {
-      console.log("Creating new workout:", newWorkout);
+    const currentToken = localStorage.getItem("token");
+    let currentUserId = null;
 
-      // Add fields needed for display and compatibility with your UI
-      const workoutWithId = {
-        ...newWorkout,
-        id: `user-${Date.now()}`,
-        createdAt: new Date().toISOString(),
-        isRecommended: false, // Explicitly set this to false for user workouts
-        // Make sure these fields exist as the WorkoutCard expects them
-        difficulty: newWorkout.difficulty || "beginner",
-        duration: newWorkout.exercises.length * 10, // Simple estimate
-        goal: newWorkout.goal || "general fitness",
-        // Add a default image if none provided
-        src: newWorkout.src || legs,
+    if (currentToken) {
+      try {
+        currentUserId = getUserIdFromToken(currentToken);
+      } catch (error) {
+        console.error("Error getting user ID for workout creation:", error);
+      }
+    }
+
+    if (!currentToken || !currentUserId) {
+      setSnackbar({ open: true, message: "You must be logged in to create workouts", severity: "error" });
+      navigate("/login");
+      return;
+    }
+
+    try {
+      console.log("Creating new workout with userId:", currentUserId);
+      const payload = {
+        name: newWorkout.title,
+        level: newWorkout.difficulty || "beginner",
+        timesPerWeek: 3,
+        workoutExercises: newWorkout.exercises.map((ex) => ({
+          exerciseId: ex.id,
+          sets: ex.sets || 3,
+          reps: ex.reps || 10,
+        })),
+        createdByUser: parseInt(currentUserId),
+        premium: false,
       };
 
-      console.log("Creating workout with data:", workoutWithId); // Debug
+      console.log("Sending workout payload:", payload);
 
-      // If you need to save to an API, do it here
-      // const response = await createWorkout(workoutWithId, token);
+      const response = await createWorkout(payload, currentToken);
+      console.log("Create workout response:", response);
 
-      // Add to local state - ensure we're creating new arrays, not mutating
+      const workoutWithId = {
+        ...newWorkout,
+        id: response.id,
+        createdAt: response.createdAt || new Date().toISOString(),
+        isRecommended: false,
+        difficulty: newWorkout.difficulty || "beginner",
+        duration: newWorkout.exercises.length * 10,
+        goal: newWorkout.goal || "general fitness",
+        userId: String(currentUserId),
+        src: legs,
+      };
+
       setUserWorkouts((prevWorkouts) => [...prevWorkouts, workoutWithId]);
       setWorkouts((prevWorkouts) => [...prevWorkouts, workoutWithId]);
-
-      // Close the modal and reset state
       setShowCreateModal(false);
-      console.log("Workout created successfully:", workoutWithId);
+      setSnackbar({ open: true, message: "Workout created successfully!", severity: "success" });
     } catch (error) {
-      console.error("Error creating workout:", error);
+      console.error("Create workout error:", error);
+      if (error.message.includes("401") || error.message.includes("403")) {
+        setSnackbar({ open: true, message: "Session expired. Please log in again.", severity: "error" });
+        localStorage.removeItem("token");
+        navigate("/login");
+      } else {
+        setSnackbar({ open: true, message: error.message || "Failed to create workout", severity: "error" });
+      }
     }
   };
 
-  const handleEditWorkout = (updatedWorkout) => {
-    if (updatedWorkout.isRecommended) {
-      const newUserWorkout = {
+  const handleEditWorkout = async (updatedWorkout) => {
+    if (!isWorkoutOwner(updatedWorkout)) {
+      console.error("Unauthorized: Cannot edit workout that belongs to another user", {
+        loggedInUserId,
+        workoutUserId: updatedWorkout.userId,
+      });
+      return;
+    }
+
+    try {
+      console.log("Updating workout:", updatedWorkout);
+      const response = await updateWorkout(
+        updatedWorkout.id,
+        {
+          name: updatedWorkout.title,
+          level: updatedWorkout.difficulty,
+          timesPerWeek: 3,
+          workoutExercises: updatedWorkout.exercises.map((ex) => ({
+            exerciseId: ex.id,
+            sets: ex.sets,
+            reps: ex.reps,
+          })),
+          createdByUser: parseInt(loggedInUserId),
+          premium: false,
+        },
+        token
+      );
+
+      const workoutWithId = {
         ...updatedWorkout,
-        id: `user-${Date.now()}`,
+        id: response.id,
+        createdAt: response.createdAt || updatedWorkout.createdAt,
         isRecommended: false,
-        title: `My ${updatedWorkout.title}`,
+        difficulty: updatedWorkout.difficulty || "beginner",
+        duration: updatedWorkout.exercises.length * 10,
+        goal: updatedWorkout.goal || "general fitness",
+        userId: String(loggedInUserId),
+        src: updatedWorkout.src || legs,
       };
 
-      setUserWorkouts([...userWorkouts, newUserWorkout]);
-      setWorkouts([...recommendedWorkouts, ...userWorkouts, newUserWorkout]);
-    } else {
       const updatedUserWorkouts = userWorkouts.map((workout) =>
-        workout.id === updatedWorkout.id ? updatedWorkout : workout
+        workout.id === updatedWorkout.id ? workoutWithId : workout
       );
 
       setUserWorkouts(updatedUserWorkouts);
       setWorkouts([...recommendedWorkouts, ...updatedUserWorkouts]);
+      setEditingWorkout(null);
+      setShowCreateModal(false);
+      setSnackbar({ open: true, message: "Workout updated successfully!", severity: "success" });
+    } catch (error) {
+      console.error("Error updating workout:", error.message, error.stack);
+      setSnackbar({ open: true, message: error.message || "Failed to update workout", severity: "error" });
     }
-
-    setEditingWorkout(null);
-    setShowCreateModal(false);
   };
 
-  const handleDeleteWorkout = (workoutId) => {
-    const updatedUserWorkouts = userWorkouts.filter(
-      (workout) => workout.id !== workoutId
-    );
-    setUserWorkouts(updatedUserWorkouts);
-    setWorkouts([...recommendedWorkouts, ...updatedUserWorkouts]);
+  const handleDeleteWorkout = async (workoutId) => {
+    const workout = workouts.find((w) => w.id === workoutId);
 
-    if (favorites.includes(workoutId)) {
-      setFavorites(favorites.filter((id) => id !== workoutId));
+    if (!workout) {
+      console.error("Cannot delete: Workout not found");
+      return;
     }
 
-    if (selectedWorkout && selectedWorkout.id === workoutId) {
-      setSelectedWorkout(null);
-      setShowDetailModal(false);
+    if (!isWorkoutOwner(workout)) {
+      console.error("Unauthorized: Cannot delete workout that belongs to another user", {
+        loggedInUserId,
+        workoutUserId: workout.userId,
+      });
+      return;
     }
+
+    try {
+      console.log("Deleting workout:", workoutId);
+      await deleteWorkout(workoutId, token);
+
+      const updatedUserWorkouts = userWorkouts.filter((w) => w.id !== workoutId);
+      setUserWorkouts(updatedUserWorkouts);
+      setWorkouts([...recommendedWorkouts, ...updatedUserWorkouts]);
+
+      if (favorites.includes(workoutId)) {
+        setFavorites(favorites.filter((id) => id !== workoutId));
+      }
+
+      if (selectedWorkout && selectedWorkout.id === workoutId) {
+        setSelectedWorkout(null);
+        setShowDetailModal(false);
+      }
+      setSnackbar({ open: true, message: "Workout deleted successfully!", severity: "success" });
+    } catch (error) {
+      console.error("Error deleting workout:", error.message, error.stack);
+      setSnackbar({ open: true, message: error.message || "Failed to delete workout", severity: "error" });
+    }
+  };
+
+  const handleDeleteFromEdit = (workoutId) => {
+    console.log("Deleting workout from edit:", workoutId);
+    handleDeleteWorkout(workoutId);
+    setShowCreateModal(false);
+    setEditingWorkout(null);
   };
 
   const handleLogWorkout = (workoutLog) => {
@@ -262,6 +402,7 @@ const UserWorkout = () => {
 
     setWorkoutLogs([logWithId, ...workoutLogs]);
     setShowLogModal(false);
+    setSnackbar({ open: true, message: "Workout logged successfully!", severity: "success" });
   };
 
   const toggleFavorite = (workoutId) => {
@@ -285,6 +426,17 @@ const UserWorkout = () => {
   };
 
   const startEditWorkout = (workout) => {
+    if (!isWorkoutOwner(workout)) {
+      console.error("Unauthorized: Cannot edit this workout", {
+        loggedInUserId,
+        workoutUserId: workout.userId,
+        tokenPresent: !!token,
+      });
+      setSnackbar({ open: true, message: "You can only edit your own workouts", severity: "error" });
+      return;
+    }
+
+    console.log("Starting edit for workout:", workout);
     const workoutToEdit = {
       ...workout,
       exercises: workout.exercises.map((ex) => ({ ...ex })),
@@ -292,14 +444,6 @@ const UserWorkout = () => {
 
     setEditingWorkout(workoutToEdit);
     setShowCreateModal(true);
-  };
-
-  // Add this new function to handle the delete action from the edit modal
-  const handleDeleteFromEdit = (workoutId) => {
-    console.log("Deleting workout:", workoutId); // Add this for debugging
-    handleDeleteWorkout(workoutId);
-    setShowCreateModal(false);
-    setEditingWorkout(null);
   };
 
   const startLogWorkout = (workout) => {
@@ -319,7 +463,40 @@ const UserWorkout = () => {
   };
 
   const handleCreateNewWorkout = () => {
+    const currentToken = localStorage.getItem("token");
+    let currentUserId = null;
+
+    if (currentToken) {
+      try {
+        currentUserId = getUserIdFromToken(currentToken);
+      } catch (error) {
+        console.error("Error getting user ID for workout creation:", error);
+      }
+    }
+
+    console.log("Create workout attempt - Token:", currentToken ? "Present" : "Missing");
+    console.log("Create workout attempt - UserId:", currentUserId);
+
+    if (!currentToken || !currentUserId) {
+      setSnackbar({ open: true, message: "Please log in to create a workout", severity: "error" });
+      navigate("/login");
+      return;
+    }
+
+    if (currentToken !== token) {
+      setToken(currentToken);
+    }
+
+    if (String(currentUserId) !== loggedInUserId) {
+      setLoggedInUserId(String(currentUserId));
+    }
+
+    setEditingWorkout(null);
     setShowCreateModal(true);
+  };
+
+  const handleCloseSnackbar = () => {
+    setSnackbar({ ...snackbar, open: false });
   };
 
   return (
@@ -338,12 +515,8 @@ const UserWorkout = () => {
         <SecondNavbar />
         <Box sx={{ paddingTop: "80px" }}>
           <div className={`workout-container ${darkMode ? "dark-mode" : ""}`}>
-            <div
-              className={`workout-search-filter ${darkMode ? "dark-mode" : ""}`}
-            >
-              <div
-                className={`search-container ${darkMode ? "dark-mode" : ""}`}
-              >
+            <div className={`workout-search-filter ${darkMode ? "dark-mode" : ""}`}>
+              <div className={`search-container ${darkMode ? "dark-mode" : ""}`}>
                 <div className={`search-bar ${darkMode ? "dark-mode" : ""}`}>
                   <div className="search-icon">
                     <svg
@@ -373,33 +546,40 @@ const UserWorkout = () => {
                         background: darkMode ? "#1e1e1e" : "white",
                       }}
                     />
-                       <button
-                  className="create-workout-button"
-                  onClick={handleCreateNewWorkout}
-                  style={{
-                    background: darkMode ? "#FFD700" : "#6200ea",
-                    color: darkMode ? "#121212" : "white",
-                  }}
-                >
-                  <svg
-                    xmlns="http://www.w3.org/2000/svg"
-                    width="20"
-                    height="20"
-                    viewBox="0 0 24 24"
-                    fill="none"
-                    stroke="currentColor"
-                    strokeWidth="2"
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                  >
-                    <line x1="12" y1="5" x2="12" y2="19"></line>
-                    <line x1="5" y1="12" x2="19" y2="12"></line>
-                  </svg>
-                  Create Workout
-                </button>
+                    <button
+                      className="create-workout-button"
+                      onClick={handleCreateNewWorkout}
+                      disabled={!token || !loggedInUserId}
+                      style={{
+                        background: darkMode ? "#FFD700" : "#6200ea",
+                        color: darkMode ? "#121212" : "white",
+                        opacity: !token || !loggedInUserId ? 0.5 : 1,
+                        cursor: !token || !loggedInUserId ? "not-allowed" : "pointer",
+                      }}
+                      title={
+                        !token || !loggedInUserId
+                          ? "Please log in to create a workout"
+                          : "Create a new workout"
+                      }
+                    >
+                      <svg
+                        xmlns="http://www.w3.org/2000/svg"
+                        width="20"
+                        height="20"
+                        viewBox="0 0 24 24"
+                        fill="none"
+                        stroke="currentColor"
+                        strokeWidth="2"
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                      >
+                        <line x1="12" y1="5" x2="12" y2="19"></line>
+                        <line x1="5" y1="12" x2="19" y2="12"></line>
+                      </svg>
+                      Create Workout
+                    </button>
                   </div>
                 </div>
-             
               </div>
             </div>
 
@@ -408,9 +588,7 @@ const UserWorkout = () => {
                 <label>Difficulty:</label>
                 <select
                   value={filterOptions.difficulty}
-                  onChange={(e) =>
-                    handleFilterChange("difficulty", e.target.value)
-                  }
+                  onChange={(e) => handleFilterChange("difficulty", e.target.value)}
                 >
                   <option value="all">All Levels</option>
                   <option value="beginner">Beginner</option>
@@ -423,9 +601,7 @@ const UserWorkout = () => {
                 <label>Duration:</label>
                 <select
                   value={filterOptions.duration}
-                  onChange={(e) =>
-                    handleFilterChange("duration", e.target.value)
-                  }
+                  onChange={(e) => handleFilterChange("duration", e.target.value)}
                 >
                   <option value="all">Any Duration</option>
                   <option value="short">Short (≤ 30 min)</option>
@@ -458,25 +634,19 @@ const UserWorkout = () => {
               All Workouts
             </button>
             <button
-              className={`tab-button ${
-                activeTab === "recommended" ? "active" : ""
-              }`}
+              className={`tab-button ${activeTab === "recommended" ? "active" : ""}`}
               onClick={() => setActiveTab("recommended")}
             >
               Recommended
             </button>
             <button
-              className={`tab-button ${
-                activeTab === "my-workouts" ? "active" : ""
-              }`}
+              className={`tab-button ${activeTab === "my-workouts" ? "active" : ""}`}
               onClick={() => setActiveTab("my-workouts")}
             >
               My Workouts
             </button>
             <button
-              className={`tab-button ${
-                activeTab === "favorites" ? "active" : ""
-              }`}
+              className={`tab-button ${activeTab === "favorites" ? "active" : ""}`}
               onClick={() => setActiveTab("favorites")}
             >
               Favorites
@@ -490,23 +660,40 @@ const UserWorkout = () => {
           ) : (
             <div className="workouts-grid">
               {filteredWorkouts.length > 0 ? (
-                filteredWorkouts.map((workout, index) => (
-                  <WorkoutCard
-                    key={workout.id}
-                    workout={workout}
-                    isFavorite={favorites.includes(workout.id)}
-                    hasNotification={notificationSettings[workout.id]}
-                    onToggleFavorite={() => toggleFavorite(workout.id)}
-                    onToggleNotification={() => toggleNotification(workout.id)}
-                    onClick={() => openWorkoutDetail(workout)}
-                    onEdit={() => startEditWorkout(workout)}
-                    onLog={() => startLogWorkout(workout)}
-                    logs={getWorkoutLogs(workout.id)}
-                    style={{ animationDelay: `${0.1 * (index % 10)}s` }}
-                  />
-                ))
+                filteredWorkouts.map((workout, index) => {
+                  const isOwner = isWorkoutOwner(workout);
+                  return (
+                    <WorkoutCard
+                      key={workout.id}
+                      workout={workout}
+                      isFavorite={favorites.includes(workout.id)}
+                      hasNotification={notificationSettings[workout.id]}
+                      onToggleFavorite={() => toggleFavorite(workout.id)}
+                      onToggleNotification={() => toggleNotification(workout.id)}
+                      onClick={() => openWorkoutDetail(workout)}
+                      onEdit={isOwner ? () => startEditWorkout(workout) : null}
+                      onLog={() => startLogWorkout(workout)}
+                      logs={getWorkoutLogs(workout.id)}
+                      style={{ animationDelay: `${0.1 * (index % 10)}s` }}
+                      isOwned={isOwner}
+                    />
+                  );
+                })
               ) : (
-                <div className="no-results">
+                <div
+                  className="no-results"
+                  style={{
+                    display: "flex",
+                    flexDirection: "column",
+                    alignItems: "center",
+                    justifyContent: "center",
+                    textAlign: "center",
+                    width: "100%",
+                    minHeight: "200px",
+                    padding: "2rem",
+                    gridColumn: "1 / -1",
+                  }}
+                >
                   <h3>No workouts found</h3>
                   <p>Try adjusting your filters or create a new workout</p>
                 </div>
@@ -514,7 +701,6 @@ const UserWorkout = () => {
             </div>
           )}
 
-          {/* Create/Edit Workout Modal */}
           {showCreateModal && (
             <CreateWorkoutModal
               onClose={() => {
@@ -523,7 +709,7 @@ const UserWorkout = () => {
               }}
               onSave={editingWorkout ? handleEditWorkout : handleCreateWorkout}
               onDelete={
-                editingWorkout && !editingWorkout.isRecommended
+                editingWorkout && loggedInUserId && token && editingWorkout.userId === loggedInUserId
                   ? () => handleDeleteFromEdit(editingWorkout.id)
                   : null
               }
@@ -531,7 +717,6 @@ const UserWorkout = () => {
             />
           )}
 
-          {/* Workout Detail Modal */}
           {showDetailModal && selectedWorkout && (
             <WorkoutDetailModal
               workout={selectedWorkout}
@@ -539,24 +724,31 @@ const UserWorkout = () => {
               isFavorite={favorites.includes(selectedWorkout.id)}
               hasNotification={notificationSettings[selectedWorkout.id]}
               onToggleFavorite={() => toggleFavorite(selectedWorkout.id)}
-              onToggleNotification={() =>
-                toggleNotification(selectedWorkout.id)
+              onToggleNotification={() => toggleNotification(selectedWorkout.id)}
+              onEdit={
+                loggedInUserId && token && selectedWorkout.userId === loggedInUserId
+                  ? () => {
+                      console.log("Opening edit modal for workout:", selectedWorkout);
+                      setShowDetailModal(false);
+                      startEditWorkout(selectedWorkout);
+                    }
+                  : null
               }
-              onEdit={() => {
-                setShowDetailModal(false);
-                startEditWorkout(selectedWorkout);
-              }}
-              onDelete={() => {
-                handleDeleteWorkout(selectedWorkout.id);
-                setShowDetailModal(false);
-              }}
+              onDelete={
+                loggedInUserId && token && selectedWorkout.userId === loggedInUserId
+                  ? () => {
+                      console.log("Deleting workout from detail modal:", selectedWorkout.id);
+                      handleDeleteWorkout(selectedWorkout.id);
+                      setShowDetailModal(false);
+                    }
+                  : null
+              }
               onLog={() => startLogWorkout(selectedWorkout)}
               logs={getWorkoutLogs(selectedWorkout.id)}
-              token={token} // Pass the state token
+              token={token}
             />
           )}
 
-          {/* Log Workout Modal */}
           {showLogModal && selectedWorkout && (
             <LogWorkoutModal
               workout={selectedWorkout}
@@ -567,6 +759,11 @@ const UserWorkout = () => {
           <ThemeToggle />
           <MobileFooter />
         </Box>
+        <Snackbar open={snackbar.open} autoHideDuration={6000} onClose={handleCloseSnackbar}>
+          <Alert onClose={handleCloseSnackbar} severity={snackbar.severity} sx={{ width: "100%" }}>
+            {snackbar.message}
+          </Alert>
+        </Snackbar>
       </Box>
     </ThemeProvider>
   );
