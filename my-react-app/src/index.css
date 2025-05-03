@@ -1620,6 +1620,22 @@ body {
   box-shadow: 0 4px 10px var(--shadow-color);
   transition: transform 0.3s ease, box-shadow 0.3s ease;
   font-size: 18px;
+
+}
+
+
+/* Add margin-bottom only for mobile screens where the footer is visible */
+@media (max-width: 767px) {
+  .theme-toggle-button {
+    margin-bottom: 48px;
+  }
+}
+
+/* If mobile footer is hidden on larger screens, ensure there's no extra margin */
+@media (min-width: 768px) {
+  .theme-toggle-button {
+    margin-bottom: 0;
+  }
 }
 
 .theme-toggle-button:hover {
@@ -7095,4 +7111,51 @@ body.dark-mode .add-exercise-btn:hover {
 /* Dark mode support */
 .dark-theme .highlight {
   background-color: rgba(99, 102, 241, 0.3);
+}
+
+
+/* Add to your global CSS or in a styled components setup */
+.profile-modal-overlay {
+  animation: fadeIn 0.3s ease;
+}
+
+.profile-modal {
+  animation: slideIn 0.4s ease;
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+@keyframes slideIn {
+  from { transform: translateY(50px); opacity: 0; }
+  to { transform: translateY(0); opacity: 1; }
+}
+
+.profile-modal-overlay.dark-mode {
+  background-color: rgba(0, 0, 0, 0.8);
+}
+
+.profile-modal.dark-mode {
+  color: #fff;
+}
+
+/* Add scrollbar styling for the modal */
+.profile-modal::-webkit-scrollbar {
+  width: 8px;
+}
+
+.profile-modal::-webkit-scrollbar-track {
+  background: rgba(0, 0, 0, 0.1);
+  border-radius: 10px;
+}
+
+.profile-modal::-webkit-scrollbar-thumb {
+  background: rgba(212, 175, 55, 0.5);
+  border-radius: 10px;
+}
+
+.profile-modal::-webkit-scrollbar-thumb:hover {
+  background: rgba(212, 175, 55, 0.8);
 }
