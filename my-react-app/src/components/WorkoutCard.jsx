@@ -13,6 +13,7 @@ const WorkoutCard = ({
   onLog,
   logs,
   style,
+  darkMode,
 }) => {
   const lastLog = logs && logs.length > 0 ? logs[0] : null
 
@@ -30,7 +31,27 @@ const WorkoutCard = ({
   }
 
   return (
-    <div className="workout-card" style={style}>
+    <div 
+      className="workout-card"
+      style={{
+        ...style,
+        transition: "all 0.3s ease",
+        transform: "translateY(0)",
+        cursor: "pointer",
+      }}
+      onMouseOver={(e) => {
+        e.currentTarget.style.transform = "translateY(-8px)";
+        e.currentTarget.style.boxShadow = darkMode 
+          ? "0 12px 24px rgba(0, 0, 0, 0.4)" 
+          : "0 12px 24px rgba(0, 0, 0, 0.1)";
+      }}
+      onMouseOut={(e) => {
+        e.currentTarget.style.transform = "translateY(0)";
+        e.currentTarget.style.boxShadow = darkMode 
+          ? "0 4px 12px rgba(0, 0, 0, 0.3)" 
+          : "0 4px 12px rgba(0, 0, 0, 0.1)";
+      }}
+    >
       <div className="workout-image-container">
         <img 
           src={workout.src || "/placeholder.svg"}

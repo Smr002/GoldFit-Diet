@@ -232,7 +232,7 @@ const MobileFooter = () => {
 
   // Only render the mobile footer on mobile devices
   return (
-    <>
+    <div div className="mobile-footer-container">
       <div
         className="mobile-footer"
         style={{
@@ -375,7 +375,7 @@ const MobileFooter = () => {
         setGoal={setGoal}
         darkMode={darkMode}
       />
-    </>
+    </div>
   );
 };
 

@@ -3396,6 +3396,11 @@ body.dark-mode .footer-legal-links a:hover {
   background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
   min-height: 100vh;
 }
+
+.mobile-footer-container{
+  margin-top: 56px !important ;
+}
+
 .mobile-footer {
   position: fixed;
   bottom: 0;
@@ -3408,6 +3413,7 @@ body.dark-mode .footer-legal-links a:hover {
   padding: 10px 0;
   box-shadow: 0 -2px 10px rgba(0, 0, 0, 0.05);
   z-index: 1000;
+
 }
 
 .footer-item {
@@ -5471,15 +5477,14 @@ body.dark-mode .skeleton-instruction-line {
   display: flex;
   flex-wrap: wrap;
   gap: 16px;
-  margin-bottom: 32px;
-  padding: 20px;
+  margin-bottom: 32px !important;
+  padding: 0px !important;
   background-color: white;
   border-radius: 12px;
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
   transition: all 0.3s ease;
   border: 1px solid #e5e7eb;
   border-radius: 12px;
-  padding: 20px;
   background-color: #fff;
 }
 
@@ -7149,3 +7154,143 @@ body.dark-mode .add-exercise-btn:hover {
 }
 
 
+
+
+.workout-modal-overlay {
+  transition: background 0.3s ease;
+}
+
+.workout-modal-overlay.dark-mode {
+  background: rgba(0, 0, 0, 0.7);
+}
+
+.log-workout-modal {
+  font-family: 'Inter', 'Roboto', 'Helvetica', 'Arial', sans-serif;
+  transition: all 0.3s ease;
+}
+
+.log-workout-modal.dark-mode {
+  background: #252525;
+  color: #ffffff;
+}
+
+.close-modal {
+  font-size: 24px;
+  font-weight: bold;
+  transition: all 0.2s ease;
+}
+
+.log-modal-title {
+  font-size: 1.5rem;
+  font-weight: 600;
+}
+
+.log-form-group {
+  margin-bottom: 24px;
+}
+
+.log-exercises-section {
+  margin-bottom: 24px;
+}
+
+.log-exercises-list {
+  max-height: 400px;
+  overflow-y: auto;
+  padding-right: 8px;
+}
+
+.log-exercise-item {
+  transition: all 0.2s ease;
+}
+
+.log-exercise-item.dark-mode {
+  background: #1e1e1e;
+  border-color: #444;
+}
+
+.log-exercise-header {
+  display: flex;
+  align-items: center;
+  margin-bottom: 8px;
+}
+
+.log-exercise-check {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.log-exercise-name {
+  font-weight: 500;
+}
+
+.log-exercise-details {
+  padding-left: 40px;
+}
+
+.log-exercise-meta {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 16px;
+  font-size: 14px;
+}
+
+.log-meta-item {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.log-meta-label {
+  opacity: 0.7;
+}
+
+.log-weight-input {
+  width: 80px;
+  padding: 6px 8px;
+  border-radius: 4px;
+}
+
+.log-weight-unit {
+  opacity: 0.7;
+}
+
+.log-modal-footer {
+  padding-top: 16px;
+}
+
+.cancel-button, .save-button {
+  padding: 8px 16px;
+  border-radius: 8px;
+  font-weight: 600;
+  transition: all 0.2s ease;
+}
+
+@media (max-width: 600px) {
+  .log-workout-modal {
+    padding: 16px;
+    max-width: 95%;
+  }
+
+  .log-exercise-details {
+    padding-left: 0;
+  }
+
+  .log-exercise-meta {
+    flex-direction: column;
+    gap: 8px;
+  }
+
+  .log-weight-input {
+    width: 100%;
+  }
+
+  .log-modal-footer {
+    flex-direction: column;
+    gap: 8px;
+  }
+
+  .cancel-button, .save-button {
+    width: 100%;
+  }
+}
