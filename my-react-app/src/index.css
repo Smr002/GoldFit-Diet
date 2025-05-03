@@ -3682,6 +3682,18 @@ body.dark-mode .body-part-name {
   display: grid;
   grid-template-columns: 1fr;
   gap: 30px;
+  display: flex !important;
+  flex-wrap: wrap !important; ;
+  justify-content: space-around !important; ;
+  align-items: center !important; ;
+  margin: 0 auto !important; ;
+  padding: 0 20px !important; ;
+  width: 100% !important; ;
+  max-width: 1280px !important; ;
+  margin-top: 20px !important; ;
+  margin-bottom: 20px !important; ;
+  padding-bottom: 20px !important; ;
+  
 }
 
 @media (min-width: 768px) {
@@ -3847,7 +3859,7 @@ body.dark-mode .body-part-name {
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
   gap: 20px;
-  padding: 20px;
+  /* padding: 20px; */
 }
 
 /* Loading Spinner */
@@ -3936,6 +3948,8 @@ body.dark-mode .body-part-name {
   transform: scale(0.95);
   animation: scaleUp 0.3s ease forwards;
   margin: 20px;
+  margin-bottom: 72px !important;
+  margin-top: 16px !important;
 }
 
 @media (min-width: 768px) {
@@ -4769,7 +4783,7 @@ body.dark-mode .footer-item.active {
 
   /* Last item in the grid should have extra margin to ensure visibility */
   .exercises-grid > *:last-child {
-    margin-bottom: 20px;
+    margin-bottom: 0px;
   }
 }
 
@@ -7293,4 +7307,36 @@ body.dark-mode .add-exercise-btn:hover {
   .cancel-button, .save-button {
     width: 100%;
   }
+}
+
+/* Add to your CSS file */
+.exercise-card.dark-mode:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 8px 25px rgba(0, 0, 0, 0.6);
+  border: 1px solid #444;
+}
+
+.body-part-item.dark-mode {
+  background: #252525;
+  border: 1px solid #333;
+}
+
+.body-part-item.dark-mode.active {
+  background: linear-gradient(135deg, #3a3a3a 0%, #2c2c2c 100%);
+  border: 1px solid #FFD700;
+  box-shadow: 0 0 10px rgba(255, 215, 0, 0.3);
+}
+
+.exercise-tags .exercise-tag.dark-mode {
+  background: #333;
+  color: #f0f0f0;
+}
+
+/* Add subtle animations for better user experience */
+.dark-mode .exercise-image {
+  transition: transform 0.3s ease;
+}
+
+.dark-mode .exercise-image:hover {
+  transform: scale(1.05);
 }
