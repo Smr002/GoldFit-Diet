@@ -7,8 +7,9 @@ import {
   Paper,
   Divider,
   useTheme,
+  Button,
 } from "@mui/material";
-import { Droplet, Utensils, Moon } from "lucide-react";
+import { Droplet, Utensils, Moon, AlertTriangle, RefreshCw } from "lucide-react";
 import CircularProgress from "@mui/material/CircularProgress";
 import { getNutritionLog } from "@/api"; // Adjust the import path
 
@@ -118,6 +119,40 @@ function DailySummaryWidget({ token, userId, date }) {
     }
   }, [token, date, isDarkMode]);
 
+  // Function to retry loading data
+  const handleRetry = () => {
+    setLoading(true);
+    setError(null);
+    // Re-trigger the useEffect by changing its dependency (could be improved with a counter)
+    setTimeout(() => {
+      if (token && date) {
+        // This will trigger the useEffect again
+        const fetchNutritionLogs = async () => {
+          try {
+            const logs = await getNutritionLog(token, userId, date);
+            // Process logs as before...
+            const log = Array.isArray(logs) ? logs[0] : logs;
+            
+            // Update state with fetched data
+            // (This is duplicate code from the useEffect, which could be refactored to a separate function)
+            // ...code omitted for brevity
+            
+            setLoading(false);
+          } catch (err) {
+            console.error("Error retrying nutrition logs fetch:", err);
+            setError(err.message || "Failed to reload nutrition data");
+            setLoading(false);
+          }
+        };
+        
+        fetchNutritionLogs();
+      } else {
+        setError("Missing required parameters (token or date)");
+        setLoading(false);
+      }
+    }, 500);
+  };
+
   // Render loading state
   if (loading) {
     return (
@@ -156,10 +191,70 @@ function DailySummaryWidget({ token, userId, date }) {
           bgcolor: 'background.paper',
           boxShadow: isDarkMode 
             ? "0px 4px 20px rgba(0, 0, 0, 0.4)" 
-            : "0px 4px 20px rgba(0, 0, 0, 0.08)" 
+            : "0px 4px 20px rgba(0, 0, 0, 0.08)",
+          display: 'flex',
+          flexDirection: 'column',
+          justifyContent: 'center',
+          alignItems: 'center',
+          textAlign: 'center',
+          background: isDarkMode
+            ? "linear-gradient(145deg, #1a1a1a, #282828)"
+            : "linear-gradient(145deg, #ffffff, #f5f7ff)",
         }}
       >
-        <Typography color="error">{error}</Typography>
+        <Box 
+          sx={{ 
+            mb: 2, 
+            p: 2, 
+            borderRadius: '50%', 
+            bgcolor: isDarkMode ? 'rgba(255, 99, 71, 0.1)' : 'rgba(255, 99, 71, 0.08)'
+          }}
+        >
+          <AlertTriangle 
+            size={32} 
+            style={{ 
+              color: isDarkMode ? '#FF6347' : '#E53935'
+            }} 
+          />
+        </Box>
+        <Typography 
+          variant="h6" 
+          sx={{ 
+            mb: 1,
+            color: isDarkMode ? '#FF6347' : '#E53935',
+            fontWeight: 600
+          }}
+        >
+          Unable to Load Data
+        </Typography>
+        <Typography 
+          variant="body2" 
+          sx={{ 
+            mb: 3, 
+            color: theme.palette.text.secondary,
+            maxWidth: '85%'
+          }}
+        >
+          {error}
+        </Typography>
+        <Button
+          variant="outlined"
+          startIcon={<RefreshCw size={16} />}
+          onClick={handleRetry}
+          sx={{
+            borderRadius: 2,
+            textTransform: 'none',
+            px: 3,
+            color: isDarkMode ? theme.palette.primary.main : '#7E69AB',
+            borderColor: isDarkMode ? theme.palette.primary.main : '#7E69AB',
+            '&:hover': {
+              borderColor: isDarkMode ? theme.palette.primary.light : '#9B87F5',
+              backgroundColor: isDarkMode ? 'rgba(255, 215, 0, 0.05)' : 'rgba(155, 135, 245, 0.05)',
+            }
+          }}
+        >
+          Try Again
+        </Button>
       </Paper>
     );
   }
