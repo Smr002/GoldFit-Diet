@@ -112,82 +112,155 @@ const MobileFooter = () => {
     height: "24px",
     filter: darkMode ? "brightness(0) invert(1)" : "none", // Make icons white in dark mode
     opacity: 0.9,
+    marginBottom: "8px", // Consistent spacing below icons
+    display: "block", // Ensures consistent display behavior
+  };
+
+  // Add a textStyle object for consistent text styling
+  const textStyle = {
+    fontSize: "12px",
+    lineHeight: "1.2",
+    display: "block",
+    whiteSpace: "nowrap", // Prevents text wrapping
+    marginTop: "0", // Remove any default margins
+  };
+
+  // Add a footerItemStyle for consistent container styling
+  const footerItemStyle = {
+    display: "flex",
+    flexDirection: "column",
+    alignItems: "center",
+    justifyContent: "center",
+    height: "100%",
+    width: "20%", // Equal width for all items
+    textDecoration: "none",
+    color: "inherit",
   };
 
   return (
     <>
-      <div className="mobile-footer">
-        <Link to="/user-home" className="footer-item">
-          <svg
-            xmlns="http://www.w3.org/2000/svg"
-            width="24"
-            height="24"
-            viewBox="0 0 24 24"
-            fill="none"
-            stroke="currentColor"
-            strokeWidth="2"
-            strokeLinecap="round"
-            strokeLinejoin="round"
-          >
-            <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path>
-            <polyline points="9 22 9 12 15 12 15 22"></polyline>
-          </svg>
-          <span>Home</span>
+      <div
+        className="mobile-footer"
+        style={{
+          display: "flex",
+          justifyContent: "space-between",
+          alignItems: "center",
+          position: "fixed",
+          bottom: 0,
+          left: 0,
+          width: "100%",
+          backgroundColor: darkMode ? "#121212" : "#ffffff",
+          boxShadow: "0 -2px 10px rgba(0, 0, 0, 0.1)",
+          zIndex: 1000,
+          height: "70px",
+          padding: "0",
+        }}
+      >
+        <Link 
+          to="/user-home" 
+          className="footer-item" 
+          style={{
+            ...footerItemStyle,
+            textAlign: "center", // Ensure text is centered
+          }}
+        >
+          <div style={{ display: "flex", flexDirection: "column", alignItems: "center", width: "100%" }}>
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              width="24"
+              height="24"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              strokeWidth="2"
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              style={iconStyle}
+            >
+              <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path>
+              <polyline points="9 22 9 12 15 12 15 22"></polyline>
+            </svg>
+            <span style={textStyle}>Home</span>
+          </div>
         </Link>
 
-        {/* Updated workouts icon to use report.png */}
-        <Link to="/workouts" className="footer-item">
-          <img src={reportIcon} alt="Workouts" style={iconStyle} />
-          <span>Workouts</span>
+        <Link 
+          to="/workouts" 
+          className="footer-item" 
+          style={{
+            ...footerItemStyle,
+            textAlign: "center", 
+          }}
+        >
+          <div style={{ display: "flex", flexDirection: "column", alignItems: "center", width: "100%" }}>
+            <img src={reportIcon} alt="Workouts" style={iconStyle} />
+            <span style={textStyle}>Workouts</span>
+          </div>
         </Link>
 
-        {/* Updated exercises icon to use fitness.png */}
-        <Link to="/exercises" className="footer-item">
-          <img src={fitnessIcon} alt="Exercises" style={iconStyle} />
-          <span>Exercises</span>
+        <Link 
+          to="/exercises" 
+          className="footer-item" 
+          style={{
+            ...footerItemStyle,
+            textAlign: "center", 
+          }}
+        >
+          <div style={{ display: "flex", flexDirection: "column", alignItems: "center", width: "100%" }}>
+            <img src={fitnessIcon} alt="Exercises" style={iconStyle} />
+            <span style={textStyle}>Exercises</span>
+          </div>
         </Link>
 
-        {/* Updated nutrition icon to use nutrition.png */}
-        <Link to="/nutrition" className="footer-item">
-          <img src={nutritionIcon} alt="Nutrition" style={iconStyle} />
-          <span>Nutrition</span>
+        <Link 
+          to="/nutrition" 
+          className="footer-item" 
+          style={{
+            ...footerItemStyle,
+            textAlign: "center", 
+          }}
+        >
+          <div style={{ display: "flex", flexDirection: "column", alignItems: "center", width: "100%" }}>
+            <img src={nutritionIcon} alt="Nutrition" style={iconStyle} />
+            <span style={textStyle}>Nutrition</span>
+          </div>
         </Link>
 
-        {/* Profile button remains unchanged */}
         <button
           onClick={() => setProfileOpen(true)}
           className="footer-item"
           style={{
+            ...footerItemStyle,
             background: "none",
             border: "none",
-            padding: 0,
             cursor: "pointer",
-            textDecoration: "none",
-            color: "inherit",
-            display: "flex",
-            flexDirection: "column",
-            alignItems: "center",
+            padding: 0,
+            textAlign: "center",
+            width: "20%",
           }}
         >
-          <svg
-            xmlns="http://www.w3.org/2000/svg"
-            viewBox="0 0 24 24"
-            fill="none"
-            stroke="currentColor"
-            strokeWidth="2"
-            strokeLinecap="round"
-            strokeLinejoin="round"
-            width="24"
-            height="24"
-          >
-            <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>
-            <circle cx="12" cy="7" r="4"></circle>
-          </svg>
-          <span>Profile</span>
+          <div style={{ display: "flex", flexDirection: "column", alignItems: "center", width: "100%" }}>
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              strokeWidth="2"
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              width="24"
+              height="24"
+              style={iconStyle}
+            >
+              <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>
+              <circle cx="12" cy="7" r="4"></circle>
+            </svg>
+            <span style={textStyle}>Profile</span>
+          </div>
         </button>
       </div>
-
-      {/* Profile popup */}
+      
+      {/* Profile popup remains the same */}
       <ProfilePopup
         open={profileOpen}
         onClose={() => setProfileOpen(false)}
