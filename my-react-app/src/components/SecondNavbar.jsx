@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { Link, useNavigate } from "react-router-dom";
+import { Link, useNavigate, useLocation } from "react-router-dom";
 import logo from "../assets/goldfitlogo.png";
 import LogoutIcon from "@mui/icons-material/Logout";
 import AccountCircleIcon from "@mui/icons-material/AccountCircle";
@@ -24,6 +24,7 @@ export default function SecondNavbar({ setModalOpen }) {
   const [menuOpen, setMenuOpen] = useState(false);
   const [openDialog, setOpenDialog] = useState(false);
   const navigate = useNavigate();
+  const location = useLocation();
   const [profileOpen, setProfileOpen] = useState(false);
   const [formData, setFormData] = useState({
     firstName: "",
@@ -93,6 +94,18 @@ export default function SecondNavbar({ setModalOpen }) {
     }
   }, [profileOpen, userId, token]);
 
+  useEffect(() => {
+    if (darkMode) {
+      document.body.setAttribute('data-theme', 'dark');
+    } else {
+      document.body.setAttribute('data-theme', 'light');
+    }
+    
+    return () => {
+      document.body.removeAttribute('data-theme');
+    };
+  }, [darkMode]);
+
   const handleSignOut = () => {
     localStorage.clear();
     sessionStorage.clear();
@@ -107,6 +120,10 @@ export default function SecondNavbar({ setModalOpen }) {
     
     // After successful submission, close the popup
     setProfileOpen(false);
+  };
+
+  const isActive = (path) => {
+    return location.pathname === path;
   };
 
   return (
@@ -134,34 +151,38 @@ export default function SecondNavbar({ setModalOpen }) {
         <nav className={`nav-links ${menuOpen ? "open" : ""}`}>
           <Link
             to="/user-home"
-            className="try-now-button"
+            className={isActive("/user-home") ? "try-now-button active" : "nav-link"}
             onClick={() => setMenuOpen(false)}
           >
-            Home
+            <span className="nav-text">Home</span>
           </Link>
           <Link
             to="/exercises"
-            className="nav-link"
+            className={isActive("/exercises") ? "try-now-button active" : "nav-link"}
             onClick={() => setMenuOpen(false)}
           >
-            Exercises
+            <span className="nav-text">Exercises</span>
           </Link>
           <Link
             to="/workouts"
-            className="nav-link"
+            className={isActive("/workouts") ? "try-now-button active" : "nav-link"}
             onClick={() => setMenuOpen(false)}
           >
-            Workouts
+            <span className="nav-text">Workouts</span>
           </Link>
           <Link
             to="/nutrition"
-            className="nav-link"
+            className={isActive("/nutrition") ? "try-now-button active" : "nav-link"}
             onClick={() => setMenuOpen(false)}
           >
-            Nutrition
+            <span className="nav-text">Nutrition</span>
           </Link>
 
-          <IconButton onClick={() => setProfileOpen(true)} color="inherit">
+          <IconButton 
+            onClick={() => setProfileOpen(true)} 
+            color="inherit"
+            className="nav-icon-button"
+          >
             <AccountCircleIcon />
           </IconButton>
 
@@ -169,6 +190,7 @@ export default function SecondNavbar({ setModalOpen }) {
             aria-label="sign out"
             onClick={() => setOpenDialog(true)}
             sx={{ border: "2px solid", borderRadius: 2, ml: 2 }}
+            className="nav-icon-button"
           >
             <LogoutIcon />
           </IconButton>
@@ -230,7 +252,7 @@ export default function SecondNavbar({ setModalOpen }) {
               color: "text.secondary",
             }}
           >
-            Are you sure you want to sign out? You’ll need to log in again to
+            Are you sure you want to sign out? You'll need to log in again to
             access your dashboard.
           </DialogContentText>
         </DialogContent>
@@ -258,15 +280,6 @@ export default function SecondNavbar({ setModalOpen }) {
             Sign Out
           </Button>
         </DialogActions>
-
-        <style>
-          {`
-            @keyframes pop {
-              0% { transform: scale(0.8); opacity: 0; }
-              100% { transform: scale(1); opacity: 1; }
-            }
-          `}
-        </style>
       </Dialog>
 
       <ProfilePopup
@@ -287,6 +300,219 @@ export default function SecondNavbar({ setModalOpen }) {
         setGoal={setGoal}
         darkMode={darkMode}
       />
+    <style>
+  {`
+    /* Enhanced link transitions */
+    .nav-link, .try-now-button {
+      position: relative;
+      transition: all 0.5s cubic-bezier(0.34, 1.56, 0.64, 1);
+      padding: 8px 16px;
+      margin: 0 4px;
+      overflow: hidden;
+      font-weight: 500;
+      text-align: center;
+    }
+    
+    /* Text span animation */
+    .nav-text {
+      display: inline-block;
+      transition: transform 0.4s cubic-bezier(0.34, 1.56, 0.64, 1), 
+                  color 0.4s ease;
+    }
+    
+    /* Default text colors - light mode */
+    .nav-link .nav-text {
+      color: var(--text-color, rgba(0, 0, 0, 0.75));
+    }
+    
+    /* Dark mode text color adjustment */
+    body[data-theme="dark"] .nav-link .nav-text {
+      color: var(--text-color-dark, rgba(255, 255, 255, 0.85));
+    }
+    
+    /* Hover effects - light mode */
+    .nav-link:hover .nav-text {
+      transform: translateY(-2px);
+      color: #6c63ff;
+    }
+    
+    /* Active state - both modes */
+    .try-now-button.active .nav-text {
+      transform: translateY(-2px);
+      color: white !important;
+    }
+    
+    /* Dark mode hover & active */
+    body[data-theme="dark"] .nav-link:hover .nav-text {
+      color: #d4af37;
+    }
+    
+    /* Background fill effect for active/hover state - light mode */
+    .nav-link::before, .try-now-button::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: linear-gradient(135deg, rgba(108, 99, 255, 0.05), rgba(72, 52, 212, 0.08));
+      border-radius: 8px;
+      transform: scaleX(0);
+      transform-origin: left;
+      transition: transform 0.5s cubic-bezier(0.165, 0.84, 0.44, 1), 
+                  background 0.5s ease-in-out;
+      z-index: -1;
+    }
+    
+    /* Dark mode background adjustment */
+    body[data-theme="dark"] .nav-link::before, 
+    body[data-theme="dark"] .try-now-button::before {
+      background: linear-gradient(135deg, rgba(212, 175, 55, 0.08), rgba(255, 215, 0, 0.12));
+    }
+    
+    /* Bottom border animation - light mode */
+    .nav-link::after, .try-now-button::after {
+      content: '';
+      position: absolute;
+      bottom: 0;
+      left: 0;
+      width: 100%;
+      height: 3px;
+      background: linear-gradient(90deg, #6c63ff, #4834d4);
+      transform: scaleX(0);
+      transform-origin: center;
+      transition: transform 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275),
+                  opacity 0.3s ease;
+      opacity: 0;
+    }
+    
+    /* Dark mode bottom border */
+    body[data-theme="dark"] .nav-link::after, 
+    body[data-theme="dark"] .try-now-button::after {
+      background: linear-gradient(90deg, #d4af37, #ffd700);
+    }
+    
+    /* Hover effects - light mode */
+    .nav-link:hover::before {
+      transform: scaleX(1);
+      background: linear-gradient(135deg, rgba(108, 99, 255, 0.1), rgba(72, 52, 212, 0.15));
+    }
+    
+    /* Dark mode hover effect */
+    body[data-theme="dark"] .nav-link:hover::before {
+      background: linear-gradient(135deg, rgba(212, 175, 55, 0.15), rgba(255, 215, 0, 0.2));
+    }
+    
+    .nav-link:hover::after {
+      transform: scaleX(0.6);
+      opacity: 0.7;
+    }
+    
+    /* Active state styling with animations */
+    .try-now-button.active {
+      font-weight: 600;
+      background: linear-gradient(90deg, #6c63ff, #4834d4);
+    }
+    
+    .try-now-button.active::before {
+      transform: scaleX(1);
+      background: linear-gradient(90deg, #6c63ff, #4834d4);
+    }
+    
+    body[data-theme="dark"] .try-now-button.active {
+      background: linear-gradient(90deg, #d4af37, #ffd700);
+      box-shadow: 0 2px 10px rgba(212, 175, 55, 0.15);
+    }
+    
+    body[data-theme="dark"] .try-now-button.active::before {
+      background: linear-gradient(90deg, #d4af37, #ffd700);
+    }
+    
+    .try-now-button.active::after {
+      transform: scaleX(0.8);
+      opacity: 1;
+    }
+    
+    /* Page transition between routes */
+    .nav-links a {
+      position: relative;
+      transition: color 0.5s ease, 
+                  transform 0.5s cubic-bezier(0.34, 1.56, 0.64, 1),
+                  background-color 0.5s ease;
+    }
+    
+    /* Active state animation */
+    @keyframes activatePage {
+      0% { transform: scale(0.95); opacity: 0.7; }
+      50% { transform: scale(1.05); opacity: 1; }
+      100% { transform: scale(1); opacity: 1; }
+    }
+    
+    .try-now-button.active {
+      animation: activatePage 0.6s cubic-bezier(0.18, 0.89, 0.32, 1.28);
+      box-shadow: 0 2px 10px rgba(108, 99, 255, 0.2);
+    }
+    
+    /* Light mode gradient for all active sections */
+    .try-now-button.active[href="/user-home"] .nav-text,
+    .try-now-button.active[href="/exercises"] .nav-text,
+    .try-now-button.active[href="/workouts"] .nav-text,
+    .try-now-button.active[href="/nutrition"] .nav-text {
+      color: white !important;
+    }
+    
+    .try-now-button.active[href="/user-home"],
+    .try-now-button.active[href="/exercises"],
+    .try-now-button.active[href="/workouts"],
+    .try-now-button.active[href="/nutrition"] {
+      background: linear-gradient(90deg, #6c63ff, #4834d4);
+    }
+    
+    /* Dark mode gradient for all active sections */
+    body[data-theme="dark"] .try-now-button.active[href="/user-home"],
+    body[data-theme="dark"] .try-now-button.active[href="/exercises"],
+    body[data-theme="dark"] .try-now-button.active[href="/workouts"],
+    body[data-theme="dark"] .try-now-button.active[href="/nutrition"] {
+      background: linear-gradient(90deg, #d4af37, #ffd700);
+    }
+    
+    body[data-theme="dark"] .try-now-button.active[href="/user-home"] .nav-text,
+    body[data-theme="dark"] .try-now-button.active[href="/exercises"] .nav-text,
+    body[data-theme="dark"] .try-now-button.active[href="/workouts"] .nav-text,
+    body[data-theme="dark"] .try-now-button.active[href="/nutrition"] .nav-text {
+      color: white !important;
+    }
+    
+    /* Section-specific hover colors */
+    .nav-link[href="/user-home"]:hover .nav-text,
+    .nav-link[href="/exercises"]:hover .nav-text,
+    .nav-link[href="/workouts"]:hover .nav-text,
+    .nav-link[href="/nutrition"]:hover .nav-text {
+      color: #6c63ff;
+    }
+    
+    body[data-theme="dark"] .nav-link[href="/user-home"]:hover .nav-text,
+    body[data-theme="dark"] .nav-link[href="/exercises"]:hover .nav-text,
+    body[data-theme="dark"] .nav-link[href="/workouts"]:hover .nav-text,
+    body[data-theme="dark"] .nav-link[href="/nutrition"]:hover .nav-text {
+      color: #d4af37;
+    }
+    
+    /* Icon button animations */
+    .nav-icon-button {
+      transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275) !important;
+    }
+    
+    .nav-icon-button:hover {
+      transform: scale(1.1) rotate(5deg);
+      box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+    }
+    
+    body[data-theme="dark"] .nav-icon-button:hover {
+      box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+    }
+  `}
+</style>
     </header>
   );
 }
