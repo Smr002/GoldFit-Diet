@@ -38,7 +38,7 @@ export default function ProfileDialog({ open, onClose, success, message }) {
           backgroundColor: theme.palette.background.default,
           boxShadow: "0 10px 30px rgba(0,0,0,0.5)",
           maxWidth: "400px",
-          width: "100%",
+          width: "100%",  
         },
       }}
     >

@@ -2,6 +2,10 @@ import React, { useState, useEffect } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import logo from "../assets/goldfitlogo.png";
 import LogoutIcon from "@mui/icons-material/Logout";
+import AccountCircleIcon from "@mui/icons-material/AccountCircle";
+import ProfilePopup from './ProfilePopup';
+import { getUserIdFromToken, getUserById } from '@/api';
+import { useUpdateProfile } from '@/store/useUpdateProfile';
 import {
   IconButton,
   Dialog,
@@ -20,6 +24,38 @@ export default function SecondNavbar({ setModalOpen }) {
   const [menuOpen, setMenuOpen] = useState(false);
   const [openDialog, setOpenDialog] = useState(false);
   const navigate = useNavigate();
+  const [profileOpen, setProfileOpen] = useState(false);
+  const [formData, setFormData] = useState({
+    firstName: "",
+    lastName: "",
+    email: "",
+    password: "",
+    confirmPassword: "",
+  });
+  const token = localStorage.getItem("token");
+  const userId = token ? getUserIdFromToken(token) : null;
+  const darkMode = localStorage.getItem("theme") === "dark";
+
+  const {
+    gender,
+    ageGroup,
+    height,
+    weight,
+    goal,
+    setGender,
+    setAgeGroup,
+    setHeight,
+    setWeight,
+    setGoal,
+  } = useUpdateProfile();
+
+  const mapAgeToAgeGroup = (age) => {
+    if (!age) return "18-25";
+    if (age >= 18 && age <= 25) return "18-25";
+    if (age >= 26 && age <= 35) return "26-35";
+    if (age >= 36 && age <= 45) return "36-45";
+    return "46+";
+  };
 
   useEffect(() => {
     const handleScroll = () => {
@@ -29,10 +65,48 @@ export default function SecondNavbar({ setModalOpen }) {
     return () => window.removeEventListener("scroll", handleScroll);
   }, []);
 
+  useEffect(() => {
+    const fetchUserData = async () => {
+      if (userId && token) {
+        try {
+          const userData = await getUserById(Number(userId), token);
+          setFormData({
+            firstName: userData.first_name || "",
+            lastName: userData.last_name || "",
+            email: userData.email || "",
+            password: "",
+            confirmPassword: "",
+          });
+          setGender(userData.gender || "Male");
+          setAgeGroup(mapAgeToAgeGroup(userData.age));
+          setHeight(userData.height || 0);
+          setWeight(userData.weight || 0);
+          setGoal(userData.goal || "Lose Weight");
+        } catch (error) {
+          console.error("Failed to fetch user data:", error);
+        }
+      }
+    };
+    
+    if (profileOpen) {
+      fetchUserData();
+    }
+  }, [profileOpen, userId, token]);
+
   const handleSignOut = () => {
     localStorage.clear();
     sessionStorage.clear();
     navigate("/", { replace: true });
+  };
+
+  const handleProfileSubmit = async (e) => {
+    e.preventDefault();
+    
+    // Import the same logic from Profile.jsx
+    // Copy the handleSubmit function from Profile.jsx
+    
+    // After successful submission, close the popup
+    setProfileOpen(false);
   };
 
   return (
@@ -87,20 +161,9 @@ export default function SecondNavbar({ setModalOpen }) {
             Nutrition
           </Link>
 
-          <Link to="/profile" className="footer-item">
-            <svg
-              xmlns="http://www.w3.org/2000/svg"
-              viewBox="0 0 24 24"
-              fill="none"
-              stroke="currentColor"
-              strokeWidth="2"
-              strokeLinecap="round"
-              strokeLinejoin="round"
-            >
-              <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>
-              <circle cx="12" cy="7" r="4"></circle>
-            </svg>
-          </Link>
+          <IconButton onClick={() => setProfileOpen(true)} color="inherit">
+            <AccountCircleIcon />
+          </IconButton>
 
           <IconButton
             aria-label="sign out"
@@ -205,6 +268,25 @@ export default function SecondNavbar({ setModalOpen }) {
           `}
         </style>
       </Dialog>
+
+      <ProfilePopup
+        open={profileOpen}
+        onClose={() => setProfileOpen(false)}
+        formData={formData}
+        setFormData={setFormData}
+        handleSubmit={handleProfileSubmit}
+        gender={gender}
+        setGender={setGender}
+        ageGroup={ageGroup}
+        setAgeGroup={setAgeGroup}
+        height={height}
+        setHeight={setHeight}
+        weight={weight}
+        setWeight={setWeight}
+        goal={goal}
+        setGoal={setGoal}
+        darkMode={darkMode}
+      />
     </header>
   );
 }

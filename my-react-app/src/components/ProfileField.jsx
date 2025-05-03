@@ -3,37 +3,47 @@ import React from "react";
 import PropTypes from "prop-types";
 import { TextField, MenuItem, InputAdornment } from "@mui/material";
 
-const fieldStyles = {
+// Create a function that returns styles based on dark mode
+const getFieldStyles = (darkMode) => ({
   "& .MuiInputLabel-root": { 
-    color: "rgba(255, 255, 255, 0.7)",
+    // Improved label contrast for better readability
+    color: darkMode ? "rgba(255, 255, 255, 0.9)" : "rgba(0, 0, 0, 0.8)",
     "&.Mui-focused": {
-      color: "#D4AF37"
+      color: darkMode ? "#FFD700" : "#6200ea"
     }
   },
   "& .MuiOutlinedInput-root": {
-    color: "#fff",
-    backgroundColor: "rgba(0, 0, 0, 0.2)",
+    color: darkMode ? "#ffffff" : "#000000",
+    backgroundColor: darkMode ? "rgba(255, 255, 255, 0.07)" : "rgba(0, 0, 0, 0.04)",
     borderRadius: 2,
     transition: "background-color 0.3s",
     "&:hover": {
-      backgroundColor: "rgba(0, 0, 0, 0.3)",
+      backgroundColor: darkMode ? "rgba(255, 255, 255, 0.12)" : "rgba(0, 0, 0, 0.08)",
     },
     "&.Mui-focused": {
-      backgroundColor: "rgba(0, 0, 0, 0.35)",
+      backgroundColor: darkMode ? "rgba(255, 255, 255, 0.15)" : "rgba(0, 0, 0, 0.1)",
     },
     "& .MuiOutlinedInput-notchedOutline": {
-      borderColor: "rgba(212, 175, 55, 0.5)",
+      borderColor: darkMode ? "rgba(255, 255, 255, 0.3)" : "rgba(0, 0, 0, 0.23)",
       transition: "border-color 0.3s",
     },
     "&:hover .MuiOutlinedInput-notchedOutline": {
-      borderColor: "rgba(212, 175, 55, 0.8)",
+      borderColor: darkMode ? "rgba(255, 255, 255, 0.5)" : "rgba(0, 0, 0, 0.5)",
     },
     "&.Mui-focused .MuiOutlinedInput-notchedOutline": {
-      borderColor: "#D4AF37",
+      borderColor: darkMode ? "#FFD700" : "#6200ea",
       borderWidth: 2,
     },
   },
-};
+  // Input adornment (units)
+  "& .MuiInputAdornment-root": {
+    color: darkMode ? "rgba(255, 255, 255, 0.7)" : "rgba(0, 0, 0, 0.6)",
+  },
+  // Menu items in select
+  "& .MuiMenuItem-root": {
+    color: darkMode ? "#ffffff" : "#000000",
+  }
+});
 
 export default function ProfileField({
   label,
@@ -45,6 +55,8 @@ export default function ProfileField({
   options = [],
   required = false,
   placeholder,
+  darkMode = false, // New prop for dark mode
+  autoComplete, // Add this prop
 }) {
   // Generate proper InputAdornment based on field name/type
   const getAdornment = () => {
@@ -72,8 +84,30 @@ export default function ProfileField({
       required={required}
       select={select}
       placeholder={placeholder}
+      autoComplete={autoComplete} // Pass this to TextField
       InputProps={getAdornment()}
-      sx={fieldStyles}
+      sx={getFieldStyles(darkMode)}
+      SelectProps={{
+        MenuProps: {
+          PaperProps: {
+            sx: {
+              bgcolor: darkMode ? "rgba(30, 30, 30, 0.9)" : "white",
+              "& .MuiMenuItem-root": {
+                color: darkMode ? "white" : "black",
+                "&:hover": {
+                  backgroundColor: darkMode ? "rgba(255, 255, 255, 0.1)" : "rgba(0, 0, 0, 0.05)",
+                },
+                "&.Mui-selected": {
+                  backgroundColor: darkMode ? "rgba(255, 215, 0, 0.2)" : "rgba(98, 0, 234, 0.1)",
+                  "&:hover": {
+                    backgroundColor: darkMode ? "rgba(255, 215, 0, 0.3)" : "rgba(98, 0, 234, 0.2)",
+                  }
+                }
+              }
+            }
+          }
+        }
+      }}
     >
       {select &&
         options.map((option) => (
@@ -100,4 +134,6 @@ ProfileField.propTypes = {
   ),
   required: PropTypes.bool,
   placeholder: PropTypes.string,
+  darkMode: PropTypes.bool,
+  autoComplete: PropTypes.string,
 };
