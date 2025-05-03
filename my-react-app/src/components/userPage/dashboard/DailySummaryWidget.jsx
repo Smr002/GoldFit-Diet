@@ -24,19 +24,19 @@ function DailySummaryWidget({ token, userId, date }) {
         amount: 0,
         goal: 150,
         percentage: 0,
-        color: isDarkMode ? "#BB86FC" : "#9B87F5",
+        color: isDarkMode ? "#FFD700" : "#9B87F5", // Gold in dark mode
       },
       carbs: {
         amount: 0,
         goal: 220,
         percentage: 0,
-        color: isDarkMode ? "#03DAC6" : "#6CCFBC",
+        color: isDarkMode ? "#FFC107" : "#6CCFBC", // Amber in dark mode
       },
       fats: {
         amount: 0,
         goal: 70,
         percentage: 0,
-        color: isDarkMode ? "#CF6679" : "#FF7D55",
+        color: isDarkMode ? "#DAA520" : "#FF7D55", // Goldenrod in dark mode
       },
     },
     hydration: { amount: 0, goal: 8, percentage: 0 },
@@ -50,15 +50,15 @@ function DailySummaryWidget({ token, userId, date }) {
     const fetchNutritionLogs = async () => {
       try {
         setLoading(true);
-        const logs = await getNutritionLog(token, userId, date); // userId not needed as per updated backend
+        const logs = await getNutritionLog(token, userId, date);
 
         // Assuming logs is an array; take the first log or adjust if single object
         const log = Array.isArray(logs) ? logs[0] : logs;
 
         // Map API data to component state
         const calories = {
-          consumed: log.totalCalories || 0, // Use totalCalories instead of calories
-          goal: 2100, // Hardcoded as goal is not in API response
+          consumed: log.totalCalories || 0,
+          goal: 2100,
           percentage: log.totalCalories
             ? Math.min((log.totalCalories / 2100) * 100, 100)
             : 0,
@@ -67,40 +67,37 @@ function DailySummaryWidget({ token, userId, date }) {
         const macros = {
           protein: {
             amount: log.protein || 0,
-            goal: 150, // Hardcoded
+            goal: 150,
             percentage: log.protein
               ? Math.min((log.protein / 150) * 100, 100)
               : 0,
-            color: isDarkMode ? "#BB86FC" : "#9B87F5",
+            color: isDarkMode ? "#FFD700" : "#9B87F5", // Gold in dark mode
           },
           carbs: {
             amount: log.carbs || 0,
-            goal: 220, // Hardcoded
+            goal: 220,
             percentage: log.carbs ? Math.min((log.carbs / 220) * 100, 100) : 0,
-            color: isDarkMode ? "#03DAC6" : "#6CCFBC",
+            color: isDarkMode ? "#FFC107" : "#6CCFBC", // Amber in dark mode
           },
           fats: {
             amount: log.fats || 0,
-            goal: 70, // Hardcoded
+            goal: 70,
             percentage: log.fats ? Math.min((log.fats / 70) * 100, 100) : 0,
-            color: isDarkMode ? "#CF6679" : "#FF7D55",
+            color: isDarkMode ? "#DAA520" : "#FF7D55", // Goldenrod in dark mode
           },
         };
 
         const hydration = {
-          amount: log.hydration || 0, // Use hydration instead of water
-          goal: 8, // Hardcoded
+          amount: log.hydration || 0,
+          goal: 8,
           percentage: log.hydration
             ? Math.min((log.hydration / 8) * 100, 100)
             : 0,
         };
 
-        // Sleep data is not available in the API response
-        // Option 1: Remove sleep section (commented out below in UI)
-        // Option 2: Fetch sleep data separately if available from another endpoint
         const sleep = {
-          hours: 0, // No sleep data in API response
-          goal: 8, // Hardcoded
+          hours: 0,
+          goal: 8,
           percentage: 0,
         };
 
@@ -124,8 +121,26 @@ function DailySummaryWidget({ token, userId, date }) {
   // Render loading state
   if (loading) {
     return (
-      <Paper sx={{ p: 2.5, height: "100%", borderRadius: 3 }}>
-        <Typography>Loading...</Typography>
+      <Paper 
+        sx={{ 
+          p: 2.5, 
+          height: "100%", 
+          borderRadius: 3, 
+          bgcolor: 'background.paper',
+          boxShadow: isDarkMode 
+            ? "0px 4px 20px rgba(0, 0, 0, 0.4)" 
+            : "0px 4px 20px rgba(0, 0, 0, 0.08)" 
+        }}
+      >
+        <Box sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '100%' }}>
+          <CircularProgress 
+            size={40} 
+            thickness={4} 
+            sx={{ 
+              color: isDarkMode ? theme.palette.primary.main : theme.palette.primary.main 
+            }} 
+          />
+        </Box>
       </Paper>
     );
   }
@@ -133,7 +148,17 @@ function DailySummaryWidget({ token, userId, date }) {
   // Render error state
   if (error) {
     return (
-      <Paper sx={{ p: 2.5, height: "100%", borderRadius: 3 }}>
+      <Paper 
+        sx={{ 
+          p: 2.5, 
+          height: "100%", 
+          borderRadius: 3,
+          bgcolor: 'background.paper',
+          boxShadow: isDarkMode 
+            ? "0px 4px 20px rgba(0, 0, 0, 0.4)" 
+            : "0px 4px 20px rgba(0, 0, 0, 0.08)" 
+        }}
+      >
         <Typography color="error">{error}</Typography>
       </Paper>
     );
@@ -149,11 +174,12 @@ function DailySummaryWidget({ token, userId, date }) {
         height: "100%",
         borderRadius: 3,
         boxShadow: isDarkMode
-          ? "0px 4px 20px rgba(0, 0, 0, 0.3)"
+          ? "0px 4px 20px rgba(0, 0, 0, 0.4)"
           : "0px 4px 20px rgba(0, 0, 0, 0.08)",
         background: isDarkMode
-          ? "linear-gradient(145deg, #1e1e1e, #2a2a2a)"
+          ? "linear-gradient(145deg, #1a1a1a, #282828)"
           : "linear-gradient(145deg, #ffffff, #f5f7ff)",
+        transition: "background 0.3s ease, box-shadow 0.3s ease",
       }}
     >
       <Box sx={{ display: "flex", alignItems: "center", gap: 1, mb: 2 }}>
@@ -199,10 +225,10 @@ function DailySummaryWidget({ token, userId, date }) {
             height: 10,
             borderRadius: 2,
             bgcolor: isDarkMode
-              ? "rgba(187, 134, 252, 0.15)"
+              ? "rgba(255, 215, 0, 0.15)"
               : "rgba(155, 135, 245, 0.15)",
             "& .MuiLinearProgress-bar": {
-              bgcolor: isDarkMode ? "#BB86FC" : "#9B87F5",
+              bgcolor: isDarkMode ? theme.palette.primary.main : "#9B87F5",
               borderRadius: 2,
             },
           }}
@@ -246,6 +272,12 @@ function DailySummaryWidget({ token, userId, date }) {
                     "& .MuiCircularProgress-circle": {
                       strokeLinecap: "round",
                     },
+                    "&.MuiCircularProgress-root": {
+                      bgcolor: isDarkMode 
+                        ? "rgba(255, 255, 255, 0.05)" 
+                        : "rgba(0, 0, 0, 0.03)",
+                      borderRadius: "50%",
+                    }
                   }}
                 />
                 <Box
@@ -351,8 +383,7 @@ function DailySummaryWidget({ token, userId, date }) {
             />
           </Box>
         </Grid>
-        {/* Comment out Sleep section since data is not available */}
-        {/* <Grid item xs={6}>
+        <Grid item xs={6}>
           <Box>
             <Box
               sx={{
@@ -365,7 +396,7 @@ function DailySummaryWidget({ token, userId, date }) {
               <Box sx={{ display: "flex", alignItems: "center", gap: 0.8 }}>
                 <Moon
                   size={18}
-                  style={{ color: isDarkMode ? "#BB86FC" : "#8B5CF6" }}
+                  style={{ color: isDarkMode ? "#FFD700" : "#8B5CF6" }}
                 />
                 <Typography
                   variant="body1"
@@ -378,7 +409,7 @@ function DailySummaryWidget({ token, userId, date }) {
               <Typography
                 variant="body2"
                 fontWeight={500}
-                sx={{ color: isDarkMode ? "#BB86FC" : "#8B5CF6" }}
+                sx={{ color: isDarkMode ? "#FFD700" : "#8B5CF6" }}
               >
                 {sleep.hours} <span style={{ fontSize: "0.7rem" }}>hrs</span>
               </Typography>
@@ -390,16 +421,16 @@ function DailySummaryWidget({ token, userId, date }) {
                 height: 8,
                 borderRadius: 4,
                 bgcolor: isDarkMode
-                  ? "rgba(187, 134, 252, 0.15)"
+                  ? "rgba(255, 215, 0, 0.15)"
                   : "rgba(139, 92, 246, 0.15)",
                 "& .MuiLinearProgress-bar": {
-                  bgcolor: isDarkMode ? "#BB86FC" : "#8B5CF6",
+                  bgcolor: isDarkMode ? "#FFD700" : "#8B5CF6",
                   borderRadius: 4,
                 },
               }}
             />
           </Box>
-        </Grid> */}
+        </Grid>
       </Grid>
     </Paper>
   );

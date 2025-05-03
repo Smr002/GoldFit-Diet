@@ -16,7 +16,8 @@ import {
   Avatar,
   Grow,
   Tooltip,
-  Zoom
+  Zoom,
+  useTheme
 } from '@mui/material';
 import { motion } from 'framer-motion'; // Add framer motion for advanced animations
 import { 
@@ -31,17 +32,10 @@ import {
 } from '@mui/icons-material';
 import FoodSearchModal from './FoodSearchModal';
 
-// Meal images
-const MEAL_IMAGES = {
-  breakfast: 'https://images.unsplash.com/photo-1494859802809-d069c3b71a8a?ixlib=rb-4.0.3&auto=format&fit=crop&w=400&q=80',
-  'morning-snack': 'https://images.unsplash.com/photo-1511688878353-3a2f5be94cd7?ixlib=rb-4.0.3&auto=format&fit=crop&w=400&q=80',
-  lunch: 'https://images.unsplash.com/photo-1546793665-c74683f339c1?ixlib=rb-4.0.3&auto=format&fit=crop&w=400&q=80',
-  'afternoon-snack': 'https://images.unsplash.com/photo-1571115177098-24ec42ed204d?ixlib=rb-4.0.3&auto=format&fit=crop&w=400&q=80',
-  dinner: 'https://images.unsplash.com/photo-1576402187878-974f70c890a5?ixlib=rb-4.0.3&auto=format&fit=crop&w=400&q=80',
-  'evening-snack': 'https://images.unsplash.com/photo-1571506165871-ee72a35bc9d4?ixlib=rb-4.0.3&auto=format&fit=crop&w=400&q=80'
-};
-
 const MealLogger = ({ meals = [], onAddFood, selectedDay }) => {
+  const theme = useTheme();
+  const isDarkMode = theme.palette.mode === 'dark';
+  
   // State for expansion of meals that have foods
   const [expandedMeal, setExpandedMeal] = useState(null);
   
@@ -60,6 +54,16 @@ const MealLogger = ({ meals = [], onAddFood, selectedDay }) => {
   
   // Determine if this is a past day or today
   const isPastDay = selectedDay && new Date(selectedDay.date) < new Date().setHours(0,0,0,0);
+
+  // Updated meal images for better visuals in both light and dark mode
+  const MEAL_IMAGES = {
+    breakfast: 'https://images.unsplash.com/photo-1494859802809-d069c3b71a8a?ixlib=rb-4.0.3&auto=format&fit=crop&w=400&q=80',
+    'morning-snack': 'https://images.unsplash.com/photo-1511688878353-3a2f5be94cd7?ixlib=rb-4.0.3&auto=format&fit=crop&w=400&q=80',
+    lunch: 'https://images.unsplash.com/photo-1546793665-c74683f339c1?ixlib=rb-4.0.3&auto=format&fit=crop&w=400&q=80',
+    'afternoon-snack': 'https://images.unsplash.com/photo-1571115177098-24ec42ed204d?ixlib=rb-4.0.3&auto=format&fit=crop&w=400&q=80',
+    dinner: 'https://images.unsplash.com/photo-1576402187878-974f70c890a5?ixlib=rb-4.0.3&auto=format&fit=crop&w=400&q=80',
+    'evening-snack': 'https://images.unsplash.com/photo-1571506165871-ee72a35bc9d4?ixlib=rb-4.0.3&auto=format&fit=crop&w=400&q=80'
+  };
 
   // Default meal list if none provided
   const defaultMeals = [
@@ -120,7 +124,7 @@ const MealLogger = ({ meals = [], onAddFood, selectedDay }) => {
       return matchedMeal || defaultMeal;
     }) : defaultMeals;
   
-  // Simplified animation effect - single timeout instead of multiple
+  // Animation effect
   useEffect(() => {
     const timer = setTimeout(() => setIsLoaded(true), 300);
     return () => clearTimeout(timer);
@@ -131,7 +135,7 @@ const MealLogger = ({ meals = [], onAddFood, selectedDay }) => {
     setExpandedMeal(expandedMeal === id ? null : id);
   };
   
-  // Enhanced handler for opening food search modal
+  // Handler for opening food search modal
   const handleOpenFoodSearch = (mealId) => {
     setActiveMealId(mealId);
     setFoodSearchOpen(true);
@@ -163,16 +167,30 @@ const MealLogger = ({ meals = [], onAddFood, selectedDay }) => {
     setExpandedMeal(mealId);
   };
   
-  // Get color based on meal type
+  // Get color based on meal type - updated for dark mode
   const getMealColor = (mealId) => {
-    switch(mealId) {
-      case 'breakfast': return '#ff9800'; // Orange
-      case 'morning-snack': return '#ffb74d'; // Light Orange
-      case 'lunch': return '#2196f3'; // Blue
-      case 'afternoon-snack': return '#90caf9'; // Light Blue
-      case 'dinner': return '#673ab7'; // Deep Purple
-      case 'evening-snack': return '#9575cd'; // Light Purple
-      default: return '#9e9e9e'; // Grey
+    if (isDarkMode) {
+      // Gold-themed colors for dark mode
+      switch(mealId) {
+        case 'breakfast': return '#FFD700'; // Gold
+        case 'morning-snack': return '#F0E68C'; // Khaki
+        case 'lunch': return '#DAA520'; // Goldenrod
+        case 'afternoon-snack': return '#B8860B'; // DarkGoldenrod
+        case 'dinner': return '#FFC107'; // Amber
+        case 'evening-snack': return '#FFECB3'; // Amber Light
+        default: return '#E0E0E0'; // Light Grey
+      }
+    } else {
+      // Original colors for light mode
+      switch(mealId) {
+        case 'breakfast': return '#ff9800'; // Orange
+        case 'morning-snack': return '#ffb74d'; // Light Orange
+        case 'lunch': return '#2196f3'; // Blue
+        case 'afternoon-snack': return '#90caf9'; // Light Blue
+        case 'dinner': return '#673ab7'; // Deep Purple
+        case 'evening-snack': return '#9575cd'; // Light Purple
+        default: return '#9e9e9e'; // Grey
+      }
     }
   };
   
@@ -188,14 +206,16 @@ const MealLogger = ({ meals = [], onAddFood, selectedDay }) => {
           sx={{
             p: 3,
             borderRadius: 2,
-            bgcolor: 'white',
+            bgcolor: 'background.paper', // Uses theme background
             height: '100%',
             display: 'flex',
             flexDirection: 'column',
             transition: 'transform 0.4s ease-in-out, box-shadow 0.4s ease-in-out',
             '&:hover': {
               transform: 'translateY(-4px)',
-              boxShadow: '0 8px 16px rgba(0,0,0,0.1)'
+              boxShadow: isDarkMode 
+                ? '0 8px 16px rgba(255, 215, 0, 0.15)' 
+                : '0 8px 16px rgba(0,0,0,0.1)'
             }
           }}
         >
@@ -207,20 +227,27 @@ const MealLogger = ({ meals = [], onAddFood, selectedDay }) => {
               sx={{ 
                 display: 'flex',
                 alignItems: 'center',
+                color: theme.palette.text.primary, // Uses theme text color
               }}
             >
-              <MenuIcon sx={{ mr: 1, color: '#673ab7' }} />
+              <MenuIcon sx={{ 
+                mr: 1, 
+                color: isDarkMode ? theme.palette.primary.main : '#673ab7' 
+              }} />
               {selectedDay ? `${new Date(selectedDay.date).toLocaleDateString('en-US', { month: 'short', day: 'numeric' })} Meals` : 'Meals'}
             </Typography>
             
             <Tooltip title="Log your meals throughout the day to track your nutritional intake">
-              <IconButton size="small">
+              <IconButton size="small" sx={{ color: theme.palette.text.secondary }}>
                 <InfoIcon fontSize="small" />
               </IconButton>
             </Tooltip>
           </Box>
           
-          <Divider sx={{ mb: 2 }} />
+          <Divider sx={{ 
+            mb: 2,
+            borderColor: isDarkMode ? 'rgba(255, 255, 255, 0.12)' : undefined 
+          }} />
           
           <Box sx={{ flexGrow: 1, overflow: 'auto' }}>
             <Stack spacing={2}>
@@ -233,6 +260,7 @@ const MealLogger = ({ meals = [], onAddFood, selectedDay }) => {
                 
                 const isLastAdded = lastAddedMealId === meal.id;
                 const isHovered = hoveredMealId === meal.id;
+                const mealColor = getMealColor(meal.id);
                   
                 return (
                   <Fade 
@@ -244,15 +272,23 @@ const MealLogger = ({ meals = [], onAddFood, selectedDay }) => {
                     <Card
                       id={`meal-card-${meal.id}`}
                       component={motion.div}
-                      whileHover={{ y: -4, boxShadow: '0 4px 12px rgba(0,0,0,0.15)' }}
+                      whileHover={{ y: -4, boxShadow: isDarkMode 
+                        ? '0 4px 12px rgba(255, 215, 0, 0.2)' 
+                        : '0 4px 12px rgba(0,0,0,0.15)' 
+                      }}
                       animate={isLastAdded ? { 
-                        boxShadow: ['0 0 0 rgba(0,0,0,0.1)', '0 0 20px rgba(103, 58, 183, 0.6)', '0 0 0 rgba(0,0,0,0.1)'],
+                        boxShadow: isDarkMode
+                          ? ['0 0 0 rgba(0,0,0,0.1)', `0 0 20px rgba(255, 215, 0, 0.5)`, '0 0 0 rgba(0,0,0,0.1)']
+                          : ['0 0 0 rgba(0,0,0,0.1)', '0 0 20px rgba(103, 58, 183, 0.6)', '0 0 0 rgba(0,0,0,0.1)'],
                         scale: [1, 1.02, 1],
                       } : {}}
                       transition={{ duration: 0.8, repeat: isLastAdded ? 1 : 0 }}
                       variant="outlined"
                       sx={{
-                        borderLeft: `4px solid ${getMealColor(meal.id)}`,
+                        borderLeft: `4px solid ${mealColor}`,
+                        backgroundColor: theme.palette.background.paper,
+                        color: theme.palette.text.primary,
+                        borderColor: isDarkMode ? 'rgba(255, 255, 255, 0.12)' : 'rgba(0, 0, 0, 0.12)',
                         transition: 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)',
                         position: 'relative',
                         overflow: 'hidden',
@@ -266,15 +302,19 @@ const MealLogger = ({ meals = [], onAddFood, selectedDay }) => {
                         },
                         // Add focus highlight for newly added meal
                         ...(isLastAdded && {
-                          border: '1px solid rgba(103, 58, 183, 0.5)',
-                          boxShadow: '0 0 8px rgba(103, 58, 183, 0.4)',
+                          border: isDarkMode 
+                            ? '1px solid rgba(255, 215, 0, 0.5)' 
+                            : '1px solid rgba(103, 58, 183, 0.5)',
+                          boxShadow: isDarkMode 
+                            ? '0 0 8px rgba(255, 215, 0, 0.4)' 
+                            : '0 0 8px rgba(103, 58, 183, 0.4)',
                         })
                       }}
                     >
                       {/* Meal image with subtle parallax effect */}
                       <Box
                         component={motion.div}
-                        animate={isHovered ? { scale: 1.05, opacity: 0.15 } : { scale: 1, opacity: 0.1 }}
+                        animate={isHovered ? { scale: 1.05, opacity: isDarkMode ? 0.1 : 0.15 } : { scale: 1, opacity: isDarkMode ? 0.07 : 0.1 }}
                         transition={{ duration: 0.5 }}
                         sx={{
                           position: 'absolute',
@@ -293,12 +333,19 @@ const MealLogger = ({ meals = [], onAddFood, selectedDay }) => {
                             top: 0,
                             width: '100%',
                             height: '100%',
-                            background: `linear-gradient(to right, white, transparent)`,
+                            background: isDarkMode 
+                              ? 'linear-gradient(to right, rgba(30, 30, 30, 1), transparent)' 
+                              : 'linear-gradient(to right, white, transparent)',
                           }
                         }}
                       />
                       
-                      <CardContent sx={{ pb: hasFoods ? 0 : 2, position: 'relative', zIndex: 2 }}>
+                      <CardContent sx={{ 
+                        pb: hasFoods ? 0 : 2, 
+                        position: 'relative', 
+                        zIndex: 2,
+                        color: theme.palette.text.primary
+                      }}>
                         <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
                           <Box sx={{ display: 'flex', alignItems: 'center' }}>
                             <Avatar
@@ -308,8 +355,10 @@ const MealLogger = ({ meals = [], onAddFood, selectedDay }) => {
                                 width: 40, 
                                 height: 40, 
                                 mr: 1.5,
-                                border: `2px solid ${getMealColor(meal.id)}`,
-                                boxShadow: '0 2px 4px rgba(0,0,0,0.1)',
+                                border: `2px solid ${mealColor}`,
+                                boxShadow: isDarkMode 
+                                  ? '0 2px 4px rgba(0,0,0,0.4)' 
+                                  : '0 2px 4px rgba(0,0,0,0.1)',
                               }}
                             >
                               {meal.icon || <MenuIcon />}
@@ -322,6 +371,9 @@ const MealLogger = ({ meals = [], onAddFood, selectedDay }) => {
                                   fontWeight: 600, 
                                   lineHeight: 1.2,
                                   mb: 0.5,
+                                  color: theme.palette.text.primary,
+                                  position: 'relative',
+                                  display: 'inline-block',
                                   '&::after': {
                                     content: '""',
                                     position: 'absolute',
@@ -329,7 +381,7 @@ const MealLogger = ({ meals = [], onAddFood, selectedDay }) => {
                                     height: '2px',
                                     bottom: 0,
                                     left: 0,
-                                    background: getMealColor(meal.id),
+                                    background: mealColor,
                                     transition: 'width 0.3s ease',
                                   },
                                   '&:hover::after': {
@@ -341,8 +393,10 @@ const MealLogger = ({ meals = [], onAddFood, selectedDay }) => {
                               </Typography>
                               <Typography 
                                 variant="caption" 
-                                color="text.secondary"
-                                sx={{ display: 'block' }}
+                                sx={{ 
+                                  display: 'block',
+                                  color: theme.palette.text.secondary 
+                                }}
                               >
                                 {meal.time}
                               </Typography>
@@ -354,14 +408,14 @@ const MealLogger = ({ meals = [], onAddFood, selectedDay }) => {
                               variant="subtitle1" 
                               fontWeight="bold"
                               sx={{
-                                color: totalCalories > 0 ? getMealColor(meal.id) : 'text.secondary',
+                                color: totalCalories > 0 ? mealColor : theme.palette.text.secondary,
                               }}
                             >
                               {totalCalories}
                             </Typography>
                             <Typography 
                               variant="caption" 
-                              color="text.secondary"
+                              sx={{ color: theme.palette.text.secondary }}
                             >
                               kcal
                             </Typography>
@@ -382,12 +436,22 @@ const MealLogger = ({ meals = [], onAddFood, selectedDay }) => {
                                     display: 'flex', 
                                     justifyContent: 'space-between',
                                     py: 0.75,
-                                    borderBottom: '1px dashed rgba(0, 0, 0, 0.1)',
+                                    borderBottom: isDarkMode 
+                                      ? '1px dashed rgba(255, 255, 255, 0.1)' 
+                                      : '1px dashed rgba(0, 0, 0, 0.1)',
                                   }}
                                 >
                                   <Box>
-                                    <Typography variant="body2">{food.name}</Typography>
-                                    <Typography variant="caption" color="text.secondary">
+                                    <Typography 
+                                      variant="body2"
+                                      sx={{ color: theme.palette.text.primary }}
+                                    >
+                                      {food.name}
+                                    </Typography>
+                                    <Typography 
+                                      variant="caption" 
+                                      sx={{ color: theme.palette.text.secondary }}
+                                    >
                                       {food.serving}
                                     </Typography>
                                   </Box>
@@ -395,7 +459,7 @@ const MealLogger = ({ meals = [], onAddFood, selectedDay }) => {
                                     variant="body2" 
                                     sx={{ 
                                       fontWeight: 500,
-                                      color: getMealColor(meal.id),
+                                      color: mealColor,
                                     }}
                                   >
                                     {food.calories} kcal
@@ -407,7 +471,17 @@ const MealLogger = ({ meals = [], onAddFood, selectedDay }) => {
                         )}
                       </CardContent>
                       
-                      <CardActions sx={{ display: 'flex', justifyContent: 'space-between', px: 2, py: 1, position: 'relative', zIndex: 2 }}>
+                      <CardActions sx={{ 
+                        display: 'flex', 
+                        justifyContent: 'space-between', 
+                        px: 2, 
+                        py: 1, 
+                        position: 'relative', 
+                        zIndex: 2,
+                        bgcolor: isDarkMode 
+                          ? 'rgba(0, 0, 0, 0.2)' 
+                          : 'rgba(0, 0, 0, 0.01)'
+                      }}>
                         {!isPastDay && (
                           <Button 
                             component={motion.button}
@@ -420,12 +494,18 @@ const MealLogger = ({ meals = [], onAddFood, selectedDay }) => {
                             onMouseEnter={() => setHoveredMealId(meal.id)}
                             onMouseLeave={() => setHoveredMealId(null)}
                             sx={{ 
-                              bgcolor: `${getMealColor(meal.id)}20`,
-                              color: getMealColor(meal.id),
+                              bgcolor: isDarkMode 
+                                ? `${mealColor}30` 
+                                : `${mealColor}20`,
+                              color: mealColor,
                               boxShadow: 'none',
                               '&:hover': {
-                                bgcolor: `${getMealColor(meal.id)}40`,
-                                boxShadow: '0 2px 8px rgba(0,0,0,0.1)',
+                                bgcolor: isDarkMode 
+                                  ? `${mealColor}50` 
+                                  : `${mealColor}40`,
+                                boxShadow: isDarkMode 
+                                  ? `0 2px 8px rgba(255, 215, 0, 0.3)` 
+                                  : '0 2px 8px rgba(0,0,0,0.1)',
                               }
                             }}
                           >
@@ -444,9 +524,13 @@ const MealLogger = ({ meals = [], onAddFood, selectedDay }) => {
                             onClick={() => handleExpandMeal(meal.id)}
                             sx={{ 
                               transition: 'all 0.3s ease-in-out',
-                              bgcolor: isExpanded ? `${getMealColor(meal.id)}10` : 'transparent',
+                              bgcolor: isExpanded 
+                                ? isDarkMode ? `${mealColor}30` : `${mealColor}10` 
+                                : 'transparent',
                               '&:hover': {
-                                bgcolor: `${getMealColor(meal.id)}20`,
+                                bgcolor: isDarkMode 
+                                  ? `${mealColor}40` 
+                                  : `${mealColor}20`,
                               }
                             }}
                           >
@@ -454,7 +538,7 @@ const MealLogger = ({ meals = [], onAddFood, selectedDay }) => {
                               sx={{
                                 transform: isExpanded ? 'rotate(180deg)' : 'rotate(0deg)',
                                 transition: 'transform 0.3s ease-in-out',
-                                color: getMealColor(meal.id)
+                                color: mealColor
                               }}
                             />
                           </IconButton>
@@ -467,21 +551,39 @@ const MealLogger = ({ meals = [], onAddFood, selectedDay }) => {
             </Stack>
           </Box>
           
-          {/* Nutrition Tip Box - enhanced animation */}
+          {/* Nutrition Tip Box - enhanced animation with dark mode */}
           <Grow in={isLoaded} timeout={1000} style={{ transformOrigin: '0 0 0' }}>
             <Box 
               component={motion.div}
-              whileHover={{ scale: 1.01, boxShadow: '0 4px 8px rgba(103, 58, 183, 0.15)' }}
+              whileHover={{ 
+                scale: 1.01,
+                boxShadow: isDarkMode 
+                  ? '0 4px 8px rgba(255, 215, 0, 0.15)' 
+                  : '0 4px 8px rgba(103, 58, 183, 0.15)' 
+              }}
               sx={{ 
                 mt: 3,
                 p: 2,
                 borderRadius: 2,
-                bgcolor: 'rgba(103, 58, 183, 0.05)',
+                bgcolor: isDarkMode 
+                  ? 'rgba(255, 215, 0, 0.05)' 
+                  : 'rgba(103, 58, 183, 0.05)',
                 transition: 'all 0.3s ease',
+                border: isDarkMode 
+                  ? '1px solid rgba(255, 215, 0, 0.1)' 
+                  : '1px solid rgba(103, 58, 183, 0.1)',
               }}
             >
-              <Typography variant="body2" color="text.secondary">
-                <MenuIcon sx={{ fontSize: 16, mr: 0.5, verticalAlign: 'text-bottom', color: '#673ab7' }} />
+              <Typography 
+                variant="body2" 
+                sx={{ color: theme.palette.text.secondary }}
+              >
+                <MenuIcon sx={{ 
+                  fontSize: 16, 
+                  mr: 0.5, 
+                  verticalAlign: 'text-bottom', 
+                  color: isDarkMode ? theme.palette.primary.main : '#673ab7' 
+                }} />
                 Nutrition Tip: Try to include protein with every meal to help maintain muscle and keep you feeling full longer.
               </Typography>
             </Box>
@@ -495,6 +597,7 @@ const MealLogger = ({ meals = [], onAddFood, selectedDay }) => {
         onClose={() => setFoodSearchOpen(false)}
         onAddFood={(mealId, food) => handleAddFoodSuccess(mealId, food)}
         mealId={activeMealId}
+        isDarkMode={isDarkMode}
       />
     </>
   );

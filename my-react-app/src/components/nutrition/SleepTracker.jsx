@@ -11,7 +11,8 @@ import {
   Fade,
   Zoom,
   Grow,
-  Stack
+  Stack,
+  useTheme
 } from '@mui/material';
 import { 
   Nightlight as MoonIcon,
@@ -21,6 +22,9 @@ import {
 } from '@mui/icons-material';
 
 const SleepTracker = ({ currentHours = 7, onLogSleep, selectedDay }) => {
+  const theme = useTheme();
+  const isDarkMode = theme.palette.mode === 'dark';
+
   // Animation states
   const [showComponent, setShowComponent] = useState(false);
   const [showHeader, setShowHeader] = useState(false);
@@ -31,17 +35,17 @@ const SleepTracker = ({ currentHours = 7, onLogSleep, selectedDay }) => {
   // Sleep hours state
   const [sleepHours, setSleepHours] = useState(currentHours);
   
-  // Theme colors
+  // Theme colors - adjusted for dark mode
   const themeColors = {
-    primary: '#4caf50',
-    secondary: '#81c784',
-    light: '#c8e6c9',
-    dark: '#2e7d32',
-    warning: '#ff9800',
-    danger: '#f44336'
+    primary: isDarkMode ? '#FFD700' : '#4caf50', // Gold in dark mode, green in light mode
+    secondary: isDarkMode ? '#FFC107' : '#81c784', // Amber in dark mode
+    light: isDarkMode ? 'rgba(255, 215, 0, 0.15)' : '#c8e6c9', // Transparent gold in dark mode
+    dark: isDarkMode ? '#DAA520' : '#2e7d32', // Goldenrod in dark mode
+    warning: isDarkMode ? '#FFA726' : '#ff9800', // Lighter orange in dark mode
+    danger: isDarkMode ? '#EF5350' : '#f44336' // Lighter red in dark mode
   };
   
-  // Define sleep quality ranges (keeping color logic for status text)
+  // Define sleep quality ranges
   const getSleepQuality = (hours) => {
     if (hours < 6) return { text: 'Not Enough', color: themeColors.danger };
     if (hours >= 6 && hours < 7) return { text: 'Borderline', color: themeColors.warning };
@@ -135,13 +139,15 @@ const SleepTracker = ({ currentHours = 7, onLogSleep, selectedDay }) => {
         sx={{
           p: 3,
           borderRadius: 2,
-          bgcolor: 'white',
+          bgcolor: 'background.paper', // Use theme background color
           width: '100%',
           height: '100%',
           transition: 'transform 0.3s ease-in-out, box-shadow 0.3s ease-in-out',
           '&:hover': {
             transform: 'translateY(-4px)',
-            boxShadow: '0 8px 16px rgba(0,0,0,0.1)'
+            boxShadow: isDarkMode 
+              ? '0 8px 16px rgba(255, 215, 0, 0.15)' 
+              : '0 8px 16px rgba(0,0,0,0.1)'
           },
           '&.pulse': {
             animation: 'pulse 0.6s ease-out',
@@ -164,6 +170,7 @@ const SleepTracker = ({ currentHours = 7, onLogSleep, selectedDay }) => {
               sx={{ 
                 display: 'flex',
                 alignItems: 'center',
+                color: theme.palette.text.primary, // Use theme text color
                 animation: 'slideRight 0.7s ease-out',
                 '@keyframes slideRight': {
                   from: { opacity: 0, transform: 'translateX(-20px)' },
@@ -181,7 +188,7 @@ const SleepTracker = ({ currentHours = 7, onLogSleep, selectedDay }) => {
               size="small" 
               sx={{
                 animation: 'pulse 2s infinite',
-                color: themeColors.dark,
+                color: theme.palette.text.secondary, // Use theme secondary text color
                 '@keyframes pulse': {
                   '0%': { transform: 'scale(1)' },
                   '50%': { transform: 'scale(1.05)' },
@@ -195,19 +202,21 @@ const SleepTracker = ({ currentHours = 7, onLogSleep, selectedDay }) => {
         </Box>
         
         <Grow in={showDivider} timeout={500}>
-          <Divider sx={{ mb: 3 }} />
+          <Divider sx={{ 
+            mb: 3,
+            borderColor: isDarkMode ? 'rgba(255, 255, 255, 0.12)' : undefined
+          }} />
         </Grow>
         
         <Fade in={showContent} timeout={800}>
           <Box sx={{ flexGrow: 1, display: 'flex', flexDirection: 'column' }}>
             <Typography 
               variant="body1" 
-              color="text.primary" 
               sx={{ 
                 mb: 3, 
                 textAlign: 'center',
                 fontWeight: 500,
-                color: themeColors.dark,
+                color: theme.palette.text.primary, // Use theme text color
                 fontSize: '1.1rem',
                 animation: 'fadeSlideUp 0.8s ease',
                 '@keyframes fadeSlideUp': {
@@ -240,17 +249,21 @@ const SleepTracker = ({ currentHours = 7, onLogSleep, selectedDay }) => {
                     justifyContent: 'center',
                     background: `conic-gradient(${sleepQuality.color} ${sleepHours/12 * 100}%, ${themeColors.light} 0)`,
                     transition: 'background 0.5s ease, transform 0.3s ease, box-shadow 0.3s ease',
-                    boxShadow: `0 4px 20px rgba(0,0,0,0.1), 0 0 0 5px ${themeColors.light}30`,
+                    boxShadow: isDarkMode
+                      ? `0 4px 20px rgba(0,0,0,0.25), 0 0 0 5px ${themeColors.light}`
+                      : `0 4px 20px rgba(0,0,0,0.1), 0 0 0 5px ${themeColors.light}30`,
                     '&::before': {
                       content: '""',
                       position: 'absolute',
                       width: 150,
                       height: 150,
                       borderRadius: '50%',
-                      background: 'white',
+                      background: theme.palette.background.paper, // Use theme background
                       zIndex: 1,
                       transition: 'all 0.3s ease',
-                      boxShadow: 'inset 0 2px 10px rgba(0,0,0,0.05)'
+                      boxShadow: isDarkMode
+                        ? 'inset 0 2px 10px rgba(0,0,0,0.3)'
+                        : 'inset 0 2px 10px rgba(0,0,0,0.05)'
                     },
                     '&.ripple': {
                       animation: 'rippleEffect 0.6s ease-out',
@@ -259,9 +272,21 @@ const SleepTracker = ({ currentHours = 7, onLogSleep, selectedDay }) => {
                       animation: 'celebrateEffect 1.2s ease-out',
                     },
                     '@keyframes rippleEffect': {
-                      '0%': { boxShadow: `0 4px 20px rgba(0,0,0,0.1), 0 0 0 5px ${themeColors.light}30` },
-                      '50%': { boxShadow: `0 4px 25px rgba(0,0,0,0.15), 0 0 0 15px ${sleepQuality.color}40` },
-                      '100%': { boxShadow: `0 4px 20px rgba(0,0,0,0.1), 0 0 0 5px ${themeColors.light}30` }
+                      '0%': { 
+                        boxShadow: isDarkMode
+                          ? `0 4px 20px rgba(0,0,0,0.25), 0 0 0 5px ${themeColors.light}`
+                          : `0 4px 20px rgba(0,0,0,0.1), 0 0 0 5px ${themeColors.light}30`
+                      },
+                      '50%': { 
+                        boxShadow: isDarkMode
+                          ? `0 4px 25px rgba(0,0,0,0.3), 0 0 0 15px ${sleepQuality.color}40`
+                          : `0 4px 25px rgba(0,0,0,0.15), 0 0 0 15px ${sleepQuality.color}40`
+                      },
+                      '100%': { 
+                        boxShadow: isDarkMode
+                          ? `0 4px 20px rgba(0,0,0,0.25), 0 0 0 5px ${themeColors.light}`
+                          : `0 4px 20px rgba(0,0,0,0.1), 0 0 0 5px ${themeColors.light}30`
+                      }
                     },
                     '@keyframes celebrateEffect': {
                       '0%': { transform: 'scale(1)' },
@@ -272,7 +297,9 @@ const SleepTracker = ({ currentHours = 7, onLogSleep, selectedDay }) => {
                     },
                     '&:hover': {
                       transform: 'scale(1.02)',
-                      boxShadow: `0 6px 25px rgba(0,0,0,0.12), 0 0 0 8px ${sleepQuality.color}30`
+                      boxShadow: isDarkMode
+                        ? `0 6px 25px rgba(0,0,0,0.3), 0 0 0 8px ${sleepQuality.color}30`
+                        : `0 6px 25px rgba(0,0,0,0.12), 0 0 0 8px ${sleepQuality.color}30`
                     },
                     opacity: isPastDay ? 0.8 : 1
                   }}
@@ -304,7 +331,7 @@ const SleepTracker = ({ currentHours = 7, onLogSleep, selectedDay }) => {
                       sx={{ 
                         opacity: 0,
                         animation: 'fadeIn 0.5s ease forwards 0.5s',
-                        color: 'text.secondary',
+                        color: theme.palette.text.secondary, // Use theme secondary text color
                         '@keyframes fadeIn': {
                           from: { opacity: 0 },
                           to: { opacity: 1 }
@@ -372,8 +399,8 @@ const SleepTracker = ({ currentHours = 7, onLogSleep, selectedDay }) => {
                     color: themeColors.primary,
                     opacity: isPastDay ? 0.7 : 1,
                     '& .MuiSlider-rail': {
-                      opacity: 0.5,
-                      backgroundColor: themeColors.light,
+                      opacity: isDarkMode ? 0.3 : 0.5,
+                      backgroundColor: isDarkMode ? 'rgba(255, 255, 255, 0.15)' : themeColors.light,
                     },
                     '& .MuiSlider-track': {
                       transition: 'background-color 0.3s ease',
@@ -388,7 +415,7 @@ const SleepTracker = ({ currentHours = 7, onLogSleep, selectedDay }) => {
                       }
                     },
                     '& .MuiSlider-mark': {
-                      backgroundColor: themeColors.light,
+                      backgroundColor: isDarkMode ? 'rgba(255, 255, 255, 0.2)' : themeColors.light,
                       '&.MuiSlider-markActive': {
                         opacity: 1,
                         backgroundColor: themeColors.primary,
@@ -396,7 +423,7 @@ const SleepTracker = ({ currentHours = 7, onLogSleep, selectedDay }) => {
                     },
                     '& .MuiSlider-markLabel': {
                       fontWeight: 'bold',
-                      color: themeColors.dark,
+                      color: theme.palette.text.secondary, // Use theme text color
                       fontSize: '0.75rem',
                       '&.MuiSlider-markLabelActive': {
                         color: themeColors.primary
@@ -434,7 +461,7 @@ const SleepTracker = ({ currentHours = 7, onLogSleep, selectedDay }) => {
                   textAlign: 'center'
                 }}
               >
-                7-9 hours recommended for optimal health
+                 7-9 hours recommended for optimal health
               </Typography>
             </Box>
             
@@ -459,6 +486,7 @@ const SleepTracker = ({ currentHours = 7, onLogSleep, selectedDay }) => {
                   onClick={handleLogSleep}
                   sx={{
                     bgcolor: themeColors.primary,
+                    color: isDarkMode ? 'black' : 'white', // Black text on gold button in dark mode
                     paddingX: 4,
                     position: 'relative',
                     overflow: 'hidden',
@@ -466,7 +494,9 @@ const SleepTracker = ({ currentHours = 7, onLogSleep, selectedDay }) => {
                     '&:hover': {
                       bgcolor: themeColors.dark,
                       transform: 'translateY(-2px)',
-                      boxShadow: '0 4px 8px rgba(0,0,0,0.2)'
+                      boxShadow: isDarkMode 
+                        ? '0 4px 8px rgba(255, 215, 0, 0.4)' 
+                        : '0 4px 8px rgba(0,0,0,0.2)'
                     },
                     '&::after': {
                       content: '""',
@@ -496,7 +526,12 @@ const SleepTracker = ({ currentHours = 7, onLogSleep, selectedDay }) => {
             mt: 'auto',
             p: 2,
             borderRadius: 2,
-            bgcolor: `${themeColors.light}50`,
+            bgcolor: isDarkMode 
+              ? 'rgba(255, 215, 0, 0.05)' 
+              : `${themeColors.light}50`,
+            border: isDarkMode 
+              ? '1px solid rgba(255, 215, 0, 0.1)'
+              : 'none',
             opacity: 0,
             animation: 'fadeIn 1s ease-in-out forwards',
             animationDelay: '1.2s',

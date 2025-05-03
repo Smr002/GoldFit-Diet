@@ -8,12 +8,15 @@ import {
   IconButton, 
   Fade,
   Zoom,
-  Divider
+  Divider,
+  useTheme
 } from '@mui/material';
 import InfoOutlinedIcon from '@mui/icons-material/InfoOutlined';
 import WeeklyCalorieChart from './WeeklyCalorieChart';
 
 const CalorieTracker = ({ caloriesConsumed, calorieTarget, weeklyData, onDaySelect }) => {
+  const theme = useTheme(); // Get the current theme
+  
   // Animation states
   const [animateProgress, setAnimateProgress] = useState(0);
   const [showContent, setShowContent] = useState(false);
@@ -32,9 +35,9 @@ const CalorieTracker = ({ caloriesConsumed, calorieTarget, weeklyData, onDaySele
   
   // Determine color based on percentage
   const getProgressColor = () => {
-    if (percentage > 100) return '#e53935'; // Red if over target
-    if (percentage > 90) return '#ff9800';  // Orange if close to target
-    return '#4caf50';  // Green if below 90%
+    if (percentage > 100) return theme.palette.error.main; // Red if over target
+    if (percentage > 90) return theme.palette.warning.main;  // Orange if close to target
+    return theme.palette.success.main;  // Green if below 90%
   };
 
   // Animation effect for progress bar
@@ -55,8 +58,8 @@ const CalorieTracker = ({ caloriesConsumed, calorieTarget, weeklyData, onDaySele
         sx={{
           p: 3,
           borderRadius: 2,
-          bgcolor: 'white',
-          // Removed hover transform animation that made it pop up
+          // Use theme's background color instead of hardcoded 'white'
+          bgcolor: 'background.paper',
           transition: 'box-shadow 0.3s ease-in-out',
           '&:hover': {
             boxShadow: '0 8px 16px rgba(0,0,0,0.1)'
@@ -83,7 +86,8 @@ const CalorieTracker = ({ caloriesConsumed, calorieTarget, weeklyData, onDaySele
                 sx={{ 
                   lineHeight: 1.2,
                   display: 'flex',
-                  alignItems: 'baseline'
+                  alignItems: 'baseline',
+                  color: 'text.primary' // Use theme's text color
                 }}
               >
                 <Box 
@@ -148,7 +152,9 @@ const CalorieTracker = ({ caloriesConsumed, calorieTarget, weeklyData, onDaySele
                 <IconButton 
                   size="small" 
                   sx={{
-                    color: '#4caf50', // Using the same green color
+                    color: theme.palette.mode === 'dark' 
+                      ? theme.palette.success.light 
+                      : theme.palette.success.main, // Adjusted for dark mode
                     animation: 'pulse 2s infinite',
                     '@keyframes pulse': {
                       '0%': { transform: 'scale(1)' },
@@ -171,7 +177,9 @@ const CalorieTracker = ({ caloriesConsumed, calorieTarget, weeklyData, onDaySele
             sx={{
               height: 10,
               borderRadius: 5,
-              backgroundColor: '#e0e0e0',
+              backgroundColor: theme.palette.mode === 'dark' 
+                ? 'rgba(255, 255, 255, 0.12)' // Darker background in dark mode
+                : '#e0e0e0',
               '& .MuiLinearProgress-bar': {
                 borderRadius: 5,
                 backgroundColor: getProgressColor(),
@@ -186,7 +194,9 @@ const CalorieTracker = ({ caloriesConsumed, calorieTarget, weeklyData, onDaySele
               position: 'absolute',
               height: 14,
               width: 2,
-              backgroundColor: '#212121',
+              backgroundColor: theme.palette.mode === 'dark' 
+                ? theme.palette.grey[300] 
+                : theme.palette.grey[800],
               right: 0,
               top: -1,
               animation: 'fadeIn 1.5s ease-in-out',

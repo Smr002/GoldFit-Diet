@@ -11,7 +11,8 @@ import {
   Stack,
   Fade,
   Zoom,
-  Grow
+  Grow,
+  useTheme
 } from '@mui/material';
 import { 
   Opacity as WaterIcon, 
@@ -21,6 +22,14 @@ import {
 } from '@mui/icons-material';
 
 const WaterTracker = ({ current = 0, target = 2000, onAddWater, selectedDay }) => {
+  const theme = useTheme();
+  const isDarkMode = theme.palette.mode === 'dark';
+  
+  // Colors for dark/light mode
+  const waterColor = isDarkMode ? '#90CAF9' : '#2196f3'; // Lighter blue in dark mode
+  const waterBgColor = isDarkMode ? 'rgba(144, 202, 249, 0.7)' : 'rgba(33, 150, 243, 0.7)';
+  const glassBorderColor = isDarkMode ? '#555555' : '#e0e0e0';
+  
   // Animation states
   const [fillAnimation, setFillAnimation] = useState(0);
   const [showComponent, setShowComponent] = useState(false);
@@ -101,14 +110,16 @@ const WaterTracker = ({ current = 0, target = 2000, onAddWater, selectedDay }) =
           sx={{
             p: 3,
             borderRadius: 2,
-            bgcolor: 'white',
+            bgcolor: 'background.paper',
             height: '100%',
             display: 'flex',
             flexDirection: 'column',
             transition: 'transform 0.3s ease-in-out, box-shadow 0.3s ease-in-out',
             '&:hover': {
               transform: 'translateY(-4px)',
-              boxShadow: '0 8px 16px rgba(0,0,0,0.1)'
+              boxShadow: isDarkMode 
+                ? '0 8px 16px rgba(144, 202, 249, 0.2)' 
+                : '0 8px 16px rgba(0,0,0,0.1)'
             }
           }}
         >
@@ -121,6 +132,7 @@ const WaterTracker = ({ current = 0, target = 2000, onAddWater, selectedDay }) =
                 sx={{ 
                   display: 'flex',
                   alignItems: 'center',
+                  color: theme.palette.text.primary,
                   animation: 'slideRight 0.7s ease-out',
                   '@keyframes slideRight': {
                     from: { opacity: 0, transform: 'translateX(-20px)' },
@@ -128,7 +140,7 @@ const WaterTracker = ({ current = 0, target = 2000, onAddWater, selectedDay }) =
                   }
                 }}
               >
-                <DrinkIcon sx={{ mr: 1, color: '#2196f3' }} />
+                <DrinkIcon sx={{ mr: 1, color: waterColor }} />
                 {selectedDay ? `${getFormattedDate()} Water Intake` : 'Water Intake'}
               </Typography>
             </Fade>
@@ -137,6 +149,7 @@ const WaterTracker = ({ current = 0, target = 2000, onAddWater, selectedDay }) =
               <IconButton 
                 size="small" 
                 sx={{
+                  color: theme.palette.text.secondary,
                   animation: 'pulse 2s infinite',
                   '@keyframes pulse': {
                     '0%': { transform: 'scale(1)' },
@@ -151,7 +164,10 @@ const WaterTracker = ({ current = 0, target = 2000, onAddWater, selectedDay }) =
           </Box>
           
           <Grow in={showDivider} timeout={500}>
-            <Divider sx={{ mb: 2 }} />
+            <Divider sx={{ 
+              mb: 2,
+              borderColor: isDarkMode ? 'rgba(255, 255, 255, 0.12)' : undefined 
+            }} />
           </Grow>
           
           <Fade in={showContent} timeout={800}>
@@ -173,11 +189,13 @@ const WaterTracker = ({ current = 0, target = 2000, onAddWater, selectedDay }) =
                       width: 120,
                       height: 220,
                       borderRadius: '10px 10px 20px 20px',
-                      border: '6px solid #e0e0e0',
-                      borderBottom: '10px solid #e0e0e0',
+                      border: `6px solid ${glassBorderColor}`,
+                      borderBottom: `10px solid ${glassBorderColor}`,
                       position: 'relative',
                       overflow: 'hidden',
-                      boxShadow: 'inset 0 0 10px rgba(0,0,0,0.1)',
+                      boxShadow: isDarkMode 
+                        ? 'inset 0 0 10px rgba(0,0,0,0.5)' 
+                        : 'inset 0 0 10px rgba(0,0,0,0.1)',
                       mb: 2,
                       transition: 'transform 0.3s ease-out',
                       '&.pulse': {
@@ -198,10 +216,12 @@ const WaterTracker = ({ current = 0, target = 2000, onAddWater, selectedDay }) =
                         left: 0,
                         right: 0,
                         height: `${fillAnimation}%`,
-                        backgroundColor: 'rgba(33, 150, 243, 0.7)',
+                        backgroundColor: waterBgColor,
                         transition: 'height 1.5s cubic-bezier(0.4, 0, 0.2, 1)',
                         borderRadius: '0 0 14px 14px',
-                        boxShadow: 'inset 0 0 15px rgba(255,255,255,0.5)',
+                        boxShadow: isDarkMode
+                          ? 'inset 0 0 15px rgba(255,255,255,0.2)' 
+                          : 'inset 0 0 15px rgba(255,255,255,0.5)',
                         '&::after': {
                           content: '""',
                           position: 'absolute',
@@ -209,7 +229,9 @@ const WaterTracker = ({ current = 0, target = 2000, onAddWater, selectedDay }) =
                           left: 0,
                           right: 0,
                           height: '10px',
-                          background: 'linear-gradient(to bottom, rgba(255,255,255,0.5), rgba(255,255,255,0))',
+                          background: isDarkMode
+                            ? 'linear-gradient(to bottom, rgba(255,255,255,0.3), rgba(255,255,255,0))' 
+                            : 'linear-gradient(to bottom, rgba(255,255,255,0.5), rgba(255,255,255,0))',
                           borderRadius: '100% 100% 0 0 / 10px'
                         },
                         animation: percentFilled > 0 ? 'waterWave 2s ease-in-out infinite' : 'none',
@@ -230,7 +252,9 @@ const WaterTracker = ({ current = 0, target = 2000, onAddWater, selectedDay }) =
                           left: -6,
                           right: -6,
                           height: '1px',
-                          backgroundColor: 'rgba(0,0,0,0.1)',
+                          backgroundColor: isDarkMode 
+                            ? 'rgba(255,255,255,0.15)' 
+                            : 'rgba(0,0,0,0.1)',
                           bottom: `${mark}%`,
                           zIndex: 1
                         }}
@@ -246,9 +270,13 @@ const WaterTracker = ({ current = 0, target = 2000, onAddWater, selectedDay }) =
                         transform: 'translate(-50%, -50%)',
                         zIndex: 2,
                         textAlign: 'center',
-                        color: percentFilled > 50 ? 'white' : 'text.primary',
+                        color: percentFilled > 50 
+                          ? (isDarkMode ? '#fff' : '#fff')
+                          : (isDarkMode ? theme.palette.text.primary : theme.palette.text.primary),
                         fontWeight: 'bold',
-                        textShadow: percentFilled > 50 ? '0 1px 2px rgba(0,0,0,0.3)' : 'none',
+                        textShadow: percentFilled > 50 
+                          ? '0 1px 2px rgba(0,0,0,0.5)' 
+                          : 'none',
                         opacity: 0,
                         animation: 'fadeIn 1s ease-in-out forwards',
                         animationDelay: '1s',
@@ -283,6 +311,7 @@ const WaterTracker = ({ current = 0, target = 2000, onAddWater, selectedDay }) =
                   variant="h6" 
                   fontWeight="bold" 
                   sx={{ 
+                    color: theme.palette.text.primary,
                     opacity: 0,
                     animation: 'fadeSlideIn 0.5s ease forwards 1.5s',
                     '@keyframes fadeSlideIn': {
@@ -325,13 +354,18 @@ const WaterTracker = ({ current = 0, target = 2000, onAddWater, selectedDay }) =
                 valueLabelDisplay="auto"
                 valueLabelFormat={(value) => `${value} ml`}
                 sx={{
-                  color: '#2196f3',
+                  color: waterColor,
                   '& .MuiSlider-thumb': {
                     transition: 'transform 0.2s ease, box-shadow 0.2s ease',
                     '&:hover, &.Mui-focusVisible': {
-                      boxShadow: '0 0 0 8px rgba(33, 150, 243, 0.16)',
+                      boxShadow: isDarkMode 
+                        ? `0 0 0 8px rgba(144, 202, 249, 0.2)` 
+                        : `0 0 0 8px rgba(33, 150, 243, 0.16)`,
                       transform: 'scale(1.1)'
                     }
+                  },
+                  '& .MuiSlider-rail': {
+                    opacity: isDarkMode ? 0.3 : 0.38,
                   }
                 }}
               />
@@ -350,15 +384,21 @@ const WaterTracker = ({ current = 0, target = 2000, onAddWater, selectedDay }) =
                         onClick={() => setWaterToAdd(amount)}
                         sx={{ 
                           minWidth: 'auto',
-                          color: waterToAdd === amount ? 'white' : '#2196f3',
-                          bgcolor: waterToAdd === amount ? '#2196f3' : 'transparent',
-                          borderColor: '#2196f3',
+                          color: waterToAdd === amount 
+                            ? (isDarkMode ? '#000' : '#fff') 
+                            : waterColor,
+                          bgcolor: waterToAdd === amount 
+                            ? waterColor 
+                            : 'transparent',
+                          borderColor: waterColor,
                           transition: 'all 0.3s ease',
                           position: 'relative',
                           overflow: 'hidden',
                           '&:hover': {
-                            bgcolor: 'rgba(33, 150, 243, 0.1)',
-                            borderColor: '#2196f3',
+                            bgcolor: isDarkMode
+                              ? 'rgba(144, 202, 249, 0.15)'
+                              : 'rgba(33, 150, 243, 0.1)',
+                            borderColor: waterColor,
                             transform: 'translateY(-2px)'
                           },
                           '&::after': {
@@ -387,14 +427,16 @@ const WaterTracker = ({ current = 0, target = 2000, onAddWater, selectedDay }) =
                   startIcon={<AddIcon />}
                   onClick={handleAddWater}
                   sx={{ 
-                    bgcolor: '#2196f3',
+                    bgcolor: waterColor,
                     position: 'relative',
                     overflow: 'hidden',
                     transition: 'all 0.3s ease',
                     '&:hover': {
-                      bgcolor: '#1976d2',
+                      bgcolor: isDarkMode ? '#64B5F6' : '#1976d2',
                       transform: 'translateY(-2px)',
-                      boxShadow: '0 4px 8px rgba(0,0,0,0.2)'
+                      boxShadow: isDarkMode 
+                        ? '0 4px 8px rgba(144, 202, 249, 0.4)' 
+                        : '0 4px 8px rgba(0,0,0,0.2)'
                     },
                     '&::after': {
                       content: '""',
@@ -423,7 +465,12 @@ const WaterTracker = ({ current = 0, target = 2000, onAddWater, selectedDay }) =
               mt: 'auto', // This pushes the box to the bottom of the container
               p: 2,
               borderRadius: 2,
-              bgcolor: 'rgba(33, 150, 243, 0.05)',
+              bgcolor: isDarkMode 
+                ? 'rgba(144, 202, 249, 0.08)' 
+                : 'rgba(33, 150, 243, 0.05)',
+              border: isDarkMode 
+                ? '1px solid rgba(144, 202, 249, 0.15)' 
+                : 'none',
               opacity: 0,
               animation: 'fadeIn 1s ease-in-out forwards',
               animationDelay: '1.2s',
@@ -434,7 +481,12 @@ const WaterTracker = ({ current = 0, target = 2000, onAddWater, selectedDay }) =
             }}
           >
             <Typography variant="body2" color="text.secondary">
-              <DrinkIcon sx={{ fontSize: 16, mr: 0.5, verticalAlign: 'text-bottom', color: '#2196f3' }} />
+              <DrinkIcon sx={{ 
+                fontSize: 16, 
+                mr: 0.5, 
+                verticalAlign: 'text-bottom', 
+                color: waterColor 
+              }} />
               Hydration Tip: Try to drink water regularly throughout the day instead of large amounts at once.
             </Typography>
           </Box>

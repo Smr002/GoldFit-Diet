@@ -21,52 +21,15 @@ import NutritionPageSkeleton from "../components/nutrition/NutritionSkeletons";
 import Footer from "../components/Footer";
 import MobileFooter from "../components/MobileFooter";
 import SecondNavbar from "../components/SecondNavbar";
+import ThemeToggle from "../components/ThemeToggle";
 import { format, subDays } from "date-fns";
-
-const theme = createTheme({
-  palette: {
-    primary: {
-      main: "#1976d2",
-      light: "#42a5f5",
-      dark: "#1565c0",
-      contrastText: "#fff",
-    },
-    secondary: {
-      main: "#9c27b0",
-      light: "#ba68c8",
-      dark: "#7b1fa2",
-      contrastText: "#fff",
-    },
-  },
-  typography: {
-    fontFamily:
-      '"Poppins", "Inter", "Roboto", "Helvetica", "Arial", sans-serif',
-  },
-  components: {
-    MuiButton: {
-      styleOverrides: {
-        root: {
-          borderRadius: 8,
-          boxShadow: "none",
-          "&:hover": {
-            boxShadow: "0 2px 8px rgba(0,0,0,0.15)",
-          },
-        },
-      },
-    },
-    MuiPaper: {
-      styleOverrides: {
-        root: {
-          borderRadius: 12,
-        },
-      },
-    },
-  },
-});
 
 const NutritionPage = () => {
   // Check for mobile/tablet view
   const isMobileOrTablet = useMediaQuery("(max-width:1024px)");
+
+  // Dark mode state
+  const [isDarkMode, setIsDarkMode] = useState(false);
 
   // Animation state
   const [pageLoaded, setPageLoaded] = useState(false);
@@ -81,6 +44,53 @@ const NutritionPage = () => {
 
   // State for sleep tracking
   const [sleepHours, setSleepHours] = useState(7);
+
+  // Create theme based on dark mode preference
+  const theme = createTheme({
+    palette: {
+      mode: isDarkMode ? "dark" : "light",
+      primary: {
+        main: isDarkMode ? "#FFD700" : "#1976d2", // Gold in dark mode, blue in light mode
+        light: isDarkMode ? "#FFEB3B" : "#42a5f5",
+        dark: isDarkMode ? "#DAA520" : "#1565c0",
+        contrastText: "#fff",
+      },
+      secondary: {
+        main: isDarkMode ? "#DAA520" : "#9c27b0", // Goldenrod in dark mode, purple in light mode
+        light: isDarkMode ? "#FFC107" : "#ba68c8",
+        dark: isDarkMode ? "#B8860B" : "#7b1fa2",
+        contrastText: "#fff",
+      },
+      background: {
+        default: isDarkMode ? "#121212" : "#fff",
+        paper: isDarkMode ? "#1e1e1e" : "#fff",
+      },
+    },
+    typography: {
+      fontFamily:
+        '"Poppins", "Inter", "Roboto", "Helvetica", "Arial", sans-serif',
+    },
+    components: {
+      MuiButton: {
+        styleOverrides: {
+          root: {
+            borderRadius: 8,
+            boxShadow: "none",
+            "&:hover": {
+              boxShadow: "0 2px 8px rgba(0,0,0,0.15)",
+            },
+          },
+        },
+      },
+      MuiPaper: {
+        styleOverrides: {
+          root: {
+            borderRadius: 12,
+          },
+        },
+      },
+    },
+  });
 
   // Nutrition data state
   const [nutritionData, setNutritionData] = useState({
@@ -186,6 +196,41 @@ const NutritionPage = () => {
       },
     ],
   });
+
+  // Check for dark mode preference and load user data on component mount
+  useEffect(() => {
+    // Theme setup
+    const savedTheme = localStorage.getItem("theme");
+    if (savedTheme === "dark") {
+      setIsDarkMode(true);
+      document.body.classList.add("dark-mode");
+    } else {
+      setIsDarkMode(false);
+      document.body.classList.remove("dark-mode");
+    }
+  }, []);
+
+  // Listen for theme changes from ThemeToggle component
+  useEffect(() => {
+    const handleThemeChange = (e) => {
+      const newTheme = e.detail?.theme || localStorage.getItem("theme");
+      setIsDarkMode(newTheme === "dark");
+    };
+
+    // Listen for custom theme change events
+    document.addEventListener("themeChanged", handleThemeChange);
+    
+    // Listen for localStorage changes (fallback for other pages changing theme)
+    window.addEventListener("storage", () => {
+      const currentTheme = localStorage.getItem("theme");
+      setIsDarkMode(currentTheme === "dark");
+    });
+
+    return () => {
+      document.removeEventListener("themeChanged", handleThemeChange);
+      window.removeEventListener("storage", handleThemeChange);
+    };
+  }, []);
 
   // Create weekly nutrition data for each day
   const weeklyNutritionData = Array.from({ length: 7 }, (_, index) => {
@@ -477,6 +522,9 @@ const NutritionPage = () => {
 
       {/* Footer based on screen size */}
       {isMobileOrTablet ? <MobileFooter /> : <Footer />}
+      
+      {/* Add the ThemeToggle component */}
+      <ThemeToggle />
     </ThemeProvider>
   );
 };
