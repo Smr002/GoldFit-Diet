@@ -1,6 +1,4 @@
-import { PrismaClient, Workout, WorkoutExercise, WorkoutSession, Exercise, SessionExercise } from '@prisma/client';
-import { WorkoutModel } from './workoutModel';
-import { WorkoutSessionModel } from './sessionModel';
+import { PrismaClient, Workout, WorkoutExercise, WorkoutSession, Exercise, SessionExercise, FavoriteWorkout } from '@prisma/client';
 
 export class WorkoutRepository {
   private prisma: PrismaClient;
@@ -9,8 +7,20 @@ export class WorkoutRepository {
     this.prisma = new PrismaClient();
   }
 
-  async createWorkout(workout: WorkoutModel): Promise<Workout> {
-    const workoutData = workout.toObject();
+  async createWorkout(workoutData: {
+    name: string;
+    level?: string | null;
+    timesPerWeek?: number | null;
+    premium?: boolean;
+    createdByAdmin?: number | null;
+    createdByUser?: number | null;
+    exercises: {
+      exerciseId: number;
+      dayOfTheWeek?: number;
+      sets: number;
+      reps: number;
+    }[];
+  }): Promise<Workout> {
     return this.prisma.workout.create({
       data: {
         name: workoutData.name,
@@ -70,8 +80,18 @@ export class WorkoutRepository {
     });
   }
 
-  async updateWorkout(id: number, workout: WorkoutModel): Promise<Workout> {
-    const workoutData = workout.toObject();
+  async updateWorkout(id: number, workoutData: {
+    name: string;
+    level?: string | null;
+    timesPerWeek?: number | null;
+    premium?: boolean;
+    exercises: {
+      exerciseId: number;
+      dayOfTheWeek?: number;
+      sets: number;
+      reps: number;
+    }[];
+  }): Promise<Workout> {
     return this.prisma.workout.update({
       where: { id },
       data: {
@@ -160,9 +180,18 @@ export class WorkoutRepository {
   }
 
   async logWorkoutSession(
-    sessionModel: WorkoutSessionModel
+    sessionData: {
+      userId: number;
+      workoutId: number;
+      date: Date;
+      exercises?: {
+        exerciseId: number;
+        weightUsed?: number;
+        setsCompleted?: number;
+        repsCompleted?: number;
+      }[];
+    }
   ): Promise<WorkoutSession & { sessionExercises: SessionExercise[] }> {
-    const sessionData = sessionModel.toObject();
     const { exercises = [], userId, workoutId, date } = sessionData;
 
     // Create the main session
@@ -300,12 +329,62 @@ export class WorkoutRepository {
     });
   }
 
-
   async countSessionsByUserId(userId: number): Promise<number> {  
     return this.prisma.workoutSession.count({
       where: { userId },
     });
   }
 
+  async getFavoriteWorkout(userId: number, workoutId: number): Promise<FavoriteWorkout | null> {
+    return this.prisma.favoriteWorkout.findFirst({
+      where: {
+        userId,
+        workoutId
+      }
+    });
+  }
 
+  async addFavoriteWorkout(userId: number, workoutId: number): Promise<FavoriteWorkout> {
+    return this.prisma.favoriteWorkout.create({
+      data: {
+        userId,
+        workoutId
+      }
+    });
+  }
+
+  async removeFavoriteWorkout(userId: number, workoutId: number): Promise<void> {
+    await this.prisma.favoriteWorkout.deleteMany({
+      where: {
+        userId,
+        workoutId
+      }
+    });
+  }
+
+  async getFavoriteWorkouts(userId: number): Promise<Workout[]> {
+    return this.prisma.workout.findMany({
+      where: {
+        favoriteWorkouts: {
+          some: {
+            userId
+          }
+        }
+      },
+      include: {
+        workoutExercises: {
+          include: {
+            exercise: true
+          }
+        }
+      }
+    });
+  }
+
+  async findSessionExerciseById(id: number) {
+    return this.prisma.sessionExercise.findUnique({
+      where: { id },
+      include: { session: true }
+    });
+  }
 }

@@ -234,5 +234,35 @@ export class WorkoutController {
       res.status(500).json({ error: 'Failed to get personal bests' });
     }
   }
+
+  async toggleFavoriteWorkout(req: AuthenticatedRequest, res: Response) {
+    try {
+      if (!req.user || !req.user.id) {
+        return res.status(401).json({ error: 'User not authenticated' });
+      }
+
+      const userId = Number(req.user.id);
+      const workoutId = Number(req.params.workoutId);
+      
+      const result = await this.service.toggleFavoriteWorkout(userId, workoutId);
+      res.json(result);
+    } catch (error) {
+      res.status(400).json({ error: 'Failed to toggle favorite workout' });
+    }
+  }
+
+  async getFavoriteWorkouts(req: AuthenticatedRequest, res: Response) {
+    try {
+      if (!req.user || !req.user.id) {
+        return res.status(401).json({ error: 'User not authenticated' });
+      }
+
+      const userId = Number(req.user.id);
+      const favoriteWorkouts = await this.service.getFavoriteWorkouts(userId);
+      res.json(favoriteWorkouts);
+    } catch (error) {
+      res.status(500).json({ error: 'Failed to get favorite workouts' });
+    }
+  }
 }
 

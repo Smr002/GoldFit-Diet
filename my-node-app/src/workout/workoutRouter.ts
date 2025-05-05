@@ -29,4 +29,8 @@ router.get('/:workoutId/performance',  controller.getWorkoutPerformance.bind(con
 router.get('/streak',  controller.getWorkoutStreak.bind(controller));
 router.get('/personal-bests',  controller.getPersonalBests.bind(controller));
 
+// Favorite Workout Routes
+router.post('/:workoutId/favorite', authenticateJWT, controller.toggleFavoriteWorkout.bind(controller));
+router.get('/favorites', authenticateJWT, controller.getFavoriteWorkouts.bind(controller));
+
 export default router;

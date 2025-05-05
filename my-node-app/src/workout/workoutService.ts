@@ -11,11 +11,7 @@ export class WorkoutService {
   }
 
   async createWorkout(workoutData: any): Promise<Workout> {
-    const workout = new WorkoutModel(workoutData);
-    if (!workout.isValid()) {
-      throw new Error('Invalid workout data');
-    }
-    return this.repository.createWorkout(workout);
+    return this.repository.createWorkout(workoutData);
   }
 
   async getWorkoutById(id: number): Promise<Workout | null> {
@@ -28,15 +24,9 @@ export class WorkoutService {
 
   async updateWorkout(id: number, workoutData: any): Promise<Workout> {
     try {
-      const workout = new WorkoutModel(workoutData);
-  
-      if (!workout.isValid()) {
-        throw new Error("Invalid workout data");
-      }
-  
-      return await this.repository.updateWorkout(id, workout);
+      return await this.repository.updateWorkout(id, workoutData);
     } catch (error) {
-      console.error("Error in updateWorkout:", error); // Log the error for debugging
+      console.error("Error in updateWorkout:", error);
       throw new Error("Workout update failed");
     }
   }
@@ -74,16 +64,12 @@ export class WorkoutService {
     date: Date,
     exercises?: { exerciseId: number; setsCompleted?: number; repsCompleted?: number; weightUsed?: number }[]
   ): Promise<WorkoutSession & { sessionExercises: SessionExercise[] }> {
-    // Create the session model
-    const sessionModel = new WorkoutSessionModel({
+    return this.repository.logWorkoutSession({
       userId,
       workoutId,
       date,
-      exercises: exercises || []
+      exercises
     });
-    
-    // Use the repository to store the workout session
-    return this.repository.logWorkoutSession(sessionModel);
   }
 
   async getSessionById(sessionId: number, userId: number) {
@@ -119,10 +105,7 @@ export class WorkoutService {
     data: { weightUsed?: number; setsCompleted?: number; repsCompleted?: number }
   ): Promise<SessionExercise> {
     // Verify ownership
-    const existing = await this.repository.sessionExercise.findUnique({
-      where: { id: sessionExerciseId },
-      include: { session: true },
-    });
+    const existing = await this.repository.findSessionExerciseById(sessionExerciseId);
     if (!existing || existing.session.userId !== userId) throw new Error("Unauthorized");
     return this.repository.updateSessionExercise(sessionExerciseId, data);
   }
@@ -176,5 +159,21 @@ export class WorkoutService {
       }, 0),
       lastSession: sessions[0]?.date || null,
     }));
+  }
+
+  async toggleFavoriteWorkout(userId: number, workoutId: number): Promise<{ isFavorite: boolean }> {
+    const existingFavorite = await this.repository.getFavoriteWorkout(userId, workoutId);
+    
+    if (existingFavorite) {
+      await this.repository.removeFavoriteWorkout(userId, workoutId);
+      return { isFavorite: false };
+    } else {
+      await this.repository.addFavoriteWorkout(userId, workoutId);
+      return { isFavorite: true };
+    }
+  }
+
+  async getFavoriteWorkouts(userId: number): Promise<Workout[]> {
+    return this.repository.getFavoriteWorkouts(userId);
   }
 }
