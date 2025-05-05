@@ -2,86 +2,15 @@ import React, { useState, useEffect, useRef } from 'react';
 import { Crown, Shield, Search, Pencil, Trash2, UserCog, MoreVertical, Trophy } from 'lucide-react';
 import 'admin.css';
 import DeleteConfirmModal from '../../components/admin/DeleteConfirmModal';
+import { getUsers, updateUser, deleteUser, promoteUser } from '../../api';
 
 const UserManagement = () => {
-  const [users, setUsers] = useState([
-    {
-      id: 1,
-      firstName: 'John',
-      lastName: 'Doe',
-      email: 'john@example.com',
-      age: 28,
-      gender: 'Male',
-      height: 180,
-      weight: 75,
-      goal: 'Weight Loss',
-      level: 'Intermediate',
-      joinDate: '2024-03-26',
-      isPremium: true
-    },
-    {
-      id: 2,
-      firstName: 'Jane',
-      lastName: 'Smith',
-      email: 'jane@example.com',
-      age: 32,
-      gender: 'Female',
-      height: 165,
-      weight: 60,
-      goal: 'Muscle Gain',
-      level: 'Beginner',
-      joinDate: '2024-03-25',
-      isPremium: false
-    },
-    {
-      id: 3,
-      firstName: 'Alice',
-      lastName: 'Johnson',
-      email: 'alice@example.com',
-      age: 29,
-      gender: 'Female',
-      height: 170,
-      weight: 68,
-      goal: 'Maintenance',
-      level: 'Advanced',
-      joinDate: '2024-03-20',
-      isPremium: true
-    },
-    {
-      id: 4,
-      firstName: 'Bob',
-      lastName: 'Brown',
-      email: 'rand',
-      age: 35,
-      gender: 'Male',
-      height: 175,
-      weight: 80,
-      goal: 'Muscle Gain',
-      level: 'Intermediate',
-      joinDate: '2024-03-18',
-      isPremium: false
-    },
-    {
-      id: 5,
-      firstName: 'Charlie',
-      lastName: 'Davis',
-      email: 'charlie@example.com',
-      age: 40,
-      gender: 'Male',
-      height: 178,
-      weight: 85,
-      goal: 'Weight Loss',
-      level: 'Beginner',
-      joinDate: '2024-03-15',
-      isPremium: false
-    }
-  ]);
+  const [users, setUsers] = useState([]);
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
   const [editingUser, setEditingUser] = useState(null);
   const [searchQuery, setSearchQuery] = useState('');
   const [currentPage, setCurrentPage] = useState(1);
   const usersPerPage = 5;
-  const [isSearchFocused, setIsSearchFocused] = useState(false);
   const [filters, setFilters] = useState({
     level: '',
     goal: '',
@@ -93,8 +22,32 @@ const UserManagement = () => {
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
   const [isPromoteModalOpen, setIsPromoteModalOpen] = useState(false);
   const [selectedUser, setSelectedUser] = useState(null);
+  const [isLoading, setIsLoading] = useState(true);
+  const [error, setError] = useState(null);
 
   const dropdownRef = useRef(null);
+
+  const fetchUsers = async () => {
+    try {
+      setIsLoading(true);
+      const token = localStorage.getItem('token');
+      if (!token) {
+        throw new Error('No authentication token found');
+      }
+      const usersData = await getUsers(token);
+      setUsers(usersData);
+      setError(null);
+    } catch (err) {
+      setError(err.message || 'Failed to fetch users');
+      console.error('Error fetching users:', err);
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    fetchUsers();
+  }, []);
 
   useEffect(() => {
     const handleClickOutside = (event) => {
@@ -122,11 +75,42 @@ const UserManagement = () => {
     setIsEditModalOpen(false);
   };
 
-  const handleEditUser = () => {
-    setUsers(users.map(user => 
-      user.id === editingUser.id ? editingUser : user
-    ));
-    closeEditModal();
+  const handleEditUser = async () => {
+    try {
+      const token = localStorage.getItem('token');
+      if (!token) {
+        throw new Error('No authentication token found');
+      }
+
+      // Format the age range for the database
+      const ageRange = editingUser.age.toString();
+      
+      // Prepare the update data
+      const updateData = {
+        fullName: `${editingUser.firstName} ${editingUser.lastName}`,
+        email: editingUser.email,
+        selectedAgeGroup: ageRange,
+        selectedGender: editingUser.gender,
+        selectedHeight: editingUser.height,
+        selectedWeight: editingUser.weight,
+        selectedGoal: editingUser.goal,
+        selectedLevel: editingUser.level
+      };
+
+      // Call the updateUser API
+      await updateUser(editingUser.id, updateData, token);
+
+      // Update the local state
+      setUsers(users.map(user => 
+        user.id === editingUser.id ? editingUser : user
+      ));
+      
+      // Close the modal
+      closeEditModal();
+    } catch (error) {
+      console.error('Error updating user:', error);
+      alert(error.message || 'Failed to update user');
+    }
   };
 
   const handleInputChange = (e) => {
@@ -137,14 +121,6 @@ const UserManagement = () => {
     }));
   };
 
-  const handlePromoteToAdmin = (userId) => {
-    console.log(`Promoting user ${userId} to admin`);
-  };
-
-  const handleViewPRs = (userId) => {
-    console.log(`Viewing PRs for user ${userId}`);
-    // Implement PR view logic here
-  };
 
   const handleFilterChange = (e) => {
     const { name, value } = e.target;
@@ -165,17 +141,50 @@ const UserManagement = () => {
     setIsBadgesModalOpen(true);
   };
 
-  const handleDeleteConfirm = () => {
-    setUsers(users.filter(user => user.id !== selectedUser.id));
-    setIsDeleteModalOpen(false);
-    setSelectedUser(null);
+  const handleDeleteConfirm = async () => {
+    try {
+      const token = localStorage.getItem('token');
+      if (!token) {
+        throw new Error('No authentication token found');
+      }
+
+      // Call the deleteUser API
+      await deleteUser(selectedUser.id, token);
+
+      // Update the local state
+      setUsers(users.filter(user => user.id !== selectedUser.id));
+      
+      // Close the modal and reset selected user
+      setIsDeleteModalOpen(false);
+      setSelectedUser(null);
+    } catch (error) {
+      console.error('Error deleting user:', error);
+      alert(error.message || 'Failed to delete user');
+    }
   };
 
-  const handlePromoteConfirm = () => {
-    // Implement actual promotion logic here
-    console.log(`Promoting user ${selectedUser.id} to admin`);
-    setIsPromoteModalOpen(false);
-    setSelectedUser(null);
+  const handlePromoteConfirm = async () => {
+    try {
+      const token = localStorage.getItem('token');
+      if (!token) {
+        throw new Error('No authentication token found');
+      }
+
+      // Call the promoteUser API
+      await promoteUser(selectedUser.id, token);
+
+      // Update the local state to reflect the promotion
+      setUsers(users.map(user => 
+        user.id === selectedUser.id ? { ...user, isAdmin: true } : user
+      ));
+      
+      // Close the modal and reset selected user
+      setIsPromoteModalOpen(false);
+      setSelectedUser(null);
+    } catch (error) {
+      console.error('Error promoting user:', error);
+      alert(error.message || 'Failed to promote user');
+    }
   };
 
   const filteredUsers = users.filter(user => {
@@ -201,6 +210,33 @@ const UserManagement = () => {
   const shouldFlipDropdown = (index, total) => {
     // Flip the last 2 rows' dropdowns to prevent them being cut off
     return index >= total - 2;
+  };
+
+  const formatDate = (dateString) => {
+    if (!dateString) return 'N/A';
+    const date = new Date(dateString);
+    return date.toLocaleDateString('en-US', {
+      year: 'numeric',
+      month: 'short',
+      day: 'numeric'
+    });
+  };
+
+  const formatAgeRange = (age) => {
+    if (!age) return 'N/A';
+    // Convert the number to string to handle both string and number inputs
+    const ageStr = age.toString();
+    // Check if the age is in the concatenated format (e.g., "1829")
+    if (ageStr.length === 4) {
+      const startAge = ageStr.substring(0, 2);
+      const endAge = ageStr.substring(2);
+      // Special case for 50 and above
+      if (startAge === '50') {
+        return '50+';
+      }
+      return `${startAge}-${endAge}`;
+    }
+    return 'N/A';
   };
 
   return (
@@ -259,7 +295,25 @@ const UserManagement = () => {
       </div>
 
       <div className="users-table-container">
-        {filteredUsers.length > 0 ? (
+        {isLoading ? (
+          <div className="loading-state">
+            <div className="loading-spinner"></div>
+            <p>Loading users...</p>
+          </div>
+        ) : error ? (
+          <div className="error-state">
+            <p className="error-message">{error}</p>
+            <button 
+              className="retry-button"
+              onClick={() => {
+                setError(null);
+                fetchUsers();
+              }}
+            >
+              Retry
+            </button>
+          </div>
+        ) : filteredUsers.length > 0 ? (
           <table className="users-table" key={`${filters.level}-${filters.goal}-${filters.premium}-${searchQuery}`}>
             <thead>
               <tr>
@@ -271,7 +325,6 @@ const UserManagement = () => {
                 <th>Height</th>
                 <th>Weight</th>
                 <th>Goal</th>
-                <th>Level</th>
                 <th>Join Date</th>
               </tr>
             </thead>
@@ -345,13 +398,12 @@ const UserManagement = () => {
                     </div>
                   </td>
                   <td>{user.email}</td>
-                  <td>{user.age}</td>
+                  <td>{formatAgeRange(user.age)}</td>
                   <td>{user.gender}</td>
                   <td>{user.height} cm</td>
                   <td>{user.weight} kg</td>
                   <td>{user.goal}</td>
-                  <td>{user.level}</td>
-                  <td>{user.joinDate}</td>
+                  <td>{formatDate(user.createdAt)}</td>
                 </tr>
               ))}
             </tbody>

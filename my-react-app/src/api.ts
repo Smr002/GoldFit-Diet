@@ -206,3 +206,107 @@ export async function getWeeklySummary(token: string, weekStart: string) {
     throw new Error("Unexpected error");
   }
 }
+
+export async function deleteUser(id: number, token: string) {
+  try {
+    const response = await axios.delete(`${API_BASE_URL}/users/${id}`, {
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    });
+    return response.data;
+  } catch (error: any) {
+    if (axios.isAxiosError(error)) {
+      console.error("Delete user error:", error.response?.data);
+      throw new Error(error.response?.data?.error || "Failed to delete user");
+    }
+    throw new Error("Unexpected error");
+  }
+}
+
+export async function promoteUser(id: number, token: string) {
+  try {
+    const response = await axios.post(`${API_BASE_URL}/admin/users/${id}/promote`, {}, {
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    });
+    return response.data;
+  } catch (error: any) {
+    if (axios.isAxiosError(error)) {
+      console.error("Promote user error:", error.response?.data);
+      throw new Error(error.response?.data?.error || "Failed to promote user");
+    }
+    throw new Error("Unexpected error");
+  }
+}
+
+export async function getNotifications(token: string) {
+  try {
+    const response = await axios.get(`${API_BASE_URL}/notifications/`, {
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    });
+    return response.data;
+  } catch (error: any) {
+    if (axios.isAxiosError(error)) {
+      console.error("Get notifications error:", error.response?.data);
+      throw new Error(error.response?.data?.error || "Failed to fetch notifications");
+    }
+    throw new Error("Unexpected error");
+  }
+}
+
+export async function createNotification(notification: any, token: string) {
+  try {
+    const response = await axios.post(`${API_BASE_URL}/notifications/`, notification, {
+      headers: {
+        Authorization: `Bearer ${token}`,
+        "Content-Type": "application/json",
+      },
+    });
+    return response.data;
+  } catch (error: any) {
+    if (axios.isAxiosError(error)) {
+      console.error("Create notification error:", error.response?.data);
+      throw new Error(error.response?.data?.error || "Failed to create notification");
+    }
+    throw new Error("Unexpected error");
+  }
+}
+
+export async function updateNotification(id: number, notification: any, token: string) {
+  try {
+    const response = await axios.put(`${API_BASE_URL}/notifications/${id}`, notification, {
+      headers: {
+        Authorization: `Bearer ${token}`,
+        "Content-Type": "application/json",
+      },
+    });
+    return response.data;
+  } catch (error: any) {
+    if (axios.isAxiosError(error)) {
+      console.error("Update notification error:", error.response?.data);
+      throw new Error(error.response?.data?.error || "Failed to update notification");
+    }
+    throw new Error("Unexpected error");
+  }
+}
+
+export async function deleteNotification(id: number, token: string) {
+  try {
+    const response = await axios.delete(`${API_BASE_URL}/notifications/${id}`, {
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    });
+    return response.data;
+  } catch (error: any) {
+    if (axios.isAxiosError(error)) {
+      console.error("Delete notification error:", error.response?.data);
+      throw new Error(error.response?.data?.error || "Failed to delete notification");
+    }
+    throw new Error("Unexpected error");
+  }
+}
