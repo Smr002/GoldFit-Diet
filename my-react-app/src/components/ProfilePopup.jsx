@@ -154,7 +154,6 @@ export default function ProfilePopup({
     };
 
     try {
-      console.log("Request body:", requestBody);
       await updateUser(Number(userId), requestBody, token);
 
       // Update localStorage

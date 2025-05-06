@@ -109,7 +109,6 @@ export default function AccModal({ open, onClose }) {
     signInWithPopup(auth, provider)
       .then((result) => {
         const user = result.user;
-        console.log("Google login successful:", user);
 
         // Save user data and token to localStorage
         localStorage.setItem(

@@ -123,7 +123,6 @@ const WorkoutCard = ({
               onClick={(e) => {
                 e.preventDefault();
                 e.stopPropagation();
-                console.log("Edit button clicked for workout:", workout);
                 onEdit();
               }}
               style={{

@@ -32,7 +32,6 @@ const ContactUs = () => {
 
     emailjs.send("service_1cbr1sj", "template_gz98svp", params).then(
       function (res) {
-        console.log("Email sent successfully:", res.status, res.text);
         setFormData({
           name: "",
           email: "",
@@ -48,7 +47,6 @@ const ContactUs = () => {
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    console.log("Form submitted:", formData);
     sendMail(formData);
     setSubmitted(true);
 

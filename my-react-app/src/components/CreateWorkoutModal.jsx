@@ -72,7 +72,6 @@ const CreateWorkoutModal = ({ onClose, onSave, onDelete, workout }) => {
       );
       setFilteredExercises(filtered);
       // Debug: Log filtered results (remove in production)
-      console.log("Search Query:", lowercaseQuery, "Filtered Exercises:", filtered);
     }, 150); // 150ms debounce for responsiveness
 
     // Cleanup function

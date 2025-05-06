@@ -232,7 +232,6 @@ export default function ProfileForm({
         selectedGoal: goal,
       };
 
-      console.log("Updating profile with data:", requestBody);
 
       const response = await updateUser(Number(userId), requestBody, token);
 

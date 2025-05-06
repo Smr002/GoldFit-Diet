@@ -364,7 +364,6 @@ const NutritionPage = () => {
   // Handler for adding food
   const handleAddFood = (mealId) => {
     // In a real app, would open a modal to add food
-    console.log(`Adding food to meal: ${mealId}`);
   };
 
   // Animation and loading effect

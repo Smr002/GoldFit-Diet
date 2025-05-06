@@ -40,17 +40,14 @@ const Dashboard = () => {
   };
 
   const handleDeleteUser = () => {
-    console.log(`Deleting user: ${selectedUser.name}`);
     closeModal();
   };
 
   const handleSaveChanges = () => {
-    console.log(`Saving changes for user: ${selectedUser.name}`);
     closeModal();
   };
 
   const handlePromoteToAdmin = () => {
-    console.log(`Promoting user: ${selectedUser.firstName} ${selectedUser.lastName} to admin`);
     closeModal();
   };
 
@@ -91,7 +88,6 @@ const Dashboard = () => {
   const handleDeleteConfirm = () => {
     setDeleteModalLeavingClass('leaving');
     setTimeout(() => {
-      console.log(`Deleting user: ${selectedUser.firstName} ${selectedUser.lastName}`);
       setIsDeleteConfirmOpen(false);
       setDeleteModalLeavingClass('');
       setSelectedUser(null);
@@ -101,7 +97,6 @@ const Dashboard = () => {
   const handlePromoteConfirm = () => {
     setPromoteModalLeavingClass('leaving');
     setTimeout(() => {
-      console.log(`Promoting user: ${selectedUser.firstName} ${selectedUser.lastName} to admin`);
       setIsPromoteConfirmOpen(false);
       setPromoteModalLeavingClass('');
       setSelectedUser(null);

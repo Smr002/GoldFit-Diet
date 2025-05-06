@@ -138,7 +138,6 @@ export default function Profile() {
     };
 
     try {
-      console.log("Request body:", requestBody);
       await updateUser(Number(userId), requestBody, token);
 
       // Update localStorage
