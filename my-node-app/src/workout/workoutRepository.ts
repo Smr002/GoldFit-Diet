@@ -1,5 +1,45 @@
 import { PrismaClient, Workout, WorkoutExercise, WorkoutSession, Exercise, SessionExercise, FavoriteWorkout } from '@prisma/client';
 
+interface CreateWorkoutData {
+  name: string;
+  level?: string | null;
+  timesPerWeek?: number | null;
+  premium?: boolean;
+  createdByAdmin?: number | null;
+  createdByUser?: number | null;
+  workoutExercises?: Array<{
+    exerciseId: number;
+    dayOfTheWeek?: number;
+    sets: number;
+    reps: number;
+  }>;
+  exercises?: Array<{
+    exerciseId: number;
+    dayOfTheWeek?: number;
+    sets: number;
+    reps: number;
+  }>;
+}
+
+interface UpdateWorkoutData {
+  name: string;
+  level?: string | null;
+  timesPerWeek?: number | null;
+  premium?: boolean;
+  workoutExercises?: Array<{
+    exerciseId: number;
+    dayOfTheWeek?: number;
+    sets: number;
+    reps: number;
+  }>;
+  exercises?: Array<{
+    exerciseId: number;
+    dayOfTheWeek?: number;
+    sets: number;
+    reps: number;
+  }>;
+}
+
 export class WorkoutRepository {
   private prisma: PrismaClient;
 
@@ -7,30 +47,20 @@ export class WorkoutRepository {
     this.prisma = new PrismaClient();
   }
 
-  async createWorkout(workoutData: {
-    name: string;
-    level?: string | null;
-    timesPerWeek?: number | null;
-    premium?: boolean;
-    createdByAdmin?: number | null;
-    createdByUser?: number | null;
-    exercises: {
-      exerciseId: number;
-      dayOfTheWeek?: number;
-      sets: number;
-      reps: number;
-    }[];
-  }): Promise<Workout> {
+  async createWorkout(workoutData: CreateWorkoutData): Promise<Workout> {
+    const exercises = workoutData.workoutExercises || workoutData.exercises || [];
+    console.log('Received workout data:', workoutData); // Debug log
+
     return this.prisma.workout.create({
       data: {
         name: workoutData.name,
         level: workoutData.level,
         timesPerWeek: workoutData.timesPerWeek,
-        premium: workoutData.premium,
+        premium: workoutData.premium ?? false,
         createdByAdmin: workoutData.createdByAdmin,
         createdByUser: workoutData.createdByUser,
         workoutExercises: {
-          create: workoutData.exercises.map(exercise => ({
+          create: exercises.map(exercise => ({
             exerciseId: exercise.exerciseId,
             dayOfTheWeek: exercise.dayOfTheWeek,
             sets: exercise.sets,
@@ -80,18 +110,10 @@ export class WorkoutRepository {
     });
   }
 
-  async updateWorkout(id: number, workoutData: {
-    name: string;
-    level?: string | null;
-    timesPerWeek?: number | null;
-    premium?: boolean;
-    exercises: {
-      exerciseId: number;
-      dayOfTheWeek?: number;
-      sets: number;
-      reps: number;
-    }[];
-  }): Promise<Workout> {
+  async updateWorkout(id: number, workoutData: UpdateWorkoutData): Promise<Workout> {
+    const exercises = workoutData.workoutExercises || workoutData.exercises || [];
+    console.log('Updating workout with data:', workoutData); // Debug log
+
     return this.prisma.workout.update({
       where: { id },
       data: {
@@ -101,7 +123,7 @@ export class WorkoutRepository {
         premium: workoutData.premium,
         workoutExercises: {
           deleteMany: {},
-          create: workoutData.exercises.map(exercise => ({
+          create: exercises.map(exercise => ({
             exerciseId: exercise.exerciseId,
             dayOfTheWeek: exercise.dayOfTheWeek,
             sets: exercise.sets,
