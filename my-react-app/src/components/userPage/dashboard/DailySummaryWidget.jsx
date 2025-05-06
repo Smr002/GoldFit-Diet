@@ -9,7 +9,13 @@ import {
   useTheme,
   Button,
 } from "@mui/material";
-import { Droplet, Utensils, Moon, AlertTriangle, RefreshCw } from "lucide-react";
+import {
+  Droplet,
+  Utensils,
+  Moon,
+  AlertTriangle,
+  RefreshCw,
+} from "lucide-react";
 import CircularProgress from "@mui/material/CircularProgress";
 import { getNutritionLog } from "@/api"; // Adjust the import path
 
@@ -132,11 +138,11 @@ function DailySummaryWidget({ token, userId, date }) {
             const logs = await getNutritionLog(token, userId, date);
             // Process logs as before...
             const log = Array.isArray(logs) ? logs[0] : logs;
-            
+
             // Update state with fetched data
             // (This is duplicate code from the useEffect, which could be refactored to a separate function)
             // ...code omitted for brevity
-            
+
             setLoading(false);
           } catch (err) {
             console.error("Error retrying nutrition logs fetch:", err);
@@ -144,7 +150,7 @@ function DailySummaryWidget({ token, userId, date }) {
             setLoading(false);
           }
         };
-        
+
         fetchNutritionLogs();
       } else {
         setError("Missing required parameters (token or date)");
@@ -156,24 +162,33 @@ function DailySummaryWidget({ token, userId, date }) {
   // Render loading state
   if (loading) {
     return (
-      <Paper 
-        sx={{ 
-          p: 2.5, 
-          height: "100%", 
-          borderRadius: 3, 
-          bgcolor: 'background.paper',
-          boxShadow: isDarkMode 
-            ? "0px 4px 20px rgba(0, 0, 0, 0.4)" 
-            : "0px 4px 20px rgba(0, 0, 0, 0.08)" 
+      <Paper
+        sx={{
+          p: 2.5,
+          height: "100%",
+          borderRadius: 3,
+          bgcolor: "background.paper",
+          boxShadow: isDarkMode
+            ? "0px 4px 20px rgba(0, 0, 0, 0.4)"
+            : "0px 4px 20px rgba(0, 0, 0, 0.08)",
         }}
       >
-        <Box sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '100%' }}>
-          <CircularProgress 
-            size={40} 
-            thickness={4} 
-            sx={{ 
-              color: isDarkMode ? theme.palette.primary.main : theme.palette.primary.main 
-            }} 
+        <Box
+          sx={{
+            display: "flex",
+            justifyContent: "center",
+            alignItems: "center",
+            height: "100%",
+          }}
+        >
+          <CircularProgress
+            size={40}
+            thickness={4}
+            sx={{
+              color: isDarkMode
+                ? theme.palette.primary.main
+                : theme.palette.primary.main,
+            }}
           />
         </Box>
       </Paper>
@@ -183,59 +198,62 @@ function DailySummaryWidget({ token, userId, date }) {
   // Render error state
   if (error) {
     return (
-      <Paper 
-        sx={{ 
-          p: 2.5, 
-          height: "100%", 
+      <Paper
+        sx={{
+          p: 2.5,
+          height: "100%",
           borderRadius: 3,
-          bgcolor: 'background.paper',
-          boxShadow: isDarkMode 
-            ? "0px 4px 20px rgba(0, 0, 0, 0.4)" 
+          bgcolor: "background.paper",
+          boxShadow: isDarkMode
+            ? "0px 4px 20px rgba(0, 0, 0, 0.4)"
             : "0px 4px 20px rgba(0, 0, 0, 0.08)",
-          display: 'flex',
-          flexDirection: 'column',
-          justifyContent: 'center',
-          alignItems: 'center',
-          textAlign: 'center',
+          display: "flex",
+          flexDirection: "column",
+          justifyContent: "center",
+          alignItems: "center",
+          textAlign: "center",
           background: isDarkMode
             ? "linear-gradient(145deg, #1a1a1a, #282828)"
             : "linear-gradient(145deg, #ffffff, #f5f7ff)",
         }}
       >
-        <Box 
-          sx={{ 
-            mb: 2, 
-            p: 2, 
-            borderRadius: '50%', 
-            bgcolor: isDarkMode ? 'rgba(255, 99, 71, 0.1)' : 'rgba(255, 99, 71, 0.08)'
+        <Box
+          sx={{
+            mb: 2,
+            p: 2,
+            borderRadius: "50%",
+            bgcolor: isDarkMode
+              ? "rgba(255, 99, 71, 0.1)"
+              : "rgba(255, 99, 71, 0.08)",
           }}
         >
-          <AlertTriangle 
-            size={32} 
-            style={{ 
-              color: isDarkMode ? '#FF6347' : '#E53935'
-            }} 
+          <AlertTriangle
+            size={32}
+            style={{
+              color: isDarkMode ? "#FF6347" : "#E53935",
+            }}
           />
         </Box>
-        <Typography 
-          variant="h6" 
-          sx={{ 
+        <Typography
+          variant="h6"
+          sx={{
             mb: 1,
-            color: isDarkMode ? '#FF6347' : '#E53935',
-            fontWeight: 600
+            color: isDarkMode ? "#FF6347" : "#E53935",
+            fontWeight: 600,
           }}
         >
-          Unable to Load Data
+          No Calories Have Been Logged Yet
         </Typography>
-        <Typography 
-          variant="body2" 
-          sx={{ 
-            mb: 3, 
+        <Typography
+          variant="body2"
+          sx={{
+            mb: 3,
             color: theme.palette.text.secondary,
-            maxWidth: '85%'
+            maxWidth: "85%",
           }}
         >
-          {error}
+          Please log your meals to see your daily summary. You can do this in
+          the "Nutrition" section of the app.
         </Typography>
         <Button
           variant="outlined"
@@ -243,14 +261,16 @@ function DailySummaryWidget({ token, userId, date }) {
           onClick={handleRetry}
           sx={{
             borderRadius: 2,
-            textTransform: 'none',
+            textTransform: "none",
             px: 3,
-            color: isDarkMode ? theme.palette.primary.main : '#7E69AB',
-            borderColor: isDarkMode ? theme.palette.primary.main : '#7E69AB',
-            '&:hover': {
-              borderColor: isDarkMode ? theme.palette.primary.light : '#9B87F5',
-              backgroundColor: isDarkMode ? 'rgba(255, 215, 0, 0.05)' : 'rgba(155, 135, 245, 0.05)',
-            }
+            color: isDarkMode ? theme.palette.primary.main : "#7E69AB",
+            borderColor: isDarkMode ? theme.palette.primary.main : "#7E69AB",
+            "&:hover": {
+              borderColor: isDarkMode ? theme.palette.primary.light : "#9B87F5",
+              backgroundColor: isDarkMode
+                ? "rgba(255, 215, 0, 0.05)"
+                : "rgba(155, 135, 245, 0.05)",
+            },
           }}
         >
           Try Again
@@ -368,11 +388,11 @@ function DailySummaryWidget({ token, userId, date }) {
                       strokeLinecap: "round",
                     },
                     "&.MuiCircularProgress-root": {
-                      bgcolor: isDarkMode 
-                        ? "rgba(255, 255, 255, 0.05)" 
+                      bgcolor: isDarkMode
+                        ? "rgba(255, 255, 255, 0.05)"
                         : "rgba(0, 0, 0, 0.03)",
                       borderRadius: "50%",
-                    }
+                    },
                   }}
                 />
                 <Box
