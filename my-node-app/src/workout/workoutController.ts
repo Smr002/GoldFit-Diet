@@ -61,7 +61,7 @@ export class WorkoutController {
   }
 
   // Custom Workout Operations
-  async createCustomWorkout(req: Request, res: Response) {
+  async createCustomWorkout(req: AuthenticatedRequest, res: Response) {
     try {
       const userId = Number(req.user?.id); // Assuming user is attached to request by auth middleware
       const workout = await this.service.createCustomWorkout(userId, req.body);
@@ -193,7 +193,7 @@ export class WorkoutController {
   }
 
   // Progress Tracking
-  async getWorkoutProgress(req: Request, res: Response) {
+  async getWorkoutProgress(req: AuthenticatedRequest, res: Response) {
     try {
       const userId = Number(req.user?.id);
       const workoutId = Number(req.params.workoutId);
@@ -204,7 +204,7 @@ export class WorkoutController {
     }
   }
 
-  async getWorkoutPerformance(req: Request, res: Response) {
+  async getWorkoutPerformance(req: AuthenticatedRequest, res: Response) {
     try {
       const userId = Number(req.user?.id);
       const workoutId = Number(req.params.workoutId);
@@ -215,7 +215,7 @@ export class WorkoutController {
     }
   }
 
-  async getWorkoutStreak(req: Request, res: Response) {
+  async getWorkoutStreak(req: AuthenticatedRequest, res: Response) {
     try {
       const userId = Number(req.user?.id);
       const streak = await this.service.getWorkoutStreak(userId);
@@ -225,7 +225,7 @@ export class WorkoutController {
     }
   }
 
-  async getPersonalBests(req: Request, res: Response) {
+  async getPersonalBests(req: AuthenticatedRequest, res: Response) {
     try {
       const userId = Number(req.user?.id);
       const personalBests = await this.service.getPersonalBests(userId);
