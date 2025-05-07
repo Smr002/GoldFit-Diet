@@ -264,5 +264,28 @@ export class WorkoutController {
       res.status(500).json({ error: 'Failed to get favorite workouts' });
     }
   }
+
+  async getLogWorkoutSession(req: AuthenticatedRequest, res: Response) {
+    try {
+      if (!req.user || !req.user.id) {
+        return res.status(401).json({ error: 'User not authenticated' });
+      }
+
+      const userId = Number(req.user.id);
+      if (isNaN(userId)) {
+        return res.status(400).json({ error: 'Invalid user ID' });
+      }
+
+      const sessions = await this.service.getLogWorkoutSession(userId);
+      console.log('Retrieved sessions:', sessions);
+      return res.status(200).json(sessions);
+    } catch (error) {
+      console.error('Error getting workout sessions:', error);
+      return res.status(500).json({ 
+        error: 'Failed to get workout sessions',
+        details: error instanceof Error ? error.message : 'Unknown error'
+      });
+    }
+  }
 }
 

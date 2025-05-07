@@ -21,8 +21,9 @@ router.get('/exercises/search',  controller.searchExercises.bind(controller));
 
 // Workout Session Routes
 router.post('/sessions', authenticateJWT, controller.logWorkoutSession.bind(controller));
+router.get('/sessions/log', authenticateJWT, controller.getLogWorkoutSession.bind(controller));
 router.get('/user/badges/:userId', controller.getUserBadge.bind(controller));
-router
+
 // Progress Tracking Routes
 router.get('/:workoutId/progress',  controller.getWorkoutProgress.bind(controller));
 router.get('/:workoutId/performance',  controller.getWorkoutPerformance.bind(controller));

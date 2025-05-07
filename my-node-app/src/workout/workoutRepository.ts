@@ -409,4 +409,44 @@ export class WorkoutRepository {
       include: { session: true }
     });
   }
+
+  async getLogWorkoutSession(userId: number): Promise<WorkoutSession[]> {
+    try {
+      console.log('Repository: Fetching sessions for userId:', userId);
+      
+      const sessions = await this.prisma.workoutSession.findMany({
+        where: { userId },
+        include: {
+          workout: {
+            include: {
+              workoutExercises: {
+                include: {
+                  exercise: true
+                }
+              }
+            }
+          },
+          sessionExercises: {
+            include: {
+              exercise: true
+            }
+          },
+          user: {
+            select: {
+              id: true,
+            }
+          }
+        },
+        orderBy: {
+          date: 'desc'
+        }
+      });
+
+      console.log(`Repository: Found ${sessions.length} sessions`);
+      return sessions;
+    } catch (error) {
+      console.error('Repository error in getLogWorkoutSession:', error);
+      throw new Error(`Failed to fetch workout sessions: ${error instanceof Error ? error.message : 'Unknown error'}`);
+    }
+  }
 }
