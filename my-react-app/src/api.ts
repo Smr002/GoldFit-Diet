@@ -166,6 +166,24 @@ export const logWorkout = async (token: string, workoutLog: WorkoutLog) => {
   }
 };
 
+
+export const getLogWorkout = async (token: string) => {
+  try {
+    const response = await axios.get(`${API_BASE_URL}/workouts/sessions/log`, {
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${token}`
+      },
+    });
+    return response.data;
+  } catch (error: any) {
+    if (axios.isAxiosError(error)) {
+      throw new Error(error.response?.data?.error || 'Failed to get workout logs');
+    }
+    throw new Error('Unexpected error');
+  }
+};
+
 interface WorkoutLog {
   workoutId: number;
   date: string;

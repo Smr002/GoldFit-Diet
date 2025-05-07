@@ -1,4 +1,5 @@
-import React from "react";
+import React, { useState, useEffect } from "react";
+import { Link } from "react-router-dom";
 import {
   Box,
   Typography,
@@ -9,24 +10,95 @@ import {
   ListItem,
   ListItemText,
   useTheme,
+  CircularProgress,
 } from "@mui/material";
 import { Dumbbell, Flame, Calendar, PlayCircle } from "lucide-react";
+import { getLogWorkout, getWorkouts } from "../../../api";
 
 function WorkoutSection() {
   const theme = useTheme();
-  const isDarkMode = theme.palette.mode === 'dark';
+  const isDarkMode = theme.palette.mode === "dark";
+  const [workoutLog, setWorkoutLog] = useState(null);
+  const [workoutDetails, setWorkoutDetails] = useState(null);
+  const [loading, setLoading] = useState(true);
 
-  // Mock data
-  const hasWorkout = true;
-  const workout = {
-    name: "Upper Body Power",
-    exercises: [
-      "Bench Press: 4 × 8",
-      "Pull-ups: 3 × 10",
-      "Military Press: 3 × 10",
-    ],
-    duration: "45 min",
+  useEffect(() => {
+    const fetchWorkoutData = async () => {
+      try {
+        const token = localStorage.getItem("token");
+        const logs = await getLogWorkout(token);
+        if (logs && logs.length > 0) {
+          // Sort logs by date and createdAt in descending order
+          const sortedLogs = logs.sort((a, b) => {
+            const dateComparison =
+              new Date(b.date).getTime() - new Date(a.date).getTime();
+            if (dateComparison === 0) {
+              return (
+                new Date(b.createdAt).getTime() -
+                new Date(a.createdAt).getTime()
+              );
+            }
+            return dateComparison;
+          });
+
+          setWorkoutLog(sortedLogs[0]); // Get the most recent workout
+          setWorkoutDetails(sortedLogs[0].workout);
+        }
+      } catch (error) {
+        console.error("Error fetching workout data:", error);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchWorkoutData();
+  }, []);
+
+  const formatDate = (dateString) => {
+    const date = new Date(dateString);
+    const today = new Date();
+    const yesterday = new Date(today);
+    yesterday.setDate(yesterday.getDate() - 1);
+
+    if (date.toDateString() === today.toDateString()) {
+      return "Today";
+    } else if (date.toDateString() === yesterday.toDateString()) {
+      return "Yesterday";
+    } else {
+      const options = {
+        year: "numeric",
+        month: "short",
+        day: "numeric",
+        hour: "2-digit",
+        minute: "2-digit",
+      };
+      return date.toLocaleDateString("en-US", options);
+    }
   };
+
+  if (loading) {
+    return (
+      <Paper
+        sx={{
+          p: 2.5,
+          height: "100%",
+          borderRadius: 3,
+          display: "flex",
+          justifyContent: "center",
+          alignItems: "center",
+        }}
+      >
+        <CircularProgress />
+      </Paper>
+    );
+  }
+
+  const hasWorkout =
+    workoutLog &&
+    workoutLog.workout &&
+    workoutLog.sessionExercises &&
+    workoutLog.sessionExercises.length > 0;
+  // Calculate streak (you might want to implement proper streak calculation logic)
   const streak = 5;
 
   return (
@@ -35,8 +107,8 @@ function WorkoutSection() {
         p: 2.5,
         height: "100%",
         borderRadius: 3,
-        boxShadow: isDarkMode 
-          ? "0px 4px 20px rgba(0, 0, 0, 0.3)" 
+        boxShadow: isDarkMode
+          ? "0px 4px 20px rgba(0, 0, 0, 0.3)"
           : "0px 4px 20px rgba(0, 0, 0, 0.08)",
         background: isDarkMode
           ? "linear-gradient(145deg, #1e1e1e, #2a2a2a)"
@@ -53,9 +125,16 @@ function WorkoutSection() {
         }}
       >
         <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
-          <Dumbbell size={20} color={isDarkMode ? theme.palette.primary.main : "#7E69AB"} />
-          <Typography variant="h6" fontWeight={600} sx={{ color: theme.palette.text.primary }}>
-            Workout Plan
+          <Dumbbell
+            size={20}
+            color={isDarkMode ? theme.palette.primary.main : "#7E69AB"}
+          />
+          <Typography
+            variant="h6"
+            fontWeight={600}
+            sx={{ color: theme.palette.text.primary }}
+          >
+            Latest Workout
           </Typography>
         </Box>
         <Chip
@@ -63,7 +142,9 @@ function WorkoutSection() {
           label={`${streak}-day streak`}
           size="small"
           sx={{
-            bgcolor: isDarkMode ? "rgba(207, 102, 121, 0.1)" : "rgba(255, 125, 85, 0.1)",
+            bgcolor: isDarkMode
+              ? "rgba(207, 102, 121, 0.1)"
+              : "rgba(255, 125, 85, 0.1)",
             color: isDarkMode ? "#CF6679" : "#FF7D55",
             fontWeight: 600,
             borderRadius: 5,
@@ -82,27 +163,40 @@ function WorkoutSection() {
               justifyContent: "space-between",
               alignItems: "center",
               p: 1.5,
-              bgcolor: isDarkMode ? "rgba(187, 134, 252, 0.1)" : "rgba(126, 105, 171, 0.1)",
+              bgcolor: isDarkMode
+                ? "rgba(187, 134, 252, 0.1)"
+                : "rgba(126, 105, 171, 0.1)",
               borderRadius: 2,
             }}
           >
             <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
-              <Calendar size={16} color={isDarkMode ? theme.palette.primary.main : "#7E69AB"} />
-              <Typography fontWeight={600} sx={{ color: theme.palette.text.primary }}>
-                {workout.name}
+              <Calendar
+                size={16}
+                color={isDarkMode ? theme.palette.primary.main : "#7E69AB"}
+              />
+              <Typography
+                fontWeight={600}
+                sx={{ color: theme.palette.text.primary }}
+              >
+                {workoutDetails.name}
               </Typography>
             </Box>
             <Typography
               variant="body2"
               fontWeight={500}
-              sx={{ color: theme.palette.text.secondary }}
+              sx={{
+                color: theme.palette.text.secondary,
+                display: "flex",
+                alignItems: "center",
+                gap: 0.5,
+              }}
             >
-              {workout.duration}
+              {formatDate(workoutLog.date)}
             </Typography>
           </Box>
 
           <List dense sx={{ pl: 1 }}>
-            {workout.exercises.map((exercise, index) => (
+            {workoutLog?.sessionExercises?.map((exercise, index) => (
               <ListItem key={index} disablePadding sx={{ py: 0.7 }}>
                 <Typography
                   variant="body1"
@@ -117,7 +211,7 @@ function WorkoutSection() {
                   •
                 </Typography>
                 <ListItemText
-                  primary={exercise}
+                  primary={`${exercise.setsCompleted} × ${exercise.repsCompleted} - ${exercise.weightUsed}kg`}
                   primaryTypographyProps={{
                     variant: "body1",
                     fontWeight: 500,
@@ -129,6 +223,8 @@ function WorkoutSection() {
           </List>
 
           <Button
+            component={Link}
+            to={`/workouts/`}
             variant="contained"
             startIcon={<PlayCircle size={20} />}
             fullWidth
@@ -140,8 +236,8 @@ function WorkoutSection() {
               textTransform: "none",
               fontWeight: 600,
               fontSize: 16,
-              boxShadow: isDarkMode 
-                ? "0 4px 12px rgba(255, 215, 0, 0.3)" 
+              boxShadow: isDarkMode
+                ? "0 4px 12px rgba(255, 215, 0, 0.3)"
                 : "0 4px 12px rgba(126, 105, 171, 0.3)",
               "&:hover": {
                 bgcolor: isDarkMode ? "#DAA520" : "#6E59A5",
@@ -159,23 +255,31 @@ function WorkoutSection() {
           </Typography>
           <Box sx={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 2 }}>
             <Button
+              component={Link}
+              to="/workouts"
               variant="outlined"
               startIcon={<Calendar size={16} />}
               sx={{
                 borderRadius: 2,
                 textTransform: "none",
-                borderColor: isDarkMode ? theme.palette.primary.main : "#7E69AB",
+                borderColor: isDarkMode
+                  ? theme.palette.primary.main
+                  : "#7E69AB",
                 color: isDarkMode ? theme.palette.primary.main : "#7E69AB",
                 fontWeight: 600,
                 "&:hover": {
                   borderColor: isDarkMode ? "#DAA520" : "#6E59A5",
-                  bgcolor: isDarkMode ? "rgba(255, 215, 0, 0.05)" : "rgba(126, 105, 171, 0.05)",
+                  bgcolor: isDarkMode
+                    ? "rgba(255, 215, 0, 0.05)"
+                    : "rgba(126, 105, 171, 0.05)",
                 },
               }}
             >
               Browse
             </Button>
             <Button
+              component={Link}
+              to="/workouts/"
               variant="contained"
               startIcon={<Dumbbell size={16} />}
               sx={{
