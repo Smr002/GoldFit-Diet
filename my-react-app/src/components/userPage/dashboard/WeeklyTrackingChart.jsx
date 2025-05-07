@@ -19,7 +19,7 @@ import {
   CircularProgress,
 } from "@mui/material";
 import TrendingUpIcon from "@mui/icons-material/TrendingUp";
-import { getWeeklySummary } from "../../../api";
+import { getWeeklySummary, getLogWorkout } from "../../../api";
 
 function WeeklyTrackingChart() {
   const theme = useTheme();
@@ -41,9 +41,55 @@ function WeeklyTrackingChart() {
           .toISOString()
           .split("T")[0];
 
-        const summary = await getWeeklySummary(token, weekStart);
+        const [summary, workoutLogs] = await Promise.all([
+          getWeeklySummary(token, weekStart),
+          getLogWorkout(token),
+        ]);
 
-        // Transform the data for the chart
+        console.log("Workout Logs:", workoutLogs); // Debug log
+
+        // Create a map of daily total weights with safety checks
+        const dailyWeights = Array(7).fill(0);
+        if (Array.isArray(workoutLogs)) {
+          workoutLogs.forEach((log) => {
+            if (log && log.date && log.sessionExercises) {
+              const logDate = new Date(log.date);
+              const today = new Date();
+              const weekStart = new Date(
+                today.setDate(today.getDate() - today.getDay())
+              );
+
+              // Only include logs from current week
+              if (logDate >= weekStart) {
+                const dayIndex = logDate.getDay();
+                const totalWeight = log.sessionExercises.reduce(
+                  (sum, exercise) => {
+                    if (
+                      exercise &&
+                      typeof exercise.weightUsed === "number" &&
+                      typeof exercise.setsCompleted === "number" &&
+                      typeof exercise.repsCompleted === "number"
+                    ) {
+                      return (
+                        sum +
+                        exercise.weightUsed *
+                          exercise.setsCompleted *
+                          exercise.repsCompleted
+                      );
+                    }
+                    return sum;
+                  },
+                  0
+                );
+
+                dailyWeights[dayIndex] += totalWeight; // Add to existing weight for that day
+              }
+            }
+          });
+        }
+
+        console.log("Final daily weights:", dailyWeights); // Debug log
+
         const days = [
           "Sunday",
           "Monday",
@@ -57,13 +103,14 @@ function WeeklyTrackingChart() {
           day,
           calories: summary.calories.daily[index] || 0,
           protein: summary.nutrition.averages.protein || 0,
-          workouts: summary.workouts.completed || 0,
           caloriesBurned: summary.workouts.caloriesBurned || 0,
+          weights: dailyWeights[index],
         }));
 
         setChartData(transformedData);
         setLoading(false);
       } catch (err) {
+        console.error("Error in fetchWeeklyData:", err); // Debug log
         setError(err.message);
         setLoading(false);
       }
@@ -216,6 +263,7 @@ function WeeklyTrackingChart() {
                 { id: "calories", color: "#ff9800" },
                 { id: "protein", color: "#29b6f6" },
                 { id: "caloriesBurned", color: "#3f51b5" },
+                { id: "weights", color: "#4caf50" },
               ].map(({ id, color }) => (
                 <linearGradient key={id} id={id} x1="0" y1="0" x2="0" y2="1">
                   <stop offset="5%" stopColor={color} stopOpacity={0.8} />
@@ -257,6 +305,7 @@ function WeeklyTrackingChart() {
                 name: "Calories Burned",
                 stroke: "#3f51b5",
               },
+              { key: "weights", name: "Total Weight (kg)", stroke: "#4caf50" },
             ].map(({ key, name, stroke }) => (
               <Line
                 key={key}
