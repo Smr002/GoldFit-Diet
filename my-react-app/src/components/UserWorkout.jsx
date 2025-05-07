@@ -602,7 +602,8 @@ const UserWorkout = () => {
                   width: "100%",
                   maxWidth: "1200px",
                   margin: "0 auto",
-                  transition: "background 0.3s ease, box-shadow 0.3s ease, color 0.3s ease, border 0.3s ease",
+                  transition:
+                    "background 0.3s ease, box-shadow 0.3s ease, color 0.3s ease, border 0.3s ease",
                   padding: "0 8px",
                 }}
               >
@@ -694,9 +695,11 @@ const UserWorkout = () => {
                         : "linear-gradient(45deg, #6200ea 0%, #7c43e0 100%)",
                       color: darkMode ? "#121212" : "white",
                       opacity: !token || !loggedInUserId ? 0.5 : 1,
-                      cursor: !token || !loggedInUserId ? "not-allowed" : "pointer",
+                      cursor:
+                        !token || !loggedInUserId ? "not-allowed" : "pointer",
                       borderRadius: "12px",
-                      padding: window.innerWidth < 400 ? "10px 16px" : "12px 20px",
+                      padding:
+                        window.innerWidth < 400 ? "10px 16px" : "12px 20px",
                       display: "flex",
                       alignItems: "center",
                       justifyContent: "center",
@@ -711,7 +714,8 @@ const UserWorkout = () => {
                       letterSpacing: "0.3px",
                       whiteSpace: "nowrap",
                       width: window.innerWidth < 600 ? "100%" : "auto",
-                      animation: token && loggedInUserId ? "pulse 2s infinite" : "none",
+                      animation:
+                        token && loggedInUserId ? "pulse 2s infinite" : "none",
                     }}
                   >
                     <svg
@@ -836,9 +840,7 @@ const UserWorkout = () => {
                     style={{
                       backgroundColor: darkMode ? "#1e1e1e" : "#ffffff",
                       color: darkMode ? "#ffffff" : "#333333",
-                      border: darkMode
-                        ? "1px solid #444"
-                        : "1px solid #e0e0e0",
+                      border: darkMode ? "1px solid #444" : "1px solid #e0e0e0",
                       borderRadius: "10px",
                       padding: "10px 16px",
                       paddingRight: "36px",
@@ -896,9 +898,7 @@ const UserWorkout = () => {
                     style={{
                       backgroundColor: darkMode ? "#1e1e1e" : "#ffffff",
                       color: darkMode ? "#ffffff" : "#333333",
-                      border: darkMode
-                        ? "1px solid #444"
-                        : "1px solid #e0e0e0",
+                      border: darkMode ? "1px solid #444" : "1px solid #e0e0e0",
                       borderRadius: "10px",
                       padding: "10px 16px",
                       paddingRight: "36px",
@@ -950,15 +950,11 @@ const UserWorkout = () => {
                   </label>
                   <select
                     value={filterOptions.goal}
-                    onChange={(e) =>
-                      handleFilterChange("goal", e.target.value)
-                    }
+                    onChange={(e) => handleFilterChange("goal", e.target.value)}
                     style={{
                       backgroundColor: darkMode ? "#1e1e1e" : "#ffffff",
                       color: darkMode ? "#ffffff" : "#333333",
-                      border: darkMode
-                        ? "1px solid #444"
-                        : "1px solid #e0e0e0",
+                      border: darkMode ? "1px solid #444" : "1px solid #e0e0e0",
                       borderRadius: "10px",
                       padding: "10px 16px",
                       paddingRight: "36px",
@@ -1012,34 +1008,38 @@ const UserWorkout = () => {
                 style={{
                   padding: "12px 20px",
                   borderRadius: "10px",
-                  background: activeTab === tab
-                    ? darkMode
-                      ? "linear-gradient(45deg, #FFD700 0%, #FFC107 100%)"
-                      : "linear-gradient(45deg, #6200ea 0%, #7c43e0 100%)"
-                    : darkMode
+                  background:
+                    activeTab === tab
+                      ? darkMode
+                        ? "linear-gradient(45deg, #FFD700 0%, #FFC107 100%)"
+                        : "linear-gradient(45deg, #6200ea 0%, #7c43e0 100%)"
+                      : darkMode
                       ? "rgba(45, 45, 45, 0.7)"
                       : "rgba(255, 255, 255, 0.7)",
-                  color: activeTab === tab
-                    ? darkMode
-                      ? "#121212"
-                      : "#ffffff"
-                    : darkMode
+                  color:
+                    activeTab === tab
+                      ? darkMode
+                        ? "#121212"
+                        : "#ffffff"
+                      : darkMode
                       ? "#ffffff"
                       : "#333333",
                   border: "none",
                   cursor: "pointer",
                   fontWeight: "600",
                   transition: "all 0.3s ease",
-                  boxShadow: activeTab === tab
-                    ? darkMode
-                      ? "0 4px 12px rgba(255, 215, 0, 0.3)"
-                      : "0 4px 12px rgba(98, 0, 234, 0.3)"
-                    : "none",
+                  boxShadow:
+                    activeTab === tab
+                      ? darkMode
+                        ? "0 4px 12px rgba(255, 215, 0, 0.3)"
+                        : "0 4px 12px rgba(98, 0, 234, 0.3)"
+                      : "none",
                   margin: "4px",
                   position: "relative",
-                  borderBottom: !darkMode && activeTab !== tab 
-                    ? "3px solid rgba(98, 0, 234, 0.1)" 
-                    : activeTab === tab 
+                  borderBottom:
+                    !darkMode && activeTab !== tab
+                      ? "3px solid rgba(98, 0, 234, 0.1)"
+                      : activeTab === tab
                       ? "none"
                       : "3px solid transparent",
                 }}
@@ -1052,9 +1052,10 @@ const UserWorkout = () => {
                     e.currentTarget.style.background = darkMode
                       ? "rgba(55, 55, 55, 0.8)"
                       : "rgba(245, 245, 245, 0.9)";
-                    
+
                     if (!darkMode) {
-                      e.currentTarget.style.borderBottom = "3px solid rgba(98, 0, 234, 0.3)";
+                      e.currentTarget.style.borderBottom =
+                        "3px solid rgba(98, 0, 234, 0.3)";
                     }
                   } else {
                     e.currentTarget.style.transform = "translateY(-2px)";
@@ -1070,9 +1071,10 @@ const UserWorkout = () => {
                     e.currentTarget.style.background = darkMode
                       ? "rgba(45, 45, 45, 0.7)"
                       : "rgba(255, 255, 255, 0.7)";
-                      
+
                     if (!darkMode) {
-                      e.currentTarget.style.borderBottom = "3px solid rgba(98, 0, 234, 0.1)";
+                      e.currentTarget.style.borderBottom =
+                        "3px solid rgba(98, 0, 234, 0.1)";
                     }
                   } else {
                     e.currentTarget.style.transform = "translateY(0)";
@@ -1088,9 +1090,9 @@ const UserWorkout = () => {
                 {tab === "favorites" && "Favorites"}
               </button>
             ))}
-            
+
             {!darkMode && (
-              <div 
+              <div
                 style={{
                   position: "absolute",
                   bottom: "3px",
@@ -1161,9 +1163,7 @@ const UserWorkout = () => {
                     isFavorite={favorites.includes(workout.id)}
                     hasNotification={notificationSettings[workout.id]}
                     onToggleFavorite={() => toggleFavorite(workout.id)}
-                    onToggleNotification={() =>
-                      toggleNotification(workout.id)
-                    }
+                    onToggleNotification={() => toggleNotification(workout.id)}
                     onClick={() => openWorkoutDetail(workout)}
                     onEdit={
                       isWorkoutOwner(workout)
@@ -1264,9 +1264,7 @@ const UserWorkout = () => {
                 setShowCreateModal(false);
                 setEditingWorkout(null);
               }}
-              onSave={
-                editingWorkout ? handleEditWorkout : handleCreateWorkout
-              }
+              onSave={editingWorkout ? handleEditWorkout : handleCreateWorkout}
               onDelete={
                 editingWorkout && isWorkoutOwner(editingWorkout)
                   ? () => handleDeleteFromEdit(editingWorkout.id)
@@ -1310,59 +1308,71 @@ const UserWorkout = () => {
               workout={selectedWorkout}
               onClose={() => setShowLogModal(false)}
               onSave={handleLogWorkout}
+              token={token}
             />
           )}
-        
-        <ThemeToggle />
-        <MobileFooter />
-      </Box>
-      <Snackbar
-        open={snackbar.open}
-        autoHideDuration={6000}
-        onClose={handleCloseSnackbar}
-        anchorOrigin={{ 
-          vertical: snackbar.severity === 'success' ? 'bottom' : 'top', 
-          horizontal: snackbar.severity === 'success' ? 'right' : 'center' 
-        }}
-        sx={{ 
-          '& .MuiAlert-root': {
-            backdropFilter: 'blur(10px)',
-            background: darkMode ? 'rgba(45, 45, 45, 0.9)' : 'rgba(255, 255, 255, 0.9)',
-            borderLeft: `4px solid ${
-              snackbar.severity === 'success' ? '#4caf50' : 
-              snackbar.severity === 'error' ? '#f44336' : 
-              snackbar.severity === 'warning' ? '#ff9800' : '#2196f3'
-            }`,
-            color: darkMode ? '#ffffff' : '#333333',
-            boxShadow: darkMode ? '0 4px 20px rgba(0, 0, 0, 0.5)' : '0 4px 20px rgba(0, 0, 0, 0.15)',
-            margin: snackbar.severity === 'success' ? '0 16px 16px 0' : '16px 0 0 0',
-            maxWidth: '400px',
-            width: 'auto',
-          }
-        }}
-      >
-        <Alert
+
+          <ThemeToggle />
+          <MobileFooter />
+        </Box>
+        <Snackbar
+          open={snackbar.open}
+          autoHideDuration={6000}
           onClose={handleCloseSnackbar}
-          severity={snackbar.severity}
-          variant="filled"
-          sx={{ 
-            width: "100%",
-            alignItems: "center",
-            borderRadius: "8px",
-            '.MuiAlert-icon': {
-              fontSize: '22px'
+          anchorOrigin={{
+            vertical: snackbar.severity === "success" ? "bottom" : "top",
+            horizontal: snackbar.severity === "success" ? "right" : "center",
+          }}
+          sx={{
+            "& .MuiAlert-root": {
+              backdropFilter: "blur(10px)",
+              background: darkMode
+                ? "rgba(45, 45, 45, 0.9)"
+                : "rgba(255, 255, 255, 0.9)",
+              borderLeft: `4px solid ${
+                snackbar.severity === "success"
+                  ? "#4caf50"
+                  : snackbar.severity === "error"
+                  ? "#f44336"
+                  : snackbar.severity === "warning"
+                  ? "#ff9800"
+                  : "#2196f3"
+              }`,
+              color: darkMode ? "#ffffff" : "#333333",
+              boxShadow: darkMode
+                ? "0 4px 20px rgba(0, 0, 0, 0.5)"
+                : "0 4px 20px rgba(0, 0, 0, 0.15)",
+              margin:
+                snackbar.severity === "success"
+                  ? "0 16px 16px 0"
+                  : "16px 0 0 0",
+              maxWidth: "400px",
+              width: "auto",
             },
-            '.MuiAlert-message': {
-              fontSize: '15px',
-              fontWeight: '500'
-            }
           }}
         >
-          {snackbar.message}
-        </Alert>
-      </Snackbar>
-    </Box>
-  </ThemeProvider>
+          <Alert
+            onClose={handleCloseSnackbar}
+            severity={snackbar.severity}
+            variant="filled"
+            sx={{
+              width: "100%",
+              alignItems: "center",
+              borderRadius: "8px",
+              ".MuiAlert-icon": {
+                fontSize: "22px",
+              },
+              ".MuiAlert-message": {
+                fontSize: "15px",
+                fontWeight: "500",
+              },
+            }}
+          >
+            {snackbar.message}
+          </Alert>
+        </Snackbar>
+      </Box>
+    </ThemeProvider>
   );
 };
 

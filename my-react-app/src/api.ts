@@ -152,6 +152,34 @@ export async function deleteWorkout(id: number, token: string) {
   }
 }
 
+export const logWorkout = async (token: string, workoutLog: WorkoutLog) => {
+  try {
+    const response = await axios.post(`${API_BASE_URL}/workouts/sessions/`, workoutLog, {
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${token}`
+      },
+    });
+    return response.data;
+  } catch (error: any) {
+    if (axios.isAxiosError(error)) {
+      throw new Error(error.response?.data?.error || 'Failed to log workout');
+    }
+    throw new Error('Unexpected error');
+  }
+};
+
+interface WorkoutLog {
+  workoutId: number;
+  date: string;
+  exercises: {
+    exerciseId: number;
+    setsCompleted: number;
+    repsCompleted: number;
+    weightUsed: number;
+  }[];
+}
+
 export async function getNutritionLog(token: string, userId: number, date: Date) {
   try {
     const response = await axios.get(`${API_BASE_URL}/nutrition/logs/${userId}`, {

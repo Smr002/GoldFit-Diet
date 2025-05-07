@@ -3,8 +3,9 @@
 import { useState, useContext } from "react";
 import { ThemeContext } from "@emotion/react";
 import { Box, Button, TextField, Checkbox, Typography } from "@mui/material";
+import { logWorkout } from "../api"; // Add this import
 
-const LogWorkoutModal = ({ workout, onClose, onSave }) => {
+const LogWorkoutModal = ({ workout, onClose, onSave, token }) => {
   const theme = useContext(ThemeContext);
   const darkMode = theme?.palette?.mode === "dark";
 
@@ -33,15 +34,29 @@ const LogWorkoutModal = ({ workout, onClose, onSave }) => {
     setCompletedExercises(updated);
   };
 
-  const handleSave = () => {
-    const workoutLog = {
-      workoutId: workout.id,
-      duration: parseInt(duration),
-      notes,
-      exercises: completedExercises,
-      date: new Date().toISOString(),
-    };
-    onSave(workoutLog);
+  const handleSave = async () => {
+    try {
+      const exercisesData = completedExercises
+        .filter((ex) => ex.completed)
+        .map((ex) => ({
+          exerciseId: ex.id,
+          weightUsed: parseFloat(ex.weight) || 0,
+          setsCompleted: ex.sets,
+          repsCompleted: ex.reps,
+        }));
+
+      const workoutLog = {
+        workoutId: workout.id,
+        date: new Date().toISOString(),
+        exercises: exercisesData,
+      };
+
+      await logWorkout(token, workoutLog);
+      onSave(workoutLog);
+    } catch (error) {
+      console.error("Failed to log workout:", error);
+      // You might want to add error handling UI here
+    }
   };
 
   return (
@@ -74,7 +89,9 @@ const LogWorkoutModal = ({ workout, onClose, onSave }) => {
           maxWidth: "700px",
           background: darkMode ? "#252525" : "#ffffff",
           borderRadius: "12px",
-          boxShadow: darkMode ? "0 8px 32px rgba(0, 0, 0, 0.5)" : "0 8px 32px rgba(0, 0, 0, 0.1)",
+          boxShadow: darkMode
+            ? "0 8px 32px rgba(0, 0, 0, 0.5)"
+            : "0 8px 32px rgba(0, 0, 0, 0.1)",
           padding: "24px",
           position: "relative",
           color: darkMode ? "#ffffff" : "#333333",
@@ -90,7 +107,9 @@ const LogWorkoutModal = ({ workout, onClose, onSave }) => {
             minWidth: "auto",
             color: darkMode ? "#FFD700" : "#6200ea",
             "&:hover": {
-              background: darkMode ? "rgba(255, 215, 0, 0.1)" : "rgba(98, 0, 234, 0.1)",
+              background: darkMode
+                ? "rgba(255, 215, 0, 0.1)"
+                : "rgba(98, 0, 234, 0.1)",
             },
           }}
         >
@@ -159,8 +178,14 @@ const LogWorkoutModal = ({ workout, onClose, onSave }) => {
                   border: darkMode ? "1px solid #444" : "1px solid #e0e0e0",
                 }}
               >
-                <Box className="log-exercise-header" sx={{ display: "flex", alignItems: "center", mb: 1 }}>
-                  <Box className="log-exercise-check" sx={{ display: "flex", alignItems: "center", gap: 1 }}>
+                <Box
+                  className="log-exercise-header"
+                  sx={{ display: "flex", alignItems: "center", mb: 1 }}
+                >
+                  <Box
+                    className="log-exercise-check"
+                    sx={{ display: "flex", alignItems: "center", gap: 1 }}
+                  >
                     <Checkbox
                       id={`exercise-${index}`}
                       checked={exercise.completed}
@@ -186,10 +211,19 @@ const LogWorkoutModal = ({ workout, onClose, onSave }) => {
                 <Box className="log-exercise-details">
                   <Box
                     className="log-exercise-meta"
-                    sx={{ display: "flex", flexWrap: "wrap", gap: 2, fontSize: "14px" }}
+                    sx={{
+                      display: "flex",
+                      flexWrap: "wrap",
+                      gap: 2,
+                      fontSize: "14px",
+                    }}
                   >
                     <Box className="log-meta-item">
-                      <Typography component="span" className="log-meta-label" sx={{ mr: 1, opacity: 0.7 }}>
+                      <Typography
+                        component="span"
+                        className="log-meta-label"
+                        sx={{ mr: 1, opacity: 0.7 }}
+                      >
                         Sets:
                       </Typography>
                       <Typography component="span" className="log-meta-value">
@@ -197,22 +231,35 @@ const LogWorkoutModal = ({ workout, onClose, onSave }) => {
                       </Typography>
                     </Box>
                     <Box className="log-meta-item">
-                      <Typography component="span" className="log-meta-label" sx={{ mr: 1, opacity: 0.7 }}>
+                      <Typography
+                        component="span"
+                        className="log-meta-label"
+                        sx={{ mr: 1, opacity: 0.7 }}
+                      >
                         Reps:
                       </Typography>
                       <Typography component="span" className="log-meta-value">
                         {exercise.reps}
                       </Typography>
                     </Box>
-                    <Box className="log-meta-item" sx={{ display: "flex", alignItems: "center", gap: 1 }}>
-                      <Typography component="label" className="log-meta-label" sx={{ opacity: 0.7 }}>
+                    <Box
+                      className="log-meta-item"
+                      sx={{ display: "flex", alignItems: "center", gap: 1 }}
+                    >
+                      <Typography
+                        component="label"
+                        className="log-meta-label"
+                        sx={{ opacity: 0.7 }}
+                      >
                         Weight:
                       </Typography>
                       <TextField
                         type="text"
                         className="log-weight-input"
                         value={exercise.weight}
-                        onChange={(e) => handleWeightChange(index, e.target.value)}
+                        onChange={(e) =>
+                          handleWeightChange(index, e.target.value)
+                        }
                         placeholder="0"
                         size="small"
                         sx={{
@@ -232,7 +279,11 @@ const LogWorkoutModal = ({ workout, onClose, onSave }) => {
                           },
                         }}
                       />
-                      <Typography component="span" className="log-weight-unit" sx={{ opacity: 0.7 }}>
+                      <Typography
+                        component="span"
+                        className="log-weight-unit"
+                        sx={{ opacity: 0.7 }}
+                      >
                         kg
                       </Typography>
                     </Box>
