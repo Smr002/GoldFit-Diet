@@ -30,8 +30,6 @@ function ProfileHeader() {
     const token = localStorage.getItem("token");
     const user = JSON.parse(localStorage.getItem("user") || "{}");
 
-    console.log("User from localStorage:", user);
-    console.log("Token from localStorage:", token);
 
     if (user?.displayName) {
       setUserName(user.displayName);
@@ -47,17 +45,14 @@ function ProfileHeader() {
     }
 
     if (user?.photoURL) {
-      console.log("Using photoURL:", user.photoURL);
       setProfileImage(user.photoURL);
     } else if (user?.email) {
       const gravatarUrl = `https://unavatar.io/${user.email}`;
-      console.log("Using Gravatar URL:", gravatarUrl);
       setProfileImage(gravatarUrl);
     } else {
       const fallbackUrl = `https://ui-avatars.com/api/?name=${encodeURIComponent(
         userName
       )}&background=random`;
-      console.log("Using fallback URL:", fallbackUrl);
       setProfileImage(fallbackUrl);
     }
   }, []);
@@ -156,7 +151,6 @@ function ProfileHeader() {
                 cursor: "pointer",
               }}
               onError={(e) => {
-                console.log("Avatar failed to load:", userData.profileImage);
                 const fallbackUrl = `https://ui-avatars.com/api/?name=${encodeURIComponent(
                   userName
                 )}&background=random`;

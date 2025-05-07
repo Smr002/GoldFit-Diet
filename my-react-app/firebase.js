@@ -35,7 +35,6 @@ if (googleLogin) {
     signInWithPopup(auth, provider)
       .then((result) => {
         const user = result.user;
-        console.log(user);
 
         // Store user data in localStorage
         localStorage.setItem(
@@ -62,7 +61,6 @@ if (signOutBtn) {
   signOutBtn.addEventListener("click", () => {
     signOut(auth)
       .then(() => {
-        console.log("User signed out successfully");
         localStorage.removeItem("user");
         window.location.href = "/";
       })

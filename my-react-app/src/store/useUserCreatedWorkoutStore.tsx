@@ -71,12 +71,10 @@ export const useUserCreatedWorkoutStore = create<UserCreatedWorkoutState>()(
             loading: false
           }));
           
-          console.log("Workout created successfully:", newWorkout.name);
           return newWorkout;
         } catch (error) {
           const errorMessage = error instanceof Error ? error.message : "Failed to create workout";
           set({ error: errorMessage, loading: false });
-          console.error("Error creating workout:", errorMessage);
           throw error;
         }
       },
@@ -93,12 +91,10 @@ export const useUserCreatedWorkoutStore = create<UserCreatedWorkoutState>()(
             loading: false
           }));
           
-          console.log("Workout updated successfully:", updatedWorkout.name);
           return updatedWorkout;
         } catch (error) {
           const errorMessage = error instanceof Error ? error.message : "Failed to update workout";
           set({ error: errorMessage, loading: false });
-          console.error("Error updating workout:", errorMessage);
           throw error;
         }
       },
@@ -113,11 +109,9 @@ export const useUserCreatedWorkoutStore = create<UserCreatedWorkoutState>()(
             loading: false
           }));
           
-          console.log("Workout deleted successfully");
         } catch (error) {
           const errorMessage = error instanceof Error ? error.message : "Failed to delete workout";
           set({ error: errorMessage, loading: false });
-          console.error("Error deleting workout:", errorMessage);
           throw error;
         }
       },
@@ -135,11 +129,9 @@ export const useUserCreatedWorkoutStore = create<UserCreatedWorkoutState>()(
           // In a real app, you would fetch from an API and set the state
           set({ loading: false });
           
-          console.log(`Fetched ${userWorkouts.length} workouts for user ${userId}`);
         } catch (error) {
           const errorMessage = error instanceof Error ? error.message : "Failed to fetch user workouts";
           set({ error: errorMessage, loading: false });
-          console.error("Error fetching user workouts:", errorMessage);
         }
       },
       

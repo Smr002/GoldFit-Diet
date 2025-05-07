@@ -150,7 +150,6 @@ export default function CreateAccount() {
       : [];
 
   useEffect(() => {
-    console.log("Store State:", store);
   }, [
     store.selectedGender,
     store.selectedBodyType,

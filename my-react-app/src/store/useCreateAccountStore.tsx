@@ -25,7 +25,6 @@ export const useCreateAccountStore = create((set) => ({
   setGetShredded: (getShredded) => set({ selectedGetShredded: getShredded }),
   setBodyYouWant: (bodyYouWant) => set({ selectedBodyYouWant: bodyYouWant }),
   setWorkoutFrequency: (frequency) => {
-    console.log("Setting workoutFrequency to:", frequency);
     set({ workoutFrequency: frequency });
   },
 

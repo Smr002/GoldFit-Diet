@@ -5,7 +5,6 @@ const API_BASE_URL = "http://localhost:3000";
 
 export async function createUser(user: CreateUserDto) {
   try {
-    console.log("Creating user:", user);
     const response = await axios.post(`${API_BASE_URL}/users/`, user);
     return response.data;
   } catch (error: any) {
@@ -103,14 +102,12 @@ export async function getWorkouts(token: string) {
 
 export async function createWorkout(data: any, token: string) {
   try {
-    console.log("Sending create workout request:", data);
     const response = await axios.post(`${API_BASE_URL}/workouts`, data, {
       headers: {
         Authorization: `Bearer ${token}`,
         "Content-Type": "application/json",
       },
     });
-    console.log("Create workout response:", response.data);
     return response.data;
   } catch (error: any) {
     if (axios.isAxiosError(error)) {
@@ -212,7 +209,6 @@ export async function getUserById(id: number, token: string) {
 export function getUserIdFromToken(token: string): number | null {
   try {
     const payload = JSON.parse(atob(token.split(".")[1]));
-    console.log("Decoded token payload:", payload);
     return payload.id || null;
   } catch (error) {
     console.error("Error decoding token:", error);
