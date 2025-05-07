@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState, useEffect } from "react";
 import {
   LineChart,
   Line,
@@ -16,22 +16,99 @@ import {
   useTheme,
   Divider,
   useMediaQuery,
+  CircularProgress,
 } from "@mui/material";
 import TrendingUpIcon from "@mui/icons-material/TrendingUp";
-
-const data = [
-  { day: "Monday", weights: 0, calories: 22, reps: 18 },
-  { day: "Tuesday", weights: 15, calories: 10, reps: 30 },
-  { day: "Wednesday", weights: 40, calories: 20, reps: 25 },
-  { day: "Thursday", weights: 28, calories: 15, reps: 40 },
-  { day: "Friday", weights: 30, calories: 50, reps: 42 },
-  { day: "Saturday", weights: 18, calories: 52, reps: 41 },
-  { day: "Sunday", weights: 32, calories: 49, reps: 30 },
-];
+import { getWeeklySummary } from "../../../api";
 
 function WeeklyTrackingChart() {
   const theme = useTheme();
   const isMobile = useMediaQuery(theme.breakpoints.down("sm"));
+  const [chartData, setChartData] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
+
+  useEffect(() => {
+    const fetchWeeklyData = async () => {
+      try {
+        const token = localStorage.getItem("token");
+        if (!token) throw new Error("No token found");
+
+        const today = new Date();
+        const weekStart = new Date(
+          today.setDate(today.getDate() - today.getDay())
+        )
+          .toISOString()
+          .split("T")[0];
+
+        const summary = await getWeeklySummary(token, weekStart);
+
+        // Transform the data for the chart
+        const days = [
+          "Sunday",
+          "Monday",
+          "Tuesday",
+          "Wednesday",
+          "Thursday",
+          "Friday",
+          "Saturday",
+        ];
+        const transformedData = days.map((day, index) => ({
+          day,
+          calories: summary.calories.daily[index] || 0,
+          protein: summary.nutrition.averages.protein || 0,
+          workouts: summary.workouts.completed || 0,
+          caloriesBurned: summary.workouts.caloriesBurned || 0,
+        }));
+
+        setChartData(transformedData);
+        setLoading(false);
+      } catch (err) {
+        setError(err.message);
+        setLoading(false);
+      }
+    };
+
+    fetchWeeklyData();
+  }, []);
+
+  if (loading) {
+    return (
+      <Paper
+        elevation={3}
+        sx={{
+          p: 3,
+          borderRadius: 3,
+          mb: 4,
+          display: "flex",
+          justifyContent: "center",
+          alignItems: "center",
+          height: 400,
+        }}
+      >
+        <CircularProgress />
+      </Paper>
+    );
+  }
+
+  if (error) {
+    return (
+      <Paper
+        elevation={3}
+        sx={{
+          p: 3,
+          borderRadius: 3,
+          mb: 4,
+          display: "flex",
+          justifyContent: "center",
+          alignItems: "center",
+          height: 400,
+        }}
+      >
+        <Typography color="error">{error}</Typography>
+      </Paper>
+    );
+  }
 
   const CustomTooltip = ({ active, payload, label }) => {
     if (active && payload && payload.length) {
@@ -131,14 +208,14 @@ function WeeklyTrackingChart() {
       <Box sx={{ width: isMobile ? 600 : "100%" }}>
         <ResponsiveContainer width="100%" height={isMobile ? 280 : 380}>
           <LineChart
-            data={data}
+            data={chartData}
             margin={{ top: 20, right: 30, left: 20, bottom: 10 }}
           >
             <defs>
               {[
-                { id: "weights", color: "#29b6f6" },
                 { id: "calories", color: "#ff9800" },
-                { id: "reps", color: "#3f51b5" },
+                { id: "protein", color: "#29b6f6" },
+                { id: "caloriesBurned", color: "#3f51b5" },
               ].map(({ id, color }) => (
                 <linearGradient key={id} id={id} x1="0" y1="0" x2="0" y2="1">
                   <stop offset="5%" stopColor={color} stopOpacity={0.8} />
@@ -173,9 +250,13 @@ function WeeklyTrackingChart() {
               }}
             />
             {[
-              { key: "weights", name: "Weights", stroke: "#29b6f6" },
-              { key: "calories", name: "Calories", stroke: "#ff9800" },
-              { key: "reps", name: "Total Reps", stroke: "#3f51b5" },
+              { key: "calories", name: "Calories Consumed", stroke: "#ff9800" },
+              { key: "protein", name: "Protein (g)", stroke: "#29b6f6" },
+              {
+                key: "caloriesBurned",
+                name: "Calories Burned",
+                stroke: "#3f51b5",
+              },
             ].map(({ key, name, stroke }) => (
               <Line
                 key={key}
