@@ -12,7 +12,15 @@ import {
   useTheme,
   CircularProgress,
 } from "@mui/material";
-import { Dumbbell, Flame, Calendar, PlayCircle } from "lucide-react";
+import {
+  Dumbbell,
+  Flame,
+  Calendar,
+  PlayCircle,
+  Activity,
+  Weight,
+  Repeat,
+} from "lucide-react";
 import { getLogWorkout, getWorkouts } from "../../../api";
 
 function WorkoutSection() {
@@ -197,27 +205,101 @@ function WorkoutSection() {
 
           <List dense sx={{ pl: 1 }}>
             {workoutLog?.sessionExercises?.map((exercise, index) => (
-              <ListItem key={index} disablePadding sx={{ py: 0.7 }}>
-                <Typography
-                  variant="body1"
-                  component="span"
-                  sx={{
-                    mr: 1.5,
-                    color: isDarkMode ? theme.palette.primary.main : "#7E69AB",
-                    fontWeight: 600,
-                    fontSize: 18,
-                  }}
-                >
-                  •
-                </Typography>
-                <ListItemText
-                  primary={`${exercise.setsCompleted} × ${exercise.repsCompleted} - ${exercise.weightUsed}kg`}
-                  primaryTypographyProps={{
-                    variant: "body1",
-                    fontWeight: 500,
-                    color: theme.palette.text.primary,
-                  }}
-                />
+              <ListItem
+                key={index}
+                disablePadding
+                sx={{
+                  py: 1.2,
+                  px: 1,
+                  bgcolor: isDarkMode
+                    ? "rgba(255,255,255,0.03)"
+                    : "rgba(0,0,0,0.02)",
+                  borderRadius: 2,
+                  mb: 1,
+                  "&:last-child": { mb: 0 },
+                }}
+              >
+                <Box sx={{ width: "100%" }}>
+                  <Box sx={{ display: "flex", alignItems: "center", mb: 1 }}>
+                    <Typography
+                      variant="body1"
+                      sx={{
+                        color: theme.palette.text.primary,
+                        fontWeight: 600,
+                      }}
+                    >
+                      Exercise {index + 1}
+                    </Typography>
+                  </Box>
+                  <Box
+                    sx={{
+                      display: "grid",
+                      gridTemplateColumns: "repeat(3, 1fr)",
+                      gap: 1,
+                    }}
+                  >
+                    <Box
+                      sx={{
+                        display: "flex",
+                        alignItems: "center",
+                        gap: 1,
+                      }}
+                    >
+                      <Repeat
+                        size={14}
+                        color={
+                          isDarkMode ? theme.palette.primary.main : "#7E69AB"
+                        }
+                      />
+                      <Typography
+                        variant="body2"
+                        sx={{ color: theme.palette.text.secondary }}
+                      >
+                        {exercise.setsCompleted} sets
+                      </Typography>
+                    </Box>
+                    <Box
+                      sx={{
+                        display: "flex",
+                        alignItems: "center",
+                        gap: 1,
+                      }}
+                    >
+                      <Activity
+                        size={14}
+                        color={
+                          isDarkMode ? theme.palette.primary.main : "#7E69AB"
+                        }
+                      />
+                      <Typography
+                        variant="body2"
+                        sx={{ color: theme.palette.text.secondary }}
+                      >
+                        {exercise.repsCompleted} reps
+                      </Typography>
+                    </Box>
+                    <Box
+                      sx={{
+                        display: "flex",
+                        alignItems: "center",
+                        gap: 1,
+                      }}
+                    >
+                      <Weight
+                        size={14}
+                        color={
+                          isDarkMode ? theme.palette.primary.main : "#7E69AB"
+                        }
+                      />
+                      <Typography
+                        variant="body2"
+                        sx={{ color: theme.palette.text.secondary }}
+                      >
+                        {exercise.weightUsed}kg
+                      </Typography>
+                    </Box>
+                  </Box>
+                </Box>
               </ListItem>
             ))}
           </List>
