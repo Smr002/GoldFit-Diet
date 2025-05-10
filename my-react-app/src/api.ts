@@ -352,3 +352,25 @@ export async function deleteNotification(id: number, token: string) {
     throw new Error("Unexpected error");
   }
 }
+
+export async function notifyPayment(token: string, userId: number, phone: string, amount: number) {
+  try {
+    const response = await axios.post(`${API_BASE_URL}/notify/pay/`, {
+      userId,
+      phone,
+      amount,
+    }, {
+      headers: {
+        Authorization: `Bearer ${token}`,
+        "Content-Type": "application/json",
+      },
+    });
+    return response.data;
+  } catch (error: any) {
+    if (axios.isAxiosError(error)) {
+      console.error("Notify payment error:", error.response?.data);
+      throw new Error(error.response?.data?.error || "Failed to notify payment");
+    }
+    throw new Error("Unexpected error");
+  }
+}

@@ -70,7 +70,7 @@ const Checkout = ({ onClose }) => {
     firstName: "",
     lastName: "",
     email: "",
-    phone: "",
+    phone: "+355",
     address: "",
     city: "",
     state: "",
