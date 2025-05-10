@@ -11,6 +11,7 @@ import nutritionRouter from './nutrition/nutritionRouter';
 import adminRoutes from './admin/adminRoutes';
 import notificationRouter from './notifications/notificationRouter';
 import weeklySummary from "./summary/weeklySummaryRouter";
+import paymentRouter from "./payment/paymentRouter";
 
 dotenv.config();
 
@@ -33,6 +34,7 @@ app.use("/nutrition", nutritionRouter);
 app.use("/admin", adminRoutes);
 app.use("/notifications", notificationRouter);
 app.use("/summary",weeklySummary);
+app.use("/notify",paymentRouter)
 
 
 app.use((req, res) => {

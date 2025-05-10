@@ -37,6 +37,20 @@ export class UsersRepository {
     return updatedUser;
   }
 
+  async updatePremiumStatus(userId: number): Promise<User> {
+    if (!userId) throw new Error('User ID is required');
+    
+    return this.prisma.user.update({
+      where: {
+        id: userId // Correctly specify the user ID
+      },
+      data: {
+        isPremium: true,
+        updatedAt: new Date()
+      }
+    });
+  }
+
   async delete(id: number): Promise<User> {
     return this.prisma.user.delete({
       where: { id },
