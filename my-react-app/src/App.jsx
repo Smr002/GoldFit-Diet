@@ -18,6 +18,7 @@ import AdminManagement from "./pages/admin/AdminManagement";
 import Workout from "./components/UserWorkout";
 import AdminProfile from "./pages/admin/AdminProfile";
 import Profile from "./components/Profile";
+import Checkout from "./components/Checkout";
 
 const ProtectedRoute = ({ children }) => {
   const token = localStorage.getItem("token");
@@ -38,6 +39,7 @@ const routes = {
     { path: "/workouts", element: <Workout /> },
     { path: "/nutrition", element: <NutritionPage /> },
     { path: "/user-profile", element: <Profile /> },
+    { path: "/checkout", element: <Checkout /> },
   ],
   admin: [
     { path: "dashboard", element: <Dashboard /> },
@@ -105,6 +107,10 @@ export default function App() {
         <Route path="/admin" element={<AdminLayout isSuperAdmin={true} />}>
           <Route path="admin-management" element={<AdminManagement />} />
         </Route>
+
+        
+        {/* Payment Routes */}
+
       </Routes>
       <AccModal open={isModalOpen} onClose={() => setModalOpen(false)} />
     </BrowserRouter>

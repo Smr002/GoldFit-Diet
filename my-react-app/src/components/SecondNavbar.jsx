@@ -3,6 +3,7 @@ import { Link, useNavigate, useLocation } from "react-router-dom";
 import logo from "../assets/goldfitlogo.png";
 import LogoutIcon from "@mui/icons-material/Logout";
 import AccountCircleIcon from "@mui/icons-material/AccountCircle";
+import ShoppingCartIcon from "@mui/icons-material/ShoppingCart";
 import ProfilePopup from './ProfilePopup';
 import { getUserIdFromToken, getUserById } from '@/api';
 import { useUpdateProfile } from '@/store/useUpdateProfile';
@@ -17,6 +18,7 @@ import {
   Box,
   Typography,
   Fade,
+  Badge,
 } from "@mui/material";
 
 export default function SecondNavbar({ setModalOpen }) {
@@ -36,6 +38,7 @@ export default function SecondNavbar({ setModalOpen }) {
   const token = localStorage.getItem("token");
   const userId = token ? getUserIdFromToken(token) : null;
   const darkMode = localStorage.getItem("theme") === "dark";
+  const [cartItemCount, setCartItemCount] = useState(0);
 
   const {
     gender,
@@ -122,6 +125,10 @@ export default function SecondNavbar({ setModalOpen }) {
     setProfileOpen(false);
   };
 
+  const handleCartClick = () => {
+    navigate('/checkout');
+  };
+
   const isActive = (path) => {
     return location.pathname === path;
   };
@@ -177,6 +184,21 @@ export default function SecondNavbar({ setModalOpen }) {
           >
             <span className="nav-text">Nutrition</span>
           </Link>
+
+          <IconButton 
+            onClick={handleCartClick} 
+            color="inherit"
+            className="nav-icon-button cart-button"
+            aria-label="shopping cart"
+            sx={{ 
+              transition: 'all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275)',
+              mr: 1 
+            }}
+          >
+            <Badge badgeContent={cartItemCount} color="error" variant="dot" invisible={cartItemCount === 0}>
+              <ShoppingCartIcon />
+            </Badge>
+          </IconButton>
 
           <IconButton 
             onClick={() => setProfileOpen(true)} 
@@ -510,6 +532,50 @@ export default function SecondNavbar({ setModalOpen }) {
     
     body[data-theme="dark"] .nav-icon-button:hover {
       box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+    }
+    
+    /* Cart icon specific animations */
+    .cart-button {
+      position: relative;
+      overflow: visible !important;
+    }
+    
+    .cart-button:hover {
+      transform: scale(1.1) !important;
+    }
+    
+    /* Cart hover animation */
+    .cart-button:hover svg {
+      animation: cartBounce 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    }
+    
+    @keyframes cartBounce {
+      0%, 100% { transform: translateY(0); }
+      50% { transform: translateY(-4px); }
+    }
+    
+    /* Light mode cart styling */
+    .cart-button svg {
+      color: var(--text-color, rgba(0, 0, 0, 0.75));
+      transition: color 0.3s ease;
+    }
+    
+    .cart-button:hover svg {
+      color: #6c63ff;
+    }
+    
+    /* Dark mode cart styling */
+    body[data-theme="dark"] .cart-button svg {
+      color: var(--text-color-dark, rgba(255, 255, 255, 0.85));
+    }
+    
+    body[data-theme="dark"] .cart-button:hover svg {
+      color: #d4af37;
+    }
+    
+    /* Additional styles for cart button with items */
+    .MuiBadge-badge {
+      transition: all 0.3s ease !important;
     }
   `}
 </style>

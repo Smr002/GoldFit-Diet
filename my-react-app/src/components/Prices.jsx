@@ -55,9 +55,14 @@ const Prices = ({setModalOpen}) => {
   };
   
   // Function to handle CTA button clicks - opens the modal
-  const handleCTAClick = () => {
+  const handleCTAClick = (plan) => {
     if (typeof setModalOpen === 'function') {
-      setModalOpen(true);
+      // Pass the selected plan and period to the modal
+      setModalOpen({
+        open: true,
+        plan: plan,
+        period: selectedPlan
+      });
     } else {
       console.error("setModalOpen is not a function");
     }
@@ -245,7 +250,7 @@ const Prices = ({setModalOpen}) => {
                 <button 
                   className="pricing-cta" 
                   style={{ background: `linear-gradient(to right, ${plan.color}, ${plan.popular ? "var(--secondary-color)" : "var(--primary-color)"})` }}
-                  onClick={handleCTAClick}
+                  onClick={() => handleCTAClick(plan)}
                 >
                   {plan.cta}
                 </button>
