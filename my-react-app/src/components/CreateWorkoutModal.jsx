@@ -16,6 +16,7 @@ const CreateWorkoutModal = ({ onClose, onSave, onDelete, workout }) => {
       description: "",
       difficulty: "beginner",
       goal: "general fitness",
+      timesPerWeek: 3, // Add timesPerWeek field with default value
       exercises: [],
     }
   );
@@ -292,6 +293,26 @@ const CreateWorkoutModal = ({ onClose, onSave, onDelete, workout }) => {
               <MenuItem value="general fitness">General Fitness</MenuItem>
             </TextField>
           </Box>
+
+          {/* Add Times per Week Dropdown */}
+          <TextField
+            select
+            label="Times per week"
+            value={workoutData.timesPerWeek}
+            onChange={(e) =>
+              setWorkoutData({
+                ...workoutData,
+                timesPerWeek: parseInt(e.target.value),
+              })
+            }
+            fullWidth
+            sx={{ mb: 3 }}
+          >
+            <MenuItem value={3}>3</MenuItem>
+            <MenuItem value={4}>4</MenuItem>
+            <MenuItem value={5}>5</MenuItem>
+            <MenuItem value={6}>6</MenuItem>
+          </TextField>
 
           <Typography variant="h6" sx={{ mt: 3, mb: 2 }}>
             Exercises
