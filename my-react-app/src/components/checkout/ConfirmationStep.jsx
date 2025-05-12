@@ -538,7 +538,7 @@ const ConfirmationStep = ({
           variant="contained"
           color="primary"
           onClick={handlePlaceOrder}
-          disabled={isLoading}
+          disabled={isLoading || !formData.termsAccepted} // Disable if loading or terms not accepted
           endIcon={<CheckCircleIcon />}
           sx={{
             backgroundColor: isDarkMode ? "#FFD700" : "#6c63ff",
