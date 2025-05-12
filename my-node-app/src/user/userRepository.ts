@@ -1,4 +1,4 @@
-import { Goal, PrismaClient, type User } from "@prisma/client";
+import { Admin, Goal, PrismaClient, type User } from "@prisma/client";
 
 export class UsersRepository {
   private prisma = new PrismaClient();
@@ -11,6 +11,24 @@ export class UsersRepository {
     return this.prisma.user.findUnique({
       where: { id },
     });
+  }
+
+  async findAdminById(id: number): Promise<Admin | null> {
+    try {
+      if (!id || isNaN(id)) {
+        throw new Error('Invalid admin ID');
+      }
+
+      return this.prisma.admin.findUnique({
+        where: { userId: id },
+        include: {
+          user: true // Include user data if needed
+        }
+      });
+    } catch (error) {
+      console.error('Error finding admin:', error);
+      return null;
+    }
   }
 
   async findByEmail(email: string): Promise<User | null> {

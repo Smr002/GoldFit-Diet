@@ -1,5 +1,5 @@
 import bcrypt from "bcrypt";
-import type { Goal, User } from "@prisma/client";
+import type { Admin, Goal, User } from "@prisma/client";
 import { mapCreateUserInput } from "./utlis/mapCreateUserInput" 
 import { mapUpdateUserInput } from "./utlis/mapUpdateUserInput";
 import { usersRepository } from "./userRepository";
@@ -14,6 +14,10 @@ export class UserService {
 
   async getUserById(id: number): Promise<User | null> {
     return usersRepository.findById(id);
+  }
+
+  async getAdminById(id: number): Promise<Admin | null> {
+    return usersRepository.findAdminById(id);
   }
 
   async getUserByEmail(email: string): Promise<User | null> {

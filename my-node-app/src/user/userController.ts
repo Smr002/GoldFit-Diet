@@ -22,6 +22,18 @@ export class UserController {
     }
   }
 
+  async getAdminById(req: Request, res: Response) {
+    try {
+      const id = Number(req.params.id);
+      const user = await userService.getAdminById(id);
+      if (!user) return res.status(404).json({ error: "User not found." });
+      res.json(user);
+    } catch (err) {
+      console.error(err);
+      res.status(400).json({ error: "Invalid ID." });
+    }
+  }
+
   async getByEmail(req: Request, res: Response) {
     try {
       const email = req.params.email;

@@ -26,6 +26,7 @@ export const login = async (req: Request, res: Response) => {
       name: user.firstName,
       lastname:user.lastName,
       email: user.email,
+     
     },
   });
 };
