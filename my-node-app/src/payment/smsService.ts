@@ -25,7 +25,7 @@ export const sendPaymentConfirmationSMS = async (phone: string, amount: number) 
     }
 
     const formattedAmount = amount.toFixed(2);
-    const message = `✅ Your payment of $${formattedAmount} was successful. Your account has been upgraded to Premium(GoldFiet Support)!`;
+    const message = `✅ Your payment of $${formattedAmount} was successful. Your account has been upgraded to Premium(GoldFit Support)!`;
  
     
     const result = await client.messages.create({
