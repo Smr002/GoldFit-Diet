@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
-import { loginUser } from "../api";
+import { loginUser, getAdminById, getUserByEmail } from "../api";
 import {
   Dialog,
   DialogTitle,
@@ -80,8 +80,24 @@ export default function AccModal({ open, onClose }) {
 
     try {
       const response = await loginUser({ email, password });
-
       localStorage.setItem("token", response.token);
+
+      try {
+        // Check if user is admin
+        const userData = await getUserByEmail(email, response.token);
+        const adminData = await getAdminById(userData.id, response.token);
+        console.log("Admin Data:", adminData);
+        console.log("User Data:", userData);
+        if (adminData && adminData.role === "admin") {
+          onClose();
+          navigate("/admin/dashboard");
+          return;
+        }
+      } catch (adminError) {
+        console.error("Error checking admin status:", adminError);
+      }
+
+      // If not admin or error checking admin status, proceed as regular user
       onClose();
       navigate("/user-home");
     } catch (err) {

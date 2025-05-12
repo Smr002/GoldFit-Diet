@@ -58,6 +58,34 @@ export async function getUsers(token: string) {
   }
 }
 
+export async function getUserByEmail(email: string, token: string) {
+  try {
+    const response = await axios.get(`${API_BASE_URL}/users/email/${email}`, {
+      headers: { Authorization: `Bearer ${token}` },
+    });
+    return response.data;
+  } catch (error: any) {
+    if (axios.isAxiosError(error)) {
+      throw new Error(error.response?.data?.error || "Failed to fetch user");
+    }
+    throw new Error("Unexpected error");
+  }
+}
+
+export async function getAdminById(id: number,token: string) {  
+  try {
+    const response = await axios.get(`${API_BASE_URL}/users/admin/${id}`, {
+      headers: { Authorization: `Bearer ${token}` },
+    });
+    return response.data;
+  } catch (error: any) {
+    if (axios.isAxiosError(error)) {
+      throw new Error(error.response?.data?.error || "Failed to fetch users");
+    }
+    throw new Error("Unexpected error");
+  }
+}
+
 export async function getExercises(token: string) {
   try {
     const response = await axios.get(`${API_BASE_URL}/exercises`, {
