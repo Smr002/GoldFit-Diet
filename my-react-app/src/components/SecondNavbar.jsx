@@ -4,9 +4,9 @@ import logo from "../assets/goldfitlogo.png";
 import LogoutIcon from "@mui/icons-material/Logout";
 import AccountCircleIcon from "@mui/icons-material/AccountCircle";
 import ShoppingCartIcon from "@mui/icons-material/ShoppingCart";
-import ProfilePopup from './ProfilePopup';
-import { getUserIdFromToken, getUserById } from '@/api';
-import { useUpdateProfile } from '@/store/useUpdateProfile';
+import ProfilePopup from "./ProfilePopup";
+import { getUserIdFromToken, getUserById } from "@/api";
+import { useUpdateProfile } from "@/store/useUpdateProfile";
 import {
   IconButton,
   Dialog,
@@ -91,7 +91,7 @@ export default function SecondNavbar({ setModalOpen }) {
         }
       }
     };
-    
+
     if (profileOpen) {
       fetchUserData();
     }
@@ -99,13 +99,13 @@ export default function SecondNavbar({ setModalOpen }) {
 
   useEffect(() => {
     if (darkMode) {
-      document.body.setAttribute('data-theme', 'dark');
+      document.body.setAttribute("data-theme", "dark");
     } else {
-      document.body.setAttribute('data-theme', 'light');
+      document.body.setAttribute("data-theme", "light");
     }
-    
+
     return () => {
-      document.body.removeAttribute('data-theme');
+      document.body.removeAttribute("data-theme");
     };
   }, [darkMode]);
 
@@ -117,16 +117,16 @@ export default function SecondNavbar({ setModalOpen }) {
 
   const handleProfileSubmit = async (e) => {
     e.preventDefault();
-    
+
     // Import the same logic from Profile.jsx
     // Copy the handleSubmit function from Profile.jsx
-    
+
     // After successful submission, close the popup
     setProfileOpen(false);
   };
 
   const handleCartClick = () => {
-    navigate('/checkout');
+    navigate("/checkout");
   };
 
   const isActive = (path) => {
@@ -136,7 +136,7 @@ export default function SecondNavbar({ setModalOpen }) {
   return (
     <header className={`custom-header ${scrolled ? "scrolled" : ""}`}>
       <div className="navbar-container">
-        <Link to="/" className="logo-container">
+        <Link to="/user-home" className="logo-container">
           <img src={logo} alt="Logo" className="logo" />
         </Link>
 
@@ -158,50 +158,63 @@ export default function SecondNavbar({ setModalOpen }) {
         <nav className={`nav-links ${menuOpen ? "open" : ""}`}>
           <Link
             to="/user-home"
-            className={isActive("/user-home") ? "try-now-button active" : "nav-link"}
+            className={
+              isActive("/user-home") ? "try-now-button active" : "nav-link"
+            }
             onClick={() => setMenuOpen(false)}
           >
             <span className="nav-text">Home</span>
           </Link>
           <Link
             to="/exercises"
-            className={isActive("/exercises") ? "try-now-button active" : "nav-link"}
+            className={
+              isActive("/exercises") ? "try-now-button active" : "nav-link"
+            }
             onClick={() => setMenuOpen(false)}
           >
             <span className="nav-text">Exercises</span>
           </Link>
           <Link
             to="/workouts"
-            className={isActive("/workouts") ? "try-now-button active" : "nav-link"}
+            className={
+              isActive("/workouts") ? "try-now-button active" : "nav-link"
+            }
             onClick={() => setMenuOpen(false)}
           >
             <span className="nav-text">Workouts</span>
           </Link>
           <Link
             to="/nutrition"
-            className={isActive("/nutrition") ? "try-now-button active" : "nav-link"}
+            className={
+              isActive("/nutrition") ? "try-now-button active" : "nav-link"
+            }
             onClick={() => setMenuOpen(false)}
           >
             <span className="nav-text">Nutrition</span>
           </Link>
 
-          <IconButton 
-            onClick={handleCartClick} 
+          <IconButton
+            onClick={handleCartClick}
             color="inherit"
             className="nav-icon-button cart-button"
             aria-label="shopping cart"
-            sx={{ 
-              transition: 'all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275)',
-              mr: 1 
+            sx={{
+              transition: "all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275)",
+              mr: 1,
             }}
           >
-            <Badge badgeContent={cartItemCount} color="error" variant="dot" invisible={cartItemCount === 0}>
+            <Badge
+              badgeContent={cartItemCount}
+              color="error"
+              variant="dot"
+              invisible={cartItemCount === 0}
+            >
               <ShoppingCartIcon />
             </Badge>
           </IconButton>
 
-          <IconButton 
-            onClick={() => setProfileOpen(true)} 
+          <IconButton
+            onClick={() => setProfileOpen(true)}
             color="inherit"
             className="nav-icon-button"
           >
@@ -322,8 +335,8 @@ export default function SecondNavbar({ setModalOpen }) {
         setGoal={setGoal}
         darkMode={darkMode}
       />
-    <style>
-  {`
+      <style>
+        {`
     /* Enhanced link transitions */
     .nav-link, .try-now-button {
       position: relative;
@@ -578,7 +591,7 @@ export default function SecondNavbar({ setModalOpen }) {
       transition: all 0.3s ease !important;
     }
   `}
-</style>
+      </style>
     </header>
   );
 }
