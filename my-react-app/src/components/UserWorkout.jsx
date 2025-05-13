@@ -199,7 +199,8 @@ const UserWorkout = () => {
           })),
           isRecommended: w.premium,
           createdAt: w.createdAt,
-          userId: w.createdByUser ? String(w.createdByUser) : null,
+          createdByUser: Number(w.createdByUser), // Ensure it's a number
+          userId: String(w.createdByUser), // Keep for backward compatibility
           src: legs,
         }));
         setRecommendedWorkouts(transformed.filter((w) => w.isRecommended));
@@ -264,11 +265,13 @@ const UserWorkout = () => {
     }
   }, [token]);
 
+  // Update the ownership check function
   const isWorkoutOwner = (workout) => {
     return (
       loggedInUserId &&
-      workout?.userId &&
-      String(workout.userId) === String(loggedInUserId)
+      (workout?.userId || workout?.createdByUser) &&
+      String(workout?.userId || workout?.createdByUser) ===
+        String(loggedInUserId)
     );
   };
 
@@ -328,7 +331,7 @@ const UserWorkout = () => {
       const payload = {
         name: newWorkout.title,
         level: newWorkout.difficulty || "beginner",
-        timesPerWeek: newWorkout.times || 3,
+        timesPerWeek: 3,
         workoutExercises: newWorkout.exercises.map((ex) => ({
           exerciseId: ex.id,
           sets: ex.sets || 3,
@@ -344,7 +347,6 @@ const UserWorkout = () => {
         id: response.id,
         createdAt: response.createdAt || new Date().toISOString(),
         isRecommended: false,
-        timesPerWeek: newWorkout.times || 3,
         difficulty: newWorkout.difficulty || "beginner",
         duration: newWorkout.exercises.length * 10,
         goal: newWorkout.goal || "general fitness",
@@ -380,12 +382,10 @@ const UserWorkout = () => {
     }
   };
 
-  const handleEditWorkout = async (updatedWorkout) => {
-    if (!isWorkoutOwner(updatedWorkout)) return;
-
+  const handleEditWorkout = async (updatedWorkout, id) => {
     try {
       const response = await updateWorkout(
-        updatedWorkout.id,
+        id,
         {
           name: updatedWorkout.title,
           level: updatedWorkout.difficulty,
@@ -1265,7 +1265,11 @@ const UserWorkout = () => {
                 setShowCreateModal(false);
                 setEditingWorkout(null);
               }}
-              onSave={editingWorkout ? handleEditWorkout : handleCreateWorkout}
+              onSave={
+                editingWorkout
+                  ? (data) => handleEditWorkout(data, editingWorkout.id)
+                  : handleCreateWorkout
+              }
               onDelete={
                 editingWorkout && isWorkoutOwner(editingWorkout)
                   ? () => handleDeleteFromEdit(editingWorkout.id)
