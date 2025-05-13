@@ -225,17 +225,37 @@ export class WorkoutRepository {
       },
     });
 
-    // Create associated session-exercises
     if (exercises.length) {
-      await this.prisma.sessionExercise.createMany({
-        data: exercises.map((ex) => ({
-          sessionId: createdSession.id,
-          exerciseId: ex.exerciseId,
-          weightUsed: ex.weightUsed || null,
-          setsCompleted: ex.setsCompleted || null,
-          repsCompleted: ex.repsCompleted || null,
-        })),
-      });
+      for (const exercise of exercises) {
+        // Skip if no weight was used
+        if (!exercise.weightUsed) {
+          await this.prisma.sessionExercise.create({
+            data: {
+              sessionId: createdSession.id,
+              exerciseId: exercise.exerciseId,
+              weightUsed: exercise.weightUsed || null,
+              setsCompleted: exercise.setsCompleted || null,
+              repsCompleted: exercise.repsCompleted || null,
+            }
+          });
+          continue;
+        }
+
+        // Get current max PR for this user and exercise
+        const currentMaxPR = await this.getMaxPrForExercise(userId, exercise.exerciseId);
+        
+        // Create the session exercise with updated max PR if needed
+        await this.prisma.sessionExercise.create({
+          data: {
+            sessionId: createdSession.id,
+            exerciseId: exercise.exerciseId,
+            weightUsed: exercise.weightUsed,
+            setsCompleted: exercise.setsCompleted || null,
+            repsCompleted: exercise.repsCompleted || null,
+            maxPr: exercise.weightUsed > currentMaxPR ? exercise.weightUsed : currentMaxPR,
+          }
+        });
+      }
     }
 
     return this.prisma.workoutSession.findUnique({
@@ -265,6 +285,26 @@ export class WorkoutRepository {
     sessionExerciseId: number,
     data: { weightUsed?: number; setsCompleted?: number; repsCompleted?: number }
   ): Promise<SessionExercise> {
+    // If weight is being updated, we need to check for PR
+    if (data.weightUsed) {
+      const currentExercise = await this.prisma.sessionExercise.findUnique({
+        where: { id: sessionExerciseId },
+        include: { session: true, exercise: true },
+      });
+      
+      if (currentExercise) {
+        const currentMaxPR = await this.getMaxPrForExercise(
+          currentExercise.session.userId, 
+          currentExercise.exerciseId
+        );
+        
+        // Update max_pr if the new weight is higher
+        if (data.weightUsed > currentMaxPR) {
+          data.maxPr = data.weightUsed;
+        }
+      }
+    }
+
     return this.prisma.sessionExercise.update({
       where: { id: sessionExerciseId },
       data,
@@ -448,5 +488,48 @@ export class WorkoutRepository {
       console.error('Repository error in getLogWorkoutSession:', error);
       throw new Error(`Failed to fetch workout sessions: ${error instanceof Error ? error.message : 'Unknown error'}`);
     }
+  }
+
+  async getMaxPrForExercise(userId: number, exerciseId: number): Promise<number> {
+    // First try to get the latest max_pr value for this exercise
+    const latestExerciseWithMaxPr = await this.prisma.sessionExercise.findFirst({
+      where: {
+        exerciseId,
+        session: {
+          userId,
+        },
+        maxPr: {
+          not: null,
+        },
+      },
+      orderBy: {
+        createdAt: 'desc',
+      },
+      select: {
+        maxPr: true,
+      },
+    });
+
+    if (latestExerciseWithMaxPr?.maxPr) {
+      return latestExerciseWithMaxPr.maxPr;
+    }
+
+    // Fall back to calculating it if no max_pr is stored
+    const result = await this.prisma.sessionExercise.aggregate({
+      where: {
+        exerciseId,
+        session: {
+          userId,
+        },
+        weightUsed: {
+          not: null,
+        },
+      },
+      _max: {
+        weightUsed: true,
+      },
+    });
+
+    return result._max.weightUsed ?? 0;
   }
 }

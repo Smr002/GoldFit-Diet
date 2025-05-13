@@ -287,5 +287,23 @@ export class WorkoutController {
       });
     }
   }
+
+  async getMaxPrForExercise(req: Request, res: Response): Promise<void> {
+    try {
+      const userId = req.user?.id;
+      const exerciseId = Number(req.params.exerciseId);
+      
+      if (!userId || isNaN(exerciseId)) {
+        res.status(400).json({ error: 'Invalid user ID or exercise ID' });
+        return;
+      }
+      
+      const maxPr = await this.service.getMaxPrForExercise(userId, exerciseId);
+      res.status(200).json({ maxPr });
+    } catch (error) {
+      console.error('Error getting max PR for exercise:', error);
+      res.status(500).json({ error: 'Failed to get max PR for exercise' });
+    }
+  }
 }
 

@@ -166,6 +166,7 @@ model SessionExercise {
   weightUsed    Float? @map("weight_used")
   setsCompleted Int?   @map("sets_completed")
   repsCompleted Int?   @map("reps_completed")
+  maxPr         Int?   @map("max_pr")
 
   createdAt DateTime @default(now()) @map("created_at")
 

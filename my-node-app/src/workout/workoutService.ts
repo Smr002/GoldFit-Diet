@@ -197,4 +197,8 @@ export class WorkoutService {
       throw error;
     }
   }
+
+  async getMaxPrForExercise(userId: number, exerciseId: number): Promise<number> {
+    return this.repository.getMaxPrForExercise(userId, exerciseId);
+  }
 }
