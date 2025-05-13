@@ -1,7 +1,16 @@
 import React, { useState, useEffect, useRef } from "react";
-import { 
-  Box, Button, TextField, Typography, MenuItem, IconButton, Divider, 
-  Autocomplete, CircularProgress, Chip, Popper 
+import {
+  Box,
+  Button,
+  TextField,
+  Typography,
+  MenuItem,
+  IconButton,
+  Divider,
+  Autocomplete,
+  CircularProgress,
+  Chip,
+  Popper,
 } from "@mui/material";
 import AddIcon from "@mui/icons-material/Add";
 import DeleteIcon from "@mui/icons-material/Delete";
@@ -9,18 +18,28 @@ import CloseIcon from "@mui/icons-material/Close";
 import { getExercises } from "../api"; // Import your API function to fetch exercises
 
 const CreateWorkoutModal = ({ onClose, onSave, onDelete, workout }) => {
-  // Workout state
-  const [workoutData, setWorkoutData] = useState(
-    workout || {
-      title: "",
-      description: "",
-      difficulty: "beginner",
-      goal: "general fitness",
-      timesPerWeek: 3, // Add timesPerWeek field with default value
-      exercises: [],
+  const [workoutData, setWorkoutData] = useState({
+    title: "",
+    description: "",
+    difficulty: "beginner",
+    goal: "general fitness",
+    timesPerWeek: 3,
+    exercises: [],
+  });
+
+  useEffect(() => {
+    if (workout) {
+      setWorkoutData({
+        title: workout.title || "",
+        description: workout.description || "",
+        difficulty: workout.difficulty || "beginner",
+        goal: workout.goal || "general fitness",
+        timesPerWeek: Number(workout.timesPerWeek) || 3,
+        exercises: workout.exercises || [],
+      });
     }
-  );
-  
+  }, [workout]);
+
   // State for available exercises from API
   const [availableExercises, setAvailableExercises] = useState([]);
   const [loading, setLoading] = useState(false);
@@ -100,7 +119,7 @@ const CreateWorkoutModal = ({ onClose, onSave, onDelete, workout }) => {
       setWorkoutData({
         ...workoutData,
         exercises: [
-          ...workoutData.exercises, 
+          ...workoutData.exercises,
           {
             id: selectedExercise.id,
             name: selectedExercise.name,
@@ -108,7 +127,7 @@ const CreateWorkoutModal = ({ onClose, onSave, onDelete, workout }) => {
             equipment: selectedExercise.equipment,
             sets: newExerciseDetails.sets,
             reps: newExerciseDetails.reps,
-          }
+          },
         ],
       });
       setSelectedExercise(null);
@@ -130,6 +149,16 @@ const CreateWorkoutModal = ({ onClose, onSave, onDelete, workout }) => {
     return <Popper {...props} placement="bottom-start" />;
   };
 
+  const handleSave = () => {
+    // Ensure timesPerWeek is included as a number
+    const workoutToSave = {
+      ...workoutData,
+      timesPerWeek: Number(workoutData.timesPerWeek),
+    };
+    console.log("Saving workout with data:", workoutToSave); // Debug log
+    onSave(workoutToSave);
+  };
+
   return (
     <div
       style={{
@@ -148,7 +177,8 @@ const CreateWorkoutModal = ({ onClose, onSave, onDelete, workout }) => {
     >
       <Box
         sx={{
-          backgroundColor: (theme) => theme.palette.mode === "dark" ? "#252525" : "background.paper",
+          backgroundColor: (theme) =>
+            theme.palette.mode === "dark" ? "#252525" : "background.paper",
           borderRadius: 2,
           boxShadow: 24,
           maxWidth: 600,
@@ -157,7 +187,10 @@ const CreateWorkoutModal = ({ onClose, onSave, onDelete, workout }) => {
           overflowY: "auto",
           p: 0,
           position: "relative",
-          border: (theme) => theme.palette.mode === "dark" ? "1px solid rgba(255, 255, 255, 0.1)" : "none",
+          border: (theme) =>
+            theme.palette.mode === "dark"
+              ? "1px solid rgba(255, 255, 255, 0.1)"
+              : "none",
         }}
       >
         {/* Header */}
@@ -166,32 +199,44 @@ const CreateWorkoutModal = ({ onClose, onSave, onDelete, workout }) => {
             display: "flex",
             justifyContent: "space-between",
             alignItems: "center",
-            backgroundColor: (theme) => 
-              theme.palette.mode === "dark" 
-                ? (workout ? "#333333" : "linear-gradient(45deg, #FFD700 0%, #FFC107 100%)") 
-                : (workout ? "grey.100" : "primary.main"),
-            color: (theme) => 
-              theme.palette.mode === "dark" 
-                ? (workout ? "#ffffff" : "#121212") 
-                : (workout ? "text.primary" : "white"),
+            backgroundColor: (theme) =>
+              theme.palette.mode === "dark"
+                ? workout
+                  ? "#333333"
+                  : "linear-gradient(45deg, #FFD700 0%, #FFC107 100%)"
+                : workout
+                ? "grey.100"
+                : "primary.main",
+            color: (theme) =>
+              theme.palette.mode === "dark"
+                ? workout
+                  ? "#ffffff"
+                  : "#121212"
+                : workout
+                ? "text.primary"
+                : "white",
             p: 2,
             borderTopLeftRadius: 8,
             borderTopRightRadius: 8,
           }}
         >
-          <Typography 
-            variant="h5" 
-            component="h2" 
+          <Typography
+            variant="h5"
+            component="h2"
             fontWeight="bold"
             sx={{
               color: (theme) =>
                 theme.palette.mode === "dark"
                   ? "#FFD700" // Gold in dark mode
-                  : (workout ? "#6200ea" : "#ffffff"), // In light mode: Purple for edit, white for create
-              textShadow: (theme) => 
+                  : workout
+                  ? "#6200ea"
+                  : "#ffffff", // In light mode: Purple for edit, white for create
+              textShadow: (theme) =>
                 theme.palette.mode === "dark" && !workout
                   ? "0 1px 2px rgba(0, 0, 0, 0.3)"
-                  : !workout ? "0 1px 2px rgba(0, 0, 0, 0.2)" : "none",
+                  : !workout
+                  ? "0 1px 2px rgba(0, 0, 0, 0.2)"
+                  : "none",
               transition: "color 0.3s ease",
             }}
           >
@@ -200,19 +245,23 @@ const CreateWorkoutModal = ({ onClose, onSave, onDelete, workout }) => {
           <IconButton
             onClick={onClose}
             size="small"
-            sx={{ 
-              color: (theme) => 
+            sx={{
+              color: (theme) =>
                 theme.palette.mode === "dark"
                   ? "#FFD700" // Gold in dark mode
-                  : (workout ? "#6200ea" : "#ffffff"), // In light mode: Purple for edit, white for create
+                  : workout
+                  ? "#6200ea"
+                  : "#ffffff", // In light mode: Purple for edit, white for create
               transition: "all 0.3s ease",
               "&:hover": {
                 backgroundColor: (theme) =>
                   theme.palette.mode === "dark"
-                    ? "rgba(255, 215, 0, 0.1)" 
-                    : (workout ? "rgba(98, 0, 234, 0.1)" : "rgba(255, 255, 255, 0.2)"),
-                transform: "rotate(90deg)"
-              }
+                    ? "rgba(255, 215, 0, 0.1)"
+                    : workout
+                    ? "rgba(98, 0, 234, 0.1)"
+                    : "rgba(255, 255, 255, 0.2)",
+                transform: "rotate(90deg)",
+              },
             }}
           >
             <CloseIcon />
@@ -220,39 +269,57 @@ const CreateWorkoutModal = ({ onClose, onSave, onDelete, workout }) => {
         </Box>
 
         {/* Body */}
-        <Box sx={{ 
-          p: 3, 
-          backgroundColor: (theme) => theme.palette.mode === "dark" ? "#252525" : "#ffffff",
-          color: (theme) => theme.palette.mode === "dark" ? "#ffffff" : "inherit",
-        }}>
+        <Box
+          sx={{
+            p: 3,
+            backgroundColor: (theme) =>
+              theme.palette.mode === "dark" ? "#252525" : "#ffffff",
+            color: (theme) =>
+              theme.palette.mode === "dark" ? "#ffffff" : "inherit",
+          }}
+        >
           <TextField
             label="Workout Title"
             variant="outlined"
             fullWidth
             value={workoutData.title}
-            onChange={(e) => setWorkoutData({ ...workoutData, title: e.target.value })}
-            sx={{ 
+            onChange={(e) =>
+              setWorkoutData({ ...workoutData, title: e.target.value })
+            }
+            sx={{
               mb: 2,
-              '& .MuiOutlinedInput-root': {
-                '& fieldset': {
-                  borderColor: (theme) => theme.palette.mode === "dark" ? "rgba(255, 255, 255, 0.23)" : "rgba(0, 0, 0, 0.23)",
+              "& .MuiOutlinedInput-root": {
+                "& fieldset": {
+                  borderColor: (theme) =>
+                    theme.palette.mode === "dark"
+                      ? "rgba(255, 255, 255, 0.23)"
+                      : "rgba(0, 0, 0, 0.23)",
                 },
-                '&:hover fieldset': {
-                  borderColor: (theme) => theme.palette.mode === "dark" ? "rgba(255, 255, 255, 0.5)" : "rgba(0, 0, 0, 0.5)",
+                "&:hover fieldset": {
+                  borderColor: (theme) =>
+                    theme.palette.mode === "dark"
+                      ? "rgba(255, 255, 255, 0.5)"
+                      : "rgba(0, 0, 0, 0.5)",
                 },
-                '&.Mui-focused fieldset': {
-                  borderColor: (theme) => theme.palette.mode === "dark" ? "#FFD700" : "primary.main",
+                "&.Mui-focused fieldset": {
+                  borderColor: (theme) =>
+                    theme.palette.mode === "dark" ? "#FFD700" : "primary.main",
                 },
               },
-              '& .MuiInputLabel-root': {
-                color: (theme) => theme.palette.mode === "dark" ? "rgba(255, 255, 255, 0.7)" : "rgba(0, 0, 0, 0.6)",
-                '&.Mui-focused': {
-                  color: (theme) => theme.palette.mode === "dark" ? "#FFD700" : "primary.main",
+              "& .MuiInputLabel-root": {
+                color: (theme) =>
+                  theme.palette.mode === "dark"
+                    ? "rgba(255, 255, 255, 0.7)"
+                    : "rgba(0, 0, 0, 0.6)",
+                "&.Mui-focused": {
+                  color: (theme) =>
+                    theme.palette.mode === "dark" ? "#FFD700" : "primary.main",
                 },
               },
-              '& .MuiInputBase-input': {
-                color: (theme) => theme.palette.mode === "dark" ? "#ffffff" : "inherit",
-              }
+              "& .MuiInputBase-input": {
+                color: (theme) =>
+                  theme.palette.mode === "dark" ? "#ffffff" : "inherit",
+              },
             }}
           />
 
@@ -263,7 +330,9 @@ const CreateWorkoutModal = ({ onClose, onSave, onDelete, workout }) => {
             multiline
             rows={2}
             value={workoutData.description}
-            onChange={(e) => setWorkoutData({ ...workoutData, description: e.target.value })}
+            onChange={(e) =>
+              setWorkoutData({ ...workoutData, description: e.target.value })
+            }
             sx={{ mb: 2 }}
           />
 
@@ -272,7 +341,9 @@ const CreateWorkoutModal = ({ onClose, onSave, onDelete, workout }) => {
               select
               label="Difficulty"
               value={workoutData.difficulty}
-              onChange={(e) => setWorkoutData({ ...workoutData, difficulty: e.target.value })}
+              onChange={(e) =>
+                setWorkoutData({ ...workoutData, difficulty: e.target.value })
+              }
               sx={{ flex: 1 }}
             >
               <MenuItem value="beginner">Beginner</MenuItem>
@@ -284,7 +355,9 @@ const CreateWorkoutModal = ({ onClose, onSave, onDelete, workout }) => {
               select
               label="Goal"
               value={workoutData.goal}
-              onChange={(e) => setWorkoutData({ ...workoutData, goal: e.target.value })}
+              onChange={(e) =>
+                setWorkoutData({ ...workoutData, goal: e.target.value })
+              }
               sx={{ flex: 1 }}
             >
               <MenuItem value="strength">Strength</MenuItem>
@@ -330,26 +403,30 @@ const CreateWorkoutModal = ({ onClose, onSave, onDelete, workout }) => {
                 mb: 2,
                 p: 2,
                 borderRadius: 1,
-                backgroundColor: (theme) => theme.palette.mode === "dark" ? "#333333" : "grey.50",
-                border: (theme) => theme.palette.mode === "dark" ? "1px solid rgba(255, 255, 255, 0.1)" : "none",
+                backgroundColor: (theme) =>
+                  theme.palette.mode === "dark" ? "#333333" : "grey.50",
+                border: (theme) =>
+                  theme.palette.mode === "dark"
+                    ? "1px solid rgba(255, 255, 255, 0.1)"
+                    : "none",
               }}
             >
               <Box sx={{ flex: 2 }}>
                 <Typography variant="subtitle1">{exercise.name}</Typography>
                 {exercise.muscle && (
-                  <Chip 
-                    label={exercise.muscle} 
-                    size="small" 
-                    color="primary" 
+                  <Chip
+                    label={exercise.muscle}
+                    size="small"
+                    color="primary"
                     variant="outlined"
                     sx={{ mr: 1, mt: 1 }}
                   />
                 )}
                 {exercise.equipment && (
-                  <Chip 
-                    label={exercise.equipment} 
-                    size="small" 
-                    color="secondary" 
+                  <Chip
+                    label={exercise.equipment}
+                    size="small"
+                    color="secondary"
                     variant="outlined"
                     sx={{ mt: 1 }}
                   />
@@ -359,14 +436,26 @@ const CreateWorkoutModal = ({ onClose, onSave, onDelete, workout }) => {
                 label="Sets"
                 type="number"
                 value={exercise.sets}
-                onChange={(e) => handleExerciseChange(index, "sets", parseInt(e.target.value) || 0)}
+                onChange={(e) =>
+                  handleExerciseChange(
+                    index,
+                    "sets",
+                    parseInt(e.target.value) || 0
+                  )
+                }
                 sx={{ flex: 1 }}
               />
               <TextField
                 label="Reps"
                 type="number"
                 value={exercise.reps}
-                onChange={(e) => handleExerciseChange(index, "reps", parseInt(e.target.value) || 0)}
+                onChange={(e) =>
+                  handleExerciseChange(
+                    index,
+                    "reps",
+                    parseInt(e.target.value) || 0
+                  )
+                }
                 sx={{ flex: 1 }}
               />
               <IconButton
@@ -398,7 +487,11 @@ const CreateWorkoutModal = ({ onClose, onSave, onDelete, workout }) => {
                   setSearchQuery(newInputValue);
                 }}
                 filterOptions={(x) => x} // Rely on custom filtering
-                noOptionsText={searchQuery.trim() ? "No matching exercises found" : "Start typing to search"}
+                noOptionsText={
+                  searchQuery.trim()
+                    ? "No matching exercises found"
+                    : "Start typing to search"
+                }
                 PopperComponent={CustomPopper} // Ensure dropdown below input
                 renderOption={(props, option) => (
                   <li {...props}>
@@ -415,7 +508,9 @@ const CreateWorkoutModal = ({ onClose, onSave, onDelete, workout }) => {
                       ...params.InputProps,
                       endAdornment: (
                         <>
-                          {loading ? <CircularProgress color="inherit" size={20} /> : null}
+                          {loading ? (
+                            <CircularProgress color="inherit" size={20} />
+                          ) : null}
                           {params.InputProps.endAdornment}
                         </>
                       ),
@@ -424,25 +519,29 @@ const CreateWorkoutModal = ({ onClose, onSave, onDelete, workout }) => {
                 )}
                 sx={{ flex: 2 }}
               />
-              
+
               <TextField
                 label="Sets"
                 type="number"
                 value={newExerciseDetails.sets}
-                onChange={(e) => setNewExerciseDetails({ 
-                  ...newExerciseDetails, 
-                  sets: parseInt(e.target.value) || 0 
-                })}
+                onChange={(e) =>
+                  setNewExerciseDetails({
+                    ...newExerciseDetails,
+                    sets: parseInt(e.target.value) || 0,
+                  })
+                }
                 sx={{ flex: 1 }}
               />
               <TextField
                 label="Reps"
                 type="number"
                 value={newExerciseDetails.reps}
-                onChange={(e) => setNewExerciseDetails({ 
-                  ...newExerciseDetails, 
-                  reps: parseInt(e.target.value) || 0 
-                })}
+                onChange={(e) =>
+                  setNewExerciseDetails({
+                    ...newExerciseDetails,
+                    reps: parseInt(e.target.value) || 0,
+                  })
+                }
                 sx={{ flex: 1 }}
               />
               <IconButton
@@ -463,11 +562,15 @@ const CreateWorkoutModal = ({ onClose, onSave, onDelete, workout }) => {
             display: "flex",
             justifyContent: "space-between",
             p: 2,
-            backgroundColor: (theme) => theme.palette.mode === "dark" ? "#333333" : "grey.50",
+            backgroundColor: (theme) =>
+              theme.palette.mode === "dark" ? "#333333" : "grey.50",
             borderBottomLeftRadius: 8,
             borderBottomRightRadius: 8,
             borderTop: "1px solid",
-            borderColor: (theme) => theme.palette.mode === "dark" ? "rgba(255, 255, 255, 0.1)" : "divider",
+            borderColor: (theme) =>
+              theme.palette.mode === "dark"
+                ? "rgba(255, 255, 255, 0.1)"
+                : "divider",
           }}
         >
           {/* Left side: Delete button (only for edits of non-recommended workouts) */}
@@ -483,13 +586,13 @@ const CreateWorkoutModal = ({ onClose, onSave, onDelete, workout }) => {
                   "&:hover": {
                     transform: "translateY(-2px)",
                     boxShadow: "0 4px 8px rgba(211, 47, 47, 0.3)",
-                    backgroundColor: (theme) => 
-                      theme.palette.mode === "dark" ? "#b71c1c" : "#d32f2f"
+                    backgroundColor: (theme) =>
+                      theme.palette.mode === "dark" ? "#b71c1c" : "#d32f2f",
                   },
                   "&:active": {
                     transform: "translateY(0)",
                     boxShadow: "0 2px 4px rgba(211, 47, 47, 0.3)",
-                  }
+                  },
                 }}
               >
                 Delete
@@ -499,67 +602,71 @@ const CreateWorkoutModal = ({ onClose, onSave, onDelete, workout }) => {
 
           {/* Right side: Cancel and Save buttons */}
           <Box sx={{ display: "flex", gap: 2 }}>
-            <Button 
-              variant="outlined" 
+            <Button
+              variant="outlined"
               onClick={onClose}
               sx={{
                 transition: "all 0.3s ease",
                 "&:hover": {
                   transform: "translateY(-2px)",
-                  backgroundColor: (theme) => 
-                    theme.palette.mode === "dark" 
-                      ? "rgba(255, 255, 255, 0.05)" 
+                  backgroundColor: (theme) =>
+                    theme.palette.mode === "dark"
+                      ? "rgba(255, 255, 255, 0.05)"
                       : "rgba(0, 0, 0, 0.04)",
-                  borderColor: (theme) => 
-                    theme.palette.mode === "dark" 
-                      ? "rgba(255, 255, 255, 0.5)" 
-                      : "rgba(0, 0, 0, 0.4)"
+                  borderColor: (theme) =>
+                    theme.palette.mode === "dark"
+                      ? "rgba(255, 255, 255, 0.5)"
+                      : "rgba(0, 0, 0, 0.4)",
                 },
                 "&:active": {
                   transform: "translateY(0)",
-                }
+                },
               }}
             >
               Cancel
             </Button>
-            
+
             <Button
               variant="contained"
               color="primary"
-              onClick={() => onSave(workoutData)}
-              disabled={!workoutData.title || workoutData.exercises.length === 0}
+              onClick={handleSave} // Changed from onSave(workoutData) to handleSave
+              disabled={
+                !workoutData.title || workoutData.exercises.length === 0
+              }
               sx={{
                 transition: "all 0.3s ease",
-                backgroundColor: (theme) => 
-                  theme.palette.mode === "dark" ? "#FFD700" : theme.palette.primary.main,
-                color: (theme) => 
+                backgroundColor: (theme) =>
+                  theme.palette.mode === "dark"
+                    ? "#FFD700"
+                    : theme.palette.primary.main,
+                color: (theme) =>
                   theme.palette.mode === "dark" ? "#121212" : "#ffffff",
                 "&:hover": {
                   transform: "translateY(-2px)",
-                  boxShadow: (theme) => 
-                    theme.palette.mode === "dark" 
-                      ? "0 4px 12px rgba(255, 215, 0, 0.3)" 
+                  boxShadow: (theme) =>
+                    theme.palette.mode === "dark"
+                      ? "0 4px 12px rgba(255, 215, 0, 0.3)"
                       : "0 4px 12px rgba(98, 0, 234, 0.3)",
-                  backgroundColor: (theme) => 
+                  backgroundColor: (theme) =>
                     theme.palette.mode === "dark" ? "#E1C000" : "#5000d0",
                 },
                 "&:active": {
                   transform: "translateY(0)",
-                  boxShadow: (theme) => 
-                    theme.palette.mode === "dark" 
-                      ? "0 2px 8px rgba(255, 215, 0, 0.3)" 
+                  boxShadow: (theme) =>
+                    theme.palette.mode === "dark"
+                      ? "0 2px 8px rgba(255, 215, 0, 0.3)"
                       : "0 2px 8px rgba(98, 0, 234, 0.3)",
                 },
                 "&.Mui-disabled": {
-                  backgroundColor: (theme) => 
-                    theme.palette.mode === "dark" 
-                      ? "rgba(255, 215, 0, 0.3)" 
+                  backgroundColor: (theme) =>
+                    theme.palette.mode === "dark"
+                      ? "rgba(255, 215, 0, 0.3)"
                       : "rgba(98, 0, 234, 0.3)",
-                  color: (theme) => 
-                    theme.palette.mode === "dark" 
-                      ? "rgba(0, 0, 0, 0.38)" 
+                  color: (theme) =>
+                    theme.palette.mode === "dark"
+                      ? "rgba(0, 0, 0, 0.38)"
                       : "rgba(255, 255, 255, 0.38)",
-                }
+                },
               }}
             >
               {workout ? "Update" : "Create"}

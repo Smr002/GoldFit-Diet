@@ -328,7 +328,7 @@ const UserWorkout = () => {
       const payload = {
         name: newWorkout.title,
         level: newWorkout.difficulty || "beginner",
-        timesPerWeek: 3,
+        timesPerWeek: newWorkout.times || 3,
         workoutExercises: newWorkout.exercises.map((ex) => ({
           exerciseId: ex.id,
           sets: ex.sets || 3,
@@ -344,6 +344,7 @@ const UserWorkout = () => {
         id: response.id,
         createdAt: response.createdAt || new Date().toISOString(),
         isRecommended: false,
+        timesPerWeek: newWorkout.times || 3,
         difficulty: newWorkout.difficulty || "beginner",
         duration: newWorkout.exercises.length * 10,
         goal: newWorkout.goal || "general fitness",
