@@ -1,27 +1,27 @@
 import React, { useState, useEffect } from 'react';
-import { 
-  Box, 
-  Paper, 
-  Typography, 
-  Card, 
-  CardContent, 
-  CardActions, 
-  Button, 
-  IconButton, 
+import {
+  Box,
+  Paper,
+  Typography,
+  Card,
+  CardContent,
+  CardActions,
+  Button,
+  IconButton,
   Divider,
-  Chip,
   Collapse,
   Stack,
   Fade,
   Avatar,
   Grow,
   Tooltip,
-  Zoom,
-  useTheme
+  useTheme,
+  CircularProgress,
+  Alert
 } from '@mui/material';
-import { motion } from 'framer-motion'; // Add framer motion for advanced animations
-import { 
-  Add as AddIcon, 
+import { motion } from 'framer-motion';
+import {
+  Add as AddIcon,
   WbSunny as MorningIcon,
   BrightnessLow as NoonIcon,
   Nightlight as EveningIcon,
@@ -31,31 +31,25 @@ import {
   Info as InfoIcon
 } from '@mui/icons-material';
 import FoodSearchModal from './FoodSearchModal';
+import { createNutritionLog, getNutritionLog, getUserIdFromToken } from '@/api';
 
-const MealLogger = ({ meals = [], onAddFood, selectedDay }) => {
+const MealLogger = ({ onAddFood, selectedDay }) => {
   const theme = useTheme();
   const isDarkMode = theme.palette.mode === 'dark';
   
-  // State for expansion of meals that have foods
   const [expandedMeal, setExpandedMeal] = useState(null);
-  
-  // Simplified animation states - reduced number of states
   const [isLoaded, setIsLoaded] = useState(false);
-  
-  // Food search modal state
   const [foodSearchOpen, setFoodSearchOpen] = useState(false);
   const [activeMealId, setActiveMealId] = useState(null);
-  
-  // Add state for button hover animations
   const [hoveredMealId, setHoveredMealId] = useState(null);
-  
-  // Add state for food add animation
   const [lastAddedMealId, setLastAddedMealId] = useState(null);
-  
-  // Determine if this is a past day or today
-  const isPastDay = selectedDay && new Date(selectedDay.date) < new Date().setHours(0,0,0,0);
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState(null);
+  const [localMeals, setLocalMeals] = useState([]);
+  const [isRefreshing, setIsRefreshing] = useState(false);
 
-  // Updated meal images for better visuals in both light and dark mode
+  const isPastDay = selectedDay && new Date(selectedDay.date) < new Date().setHours(0, 0, 0, 0);
+
   const MEAL_IMAGES = {
     breakfast: 'https://images.unsplash.com/photo-1494859802809-d069c3b71a8a?ixlib=rb-4.0.3&auto=format&fit=crop&w=400&q=80',
     'morning-snack': 'https://images.unsplash.com/photo-1511688878353-3a2f5be94cd7?ixlib=rb-4.0.3&auto=format&fit=crop&w=400&q=80',
@@ -65,206 +59,332 @@ const MealLogger = ({ meals = [], onAddFood, selectedDay }) => {
     'evening-snack': 'https://images.unsplash.com/photo-1571506165871-ee72a35bc9d4?ixlib=rb-4.0.3&auto=format&fit=crop&w=400&q=80'
   };
 
-  // Default meal list if none provided
   const defaultMeals = [
-    { 
-      id: 'breakfast', 
-      name: 'Breakfast', 
-      icon: <MorningIcon />, 
-      time: '6:00 - 10:00 AM', 
-      calories: 0, 
-      foods: [] 
-    },
-    { 
-      id: 'morning-snack', 
-      name: 'Morning Snack', 
-      icon: <SnackIcon />, 
-      time: '10:00 - 12:00 PM', 
-      calories: 0, 
-      foods: [] 
-    },
-    { 
-      id: 'lunch', 
-      name: 'Lunch', 
-      icon: <NoonIcon />, 
-      time: '12:00 - 2:00 PM', 
-      calories: 0, 
-      foods: [] 
-    },
-    { 
-      id: 'afternoon-snack', 
-      name: 'Afternoon Snack', 
-      icon: <SnackIcon />, 
-      time: '2:00 - 6:00 PM', 
-      calories: 0, 
-      foods: [] 
-    },
-    { 
-      id: 'dinner', 
-      name: 'Dinner', 
-      icon: <EveningIcon />, 
-      time: '6:00 - 8:00 PM', 
-      calories: 0, 
-      foods: [] 
-    },
-    { 
-      id: 'evening-snack', 
-      name: 'Evening Snack', 
-      icon: <SnackIcon />, 
-      time: '8:00 - 10:00 PM', 
-      calories: 0, 
-      foods: [] 
-    }
+    { id: 'breakfast', name: 'Breakfast', icon: <MorningIcon />, time: '6:00 - 10:00 AM', calories: 0, foods: [] },
+    { id: 'morning-snack', name: 'Morning Snack', icon: <SnackIcon />, time: '10:00 - 12:00 PM', calories: 0, foods: [] },
+    { id: 'lunch', name: 'Lunch', icon: <NoonIcon />, time: '12:00 - 2:00 PM', calories: 0, foods: [] },
+    { id: 'afternoon-snack', name: 'Afternoon Snack', icon: <SnackIcon />, time: '2:00 - 6:00 PM', calories: 0, foods: [] },
+    { id: 'dinner', name: 'Dinner', icon: <EveningIcon />, time: '6:00 - 8:00 PM', calories: 0, foods: [] },
+    { id: 'evening-snack', name: 'Evening Snack', icon: <SnackIcon />, time: '8:00 - 10:00 PM', calories: 0, foods: [] }
   ];
-  
-  // Merge provided meals with defaults (to ensure all meal types are present)
-  const mealsToShow = meals.length > 0 ? 
-    defaultMeals.map(defaultMeal => {
-      const matchedMeal = meals.find(meal => meal.id === defaultMeal.id);
-      return matchedMeal || defaultMeal;
-    }) : defaultMeals;
-  
-  // Animation effect
+
+  // Function to fetch nutrition logs
+  const fetchNutritionLogs = async () => {
+    try {
+      const token = localStorage.getItem('token');
+      if (!token) {
+        throw new Error('No authentication token found');
+      }
+
+      const userId = getUserIdFromToken(token);
+      if (!userId) {
+        throw new Error('No user ID found in token');
+      }
+
+      // Get the current date in the local timezone
+      const today = new Date();
+      const date = selectedDay && selectedDay.date
+        ? new Date(selectedDay.date)
+        : today;
+
+      console.log('Fetching logs for date:', date.toISOString()); // Debug log
+
+      const logs = await getNutritionLog(token, userId, date);
+      console.log('Received logs:', logs); // Debug log
+      
+      if (logs && Array.isArray(logs) && logs.length > 0) {
+        // Create a mapping between API meal types and our meal IDs
+        const mealTypeMap = {
+          'BREAKFAST': 'breakfast',
+          'MORNING_SNACK': 'morning-snack',
+          'LUNCH': 'lunch',
+          'AFTERNOON_SNACK': 'afternoon-snack',
+          'DINNER': 'dinner',
+          'EVENING_SNACK': 'evening-snack'
+        };
+
+        // Transform the logs into the meal format
+        const updatedMeals = defaultMeals.map(defaultMeal => {
+          // Find the log that matches this meal type
+          const mealLog = logs.find(log => {
+            if (!log || !log.mealType) return false;
+            const apiMealType = log.mealType.toUpperCase();
+            const mappedType = mealTypeMap[apiMealType];
+            return mappedType === defaultMeal.id;
+          });
+
+          if (mealLog && Array.isArray(mealLog.foodItems) && mealLog.foodItems.length > 0) {
+            const foods = mealLog.foodItems.map(item => ({
+              id: `food-${item.fdcId || 'unknown'}`,
+              name: item.description || 'Unknown Food',
+              serving: `${item.servingSize || 100} ${item.unit || 'g'}`,
+              calories: parseFloat(item.calories || 0),
+              protein: parseFloat(item.protein || 0),
+              carbs: parseFloat(item.carbs || 0),
+              fats: parseFloat(item.fats || 0),
+              foodId: item.fdcId || 'unknown'
+            }));
+
+            // Calculate total calories for the meal
+            const totalCalories = foods.reduce((sum, food) => sum + (food.calories || 0), 0);
+
+            return {
+              ...defaultMeal,
+              foods,
+              calories: totalCalories
+            };
+          }
+          return defaultMeal;
+        });
+
+        console.log('Updated meals:', updatedMeals); // Debug log
+        setLocalMeals(updatedMeals);
+      } else {
+        console.log('No logs found for date:', date.toISOString()); // Debug log
+        setLocalMeals(defaultMeals);
+      }
+      setIsLoaded(true);
+    } catch (err) {
+      console.error('Error fetching nutrition logs:', err);
+      setError(err.message || 'Failed to load nutrition data');
+      setLocalMeals(defaultMeals);
+      setIsLoaded(true);
+    }
+  };
+
+  // Initial fetch and refresh interval
   useEffect(() => {
-    const timer = setTimeout(() => setIsLoaded(true), 300);
-    return () => clearTimeout(timer);
-  }, [meals, selectedDay]);
-  
-  // Handler for expanding meal details
+    console.log('Component mounted or selectedDay changed:', selectedDay); // Debug log
+    fetchNutritionLogs();
+
+    // Set up refresh interval (every 30 seconds)
+    const refreshInterval = setInterval(() => {
+      console.log('Refreshing nutrition logs...'); // Debug log
+      setIsRefreshing(true);
+      fetchNutritionLogs().finally(() => {
+        setIsRefreshing(false);
+      });
+    }, 30000);
+
+    return () => clearInterval(refreshInterval);
+  }, [selectedDay]); // Re-fetch when selected day changes
+
   const handleExpandMeal = (id) => {
     setExpandedMeal(expandedMeal === id ? null : id);
   };
-  
-  // Handler for opening food search modal
+
   const handleOpenFoodSearch = (mealId) => {
     setActiveMealId(mealId);
     setFoodSearchOpen(true);
-    
-    // Visual feedback animation
     const mealCard = document.getElementById(`meal-card-${mealId}`);
     if (mealCard) {
       mealCard.classList.add('pulse');
-      setTimeout(() => {
-        mealCard.classList.remove('pulse');
-      }, 600);
+      setTimeout(() => mealCard.classList.remove('pulse'), 600);
     }
   };
-  
-  // Handle food added animation
-  const handleAddFoodSuccess = (mealId, food) => {
-    // Call the original onAddFood function
-    onAddFood(mealId, food);
-    
-    // Set the last added meal ID for animation
-    setLastAddedMealId(mealId);
-    
-    // Clear the animation state after a delay
-    setTimeout(() => {
-      setLastAddedMealId(null);
-    }, 2000);
-    
-    // Expand the meal to show the newly added food
-    setExpandedMeal(mealId);
+
+  const handleAddFoodSuccess = async (mealId, food) => {
+    try {
+      setLoading(true);
+      setError(null);
+
+      const token = localStorage.getItem('token');
+      if (!token) {
+        throw new Error('No authentication token found');
+      }
+
+      const userId = getUserIdFromToken(token);
+      if (!userId) {
+        throw new Error('No user ID found in token');
+      }
+
+      // Update local meals with the new food
+      const updatedMeals = localMeals.map(meal => {
+        if (meal.id === mealId) {
+          const updatedFoods = [...(meal.foods || []), food];
+          return { ...meal, foods: updatedFoods };
+        }
+        return meal;
+      });
+
+      const mealToUpdate = updatedMeals.find(meal => meal.id === mealId);
+      if (!mealToUpdate) {
+        throw new Error('Meal not found');
+      }
+
+      // Calculate totals for the meal
+      const totalCalories = (mealToUpdate.foods || []).reduce((sum, f) => sum + (f.calories || 0), 0);
+      const totalProtein = (mealToUpdate.foods || []).reduce((sum, f) => sum + (f.protein || 0), 0);
+      const totalCarbs = (mealToUpdate.foods || []).reduce((sum, f) => sum + (f.carbs || 0), 0);
+      const totalFats = (mealToUpdate.foods || []).reduce((sum, f) => sum + (f.fats || 0), 0);
+
+      // Map mealId to valid mealType
+      const mealTypeMap = {
+        'breakfast': 'BREAKFAST',
+        'morning-snack': 'MORNING_SNACK',
+        'lunch': 'LUNCH',
+        'afternoon-snack': 'AFTERNOON_SNACK',
+        'dinner': 'DINNER',
+        'evening-snack': 'EVENING_SNACK'
+      };
+
+      // Get the current date in the local timezone
+      const today = new Date();
+      const logDate = selectedDay && selectedDay.date
+        ? new Date(selectedDay.date)
+        : today;
+
+      // Create nutrition log data
+      const logData = {
+        date: logDate.toISOString().split('T')[0],
+        mealType: mealTypeMap[mealId] || 'SNACK',
+        totalCalories: parseFloat((totalCalories || 0).toString()),
+        protein: parseFloat((totalProtein || 0).toString()),
+        carbs: parseFloat((totalCarbs || 0).toString()),
+        fats: parseFloat((totalFats || 0).toString()),
+        hydration: 0,
+        foodItems: (mealToUpdate.foods || []).map(f => ({
+          fdcId: f.foodId || 'unknown',
+          description: f.name || 'Unknown Food',
+          servingSize: parseFloat((f.serving?.split(' ')[0] || 100).toString()),
+          unit: f.serving?.split(' ')[1] || 'g',
+          calories: parseFloat((f.calories || 0).toString()),
+          protein: parseFloat((f.protein || 0).toString()),
+          carbs: parseFloat((f.carbs || 0).toString()),
+          fats: parseFloat((f.fats || 0).toString())
+        }))
+      };
+
+      console.log('Sending nutrition log data:', logData); // Debug log
+
+      // Send to backend
+      await createNutritionLog(token, logData);
+
+      // Update local state
+      setLocalMeals(updatedMeals);
+      setLastAddedMealId(mealId);
+      setTimeout(() => setLastAddedMealId(null), 2000);
+      setExpandedMeal(mealId);
+
+      // Fetch updated data
+      await fetchNutritionLogs();
+
+      if (onAddFood) {
+        onAddFood(mealId, food);
+      }
+    } catch (err) {
+      console.error('Error adding food:', err);
+      setError(err.message || 'Failed to add food');
+    } finally {
+      setLoading(false);
+    }
   };
-  
-  // Get color based on meal type - updated for dark mode
+
   const getMealColor = (mealId) => {
     if (isDarkMode) {
-      // Gold-themed colors for dark mode
       switch(mealId) {
-        case 'breakfast': return '#FFD700'; // Gold
-        case 'morning-snack': return '#F0E68C'; // Khaki
-        case 'lunch': return '#DAA520'; // Goldenrod
-        case 'afternoon-snack': return '#B8860B'; // DarkGoldenrod
-        case 'dinner': return '#FFC107'; // Amber
-        case 'evening-snack': return '#FFECB3'; // Amber Light
-        default: return '#E0E0E0'; // Light Grey
+        case 'breakfast': return '#FFD700';
+        case 'morning-snack': return '#F0E68C';
+        case 'lunch': return '#DAA520';
+        case 'afternoon-snack': return '#B8860B';
+        case 'dinner': return '#FFC107';
+        case 'evening-snack': return '#FFECB3';
+        default: return '#E0E0E0';
       }
     } else {
-      // Original colors for light mode
       switch(mealId) {
-        case 'breakfast': return '#ff9800'; // Orange
-        case 'morning-snack': return '#ffb74d'; // Light Orange
-        case 'lunch': return '#2196f3'; // Blue
-        case 'afternoon-snack': return '#90caf9'; // Light Blue
-        case 'dinner': return '#673ab7'; // Deep Purple
-        case 'evening-snack': return '#9575cd'; // Light Purple
-        default: return '#9e9e9e'; // Grey
+        case 'breakfast': return '#ff9800';
+        case 'morning-snack': return '#ffb74d';
+        case 'lunch': return '#2196f3';
+        case 'afternoon-snack': return '#90caf9';
+        case 'dinner': return '#673ab7';
+        case 'evening-snack': return '#9575cd';
+        default: return '#9e9e9e';
       }
     }
   };
-  
+
   return (
     <>
-      <Fade in={isLoaded} timeout={800}>
+      <Fade in={isLoaded} timeout={1000}>
         <Paper
-          component={motion.div}
-          initial={{ y: 20, opacity: 0 }}
-          animate={{ y: 0, opacity: 1 }}
-          transition={{ duration: 0.5 }}
-          elevation={1}
+          elevation={3}
           sx={{
             p: 3,
             borderRadius: 2,
-            bgcolor: 'background.paper', // Uses theme background
-            height: '100%',
-            display: 'flex',
-            flexDirection: 'column',
-            transition: 'transform 0.4s ease-in-out, box-shadow 0.4s ease-in-out',
-            '&:hover': {
-              transform: 'translateY(-4px)',
-              boxShadow: isDarkMode 
-                ? '0 8px 16px rgba(255, 215, 0, 0.15)' 
-                : '0 8px 16px rgba(0,0,0,0.1)'
-            }
+            bgcolor: isDarkMode ? 'rgba(255, 215, 0, 0.05)' : 'rgba(103, 58, 183, 0.05)',
+            position: 'relative'
           }}
         >
+          {isRefreshing && (
+            <CircularProgress
+              size={24}
+              sx={{
+                position: 'absolute',
+                top: 16,
+                right: 16,
+                zIndex: 1
+              }}
+            />
+          )}
+          {error && (
+            <Alert severity="error" sx={{ mb: 2 }}>
+              {error}
+            </Alert>
+          )}
+
+          {loading && (
+            <Box sx={{ display: 'flex', justifyContent: 'center', my: 2 }}>
+              <CircularProgress size={24} />
+            </Box>
+          )}
+
           <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', mb: 2 }}>
-            <Typography 
-              variant="h6" 
-              component="h2" 
-              fontWeight="bold" 
-              sx={{ 
+            <Typography
+              variant="h6"
+              component="h2"
+              fontWeight="bold"
+              sx={{
                 display: 'flex',
                 alignItems: 'center',
-                color: theme.palette.text.primary, // Uses theme text color
+                color: theme.palette.text.primary,
               }}
             >
-              <MenuIcon sx={{ 
-                mr: 1, 
-                color: isDarkMode ? theme.palette.primary.main : '#673ab7' 
+              <MenuIcon sx={{
+                mr: 1,
+                color: isDarkMode ? theme.palette.primary.main : '#673ab7'
               }} />
               {selectedDay ? `${new Date(selectedDay.date).toLocaleDateString('en-US', { month: 'short', day: 'numeric' })} Meals` : 'Meals'}
             </Typography>
-            
+
             <Tooltip title="Log your meals throughout the day to track your nutritional intake">
               <IconButton size="small" sx={{ color: theme.palette.text.secondary }}>
                 <InfoIcon fontSize="small" />
               </IconButton>
             </Tooltip>
           </Box>
-          
-          <Divider sx={{ 
+
+          <Divider sx={{
             mb: 2,
-            borderColor: isDarkMode ? 'rgba(255, 255, 255, 0.12)' : undefined 
+            borderColor: isDarkMode ? 'rgba(255, 255, 255, 0.12)' : undefined
           }} />
-          
+
           <Box sx={{ flexGrow: 1, overflow: 'auto' }}>
             <Stack spacing={2}>
-              {mealsToShow.map((meal, index) => {
+              {localMeals.map((meal, index) => {
                 const isExpanded = expandedMeal === meal.id;
                 const hasFoods = meal.foods && meal.foods.length > 0;
                 const totalCalories = hasFoods
-                  ? meal.foods.reduce((sum, food) => sum + food.calories, 0)
+                  ? meal.foods.reduce((sum, food) => sum + (food.calories || 0), 0)
                   : meal.calories || 0;
-                
+
                 const isLastAdded = lastAddedMealId === meal.id;
                 const isHovered = hoveredMealId === meal.id;
                 const mealColor = getMealColor(meal.id);
-                  
+
                 return (
-                  <Fade 
-                    in={isLoaded} 
+                  <Fade
+                    in={isLoaded}
                     timeout={500}
                     style={{ transitionDelay: `${index * 60}ms` }}
                     key={meal.id}
@@ -272,11 +392,11 @@ const MealLogger = ({ meals = [], onAddFood, selectedDay }) => {
                     <Card
                       id={`meal-card-${meal.id}`}
                       component={motion.div}
-                      whileHover={{ y: -4, boxShadow: isDarkMode 
-                        ? '0 4px 12px rgba(255, 215, 0, 0.2)' 
-                        : '0 4px 12px rgba(0,0,0,0.15)' 
+                      whileHover={{ y: -4, boxShadow: isDarkMode
+                        ? '0 4px 12px rgba(255, 215, 0, 0.2)'
+                        : '0 4px 12px rgba(0,0,0,0.15)'
                       }}
-                      animate={isLastAdded ? { 
+                      animate={isLastAdded ? {
                         boxShadow: isDarkMode
                           ? ['0 0 0 rgba(0,0,0,0.1)', `0 0 20px rgba(255, 215, 0, 0.5)`, '0 0 0 rgba(0,0,0,0.1)']
                           : ['0 0 0 rgba(0,0,0,0.1)', '0 0 20px rgba(103, 58, 183, 0.6)', '0 0 0 rgba(0,0,0,0.1)'],
@@ -300,18 +420,16 @@ const MealLogger = ({ meals = [], onAddFood, selectedDay }) => {
                           '50%': { transform: 'scale(1.02)' },
                           '100%': { transform: 'scale(1)' }
                         },
-                        // Add focus highlight for newly added meal
                         ...(isLastAdded && {
-                          border: isDarkMode 
-                            ? '1px solid rgba(255, 215, 0, 0.5)' 
+                          border: isDarkMode
+                            ? '1px solid rgba(255, 215, 0, 0.5)'
                             : '1px solid rgba(103, 58, 183, 0.5)',
-                          boxShadow: isDarkMode 
-                            ? '0 0 8px rgba(255, 215, 0, 0.4)' 
+                          boxShadow: isDarkMode
+                            ? '0 0 8px rgba(255, 215, 0, 0.4)'
                             : '0 0 8px rgba(103, 58, 183, 0.4)',
                         })
                       }}
                     >
-                      {/* Meal image with subtle parallax effect */}
                       <Box
                         component={motion.div}
                         animate={isHovered ? { scale: 1.05, opacity: isDarkMode ? 0.1 : 0.15 } : { scale: 1, opacity: isDarkMode ? 0.07 : 0.1 }}
@@ -333,16 +451,16 @@ const MealLogger = ({ meals = [], onAddFood, selectedDay }) => {
                             top: 0,
                             width: '100%',
                             height: '100%',
-                            background: isDarkMode 
-                              ? 'linear-gradient(to right, rgba(30, 30, 30, 1), transparent)' 
+                            background: isDarkMode
+                              ? 'linear-gradient(to right, rgba(30, 30, 30, 1), transparent)'
                               : 'linear-gradient(to right, white, transparent)',
                           }
                         }}
                       />
-                      
-                      <CardContent sx={{ 
-                        pb: hasFoods ? 0 : 2, 
-                        position: 'relative', 
+
+                      <CardContent sx={{
+                        pb: hasFoods ? 0 : 2,
+                        position: 'relative',
                         zIndex: 2,
                         color: theme.palette.text.primary
                       }}>
@@ -351,24 +469,24 @@ const MealLogger = ({ meals = [], onAddFood, selectedDay }) => {
                             <Avatar
                               src={MEAL_IMAGES[meal.id] || MEAL_IMAGES.dinner}
                               alt={meal.name}
-                              sx={{ 
-                                width: 40, 
-                                height: 40, 
+                              sx={{
+                                width: 40,
+                                height: 40,
                                 mr: 1.5,
                                 border: `2px solid ${mealColor}`,
-                                boxShadow: isDarkMode 
-                                  ? '0 2px 4px rgba(0,0,0,0.4)' 
+                                boxShadow: isDarkMode
+                                  ? '0 2px 4px rgba(0,0,0,0.4)'
                                   : '0 2px 4px rgba(0,0,0,0.1)',
                               }}
                             >
                               {meal.icon || <MenuIcon />}
                             </Avatar>
                             <Box>
-                              <Typography 
-                                variant="h6" 
-                                component="div" 
-                                sx={{ 
-                                  fontWeight: 600, 
+                              <Typography
+                                variant="h6"
+                                component="div"
+                                sx={{
+                                  fontWeight: 600,
                                   lineHeight: 1.2,
                                   mb: 0.5,
                                   color: theme.palette.text.primary,
@@ -391,21 +509,21 @@ const MealLogger = ({ meals = [], onAddFood, selectedDay }) => {
                               >
                                 {meal.name}
                               </Typography>
-                              <Typography 
-                                variant="caption" 
-                                sx={{ 
+                              <Typography
+                                variant="caption"
+                                sx={{
                                   display: 'block',
-                                  color: theme.palette.text.secondary 
+                                  color: theme.palette.text.secondary
                                 }}
                               >
                                 {meal.time}
                               </Typography>
                             </Box>
                           </Box>
-                          
+
                           <Box sx={{ textAlign: 'right' }}>
-                            <Typography 
-                              variant="subtitle1" 
+                            <Typography
+                              variant="subtitle1"
                               fontWeight="bold"
                               sx={{
                                 color: totalCalories > 0 ? mealColor : theme.palette.text.secondary,
@@ -413,51 +531,51 @@ const MealLogger = ({ meals = [], onAddFood, selectedDay }) => {
                             >
                               {totalCalories}
                             </Typography>
-                            <Typography 
-                              variant="caption" 
+                            <Typography
+                              variant="caption"
                               sx={{ color: theme.palette.text.secondary }}
                             >
                               kcal
                             </Typography>
                           </Box>
                         </Box>
-                        
+
                         {hasFoods && (
-                          <Collapse 
-                            in={isExpanded} 
+                          <Collapse
+                            in={isExpanded}
                             timeout={300}
                             unmountOnExit
                           >
                             <Box sx={{ mt: 2, ml: 5, mb: 1 }}>
                               {meal.foods.map((food) => (
-                                <Box 
-                                  key={food.id} 
-                                  sx={{ 
-                                    display: 'flex', 
+                                <Box
+                                  key={food.id}
+                                  sx={{
+                                    display: 'flex',
                                     justifyContent: 'space-between',
                                     py: 0.75,
-                                    borderBottom: isDarkMode 
-                                      ? '1px dashed rgba(255, 255, 255, 0.1)' 
+                                    borderBottom: isDarkMode
+                                      ? '1px dashed rgba(255, 255, 255, 0.1)'
                                       : '1px dashed rgba(0, 0, 0, 0.1)',
                                   }}
                                 >
                                   <Box>
-                                    <Typography 
+                                    <Typography
                                       variant="body2"
                                       sx={{ color: theme.palette.text.primary }}
                                     >
                                       {food.name}
                                     </Typography>
-                                    <Typography 
-                                      variant="caption" 
+                                    <Typography
+                                      variant="caption"
                                       sx={{ color: theme.palette.text.secondary }}
                                     >
                                       {food.serving}
                                     </Typography>
                                   </Box>
-                                  <Typography 
-                                    variant="body2" 
-                                    sx={{ 
+                                  <Typography
+                                    variant="body2"
+                                    sx={{
                                       fontWeight: 500,
                                       color: mealColor,
                                     }}
@@ -470,41 +588,41 @@ const MealLogger = ({ meals = [], onAddFood, selectedDay }) => {
                           </Collapse>
                         )}
                       </CardContent>
-                      
-                      <CardActions sx={{ 
-                        display: 'flex', 
-                        justifyContent: 'space-between', 
-                        px: 2, 
-                        py: 1, 
-                        position: 'relative', 
+
+                      <CardActions sx={{
+                        display: 'flex',
+                        justifyContent: 'space-between',
+                        px: 2,
+                        py: 1,
+                        position: 'relative',
                         zIndex: 2,
-                        bgcolor: isDarkMode 
-                          ? 'rgba(0, 0, 0, 0.2)' 
+                        bgcolor: isDarkMode
+                          ? 'rgba(0, 0, 0, 0.2)'
                           : 'rgba(0, 0, 0, 0.01)'
                       }}>
                         {!isPastDay && (
-                          <Button 
+                          <Button
                             component={motion.button}
                             whileHover={{ scale: 1.05 }}
                             whileTap={{ scale: 0.95 }}
-                            variant="contained" 
-                            size="small" 
+                            variant="contained"
+                            size="small"
                             startIcon={<AddIcon />}
                             onClick={() => handleOpenFoodSearch(meal.id)}
                             onMouseEnter={() => setHoveredMealId(meal.id)}
                             onMouseLeave={() => setHoveredMealId(null)}
-                            sx={{ 
-                              bgcolor: isDarkMode 
-                                ? `${mealColor}30` 
+                            sx={{
+                              bgcolor: isDarkMode
+                                ? `${mealColor}30`
                                 : `${mealColor}20`,
                               color: mealColor,
                               boxShadow: 'none',
                               '&:hover': {
-                                bgcolor: isDarkMode 
-                                  ? `${mealColor}50` 
+                                bgcolor: isDarkMode
+                                  ? `${mealColor}50`
                                   : `${mealColor}40`,
-                                boxShadow: isDarkMode 
-                                  ? `0 2px 8px rgba(255, 215, 0, 0.3)` 
+                                boxShadow: isDarkMode
+                                  ? `0 2px 8px rgba(255, 215, 0, 0.3)`
                                   : '0 2px 8px rgba(0,0,0,0.1)',
                               }
                             }}
@@ -512,29 +630,29 @@ const MealLogger = ({ meals = [], onAddFood, selectedDay }) => {
                             Add Food
                           </Button>
                         )}
-                        
+
                         <Box sx={{ flex: 1 }} />
-                        
+
                         {hasFoods && (
-                          <IconButton 
+                          <IconButton
                             component={motion.button}
                             whileHover={{ scale: 1.1 }}
                             whileTap={{ scale: 0.9 }}
-                            size="small" 
+                            size="small"
                             onClick={() => handleExpandMeal(meal.id)}
-                            sx={{ 
+                            sx={{
                               transition: 'all 0.3s ease-in-out',
-                              bgcolor: isExpanded 
-                                ? isDarkMode ? `${mealColor}30` : `${mealColor}10` 
+                              bgcolor: isExpanded
+                                ? isDarkMode ? `${mealColor}30` : `${mealColor}10`
                                 : 'transparent',
                               '&:hover': {
-                                bgcolor: isDarkMode 
-                                  ? `${mealColor}40` 
+                                bgcolor: isDarkMode
+                                  ? `${mealColor}40`
                                   : `${mealColor}20`,
                               }
                             }}
                           >
-                            <ExpandMoreIcon 
+                            <ExpandMoreIcon
                               sx={{
                                 transform: isExpanded ? 'rotate(180deg)' : 'rotate(0deg)',
                                 transition: 'transform 0.3s ease-in-out',
@@ -550,39 +668,38 @@ const MealLogger = ({ meals = [], onAddFood, selectedDay }) => {
               })}
             </Stack>
           </Box>
-          
-          {/* Nutrition Tip Box - enhanced animation with dark mode */}
+
           <Grow in={isLoaded} timeout={1000} style={{ transformOrigin: '0 0 0' }}>
-            <Box 
+            <Box
               component={motion.div}
-              whileHover={{ 
+              whileHover={{
                 scale: 1.01,
-                boxShadow: isDarkMode 
-                  ? '0 4px 8px rgba(255, 215, 0, 0.15)' 
-                  : '0 4px 8px rgba(103, 58, 183, 0.15)' 
+                boxShadow: isDarkMode
+                  ? '0 4px 8px rgba(255, 215, 0, 0.15)'
+                  : '0 4px 8px rgba(103, 58, 183, 0.15)'
               }}
-              sx={{ 
+              sx={{
                 mt: 3,
                 p: 2,
                 borderRadius: 2,
-                bgcolor: isDarkMode 
-                  ? 'rgba(255, 215, 0, 0.05)' 
+                bgcolor: isDarkMode
+                  ? 'rgba(255, 215, 0, 0.05)'
                   : 'rgba(103, 58, 183, 0.05)',
                 transition: 'all 0.3s ease',
-                border: isDarkMode 
-                  ? '1px solid rgba(255, 215, 0, 0.1)' 
+                border: isDarkMode
+                  ? '1px solid rgba(255, 215, 0, 0.1)'
                   : '1px solid rgba(103, 58, 183, 0.1)',
               }}
             >
-              <Typography 
-                variant="body2" 
+              <Typography
+                variant="body2"
                 sx={{ color: theme.palette.text.secondary }}
               >
-                <MenuIcon sx={{ 
-                  fontSize: 16, 
-                  mr: 0.5, 
-                  verticalAlign: 'text-bottom', 
-                  color: isDarkMode ? theme.palette.primary.main : '#673ab7' 
+                <MenuIcon sx={{
+                  fontSize: 16,
+                  mr: 0.5,
+                  verticalAlign: 'text-bottom',
+                  color: isDarkMode ? theme.palette.primary.main : '#673ab7'
                 }} />
                 Nutrition Tip: Try to include protein with every meal to help maintain muscle and keep you feeling full longer.
               </Typography>
@@ -590,8 +707,7 @@ const MealLogger = ({ meals = [], onAddFood, selectedDay }) => {
           </Grow>
         </Paper>
       </Fade>
-      
-      {/* Updated Food Search Modal with animation callback */}
+
       <FoodSearchModal
         open={foodSearchOpen}
         onClose={() => setFoodSearchOpen(false)}

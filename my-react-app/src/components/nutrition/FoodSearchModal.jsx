@@ -31,11 +31,9 @@ import {
   Info as InfoIcon,
 } from "@mui/icons-material";
 
-// USDA API key (in a real app, this would be stored securely in environment variables)
-const API_KEY = "Q0OdBuGbK6sKKOj7YhXNN7ECmpVig2YL7za67Ge8"; // Replace with your actual API key
+const API_KEY = "Q0OdBuGbK6sKKOj7YhXNN7ECmpVig2YL7za67Ge8"; // Store in .env in production
 
 const FoodSearchModal = ({ open, onClose, onAddFood, mealId }) => {
-  // Search state
   const [searchQuery, setSearchQuery] = useState("");
   const [searchResults, setSearchResults] = useState([]);
   const [loading, setLoading] = useState(false);
@@ -44,7 +42,6 @@ const FoodSearchModal = ({ open, onClose, onAddFood, mealId }) => {
   const [servingSize, setServingSize] = useState("100");
   const [servingUnit, setServingUnit] = useState("g");
 
-  // Handle search
   const handleSearch = async () => {
     if (!searchQuery.trim()) return;
 
@@ -83,14 +80,12 @@ const FoodSearchModal = ({ open, onClose, onAddFood, mealId }) => {
     }
   };
 
-  // Handle pressing Enter in the search field
   const handleKeyPress = (e) => {
     if (e.key === "Enter") {
       handleSearch();
     }
   };
 
-  // Clear search
   const handleClearSearch = () => {
     setSearchQuery("");
     setSearchResults([]);
@@ -98,62 +93,61 @@ const FoodSearchModal = ({ open, onClose, onAddFood, mealId }) => {
     setError(null);
   };
 
-  // Select a food from search results
   const handleSelectFood = (food) => {
     setSelectedFood(food);
-
-    // Reset serving size and unit when selecting a new food
     setServingSize("100");
     setServingUnit("g");
   };
 
-  // Add the selected food to the meal
-  const handleAddFood = () => {
-    // Make sure we have a selected food
+  const handleAddFood = async () => {
     if (!selectedFood) return;
 
-    // Find nutrients
-    const nutrients = selectedFood.foodNutrients || [];
-    const calories =
-      nutrients.find(
-        (n) => n.nutrientName === "Energy" || n.nutrientNumber === "208"
-      )?.value || 0;
-    const protein =
-      nutrients.find(
-        (n) => n.nutrientName === "Protein" || n.nutrientNumber === "203"
-      )?.value || 0;
-    const carbs =
-      nutrients.find(
-        (n) =>
-          n.nutrientName === "Carbohydrate, by difference" ||
-          n.nutrientNumber === "205"
-      )?.value || 0;
-    const fat =
-      nutrients.find(
-        (n) =>
-          n.nutrientName === "Total lipid (fat)" || n.nutrientNumber === "204"
-      )?.value || 0;
+    try {
+      setLoading(true);
+      setError(null);
 
-    // Calculate values based on serving size
-    const multiplier = parseFloat(servingSize) / 100; // Assuming default nutrition values are per 100g
+      const nutrients = selectedFood.foodNutrients || [];
+      const calories =
+        nutrients.find(
+          (n) => n.nutrientName === "Energy" || n.nutrientNumber === "208"
+        )?.value || 0;
+      const protein =
+        nutrients.find(
+          (n) => n.nutrientName === "Protein" || n.nutrientNumber === "203"
+        )?.value || 0;
+      const carbs =
+        nutrients.find(
+          (n) =>
+            n.nutrientName === "Carbohydrate, by difference" ||
+            n.nutrientNumber === "205"
+        )?.value || 0;
+      const fats =
+        nutrients.find(
+          (n) =>
+            n.nutrientName === "Total lipid (fat)" || n.nutrientNumber === "204"
+        )?.value || 0;
 
-    // Create a food object
-    const newFood = {
-      id: `food-${Date.now()}`, // Generate a temporary ID
-      name: selectedFood.description,
-      serving: `${servingSize} ${servingUnit}`,
-      calories: Math.round(calories * multiplier),
-      protein: Math.round(protein * multiplier * 10) / 10,
-      carbs: Math.round(carbs * multiplier * 10) / 10,
-      fat: Math.round(fat * multiplier * 10) / 10,
-      foodId: selectedFood.fdcId,
-    };
+      const multiplier = parseFloat(servingSize) / 100;
 
-    // Add food to the meal
-    onAddFood(mealId, newFood);
+      const newFood = {
+        id: `food-${Date.now()}`,
+        name: selectedFood.description,
+        serving: `${servingSize} ${servingUnit}`,
+        calories: Math.round(calories * multiplier),
+        protein: Math.round(protein * multiplier * 10) / 10,
+        carbs: Math.round(carbs * multiplier * 10) / 10,
+        fats: Math.round(fats * multiplier * 10) / 10, // Changed from "fat" to "fats"
+        foodId: selectedFood.fdcId,
+      };
 
-    // Close the modal
-    onClose();
+      await onAddFood(mealId, newFood);
+      onClose();
+    } catch (err) {
+      console.error('Error adding food:', err);
+      setError(err.message || 'Failed to add food');
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (
@@ -176,7 +170,6 @@ const FoodSearchModal = ({ open, onClose, onAddFood, mealId }) => {
       </DialogTitle>
 
       <DialogContent dividers>
-        {/* Search Field */}
         <Box sx={{ mb: 3 }}>
           <TextField
             fullWidth
@@ -217,23 +210,19 @@ const FoodSearchModal = ({ open, onClose, onAddFood, mealId }) => {
           </Typography>
         </Box>
 
-        {/* Error alert */}
         {error && (
           <Alert severity="error" sx={{ mb: 2 }}>
             {error}
           </Alert>
         )}
 
-        {/* Loading indicator */}
         {loading && (
           <Box sx={{ display: "flex", justifyContent: "center", my: 3 }}>
             <CircularProgress />
           </Box>
         )}
 
-        {/* Search results and food details side by side */}
         <Grid container spacing={2}>
-          {/* Search results */}
           <Grid item xs={12} md={6}>
             {searchResults.length > 0 && !loading && (
               <Paper
@@ -247,9 +236,9 @@ const FoodSearchModal = ({ open, onClose, onAddFood, mealId }) => {
                   {searchResults.map((food) => (
                     <React.Fragment key={food.fdcId}>
                       <ListItem
-                        button
                         selected={selectedFood?.fdcId === food.fdcId}
                         onClick={() => handleSelectFood(food)}
+                        sx={{ cursor: 'pointer' }}
                       >
                         <ListItemText
                           primary={food.description}
@@ -264,7 +253,6 @@ const FoodSearchModal = ({ open, onClose, onAddFood, mealId }) => {
             )}
           </Grid>
 
-          {/* Selected food details */}
           <Grid item xs={12} md={6}>
             {selectedFood && (
               <Paper variant="outlined" sx={{ p: 2, height: "100%" }}>
@@ -349,12 +337,12 @@ const FoodSearchModal = ({ open, onClose, onAddFood, mealId }) => {
                           n.nutrientName === "Carbohydrate, by difference" ||
                           n.nutrientNumber === "205"
                       )?.value || 0;
-                    const fat =
+                    const fats =
                       nutrients.find(
                         (n) =>
                           n.nutrientName === "Total lipid (fat)" ||
                           n.nutrientNumber === "204"
-                      )?.value || 0;
+                        )?.value || 0;
 
                     return (
                       <Grid container spacing={1}>
@@ -380,8 +368,8 @@ const FoodSearchModal = ({ open, onClose, onAddFood, mealId }) => {
                         </Grid>
                         <Grid item xs={6}>
                           <Typography variant="body2">
-                            Fat:{" "}
-                            <strong>{(fat * multiplier).toFixed(1)}</strong> g
+                            Fats:{" "}
+                            <strong>{(fats * multiplier).toFixed(1)}</strong> g
                           </Typography>
                         </Grid>
                       </Grid>

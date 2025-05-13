@@ -9,23 +9,27 @@ import {
   Fade,
   Zoom,
   Divider,
-  useTheme
+  useTheme,
+  CircularProgress
 } from '@mui/material';
 import InfoOutlinedIcon from '@mui/icons-material/InfoOutlined';
 import WeeklyCalorieChart from './WeeklyCalorieChart';
+import { getNutritionLog, getUserIdFromToken } from '@/api';
+import { format } from 'date-fns';
 
-const CalorieTracker = ({ caloriesConsumed, calorieTarget, weeklyData, onDaySelect }) => {
-  const theme = useTheme(); // Get the current theme
+const CalorieTracker = ({ calorieTarget, onDaySelect }) => {
+  const theme = useTheme();
+  
+  // State for data and loading
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
+  const [caloriesConsumed, setCaloriesConsumed] = useState(0);
+  const [weeklyData, setWeeklyData] = useState([]);
+  const [selectedDate, setSelectedDate] = useState(null);
   
   // Animation states
   const [animateProgress, setAnimateProgress] = useState(0);
   const [showContent, setShowContent] = useState(false);
-  
-  // Default weekly data if none provided
-  const defaultWeeklyData = [1550, 1720, 1840, 1650, 2100, 1790, caloriesConsumed];
-  
-  // Use provided data or default
-  const weeklyCalorieData = weeklyData || defaultWeeklyData;
   
   // Calculate percentage, capped at 100 for the progress bar
   const percentage = Math.min(Math.round((caloriesConsumed / calorieTarget) * 100), 100);
@@ -40,16 +44,116 @@ const CalorieTracker = ({ caloriesConsumed, calorieTarget, weeklyData, onDaySele
     return theme.palette.success.main;  // Green if below 90%
   };
 
+  // Handle day selection from chart
+  const handleDaySelect = (dayData) => {
+    if (dayData) {
+      setSelectedDate(dayData.fullDate);
+      setCaloriesConsumed(weeklyData[dayData.index]);
+      if (onDaySelect) {
+        onDaySelect(dayData);
+      }
+    } else {
+      // If no day selected, show today's data
+      setSelectedDate(null);
+      setCaloriesConsumed(weeklyData[6]);
+      if (onDaySelect) {
+        onDaySelect(null);
+      }
+    }
+  };
+
+  // Fetch nutrition data
+  useEffect(() => {
+    const fetchNutritionData = async () => {
+      try {
+        setLoading(true);
+        setError(null);
+        
+        // Get token from localStorage
+        const token = localStorage.getItem('token');
+        if (!token) {
+          throw new Error('No authentication token found');
+        }
+
+        // Get user ID from token
+        const userId = getUserIdFromToken(token);
+        if (!userId) {
+          throw new Error('No user ID found in token');
+        }
+
+        // Get today's date
+        const today = new Date();
+        
+        // Generate array of dates for the past week
+        const dates = Array.from({ length: 7 }, (_, i) => {
+          const date = new Date();
+          date.setDate(today.getDate() - (6 - i));
+          return date;
+        });
+
+        // Fetch data for each day
+        const nutritionPromises = dates.map(date => 
+          getNutritionLog(token, userId, date)
+        );
+
+        const results = await Promise.all(nutritionPromises);
+        
+        console.log('Raw API results:', results); // Debug log
+        
+        // Extract calorie data from results
+        const newWeeklyData = results.map(result => {
+          if (!result) return 0;
+          // If result is an array, sum up all entries for that day
+          if (Array.isArray(result)) {
+            const total = result.reduce((sum, entry) => sum + (entry?.totalCalories || 0), 0);
+            return Number(total.toFixed(2));
+          }
+          // If result is a single object
+          return Number((result?.totalCalories || 0).toFixed(2));
+        });
+
+        console.log('Processed weekly data:', newWeeklyData); // Debug log
+        setWeeklyData(newWeeklyData);
+        setCaloriesConsumed(newWeeklyData[6]); // Today's calories (last in array)
+      } catch (err) {
+        console.error('Error fetching nutrition data:', err);
+        setError(err.message || 'Failed to load nutrition data');
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchNutritionData();
+  }, []); // Empty dependency array since we want to fetch only once on mount
+
   // Animation effect for progress bar
   useEffect(() => {
-    setShowContent(true);
-    
-    const timer = setTimeout(() => {
-      setAnimateProgress(percentage);
-    }, 300);
-    
-    return () => clearTimeout(timer);
-  }, [percentage]);
+    if (!loading) {
+      setShowContent(true);
+      
+      const timer = setTimeout(() => {
+        setAnimateProgress(percentage);
+      }, 300);
+      
+      return () => clearTimeout(timer);
+    }
+  }, [percentage, loading]);
+
+  if (loading) {
+    return (
+      <Box sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: 400 }}>
+        <CircularProgress />
+      </Box>
+    );
+  }
+
+  if (error) {
+    return (
+      <Box sx={{ p: 2, textAlign: 'center' }}>
+        <Typography color="error">{error}</Typography>
+      </Box>
+    );
+  }
 
   return (
     <Fade in={showContent} timeout={600}>
@@ -58,7 +162,6 @@ const CalorieTracker = ({ caloriesConsumed, calorieTarget, weeklyData, onDaySele
         sx={{
           p: 3,
           borderRadius: 2,
-          // Use theme's background color instead of hardcoded 'white'
           bgcolor: 'background.paper',
           transition: 'box-shadow 0.3s ease-in-out',
           '&:hover': {
@@ -68,9 +171,9 @@ const CalorieTracker = ({ caloriesConsumed, calorieTarget, weeklyData, onDaySele
       >
         {/* Weekly Chart Section */}
         <WeeklyCalorieChart 
-          calorieData={weeklyCalorieData} 
+          calorieData={weeklyData} 
           calorieTarget={calorieTarget}
-          onDaySelect={onDaySelect}
+          onDaySelect={handleDaySelect}
         />
         
         <Divider sx={{ my: 2 }} />
@@ -87,7 +190,7 @@ const CalorieTracker = ({ caloriesConsumed, calorieTarget, weeklyData, onDaySele
                   lineHeight: 1.2,
                   display: 'flex',
                   alignItems: 'baseline',
-                  color: 'text.primary' // Use theme's text color
+                  color: 'text.primary'
                 }}
               >
                 <Box 
@@ -123,7 +226,7 @@ const CalorieTracker = ({ caloriesConsumed, calorieTarget, weeklyData, onDaySele
                   }
                 }}
               >
-                Today's Target: {calorieTarget}
+                {selectedDate ? format(selectedDate, 'MMMM d') : 'Today'}'s Target: {calorieTarget}
               </Typography>
             </Box>
           </Zoom>
@@ -154,7 +257,7 @@ const CalorieTracker = ({ caloriesConsumed, calorieTarget, weeklyData, onDaySele
                   sx={{
                     color: theme.palette.mode === 'dark' 
                       ? theme.palette.success.light 
-                      : theme.palette.success.main, // Adjusted for dark mode
+                      : theme.palette.success.main,
                     animation: 'pulse 2s infinite',
                     '@keyframes pulse': {
                       '0%': { transform: 'scale(1)' },
@@ -173,12 +276,12 @@ const CalorieTracker = ({ caloriesConsumed, calorieTarget, weeklyData, onDaySele
         <Box sx={{ position: 'relative', pt: 1 }}>
           <LinearProgress
             variant="determinate"
-            value={animateProgress} // Use animated value
+            value={animateProgress}
             sx={{
               height: 10,
               borderRadius: 5,
               backgroundColor: theme.palette.mode === 'dark' 
-                ? 'rgba(255, 255, 255, 0.12)' // Darker background in dark mode
+                ? 'rgba(255, 255, 255, 0.12)'
                 : '#e0e0e0',
               '& .MuiLinearProgress-bar': {
                 borderRadius: 5,

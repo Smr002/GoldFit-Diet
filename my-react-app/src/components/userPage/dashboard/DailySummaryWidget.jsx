@@ -25,7 +25,7 @@ function DailySummaryWidget({ token, userId, date }) {
 
   // State to store fetched data
   const [nutritionData, setNutritionData] = useState({
-    calories: { consumed: 0, goal: 2100, percentage: 0 },
+    calories: { consumed: 0, goal: 2100, percentage: 0, isOverGoal: false },
     macros: {
       protein: {
         amount: 0,
@@ -59,53 +59,91 @@ function DailySummaryWidget({ token, userId, date }) {
         setLoading(true);
         const logs = await getNutritionLog(token, userId, date);
 
-        // Assuming logs is an array; take the first log or adjust if single object
-        const log = Array.isArray(logs) ? logs[0] : logs;
+        // Process all logs for the day
+        let totalCalories = 0;
+        let totalProtein = 0;
+        let totalCarbs = 0;
+        let totalFats = 0;
+        let totalHydration = 0;
+
+        if (Array.isArray(logs)) {
+          // Sum up all entries for the day
+          logs.forEach(log => {
+            totalCalories += log.totalCalories || 0;
+            totalProtein += log.protein || 0;
+            totalCarbs += log.carbs || 0;
+            totalFats += log.fats || 0;
+            totalHydration += log.hydration || 0;
+          });
+        } else if (logs) {
+          // Single entry
+          totalCalories = logs.totalCalories || 0;
+          totalProtein = logs.protein || 0;
+          totalCarbs = logs.carbs || 0;
+          totalFats = logs.fats || 0;
+          totalHydration = logs.hydration || 0;
+        }
+
+        // Round all values to 2 decimal places
+        totalCalories = Number(totalCalories.toFixed(2));
+        totalProtein = Number(totalProtein.toFixed(2));
+        totalCarbs = Number(totalCarbs.toFixed(2));
+        totalFats = Number(totalFats.toFixed(2));
+        totalHydration = Number(totalHydration.toFixed(2));
+
+        // Convert hydration from liters to milliliters
+        const hydrationInMl = totalHydration * 1000;
+        const hydrationGoalInMl = 8 * 1000; // Convert 8L goal to ml
 
         // Map API data to component state
         const calories = {
-          consumed: log.totalCalories || 0,
+          consumed: totalCalories,
           goal: 2100,
-          percentage: log.totalCalories
-            ? Math.min((log.totalCalories / 2100) * 100, 100)
+          percentage: totalCalories
+            ? Math.min((totalCalories / 2100) * 100, 100)
             : 0,
+          isOverGoal: totalCalories > 2100
         };
 
         const macros = {
           protein: {
-            amount: log.protein || 0,
+            amount: totalProtein,
             goal: 150,
-            percentage: log.protein
-              ? Math.min((log.protein / 150) * 100, 100)
+            percentage: totalProtein
+              ? Math.min((totalProtein / 150) * 100, 100)
               : 0,
-            color: isDarkMode ? "#FFD700" : "#9B87F5", // Gold in dark mode
+            color: isDarkMode ? "#FFD700" : "#9B87F5",
           },
           carbs: {
-            amount: log.carbs || 0,
+            amount: totalCarbs,
             goal: 220,
-            percentage: log.carbs ? Math.min((log.carbs / 220) * 100, 100) : 0,
-            color: isDarkMode ? "#FFC107" : "#6CCFBC", // Amber in dark mode
+            percentage: totalCarbs 
+              ? Math.min((totalCarbs / 220) * 100, 100) 
+              : 0,
+            color: isDarkMode ? "#FFC107" : "#6CCFBC",
           },
           fats: {
-            amount: log.fats || 0,
+            amount: totalFats,
             goal: 70,
-            percentage: log.fats ? Math.min((log.fats / 70) * 100, 100) : 0,
-            color: isDarkMode ? "#DAA520" : "#FF7D55", // Goldenrod in dark mode
+            percentage: totalFats 
+              ? Math.min((totalFats / 70) * 100, 100) 
+              : 0,
+            color: isDarkMode ? "#DAA520" : "#FF7D55",
           },
         };
 
         const hydration = {
-          amount: log.hydration || 0,
-          goal: 8,
-          percentage: log.hydration
-            ? Math.min((log.hydration / 8) * 100, 100)
+          amount: totalHydration,
+          goal: 3000,
+          percentage: totalHydration
+            ? Math.min((totalHydration / 3000) * 100, 100)
             : 0,
         };
 
         const sleep = {
-          hours: 0,
+          hours: 7.5,
           goal: 8,
-          percentage: 0,
+          percentage: (7.5 / 8) * 100,
         };
 
         setNutritionData({ calories, macros, hydration, sleep });
@@ -323,7 +361,7 @@ function DailySummaryWidget({ token, userId, date }) {
           <Typography
             variant="body1"
             fontWeight={600}
-            sx={{ color: theme.palette.text.primary }}
+            sx={{ color: calories.isOverGoal ? theme.palette.error.main : theme.palette.text.primary }}
           >
             {calories.consumed}{" "}
             <span
@@ -343,7 +381,9 @@ function DailySummaryWidget({ token, userId, date }) {
               ? "rgba(255, 215, 0, 0.15)"
               : "rgba(155, 135, 245, 0.15)",
             "& .MuiLinearProgress-bar": {
-              bgcolor: isDarkMode ? theme.palette.primary.main : "#9B87F5",
+              bgcolor: calories.isOverGoal 
+                ? theme.palette.error.main 
+                : (isDarkMode ? theme.palette.primary.main : "#9B87F5"),
               borderRadius: 2,
             },
           }}
@@ -476,8 +516,8 @@ function DailySummaryWidget({ token, userId, date }) {
                 fontWeight={500}
                 sx={{ color: isDarkMode ? "#90CAF9" : "#3B82F6" }}
               >
-                {hydration.amount}/{hydration.goal}{" "}
-                <span style={{ fontSize: "0.7rem" }}>L</span>
+                {hydration.amount}/ {hydration.goal}{" "}
+                <span style={{ fontSize: "0.7rem" }}>ml</span>
               </Typography>
             </Box>
             <LinearProgress

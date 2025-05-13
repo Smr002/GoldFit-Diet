@@ -1,8 +1,8 @@
 import React, { useState, useEffect } from 'react';
-import { Box, Typography, Fade, Zoom } from '@mui/material';
+import { Box, Typography, Fade, Zoom, CircularProgress } from '@mui/material';
 import { format, subDays, isToday } from 'date-fns';
 
-const WeeklyCalorieChart = ({ calorieData, calorieTarget, onDaySelect }) => {
+const WeeklyCalorieChart = ({ calorieTarget, onDaySelect, calorieData }) => {
   const [animatedBars, setAnimatedBars] = useState(Array(7).fill(0));
   const [highlightedDay, setHighlightedDay] = useState(null);
   const [selectedDay, setSelectedDay] = useState(null);

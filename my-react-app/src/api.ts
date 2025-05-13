@@ -402,3 +402,74 @@ export async function notifyPayment(token: string, userId: number, phone: string
     throw new Error("Unexpected error");
   }
 }
+
+
+export const createNutritionLog = async (
+  token: string,
+  logData: {
+    date: string;
+    mealType: string;
+    totalCalories: number;
+    protein: number;
+    carbs: number;
+    fats: number;
+    hydration: number;
+    foodItems: {
+      fdcId: string;
+      description: string;
+      servingSize: number;
+      unit: string;
+      calories: number;
+      protein: number;
+      carbs: number;
+      fats: number;
+    }[];
+  }
+) => {
+  try {
+    // Get user ID from token
+    const userId = getUserIdFromToken(token);
+    if (!userId) {
+      throw new Error("No user ID found in token");
+    }
+
+    // Format the data to match the Prisma schema
+    const requestBody = {
+      userId,
+      date: logData.date,
+      mealType: logData.mealType,
+      totalCalories: parseFloat(logData.totalCalories.toString()),
+      protein: parseFloat(logData.protein.toString()),
+      carbs: parseFloat(logData.carbs.toString()),
+      fats: parseFloat(logData.fats.toString()),
+      hydration: parseFloat(logData.hydration.toString()),
+      foodItems: logData.foodItems.map((item) => ({
+        fdcId: item.fdcId,
+        description: item.description,
+        servingSize: parseFloat(item.servingSize.toString()),
+        unit: item.unit,
+        calories: parseFloat(item.calories.toString()),
+        protein: parseFloat(item.protein.toString()),
+        carbs: parseFloat(item.carbs.toString()),
+        fats: parseFloat(item.fats.toString()),
+      })),
+    };
+
+    console.log("Sending nutrition log data:", requestBody); // Add logging
+
+    const response = await axios.post(`${API_BASE_URL}/nutrition/logs`, requestBody, {
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${token}`,
+      },
+    });
+    return response.data;
+  } catch (error: any) {
+    if (axios.isAxiosError(error)) {
+      console.error("Nutrition log error:", error.response?.data); // Add error logging
+      throw new Error(error.response?.data?.error || "Failed to create nutrition log");
+    }
+    throw new Error("Unexpected error");
+  }
+};
+

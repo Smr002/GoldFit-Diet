@@ -6,15 +6,26 @@ import {
   Grid,
   useMediaQuery,
   Fade,
-  Grow
+  Grow,
+  CircularProgress
 } from '@mui/material';
 import { useTheme } from '@mui/material/styles';
 import { PieChart } from '@mui/x-charts/PieChart';
+import { getNutritionLog, getUserIdFromToken } from '@/api';
 
-const MacronutrientBreakdown = ({ macros }) => {
+const MacronutrientBreakdown = ({ selectedDay }) => {
   const theme = useTheme();
   const isMobile = useMediaQuery(theme.breakpoints.down('sm'));
   const isDarkMode = theme.palette.mode === 'dark';
+
+  // State for data and loading
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
+  const [macros, setMacros] = useState({
+    protein: { consumed: 0, target: 98 },
+    carbs: { consumed: 0, target: 196 },
+    fat: { consumed: 0, target: 65 }
+  });
 
   // Updated color scheme based on theme
   const MACRO_COLORS = {
@@ -54,17 +65,98 @@ const MacronutrientBreakdown = ({ macros }) => {
 
   const chartSize = isMobile ? 160 : 200;
 
+  // Fetch nutrition data
   useEffect(() => {
-    const timer1 = setTimeout(() => setShowRecommended(true), 300);
-    const timer2 = setTimeout(() => setShowActual(true), 600);
-    const timer3 = setTimeout(() => setShowDetails(true), 900);
+    const fetchNutritionData = async () => {
+      try {
+        setLoading(true);
+        setError(null);
+        
+        // Get token from localStorage
+        const token = localStorage.getItem('token');
+        if (!token) {
+          throw new Error('No authentication token found');
+        }
 
-    return () => {
-      clearTimeout(timer1);
-      clearTimeout(timer2);
-      clearTimeout(timer3);
+        // Get user ID from token
+        const userId = getUserIdFromToken(token);
+        if (!userId) {
+          throw new Error('No user ID found in token');
+        }
+
+        // Use selected day's date or today's date
+        const date = selectedDay ? new Date(selectedDay.date) : new Date();
+        
+        // Fetch nutrition data for the selected date
+        const result = await getNutritionLog(token, userId, date);
+        
+        if (result) {
+          // Extract macro data from the result
+          const macroData = {
+            protein: {
+              consumed: Array.isArray(result) 
+                ? Number(result.reduce((sum, entry) => sum + (entry?.protein || 0), 0).toFixed(2))
+                : Number((result.protein || 0).toFixed(2)),
+              target: 98
+            },
+            carbs: {
+              consumed: Array.isArray(result)
+                ? Number(result.reduce((sum, entry) => sum + (entry?.carbs || 0), 0).toFixed(2))
+                : Number((result.carbs || 0).toFixed(2)),
+              target: 196
+            },
+            fat: {
+              consumed: Array.isArray(result)
+                ? Number(result.reduce((sum, entry) => sum + (entry?.fats || 0), 0).toFixed(2))
+                : Number((result.fats || 0).toFixed(2)),
+              target: 65
+            }
+          };
+          
+          console.log('Processed macro data:', macroData); // Debug log
+          setMacros(macroData);
+        }
+      } catch (err) {
+        console.error('Error fetching nutrition data:', err);
+        setError(err.message || 'Failed to load nutrition data');
+      } finally {
+        setLoading(false);
+      }
     };
-  }, []);
+
+    fetchNutritionData();
+  }, [selectedDay]); // Re-fetch when selected day changes
+
+  // Animation effects
+  useEffect(() => {
+    if (!loading) {
+      const timer1 = setTimeout(() => setShowRecommended(true), 300);
+      const timer2 = setTimeout(() => setShowActual(true), 600);
+      const timer3 = setTimeout(() => setShowDetails(true), 900);
+
+      return () => {
+        clearTimeout(timer1);
+        clearTimeout(timer2);
+        clearTimeout(timer3);
+      };
+    }
+  }, [loading]);
+
+  if (loading) {
+    return (
+      <Box sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: 400 }}>
+        <CircularProgress />
+      </Box>
+    );
+  }
+
+  if (error) {
+    return (
+      <Box sx={{ p: 2, textAlign: 'center' }}>
+        <Typography color="error">{error}</Typography>
+      </Box>
+    );
+  }
 
   const MacroLegend = ({ data, colors }) => (
     <Box
@@ -122,7 +214,7 @@ const MacronutrientBreakdown = ({ macros }) => {
       sx={{
         p: 3,
         borderRadius: 2,
-        bgcolor: 'background.paper', // Uses theme's background color
+        bgcolor: 'background.paper',
         mb: 3,
         transition: 'transform 0.3s ease-in-out, box-shadow 0.3s ease-in-out',
         '&:hover': {
@@ -139,7 +231,7 @@ const MacronutrientBreakdown = ({ macros }) => {
         fontWeight="bold"
         sx={{
           mb: 2,
-          color: theme.palette.text.primary, // Uses theme's text color
+          color: theme.palette.text.primary,
           animation: 'slideRight 0.7s ease-out',
           '@keyframes slideRight': {
             from: { opacity: 0, transform: 'translateX(-20px)' },
@@ -165,7 +257,6 @@ const MacronutrientBreakdown = ({ macros }) => {
                     from: { opacity: 0, transform: 'rotate(-30deg)' },
                     to: { opacity: 1, transform: 'rotate(0)' }
                   },
-                  // Add subtle glow for charts in dark mode
                   filter: isDarkMode ? 'drop-shadow(0 0 6px rgba(255, 215, 0, 0.2))' : 'none'
                 }}
               >
@@ -187,7 +278,6 @@ const MacronutrientBreakdown = ({ macros }) => {
                   height={chartSize}
                   slotProps={{ legend: { hidden: true } }}
                   sx={{
-                    // Improved chart visibility in dark mode
                     '--ChartsLegend-label-color': theme.palette.text.primary,
                     '--ChartsLegend-item-gap': '8px',
                   }}
@@ -230,7 +320,6 @@ const MacronutrientBreakdown = ({ macros }) => {
                     from: { opacity: 0, transform: 'rotate(30deg)' },
                     to: { opacity: 1, transform: 'rotate(0)' }
                   },
-                  // Add subtle glow for charts in dark mode
                   filter: isDarkMode ? 'drop-shadow(0 0 6px rgba(255, 215, 0, 0.2))' : 'none'
                 }}
               >
@@ -253,7 +342,6 @@ const MacronutrientBreakdown = ({ macros }) => {
                   height={chartSize}
                   slotProps={{ legend: { hidden: true } }}
                   sx={{
-                    // Improved chart visibility in dark mode
                     '--ChartsLegend-label-color': theme.palette.text.primary,
                     '--ChartsLegend-item-gap': '8px',
                   }}

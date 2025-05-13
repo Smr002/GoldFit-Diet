@@ -12,7 +12,8 @@ import {
   Fade,
   Zoom,
   Grow,
-  useTheme
+  useTheme,
+  CircularProgress
 } from '@mui/material';
 import { 
   Opacity as WaterIcon, 
@@ -20,13 +21,19 @@ import {
   Info as InfoIcon,
   LocalDrink as DrinkIcon
 } from '@mui/icons-material';
+import { getNutritionLog, getUserIdFromToken, createNutritionLog } from '@/api';
 
-const WaterTracker = ({ current = 0, target = 2000, onAddWater, selectedDay }) => {
+const WaterTracker = ({ target = 2000, onAddWater, selectedDay }) => {
   const theme = useTheme();
   const isDarkMode = theme.palette.mode === 'dark';
   
+  // State for data and loading
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
+  const [current, setCurrent] = useState(0);
+  
   // Colors for dark/light mode
-  const waterColor = isDarkMode ? '#90CAF9' : '#2196f3'; // Lighter blue in dark mode
+  const waterColor = isDarkMode ? '#90CAF9' : '#2196f3';
   const waterBgColor = isDarkMode ? 'rgba(144, 202, 249, 0.7)' : 'rgba(33, 150, 243, 0.7)';
   const glassBorderColor = isDarkMode ? '#555555' : '#e0e0e0';
   
@@ -39,6 +46,71 @@ const WaterTracker = ({ current = 0, target = 2000, onAddWater, selectedDay }) =
   
   // Local state for water amount to add
   const [waterToAdd, setWaterToAdd] = useState(250);
+
+  // Fetch water intake data
+  useEffect(() => {
+    const fetchWaterData = async () => {
+      try {
+        setLoading(true);
+        setError(null);
+        
+        // Get token from localStorage
+        const token = localStorage.getItem('token');
+        if (!token) {
+          throw new Error('No authentication token found');
+        }
+
+        // Get user ID from token
+        const userId = getUserIdFromToken(token);
+        if (!userId) {
+          throw new Error('No user ID found in token');
+        }
+
+        // Use selected day's date or today's date
+        const date = selectedDay ? new Date(selectedDay.date) : new Date();
+        console.log('Fetching water data for date:', date);
+        
+        // Fetch nutrition data for the selected date
+        const result = await getNutritionLog(token, userId, date);
+        console.log('Raw water data result:', result);
+        
+        if (result) {
+          // Extract water data from the result
+          let waterIntake = 0;
+          
+          if (Array.isArray(result)) {
+            // Sum up all water entries for the day
+            waterIntake = result.reduce((sum, entry) => {
+              const hydration = parseFloat(entry?.hydration || 0);
+              console.log('Processing entry:', entry, 'Hydration value:', hydration);
+              return sum + hydration;
+            }, 0);
+          } else if (result.hydration) {
+            waterIntake = parseFloat(result.hydration);
+          }
+          
+          console.log('Total water intake calculated:', waterIntake);
+          setCurrent(Number(waterIntake.toFixed(2)));
+        } else {
+          console.log('No water data found for the selected date');
+          setCurrent(0);
+        }
+      } catch (err) {
+        console.error('Error fetching water data:', err);
+        console.error('Error details:', {
+          message: err.message,
+          response: err.response?.data,
+          status: err.response?.status
+        });
+        setError(err.response?.data?.message || err.message || 'Failed to load water data');
+        setCurrent(0);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchWaterData();
+  }, [selectedDay]); // Re-fetch when selected day changes
   
   // Calculate percentage filled
   const percentFilled = Math.min(Math.round((current / target) * 100), 100);
@@ -50,7 +122,6 @@ const WaterTracker = ({ current = 0, target = 2000, onAddWater, selectedDay }) =
   const getFormattedDate = () => {
     if (selectedDay && selectedDay.date) {
       try {
-        // Try to format the date if it's a valid Date object or string
         return new Date(selectedDay.date).toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
       } catch (error) {
         return '';
@@ -61,22 +132,40 @@ const WaterTracker = ({ current = 0, target = 2000, onAddWater, selectedDay }) =
   
   // Trigger sequential animations
   useEffect(() => {
-    const timer1 = setTimeout(() => setShowComponent(true), 100);
-    const timer2 = setTimeout(() => setShowHeader(true), 400);
-    const timer3 = setTimeout(() => setShowDivider(true), 700); 
-    const timer4 = setTimeout(() => setShowContent(true), 900);
-    const timer5 = setTimeout(() => {
-      setFillAnimation(percentFilled);
-    }, 1200);
-    
-    return () => {
-      clearTimeout(timer1);
-      clearTimeout(timer2);
-      clearTimeout(timer3);
-      clearTimeout(timer4);
-      clearTimeout(timer5);
-    };
-  }, [percentFilled, selectedDay]);
+    if (!loading) {
+      const timer1 = setTimeout(() => setShowComponent(true), 100);
+      const timer2 = setTimeout(() => setShowHeader(true), 400);
+      const timer3 = setTimeout(() => setShowDivider(true), 700); 
+      const timer4 = setTimeout(() => setShowContent(true), 900);
+      const timer5 = setTimeout(() => {
+        setFillAnimation(percentFilled);
+      }, 1200);
+      
+      return () => {
+        clearTimeout(timer1);
+        clearTimeout(timer2);
+        clearTimeout(timer3);
+        clearTimeout(timer4);
+        clearTimeout(timer5);
+      };
+    }
+  }, [percentFilled, selectedDay, loading]);
+
+  if (loading) {
+    return (
+      <Box sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: 400 }}>
+        <CircularProgress />
+      </Box>
+    );
+  }
+
+  if (error) {
+    return (
+      <Box sx={{ p: 2, textAlign: 'center' }}>
+        <Typography color="error">{error}</Typography>
+      </Box>
+    );
+  }
   
   // Handle water amount changed from slider
   const handleSliderChange = (event, newValue) => {
@@ -84,18 +173,71 @@ const WaterTracker = ({ current = 0, target = 2000, onAddWater, selectedDay }) =
   };
   
   // Handle add water click
-  const handleAddWater = () => {
-    if (onAddWater) {
-      onAddWater(waterToAdd);
-    }
-    
-    // Visual feedback animation
-    const waterContainer = document.getElementById('water-container');
-    if (waterContainer) {
-      waterContainer.classList.add('pulse');
-      setTimeout(() => {
-        waterContainer.classList.remove('pulse');
-      }, 600);
+  const handleAddWater = async () => {
+    try {
+      // Get token from localStorage
+      const token = localStorage.getItem('token');
+      if (!token) {
+        throw new Error('No authentication token found');
+      }
+
+      // Get user ID from token
+      const userId = getUserIdFromToken(token);
+      if (!userId) {
+        throw new Error('No user ID found in token');
+      }
+
+      // Get current date or selected date
+      const date = selectedDay ? new Date(selectedDay.date) : new Date();
+      const formattedDate = date.toISOString().split('T')[0];
+
+      // Create nutrition log data matching the exact format
+      const logData = {
+        carbs: 0,
+        date: formattedDate,
+        fats: 0,
+        foodItems: [],
+        hydration: parseFloat(waterToAdd),
+        mealType: 'SNACK',
+        protein: 0,
+        totalCalories: 0,
+        userId: parseInt(userId)
+      };
+
+      console.log('Sending water log data:', logData);
+
+      // Send to backend
+      const response = await createNutritionLog(token, logData);
+      console.log('Water log response:', response);
+
+      if (!response) {
+        throw new Error('No response from server');
+      }
+
+      // Update local state
+      setCurrent(prev => Number((prev + waterToAdd).toFixed(2)));
+
+      // Visual feedback animation
+      const waterContainer = document.getElementById('water-container');
+      if (waterContainer) {
+        waterContainer.classList.add('pulse');
+        setTimeout(() => {
+          waterContainer.classList.remove('pulse');
+        }, 600);
+      }
+
+      // Call parent's onAddWater if provided
+      if (onAddWater) {
+        onAddWater(waterToAdd);
+      }
+    } catch (err) {
+      console.error('Error adding water:', err);
+      console.error('Error details:', {
+        message: err.message,
+        response: err.response?.data,
+        status: err.response?.status
+      });
+      setError(err.response?.data?.message || err.message || 'Failed to add water');
     }
   };
   
