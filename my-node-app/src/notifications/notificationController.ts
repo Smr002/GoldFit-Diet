@@ -11,6 +11,15 @@ export class NotificationController {
       const notification = await notificationService.createNotification(data);
       res.status(201).json(notification);
     } catch (error) {
+      if (error instanceof Error) {
+        console.log(error)
+        if (error.message === 'Creator user not found') {
+          return res.status(400).json({ error: 'The specified creator user does not exist' });
+        }
+        if (error.message === 'Invalid notification data') {
+          return res.status(400).json({ error: 'Invalid notification data provided' });
+        }
+      }
       res.status(500).json({ error: 'Failed to create notification' });
     }
   }
@@ -83,6 +92,15 @@ export class NotificationController {
       res.json({ message: 'Progress achievements check completed' });
     } catch (error) {
       res.status(500).json({ error: 'Failed to check progress achievements' });
+    }
+  }
+
+  async getAllNotifications(req: Request, res: Response) {
+    try {
+      const notifications = await notificationService.getAllNotifications();
+      res.json(notifications);
+    } catch (error) {
+      res.status(500).json({ error: 'Failed to get notifications' });
     }
   }
 }

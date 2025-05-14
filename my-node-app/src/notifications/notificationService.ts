@@ -162,4 +162,13 @@ export class NotificationService {
       throw error;
     }
   }
+
+  async getAllNotifications(): Promise<Notification[]> {
+    try {
+      return this.repository.getAllNotifications();
+    } catch (error) {
+      console.error('Error getting all notifications:', error);
+      throw error;
+    }
+  }
 }

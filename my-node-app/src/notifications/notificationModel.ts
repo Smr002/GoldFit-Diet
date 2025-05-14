@@ -28,7 +28,8 @@ export const NotificationSchema = z.object({
   isAutomated: z.boolean(),
   frequency: NotificationFrequencySchema.optional(),
   targetUsers: NotificationAudienceSchema,
-  createdBy: z.number().optional(),
+  createdByUserId: z.number().optional(),
+  createdByAdminId: z.number().optional(),
   createdAt: z.date().optional(),
   updatedAt: z.date().optional(),
   deletedAt: z.date().optional().nullable(),
@@ -76,6 +77,7 @@ export class NotificationModel {
 
   isValid(): boolean {
     try {
+      console.log('Validating notification data:', this.data);
       NotificationSchema.parse(this.data);
       return true;
     } catch (error) {

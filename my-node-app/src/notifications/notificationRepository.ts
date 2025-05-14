@@ -5,6 +5,8 @@ const prisma = new PrismaClient();
 
 type FullPrismaNotification = PrismaNotification & {
   deletedAt: Date | null;
+  createdByUserId: number | null;
+  createdByAdminId: number | null;
 };
 
 const mapPrismaToNotification = (prismaNotification: FullPrismaNotification): Notification => {
@@ -15,7 +17,8 @@ const mapPrismaToNotification = (prismaNotification: FullPrismaNotification): No
     isAutomated: prismaNotification.isAutomated,
     frequency: (prismaNotification.frequency as Notification['frequency']) || undefined,
     targetUsers: prismaNotification.targetUsers as Notification['targetUsers'],
-    createdBy: prismaNotification.createdBy || undefined,
+    createdByUserId: prismaNotification.createdByUserId || undefined,
+    createdByAdminId: prismaNotification.createdByAdminId || undefined,
     createdAt: prismaNotification.createdAt,
     updatedAt: prismaNotification.updatedAt,
     deletedAt: prismaNotification.deletedAt || undefined,
@@ -29,7 +32,20 @@ export class NotificationRepository {
       throw new Error('Invalid notification data');
     }
 
+    // Verify the creator exists if createdByUserId is provided
+    if (data.createdByUserId) {
+      console.log('Checking for creator with ID:', data.createdByUserId);
+      const creator = await prisma.user.findUnique({
+        where: { id: data.createdByUserId }
+      });
+      console.log('Creator found:', creator);
+      if (!creator) {
+        throw new Error('Creator user not found');
+      }
+    }
+
     const notificationData = notificationModel.toObject();
+    console.log('Creating notification with data:', notificationData);
     const prismaNotification = await prisma.notification.create({
       data: {
         type: notificationData.type,
@@ -37,7 +53,8 @@ export class NotificationRepository {
         isAutomated: notificationData.isAutomated,
         frequency: notificationData.frequency,
         targetUsers: notificationData.targetUsers,
-        createdBy: notificationData.createdBy,
+        createdByUserId: notificationData.createdByUserId,
+        createdByAdminId: notificationData.createdByAdminId,
       },
     }) as FullPrismaNotification;
 
@@ -47,7 +64,7 @@ export class NotificationRepository {
   async getNotificationById(id: number): Promise<Notification | null> {
     const prismaNotification = await prisma.notification.findUnique({
       where: { id },
-      include: { creator: true },
+      include: { adminCreator: true },
     }) as FullPrismaNotification | null;
 
     return prismaNotification ? mapPrismaToNotification(prismaNotification) : null;
@@ -68,7 +85,7 @@ export class NotificationRepository {
         isAutomated: notificationData.isAutomated,
         frequency: notificationData.frequency,
         targetUsers: notificationData.targetUsers,
-        createdBy: notificationData.createdBy,
+        createdByAdminId: notificationData.createdByAdminId,
       },
     }) as FullPrismaNotification;
 
@@ -137,9 +154,17 @@ export class NotificationRepository {
       message: data.message,
       isAutomated: false,
       targetUsers: data.targetUsers,
-      createdBy: data.createdBy,
+      createdByAdminId: data.createdBy,
     };
 
     return this.createNotification(notificationData);
+  }
+
+  async getAllNotifications(): Promise<Notification[]> {
+    const prismaNotifications = await prisma.notification.findMany({
+      orderBy: { createdAt: 'desc' },
+    }) as FullPrismaNotification[];
+
+    return prismaNotifications.map(mapPrismaToNotification);
   }
 }
