@@ -1,10 +1,10 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { MoreVertical, Pencil, Trash2, Eye, Plus, Search } from 'lucide-react';
 import 'admin.css';
-// Update the import statements
 import WorkoutDetailsModal from '../../components/admin/WorkoutDetailsModal';
 import WorkoutEditModal from '../../components/admin/WorkoutEditModal';
 import DeleteConfirmModal from '../../components/admin/DeleteConfirmModal';
+import { getWorkouts, createWorkout, updateWorkout, deleteWorkout } from '../../api';
 
 const WorkoutManagement = () => {
   const [searchQuery, setSearchQuery] = useState('');
@@ -20,6 +20,9 @@ const WorkoutManagement = () => {
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
   const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
+  const [workouts, setWorkouts] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState('');
   
   // Add this ref to track dropdown containers
   const dropdownRef = useRef(null);
@@ -49,80 +52,22 @@ const WorkoutManagement = () => {
     return index >= total - 2;
   };
 
-  const [workouts, setWorkouts] = useState([
-    {
-      id: 1,
-      name: "Full Body Strength",
-      level: "Intermediate",
-      timesPerWeek: 3,
-      createdBy: "Admin",
-      isPremade: true,
-      createdAt: "2024-03-15",
-      exercises: [
-        { 
-          id: 1, 
-          name: "Alternate Lateral Pulldown", 
-          reps: "3x12" 
-        },
-        { 
-          id: 2, 
-          name: "Assisted Parallel Close Grip Pull-up", 
-          reps: "4x8" 
-        },
-        { 
-          id: 3, 
-          name: "Assisted Pull-up", 
-          reps: "3x10" 
-        },
-        { 
-          id: 4, 
-          name: "Barbell Pullover To Press", 
-          reps: "3x12" 
-        },
-        { 
-          id: 5, 
-          name: "Barbell Bent Over Row", 
-          reps: "4x10" 
-        }
-      ]
-    },
-    {
-      id: 2,
-      name: "HIIT Cardio",
-      level: "Advanced",
-      timesPerWeek: 4,
-      createdBy: "Admin",
-      isPremade: true,
-      createdAt: "2024-03-15" // Add this field to all workout objects
-    },
-    {
-      id: 3,
-      name: "Beginner Core",
-      level: "Beginner",
-      timesPerWeek: 2,
-      createdBy: "Admin",
-      isPremade: true,
-      createdAt: "2024-03-15" // Add this field to all workout objects
-    },
-    {
-      id: 4,
-      name: "Custom Split",
-      level: "Intermediate",
-      timesPerWeek: 5,
-      createdBy: "User",
-      isPremade: false,
-      createdAt: "2024-03-15" // Add this field to all workout objects
-    },
-    {
-      id: 5,
-      name: "Strength & Conditioning",
-      level: "Advanced",
-      timesPerWeek: 4,
-      createdBy: "Admin",
-      isPremade: true,
-      createdAt: "2024-03-15" // Add this field to all workout objects
-    }
-  ]);
+  useEffect(() => {
+    const fetchWorkouts = async () => {
+      setLoading(true);
+      setError('');
+      try {
+        const token = localStorage.getItem('token');
+        const data = await getWorkouts(token);
+        setWorkouts(data);
+      } catch {
+        setError('Failed to load workouts');
+      } finally {
+        setLoading(false);
+      }
+    };
+    fetchWorkouts();
+  }, []);
 
   const handleFilterChange = (e) => {
     const { name, value } = e.target;
@@ -144,28 +89,26 @@ const WorkoutManagement = () => {
     setActiveDropdown(null);
   };
 
-  const handleSaveWorkout = (updatedWorkout) => {
-    if (isCreateModalOpen) {
-      // This is a new workout creation
-      const newWorkout = {
-        ...updatedWorkout,
-        id: workouts.length + 1 // In a real app, you'd use a UUID or let the backend generate an ID
-      };
-      
-      setWorkouts([...workouts, newWorkout]);
-      setIsCreateModalOpen(false);
-    } else {
-      // This is an edit of an existing workout
-      setWorkouts(prevWorkouts => 
-        prevWorkouts.map(workout => 
-          workout.id === updatedWorkout.id ? updatedWorkout : workout
-        )
-      );
+  const handleSaveWorkout = async (updatedWorkout) => {
+    const token = localStorage.getItem('token');
+    try {
+      if (isCreateModalOpen) {
+        const newWorkout = await createWorkout(updatedWorkout, token);
+        setWorkouts([...workouts, newWorkout]);
+        setIsCreateModalOpen(false);
+      } else {
+        const savedWorkout = await updateWorkout(updatedWorkout.id, updatedWorkout, token);
+        setWorkouts(prevWorkouts =>
+          prevWorkouts.map(workout =>
+            workout.id === savedWorkout.id ? savedWorkout : workout
+          )
+        );
+      }
+      setIsEditModalOpen(false);
+      setSelectedWorkout(null);
+    } catch {
+      setError('Failed to save workout');
     }
-    
-    // Close the modal
-    setIsEditModalOpen(false);
-    setSelectedWorkout(null);
   };
 
   const handleDeleteClick = (workout) => {
@@ -180,31 +123,31 @@ const WorkoutManagement = () => {
     setSelectedWorkout(null);
   };
 
-  const handleDeleteConfirm = () => {
-    // Remove the workout from the state
-    setWorkouts(prevWorkouts => 
-      prevWorkouts.filter(workout => workout.id !== selectedWorkout.id)
-    );
-    
-    // Close the modal and reset selected workout
-    setIsDeleteModalOpen(false);
-    setSelectedWorkout(null);
+  const handleDeleteConfirm = async () => {
+    const token = localStorage.getItem('token');
+    try {
+      await deleteWorkout(selectedWorkout.id, token);
+      setWorkouts(prevWorkouts =>
+        prevWorkouts.filter(workout => workout.id !== selectedWorkout.id)
+      );
+      setIsDeleteModalOpen(false);
+      setSelectedWorkout(null);
+    } catch {
+      setError('Failed to delete workout');
+    }
   };
 
   const handleCreateWorkout = () => {
-    // Set an empty workout template
     const newWorkoutTemplate = {
-      id: `temp-${Date.now()}`,
-      name: "",
-      level: "Beginner",
+      name: '',
+      level: 'Beginner',
       timesPerWeek: 3,
-      createdBy: "Admin",
+      createdBy: 'Admin',
       isPremade: true,
       createdAt: new Date().toISOString().split('T')[0],
-      coverImage: null, // Add this empty field for the image
+      coverImage: null,
       exercises: []
     };
-    
     setSelectedWorkout(newWorkoutTemplate);
     setIsEditModalOpen(true);
     setIsCreateModalOpen(true);
@@ -226,6 +169,9 @@ const WorkoutManagement = () => {
   const indexOfFirstWorkout = indexOfLastWorkout - workoutsPerPage;
   const currentWorkouts = filteredWorkouts.slice(indexOfFirstWorkout, indexOfLastWorkout);
   const pageCount = Math.ceil(filteredWorkouts.length / workoutsPerPage);
+
+  if (loading) return <div>Loading workouts...</div>;
+  if (error) return <div>{error}</div>;
 
   return (
     <div className="admin-page">
@@ -348,7 +294,13 @@ const WorkoutManagement = () => {
                   <td>{workout.name}</td>
                   <td>{workout.level}</td>
                   <td>{workout.timesPerWeek}</td>
-                  <td>{workout.createdBy}</td>
+                  <td>
+                    {workout.createdByAdmin
+                      ? `Admin #${workout.createdByAdmin}`
+                      : workout.createdByUser
+                        ? `User #${workout.createdByUser}`
+                        : 'Unknown'}
+                  </td>
                   <td>{workout.isPremade ? 'Yes' : 'No'}</td>
                 </tr>
               ))}
@@ -409,10 +361,7 @@ const WorkoutManagement = () => {
 
       <DeleteConfirmModal
         isOpen={isDeleteModalOpen}
-        onClose={() => {
-          setIsDeleteModalOpen(false);
-          setSelectedWorkout(null);
-        }}
+        onClose={handleDeleteCancel}
         onConfirm={handleDeleteConfirm}
         item={selectedWorkout || {}}
         itemType="workout"

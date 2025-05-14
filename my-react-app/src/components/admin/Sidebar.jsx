@@ -8,6 +8,15 @@ import 'admin.css';
 // Import the logo
 import goldFitLogo from '../../assets/goldfitlogo.png';
 
+const handleLogout = () => {
+  // Clear authentication-related data (e.g., tokens)
+  localStorage.removeItem('authToken'); // Adjust based on how you store the token
+  sessionStorage.removeItem('authToken'); // Optional if you use sessionStorage
+
+  // Redirect to the normal page
+  window.location.href = 'http://localhost:5173'; // Redirect to the desired page
+};
+
 const Sidebar = ({ isSuperAdmin, collapsed, toggleCollapse }) => {
   const location = useLocation();
   
@@ -93,7 +102,7 @@ const Sidebar = ({ isSuperAdmin, collapsed, toggleCollapse }) => {
         
         {/* Logout link as part of the main navigation */}
         <Link 
-          to="/logout" 
+          onClick={handleLogout} 
           className="admin-nav-item logout-item"
         >
           <LogOut className="admin-nav-icon" size={collapsed ? 28 : 24} />
