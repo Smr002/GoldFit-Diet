@@ -52,6 +52,9 @@ export default function ProfileForm({
   const [alertOpen, setAlertOpen] = useState(false);
   const [alertMessage, setAlertMessage] = useState("");
   const [alertSeverity, setAlertSeverity] = useState("success");
+  const [avatarImage, setAvatarImage] = useState(() => {
+    return localStorage.getItem("avatarImage") || null;
+  });
 
   useEffect(() => {
     if (heightUnit === 'ft' && height) {
@@ -246,6 +249,19 @@ export default function ProfileForm({
     }
   };
 
+  const handleAvatarChange = (e) => {
+    const file = e.target.files[0];
+    if (file) {
+      const reader = new FileReader();
+      reader.onload = () => {
+        const imageData = reader.result;
+        setAvatarImage(imageData);
+        localStorage.setItem("avatarImage", imageData);
+      };
+      reader.readAsDataURL(file);
+    }
+  };
+
   const unitToggleStyle = {
     mb: 2,
     width: '100%',
@@ -291,10 +307,34 @@ export default function ProfileForm({
             mb: 2,
             boxShadow: "0 4px 8px rgba(0,0,0,0.3)"
           }}
+          src={avatarImage}
         >
-          <Person sx={{ fontSize: 60 }} />
+          {!avatarImage && <Person sx={{ fontSize: 60 }} />}
         </Avatar>
-        <Typography variant="subtitle1" sx={{ color: "text.secondary", mb: 1 }}>
+        <Button
+          variant="outlined"
+          component="label"
+          sx={{
+            textTransform: "none",
+            color: darkMode ? "#D4AF37" : "#6200ea",
+            borderColor: darkMode ? "#D4AF37" : "#6200ea",
+            "&:hover": {
+              borderColor: darkMode ? "#b8860b" : "#3f51b5",
+              backgroundColor: darkMode 
+                ? "rgba(212, 175, 55, 0.1)" 
+                : "rgba(98, 0, 234, 0.1)",
+            },
+          }}
+        >
+          Upload Picture
+          <input
+            type="file"
+            accept="image/*"
+            hidden
+            onChange={handleAvatarChange}
+          />
+        </Button>
+        <Typography variant="subtitle1" sx={{ color: "text.secondary", mt: 1 }}>
           Your Personal Information
         </Typography>
       </Box>
