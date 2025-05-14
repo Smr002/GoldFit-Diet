@@ -406,6 +406,22 @@ export async function notifyPayment(token: string, userId: number, phone: string
   }
 }
 
+export async function getNotificationsByUser(userId: number, token: string) {
+  try {
+    const response = await axios.get(`${API_BASE_URL}/notifications/user/${userId}`, {
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    });
+    return response.data;
+  } catch (error: any) {
+    if (axios.isAxiosError(error)) {
+      console.error("Get user notifications error:", error.response?.data);
+      throw new Error(error.response?.data?.error || "Failed to fetch user notifications");
+    }
+    throw new Error("Unexpected error");
+  }
+}
 
 export const createNutritionLog = async (
   token: string,
