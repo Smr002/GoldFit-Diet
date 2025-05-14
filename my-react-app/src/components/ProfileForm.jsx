@@ -60,7 +60,7 @@ export default function ProfileForm({
     if (heightUnit === 'ft' && height) {
       const totalInches = height / 2.54;
       const ft = Math.floor(totalInches / 12);
-      const inch = Math.round(totalInches % 12);
+      const inch = Math.round(totalInches % 12); //
       setFeet(ft);
       setInches(inch);
     } else if (heightUnit === 'cm' && (feet || inches)) {
