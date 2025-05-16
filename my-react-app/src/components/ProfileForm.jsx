@@ -3,8 +3,8 @@ import PropTypes from "prop-types";
 import { Box, Button, Grid, Typography, Divider, Avatar, ToggleButtonGroup, ToggleButton, Snackbar, Alert } from "@mui/material";
 import { ArrowForward, Person, Save, Refresh } from "@mui/icons-material";
 import ProfileField from "./ProfileField";
-import { updateUser } from "../api";
-import { getUserIdFromToken} from "@/api";
+import { updateUser, deleteUser } from "../api";
+import { getUserIdFromToken } from "@/api";
 
 const genderOptions = [
   { value: "male", label: "Male" },
@@ -262,6 +262,44 @@ export default function ProfileForm({
     }
   };
 
+// ProfileForm.jsx
+const handleDeleteProfile = async () => {
+  const confirmDelete = window.confirm(
+    "Are you sure you want to deactivate your profile? You can contact support to restore it later."
+  );
+  if (!confirmDelete) return;
+
+  try {
+    const token = localStorage.getItem("token");
+    const userId = getUserIdFromToken(token);
+
+    console.log("Attempting to delete user with ID:", userId, "Token:", token);
+
+    if (!userId || !token) {
+      showAlert("You must be logged in to deactivate your profile", "error");
+      return;
+    }
+
+    await deleteUser(Number(userId), token);
+
+    localStorage.clear();
+    showAlert("Profile deactivated successfully!", "success");
+    setTimeout(() => {
+      window.location.href = "/";
+    }, 2000);
+  } catch (error) {
+    console.error("Error deactivating profile:", error);
+    let errorMessage = "Failed to deactivate profile";
+    if (error.message.includes("User not found")) {
+      errorMessage = "Your account is already deactivated or does not exist.";
+    } else if (error.message.includes("own account")) {
+      errorMessage = "You can only deactivate your own account";
+    } else if (error.message.includes("Invalid token")) {
+      errorMessage = "Your session is invalid. Please log in again.";
+    }
+    showAlert(errorMessage, "error");
+  }
+};
   const unitToggleStyle = {
     mb: 2,
     width: '100%',
@@ -665,6 +703,26 @@ export default function ProfileForm({
           }}
         >
           Save Profile Changes
+        </Button>
+        <Button
+          onClick={handleDeleteProfile}
+          variant="outlined"
+          size="large"
+          startIcon={<ArrowForward />}
+          sx={{
+            flex: 1,
+            textTransform: "none",
+            color: darkMode ? "#D4AF37" : "#6200ea",
+            borderColor: darkMode ? "#D4AF37" : "#6200ea",
+            "&:hover": {
+              borderColor: darkMode ? "#b8860b" : "#3f51b5",
+              backgroundColor: darkMode 
+                ? "rgba(212, 175, 55, 0.1)" 
+                : "rgba(98, 0, 234, 0.1)",
+            },
+          }}
+        >
+          Delete Profile
         </Button>
       </Box>
 
