@@ -99,8 +99,16 @@ export class UserService {
     }
   }
 
-  async deleteUser(id: number): Promise<User> {
-    return usersRepository.delete(id);
+async deleteUser(id: number): Promise<User> {
+    try {
+      if (!id || isNaN(id)) {
+        throw new Error("Invalid user ID");
+      }
+      return await usersRepository.delete(id);
+    } catch (error: any) {
+      console.error(`Error deleting user ID ${id}:`, error);
+      throw error; // Let controller handle specific Prisma errors
+    }
   }
 
 }

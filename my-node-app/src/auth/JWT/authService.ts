@@ -7,15 +7,15 @@ const JWT_SECRET = process.env.JWT_SECRET || "super-secret";
 const JWT_EXPIRES_IN = "1h";
 
 export class AuthService {
-  async validateUser(email: string, password: string): Promise<User | null> {
-    const user = await usersRepository.findByEmail(email);
-    if (!user) return null;
-    const isMatch = await bcrypt.compare(password, user.password);
-    console.log("user password", user.password);
-    console.log("password", password);
-    console.log("user id", user.id);
-    return isMatch ? user : null;
+async validateUser(email: string, password: string): Promise<User | null | { error: string }> {
+  const user = await usersRepository.findByEmail(email);
+  if (!user) {
+    // User not found or soft deleted
+    return { error: "deactivated" };
   }
+  const isMatch = await bcrypt.compare(password, user.password);
+  return isMatch ? user : null;
+}
 
   generateToken(user: User): string {
     return jwt.sign(
@@ -37,6 +37,8 @@ export class AuthService {
       return null;
     }
   }
+
+
 }
 
 export const authService = new AuthService();

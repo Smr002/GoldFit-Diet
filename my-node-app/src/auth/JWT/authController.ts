@@ -15,8 +15,12 @@ export const login = async (req: Request, res: Response) => {
 
   const { email, password } = result.data;
   const user = await authService.validateUser(email, password);
+  if (user && typeof user === "object" && "error" in user && user.error === "deactivated") {
+    return res.status(403).json({ error: "Your account has been deactivated. Please contact support if you believe this is a mistake." });
+  }
 
-  if (!user) return res.status(401).json({ error: "Invalid credentials" });
+if (!user || "error" in user) return res.status(401).json({ error: "Invalid credentials" });
+
 
   const token = authService.generateToken(user);
   res.json({

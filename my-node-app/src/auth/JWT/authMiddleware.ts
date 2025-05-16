@@ -10,6 +10,7 @@ export interface AuthenticatedRequest extends Request {
     email: string;
     role: string;
   };
+  params: { [key: string]: string };
 }
 
 export const authenticateJWT = (

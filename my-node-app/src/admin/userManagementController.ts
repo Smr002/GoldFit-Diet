@@ -211,11 +211,20 @@ export const updateUser = async (req: Request, res: Response) => {
 export const deleteUser = async (req: Request, res: Response) => {
   try {
     const { id } = req.params;
+    const authHeader = req.headers.authorization;
 
-    // Soft delete by setting deletedAt
+    console.log("Received ID for deletion:", id); // Debugging log
+    console.log("Authorization header:", authHeader); // Debugging log
+
+    // Validate the ID
+    if (!id || isNaN(Number(id))) {
+      return res.status(400).json({ error: 'Invalid user ID' });
+    }
+
+    // Perform soft delete
     await prisma.user.update({
       where: { id: parseInt(id) },
-      data: { deletedAt: new Date() }
+      data: { deletedAt: new Date() },
     });
 
     res.json({ message: 'User deleted successfully' });
@@ -224,7 +233,6 @@ export const deleteUser = async (req: Request, res: Response) => {
     res.status(500).json({ error: 'Failed to delete user' });
   }
 };
-
 // Promote user to admin
 export const promoteToAdmin = async (req: Request, res: Response) => {
   try {
