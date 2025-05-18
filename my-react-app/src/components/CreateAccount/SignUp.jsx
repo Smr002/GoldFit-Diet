@@ -8,27 +8,13 @@ import {
   Button,
   Link,
   Zoom,
-  Dialog,
-  DialogActions,
-  DialogTitle,
-  DialogContent,
-  Alert,
-  AlertTitle,
-  Slide,
-  useTheme,
 } from "@mui/material";
-import { ArrowForward } from "@mui/icons-material";
 import { useCreateAccountStore } from "@/store/useCreateAccountStore";
 import { createUser } from "@/api";
-
-const Transition = React.forwardRef(function Transition(props, ref) {
-  return <Slide direction="up" ref={ref} {...props} />;
-});
+import CustomModal from "./CustomModal";
 
 export default function SignUp() {
-  const theme = useTheme();
   const navigate = useNavigate();
-
   const {
     selectedGender,
     selectedBodyType,
@@ -56,8 +42,6 @@ export default function SignUp() {
     message: "",
   });
 
-  const isSuccess = submitStatus.success;
-
   const handleChange = (e) => {
     setFormData((prev) => ({
       ...prev,
@@ -67,7 +51,7 @@ export default function SignUp() {
 
   const handleCloseModal = () => {
     setOpenModal(false);
-    if (isSuccess) {
+    if (submitStatus.success) {
       navigate("/");
     }
   };
@@ -111,7 +95,7 @@ export default function SignUp() {
     };
 
     try {
-      const response = await createUser(requestBody);
+      await createUser(requestBody);
       setSubmitStatus({
         success: true,
         message: "Account created successfully! Please login to continue.",
@@ -165,7 +149,7 @@ export default function SignUp() {
               sx={{ mt: 2, textAlign: "left" }}
             >
               {["fullName", "email", "password", "confirmPassword"].map(
-                (field, idx) => (
+                (field) => (
                   <TextField
                     key={field}
                     fullWidth
@@ -210,7 +194,6 @@ export default function SignUp() {
                 fullWidth
                 variant="contained"
                 size="large"
-                endIcon={<ArrowForward />}
                 sx={{
                   fontWeight: "bold",
                   textTransform: "none",
@@ -245,53 +228,12 @@ export default function SignUp() {
         </Zoom>
       </Container>
 
-      {/* Modal Dialog */}
-      <Dialog
-        open={openModal}
-        TransitionComponent={Transition}
-        keepMounted
-        onClose={handleCloseModal}
-        aria-labelledby="alert-dialog-title"
-        aria-describedby="alert-dialog-description"
-        PaperProps={{
-          sx: {
-            borderRadius: 3,
-            p: 1,
-            backgroundColor: theme.palette.background.default,
-          },
-        }}
-      >
-        <DialogTitle
-          id="alert-dialog-title"
-          sx={{ textAlign: "center", pb: 0, fontWeight: 600 }}
-        >
-          {isSuccess ? "🎉 Success" : "⚠️ Oops!"}
-        </DialogTitle>
-
-        <DialogContent>
-          <Alert
-            severity={isSuccess ? "success" : "error"}
-            variant="outlined"
-            sx={{ borderRadius: 2, px: 2, py: 1 }}
-          >
-            <AlertTitle>
-              {isSuccess ? "Your action was successful!" : "There was an error"}
-            </AlertTitle>
-            {submitStatus.message}
-          </Alert>
-        </DialogContent>
-
-        <DialogActions sx={{ justifyContent: "center", pb: 2 }}>
-          <Button
-            onClick={handleCloseModal}
-            color={isSuccess ? "success" : "error"}
-            variant={isSuccess ? "contained" : "outlined"}
-            autoFocus
-          >
-            {isSuccess ? "Go to Login" : "Close"}
-          </Button>
-        </DialogActions>
-      </Dialog>
+      <CustomModal
+        openModal={openModal}
+        handleCloseModal={handleCloseModal}
+        isSuccess={submitStatus.success}
+        submitStatus={submitStatus}
+      />
     </Box>
   );
 }
