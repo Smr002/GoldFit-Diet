@@ -55,6 +55,16 @@ export class UserController {
         .json({ error: "Failed to create user.", details: err?.message });
     }
   }
+  // controller
+
+  async getTotalUserCount(req: Request, res: Response) {
+    try {
+      const count = await userService.getTotalUserCount();
+      res.json({ totalUsers: count });
+    } catch (err) {
+      res.status(500).json({ error: "Failed to fetch user count." });
+    }
+  }
 
   async update(req: Request, res: Response) {
     try {
@@ -96,5 +106,7 @@ async delete(req: AuthenticatedRequest, res: Response) {
     }
   }
 }
+
+
 
 export const userController = new UserController();

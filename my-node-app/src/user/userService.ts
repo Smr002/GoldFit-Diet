@@ -24,6 +24,14 @@ export class UserService {
     return usersRepository.findByEmail(email);
   }
 
+//service 
+
+  async getTotalUserCount(): Promise<number> {
+    const users = await usersRepository.findAll();
+    return users.length;
+  }
+
+
   async createUser(rawData: any) {
     try {
 

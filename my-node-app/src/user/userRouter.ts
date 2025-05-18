@@ -15,6 +15,9 @@ router.get("/email/:email", async (req, res) => {
 
 router.get("/", (req, res) => userController.getAll(req, res));
 
+router.get("/count", async (req, res) => {
+  await userController.getTotalUserCount(req, res);
+});
 
 router.get("/:id", async (req, res) => {
   await userController.getById(req, res);
