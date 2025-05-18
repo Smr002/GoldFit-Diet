@@ -85,7 +85,8 @@ function SupportFAQCard() {
         </Typography>
         <Box sx={{ display: "flex", gap: 2 }}>
           <Link
-            href="#"
+            href="/faqs.pdf"
+            download
             sx={{
               bgcolor: "rgba(255, 255, 255, 0.9)",
               color: isDarkMode ? "#6F5AAD" : "#7E69AB",
