@@ -143,7 +143,7 @@ export default function HeightInput({ type, prevLink, nextLink }) {
                   },
                 }}
                 variant={unit === "cm" ? "contained" : "outlined"}
-                onClick={() => setUnit("cm")}
+                onClick={toggleUnit}
               >
                 cm
               </Button>
@@ -165,7 +165,7 @@ export default function HeightInput({ type, prevLink, nextLink }) {
                   },
                 }}
                 variant={unit === "ft" ? "contained" : "outlined"}
-                onClick={() => setUnit("ft")}
+                onClick={toggleUnit}
               >
                 ft
               </Button>
@@ -329,7 +329,8 @@ export default function HeightInput({ type, prevLink, nextLink }) {
                   left: "-100%",
                   width: "100%",
                   height: "100%",
-                  background: "linear-gradient(90deg, transparent, rgba(255,255,255,0.2), transparent)",
+                  background:
+                    "linear-gradient(90deg, transparent, rgba(255,255,255,0.2), transparent)",
                   transition: "0.5s",
                 },
                 "&:hover::before": {
@@ -386,10 +387,10 @@ export default function HeightInput({ type, prevLink, nextLink }) {
         }
 
         body.dark-mode {
-          --primary-color: #D4AF37;
+          --primary-color: #d4af37;
           --secondary-color: #ffd700;
-          --slider-gradient: linear-gradient(0deg, #D4AF37, #ffd700);
-          --button-gradient: linear-gradient(135deg, #D4AF37, #ffd700);
+          --slider-gradient: linear-gradient(0deg, #d4af37, #ffd700);
+          --button-gradient: linear-gradient(135deg, #d4af37, #ffd700);
           --button-hover-gradient: linear-gradient(135deg, #c19b2e, #e6c200);
           --thumb-shadow: 0 2px 8px rgba(212, 175, 55, 0.4);
           --thumb-focus-shadow: 0 0 0 8px rgba(212, 175, 55, 0.2);
