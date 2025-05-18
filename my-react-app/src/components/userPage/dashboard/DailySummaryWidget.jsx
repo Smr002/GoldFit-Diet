@@ -177,9 +177,9 @@ function DailySummaryWidget({ token, userId, date }) {
         };
 
         const sleep = {
-          hours: 7.5,
+          hours: 7,
           goal: 8,
-          percentage: (7.5 / 8) * 100,
+          percentage: (7 / 8) * 100,
         };
 
         // Update state
@@ -305,9 +305,9 @@ function DailySummaryWidget({ token, userId, date }) {
         };
 
         const sleep = {
-          hours: 7.5,
+          hours: 7,
           goal: 8,
-          percentage: (7.5 / 8) * 100,
+          percentage: (7 / 8) * 100,
         };
 
         setNutritionData({
