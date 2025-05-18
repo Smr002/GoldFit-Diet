@@ -104,7 +104,7 @@ const NutritionPage = () => {
     macros: {
       protein: { consumed: 65, target: 98 },
       carbs: { consumed: 110, target: 196 },
-      fat: { consumed: 35, target: 65 },
+      fats: { consumed: 35, target: 65 },
     },
     meals: [
       {
@@ -119,7 +119,7 @@ const NutritionPage = () => {
             calories: 180,
             protein: 14,
             carbs: 2,
-            fat: 12,
+            fats: 12,
           },
           {
             id: "b2",
@@ -128,7 +128,7 @@ const NutritionPage = () => {
             calories: 80,
             protein: 4,
             carbs: 15,
-            fat: 1,
+            fats: 1,
           },
           {
             id: "b3",
@@ -137,7 +137,7 @@ const NutritionPage = () => {
             calories: 90,
             protein: 1,
             carbs: 5,
-            fat: 8,
+            fats: 8,
           },
         ],
       },
@@ -153,7 +153,7 @@ const NutritionPage = () => {
             calories: 320,
             protein: 35,
             carbs: 10,
-            fat: 15,
+            fats: 15,
           },
           {
             id: "l2",
@@ -162,7 +162,7 @@ const NutritionPage = () => {
             calories: 130,
             protein: 0,
             carbs: 0,
-            fat: 14,
+            fats: 14,
           },
         ],
       },
@@ -178,7 +178,7 @@ const NutritionPage = () => {
             calories: 120,
             protein: 18,
             carbs: 5,
-            fat: 0,
+            fats: 0,
           },
           {
             id: "s2",
@@ -187,7 +187,7 @@ const NutritionPage = () => {
             calories: 80,
             protein: 1,
             carbs: 20,
-            fat: 0,
+            fats: 0,
           },
         ],
       },
@@ -266,9 +266,9 @@ const NutritionPage = () => {
           consumed: Math.round((calorieValue * 0.5) / 4), // 50% of calories from carbs (4 cal/g)
           target: nutritionData.macros.carbs.target,
         },
-        fat: {
-          consumed: Math.round((calorieValue * 0.25) / 9), // 25% of calories from fat (9 cal/g)
-          target: nutritionData.macros.fat.target,
+        fats: {
+          consumed: Math.round((calorieValue * 0.25) / 9), // 25% of calories from fats (9 cal/g)
+          target: nutritionData.macros.fats.target,
         },
       },
       waterIntake: Math.round(500 + Math.random() * 1500), // Random water intake between 500-2000ml
@@ -289,7 +289,7 @@ const NutritionPage = () => {
                     calories: Math.round(calorieValue * 0.25),
                     protein: Math.round((calorieValue * 0.25 * 0.3) / 4),
                     carbs: Math.round((calorieValue * 0.25 * 0.5) / 4),
-                    fat: Math.round((calorieValue * 0.25 * 0.2) / 9),
+                    fats: Math.round((calorieValue * 0.25 * 0.2) / 9),
                   },
                 ],
         },
@@ -308,7 +308,7 @@ const NutritionPage = () => {
                     calories: Math.round(calorieValue * 0.35),
                     protein: Math.round((calorieValue * 0.35 * 0.4) / 4),
                     carbs: Math.round((calorieValue * 0.35 * 0.4) / 4),
-                    fat: Math.round((calorieValue * 0.35 * 0.2) / 9),
+                    fats: Math.round((calorieValue * 0.35 * 0.2) / 9),
                   },
                 ],
         },
@@ -327,7 +327,7 @@ const NutritionPage = () => {
                     calories: Math.round(calorieValue * 0.4),
                     protein: Math.round((calorieValue * 0.4 * 0.3) / 4),
                     carbs: Math.round((calorieValue * 0.4 * 0.5) / 4),
-                    fat: Math.round((calorieValue * 0.4 * 0.2) / 9),
+                    fats: Math.round((calorieValue * 0.4 * 0.2) / 9),
                   },
                 ],
         },

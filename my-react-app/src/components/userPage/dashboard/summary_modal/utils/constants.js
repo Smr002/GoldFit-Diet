@@ -44,7 +44,7 @@ export const getThemeColors = (isDarkMode) => ({
       chipBg: isDarkMode ? 'rgba(255, 215, 0, 0.2)' : '#ffb74d',
       text: isDarkMode ? '#FFD700' : '#ffb74d'
     },
-    fat: {
+    fats: {
       bg: isDarkMode ? 'rgba(3, 218, 198, 0.1)' : 'rgba(77, 182, 172, 0.08)',
       chipBg: isDarkMode ? 'rgba(3, 218, 198, 0.2)' : '#4db6ac',
       text: isDarkMode ? '#03DAC6' : '#4db6ac'
@@ -106,7 +106,7 @@ export const defaultSummaryData = {
     averages: {
       protein: 120,
       carbs: 210,
-      fat: 65
+      fats: 65
     },
     waterIntake: 1.8
   },

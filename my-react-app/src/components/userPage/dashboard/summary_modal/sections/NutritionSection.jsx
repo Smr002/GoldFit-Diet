@@ -13,27 +13,27 @@ import RestaurantIcon from '@mui/icons-material/Restaurant';
 import WaterDropIcon from '@mui/icons-material/WaterDrop';
 import KebabDiningIcon from '@mui/icons-material/KebabDining'; // for protein
 import LocalPizzaIcon from '@mui/icons-material/LocalPizza'; // for carbs
-import IcecreamIcon from '@mui/icons-material/Icecream'; // for fat
+import IcecreamIcon from '@mui/icons-material/Icecream'; // for fats
 import GrainIcon from '@mui/icons-material/Grain';
 import OilBarrelIcon from '@mui/icons-material/OilBarrel';
 import { getThemeColors } from '../utils/constants';
 
-const calculateMacroPercentages = (protein, carbs, fat) => {
+const calculateMacroPercentages = (protein, carbs, fats) => {
   // Convert macros to calories
   const proteinCals = protein * 4;
   const carbsCals = carbs * 4;
-  const fatCals = fat * 9;
+  const fatsCals = fats * 9;
   
   // Calculate total calories
-  const totalCals = proteinCals + carbsCals + fatCals;
+  const totalCals = proteinCals + carbsCals + fatsCals;
   
   // Prevent division by zero
-  if (totalCals === 0) return { protein: 0, carbs: 0, fat: 0 };
+  if (totalCals === 0) return { protein: 0, carbs: 0, fats: 0 };
   
   return {
     protein: Math.round((proteinCals / totalCals) * 100),
     carbs: Math.round((carbsCals / totalCals) * 100),
-    fat: Math.round((fatCals / totalCals) * 100)
+    fats: Math.round((fatsCals / totalCals) * 100)
   };
 };
 
@@ -43,10 +43,10 @@ const NutritionSection = ({ nutritionData }) => {
   const themeColors = getThemeColors(isDarkMode);
 
   // Calculate percentages using the new function
-  const { protein: proteinPercentage, carbs: carbsPercentage, fat: fatPercentage } = calculateMacroPercentages(
+  const { protein: proteinPercentage, carbs: carbsPercentage, fats: fatsPercentage } = calculateMacroPercentages(
     nutritionData.averages.protein,
     nutritionData.averages.carbs,
-    nutritionData.averages.fat
+    nutritionData.averages.fats
   );
 
   return (
@@ -198,7 +198,7 @@ const NutritionSection = ({ nutritionData }) => {
               </Box>
             </Grid>
             
-            {/* Fat Card */}
+            {/* Fats Card */}
             <Grid item xs={4}>
               <Box sx={{ 
                 height: '100%',
@@ -207,7 +207,7 @@ const NutritionSection = ({ nutritionData }) => {
                 textAlign: 'center',
                 p: 1.5,
                 borderRadius: 2,
-                background: themeColors.nutrition.fat.bg
+                background: themeColors.nutrition.fats.bg
               }}>
                 <Box sx={{ 
                   display: 'flex', 
@@ -219,27 +219,27 @@ const NutritionSection = ({ nutritionData }) => {
                     sx={{ 
                       width: 32, 
                       height: 32, 
-                      bgcolor: themeColors.nutrition.fat.chipBg,
+                      bgcolor: themeColors.nutrition.fats.chipBg,
                       mb: 0.5
                     }}
                   >
-                    <IcecreamIcon fontSize="small" sx={{ color: isDarkMode ? themeColors.nutrition.fat.text : 'white' }} />
+                    <IcecreamIcon fontSize="small" sx={{ color: isDarkMode ? themeColors.nutrition.fats.text : 'white' }} />
                   </Avatar>
                 </Box>
                 <Typography variant="body2" color="text.secondary" gutterBottom>
-                  Fat
+                  Fats
                 </Typography>
-                <Typography variant="h6" fontWeight="bold" color={themeColors.nutrition.fat.text}
+                <Typography variant="h6" fontWeight="bold" color={themeColors.nutrition.fats.text}
                 sx={{
                   fontSize: {
                     xs: '1rem',     
                     sm: '1.25rem'   
                   }
                 }}>
-                  {nutritionData.averages.fat}g
+                  {nutritionData.averages.fats}g
                 </Typography>
                 <Typography variant="caption" color="text.secondary" sx={{ mt: 0.5 }}>
-                  {fatPercentage}% of calories
+                  {fatsPercentage}% of calories
                 </Typography>
               </Box>
             </Grid>
@@ -263,8 +263,8 @@ const NutritionSection = ({ nutritionData }) => {
                 bgcolor: themeColors.nutrition.carbs.chipBg,
               }} />
               <Box sx={{
-                width: `${fatPercentage}%`,
-                bgcolor: themeColors.nutrition.fat.chipBg,
+                width: `${fatsPercentage}%`,
+                bgcolor: themeColors.nutrition.fats.chipBg,
               }} />
             </Box>
           </Box>

@@ -24,7 +24,7 @@ const MacronutrientBreakdown = ({ refreshTrigger }) => {
   const [macros, setMacros] = useState({
     protein: 0,
     carbs: 0,
-    fat: 0
+    fats: 0
   });
   const [totalCalories, setTotalCalories] = useState(0);
   
@@ -36,36 +36,36 @@ const MacronutrientBreakdown = ({ refreshTrigger }) => {
   const MACRO_COLORS = {
     protein: isDarkMode ? '#FFD700' : '#7b1fa2', // Gold in dark mode, purple in light
     carbs: isDarkMode ? '#FFC107' : '#ff6f00',   // Amber in dark mode, orange in light
-    fat: isDarkMode ? '#DAA520' : '#1565c0',     // Goldenrod in dark mode, blue in light
+    fats: isDarkMode ? '#DAA520' : '#1565c0',     // Goldenrod in dark mode, blue in light
     noData: isDarkMode ? '#555555' : '#e0e0e0'   // Darker gray in dark mode
   };
 
   const colorArray = [
     MACRO_COLORS.protein,
     MACRO_COLORS.carbs,
-    MACRO_COLORS.fat
+    MACRO_COLORS.fats
   ];
 
   const [showRecommended, setShowRecommended] = useState(false);
   const [showActual, setShowActual] = useState(false);
   const [showDetails, setShowDetails] = useState(false);
 
-  const { protein, carbs, fat } = macros;
+  const { protein, carbs, fats } = macros;
 
   const recommendedTotal = 98 + 196 + 65;
   const recommendedData = [
     { id: 0, value: Math.round((98 / recommendedTotal) * 100), label: 'Protein', color: MACRO_COLORS.protein },
     { id: 1, value: Math.round((196 / recommendedTotal) * 100), label: 'Carbs', color: MACRO_COLORS.carbs },
-    { id: 2, value: Math.round((65 / recommendedTotal) * 100), label: 'Fat', color: MACRO_COLORS.fat }
+    { id: 2, value: Math.round((65 / recommendedTotal) * 100), label: 'Fats', color: MACRO_COLORS.fats }
   ];
   
-  const actualTotal = protein + carbs + fat;
+  const actualTotal = protein + carbs + fats;
   const actualData = actualTotal === 0
     ? [{ id: 0, value: 100, label: 'No data', color: MACRO_COLORS.noData }]
     : [
         { id: 0, value: Math.round((protein / actualTotal) * 100), label: 'Protein', color: MACRO_COLORS.protein },
         { id: 1, value: Math.round((carbs / actualTotal) * 100), label: 'Carbs', color: MACRO_COLORS.carbs },
-        { id: 2, value: Math.round((fat / actualTotal) * 100), label: 'Fat', color: MACRO_COLORS.fat }
+        { id: 2, value: Math.round((fats / actualTotal) * 100), label: 'Fats', color: MACRO_COLORS.fats }
       ];
 
   const chartSize = isMobile ? 160 : 200;
@@ -100,7 +100,7 @@ const MacronutrientBreakdown = ({ refreshTrigger }) => {
         // Process the data
         let totalProtein = 0;
         let totalCarbs = 0;
-        let totalFat = 0;
+        let totalFats = 0;
         let totalCal = 0;
 
         if (result) {
@@ -110,7 +110,7 @@ const MacronutrientBreakdown = ({ refreshTrigger }) => {
               if (entry) {
                 totalProtein += entry.protein || 0;
                 totalCarbs += entry.carbs || 0;
-                totalFat += entry.fat || 0;
+                totalFats += entry.fats || 0;
                 totalCal += entry.totalCalories || 0;
               }
             });
@@ -118,7 +118,7 @@ const MacronutrientBreakdown = ({ refreshTrigger }) => {
             // If result is a single object
             totalProtein = result.protein || 0;
             totalCarbs = result.carbs || 0;
-            totalFat = result.fat || 0;
+            totalFats = result.fats || 0;
             totalCal = result.totalCalories || 0;
           }
         }
@@ -126,7 +126,7 @@ const MacronutrientBreakdown = ({ refreshTrigger }) => {
         setMacros({
           protein: Number(totalProtein.toFixed(2)),
           carbs: Number(totalCarbs.toFixed(2)),
-          fat: Number(totalFat.toFixed(2))
+          fats: Number(totalFats.toFixed(2))
         });
         setTotalCalories(Number(totalCal.toFixed(2)));
       } catch (err) {
@@ -466,14 +466,14 @@ const MacronutrientBreakdown = ({ refreshTrigger }) => {
                   variant="body2" 
                   sx={{ mb: 0.5, color: theme.palette.text.secondary }}
                 >
-                  Fat
+                  Fats
                 </Typography>
                 <Typography 
                   variant="body1" 
                   fontWeight="medium" 
-                  sx={{ color: MACRO_COLORS.fat }}
+                  sx={{ color: MACRO_COLORS.fats }}
                 >
-                  {fat}g
+                  {fats}g
                 </Typography>
               </Box>
             </Grid>
