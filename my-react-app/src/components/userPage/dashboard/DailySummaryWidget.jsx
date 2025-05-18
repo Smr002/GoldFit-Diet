@@ -17,117 +17,153 @@ import {
   RefreshCw,
 } from "lucide-react";
 import CircularProgress from "@mui/material/CircularProgress";
-import { getNutritionLog } from "@/api"; // Adjust the import path
+import { getNutritionLog, getUserByEmail } from "@/api";
+import { jwtDecode } from "jwt-decode";
 
 function DailySummaryWidget({ token, userId, date }) {
   const theme = useTheme();
   const isDarkMode = theme.palette.mode === "dark";
 
-  // State to store fetched data
   const [nutritionData, setNutritionData] = useState({
-    calories: { consumed: 0, goal: 2100, percentage: 0, isOverGoal: false },
+    calories: {
+      consumed: 0,
+      goal: 2100, // Fallback
+      percentage: 0,
+      isOverGoal: false,
+    },
     macros: {
       protein: {
         amount: 0,
-        goal: 150,
+        goal: 140, // Initial fallback
         percentage: 0,
-        color: isDarkMode ? "#FFD700" : "#9B87F5", // Gold in dark mode
+        color: isDarkMode ? "#FFD700" : "#9B87F5",
       },
       carbs: {
         amount: 0,
-        goal: 220,
+        goal: 385, // Initial fallback
         percentage: 0,
-        color: isDarkMode ? "#FFC107" : "#6CCFBC", // Amber in dark mode
+        color: isDarkMode ? "#FFC107" : "#6CCFBC",
       },
       fats: {
         amount: 0,
-        goal: 70,
+        goal: 78, // Initial fallback
         percentage: 0,
-        color: isDarkMode ? "#DAA520" : "#FF7D55", // Goldenrod in dark mode
+        color: isDarkMode ? "#DAA520" : "#FF7D55",
       },
     },
-    hydration: { amount: 0, goal: 8, percentage: 0 },
+    hydration: { amount: 0, goal: 3000, percentage: 0 },
     sleep: { hours: 0, goal: 8, percentage: 0 },
   });
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
 
-  // Fetch nutrition logs when component mounts or dependencies change
+  // Function to calculate macro goals based on calorie goal and weight
+  const calculateMacroGoals = (calorieGoal, weight) => {
+    // Protein: 2.0 g/kg body weight
+    const proteinGoal = weight ? Math.round(2.0 * weight) : 140;
+    const proteinCalories = proteinGoal * 4;
+
+    // Fats: 25% of total calories
+    const fatCalories = calorieGoal * 0.25;
+    const fatGoal = Math.round(fatCalories / 9);
+
+    // Carbs: Remaining calories
+    const carbCalories = calorieGoal - (proteinCalories + fatCalories);
+    const carbGoal = Math.round(carbCalories / 4);
+
+    return { proteinGoal, carbGoal, fatGoal };
+  };
+
+  // Fetch nutrition goal and logs
   useEffect(() => {
-    const fetchNutritionLogs = async () => {
+    const fetchData = async () => {
       try {
         setLoading(true);
-        const logs = await getNutritionLog(token, userId, date);
 
-        // Process all logs for the day
+        // Fetch nutrition goal and user data
+        let calorieGoal = 2800; // Calculated default
+        let weight = 70; // Default weight
+        if (token) {
+          const decoded = jwtDecode(token);
+          const email = decoded.email;
+          const user = await getUserByEmail(email, token);
+          calorieGoal = user?.nutritionGoal ?? calorieGoal;
+          weight = user?.weight ?? weight;
+        }
+
+        // Calculate macro goals
+        const { proteinGoal, carbGoal, fatGoal } = calculateMacroGoals(
+          calorieGoal,
+          weight
+        );
+
+        // Fetch nutrition logs
         let totalCalories = 0;
         let totalProtein = 0;
         let totalCarbs = 0;
         let totalFats = 0;
         let totalHydration = 0;
 
-        if (Array.isArray(logs)) {
-          // Sum up all entries for the day
-          logs.forEach(log => {
-            totalCalories += log.totalCalories || 0;
-            totalProtein += log.protein || 0;
-            totalCarbs += log.carbs || 0;
-            totalFats += log.fats || 0;
-            totalHydration += log.hydration || 0;
-          });
-        } else if (logs) {
-          // Single entry
-          totalCalories = logs.totalCalories || 0;
-          totalProtein = logs.protein || 0;
-          totalCarbs = logs.carbs || 0;
-          totalFats = logs.fats || 0;
-          totalHydration = logs.hydration || 0;
+        if (token && date) {
+          const logs = await getNutritionLog(token, userId, date);
+
+          if (Array.isArray(logs)) {
+            logs.forEach((log) => {
+              totalCalories += log.totalCalories || 0;
+              totalProtein += log.protein || 0;
+              totalCarbs += log.carbs || 0;
+              totalFats += log.fats || 0;
+              totalHydration += log.hydration || 0;
+            });
+          } else if (logs) {
+            totalCalories = logs.totalCalories || 0;
+            totalProtein = logs.protein || 0;
+            totalCarbs = logs.carbs || 0;
+            totalFats = logs.fats || 0;
+            totalHydration = logs.hydration || 0;
+          }
         }
 
-        // Round all values to 2 decimal places
+        // Round values
         totalCalories = Number(totalCalories.toFixed(2));
         totalProtein = Number(totalProtein.toFixed(2));
         totalCarbs = Number(totalCarbs.toFixed(2));
         totalFats = Number(totalFats.toFixed(2));
         totalHydration = Number(totalHydration.toFixed(2));
 
-        // Convert hydration from liters to milliliters
-        const hydrationInMl = totalHydration * 1000;
-        const hydrationGoalInMl = 8 * 1000; // Convert 8L goal to ml
-
-        // Map API data to component state
+        // Calculate percentages and states
         const calories = {
           consumed: totalCalories,
-          goal: 2100,
-          percentage: totalCalories
-            ? Math.min((totalCalories / 2100) * 100, 100)
-            : 0,
-          isOverGoal: totalCalories > 2100
+          goal: calorieGoal,
+          percentage:
+            calorieGoal > 0
+              ? Math.min((totalCalories / calorieGoal) * 100, 100)
+              : 0,
+          isOverGoal: totalCalories > calorieGoal,
         };
 
         const macros = {
           protein: {
             amount: totalProtein,
-            goal: 150,
-            percentage: totalProtein
-              ? Math.min((totalProtein / 150) * 100, 100)
-              : 0,
+            goal: proteinGoal,
+            percentage:
+              proteinGoal > 0
+                ? Math.min((totalProtein / proteinGoal) * 100, 100)
+                : 0,
             color: isDarkMode ? "#FFD700" : "#9B87F5",
           },
           carbs: {
             amount: totalCarbs,
-            goal: 220,
-            percentage: totalCarbs 
-              ? Math.min((totalCarbs / 220) * 100, 100) 
-              : 0,
+            goal: carbGoal,
+            percentage:
+              carbGoal > 0 ? Math.min((totalCarbs / carbGoal) * 100, 100) : 0,
             color: isDarkMode ? "#FFC107" : "#6CCFBC",
           },
           fats: {
             amount: totalFats,
-            goal: 70,
-            percentage: totalFats 
-              ? Math.min((totalFats / 70) * 100, 100) 
-              : 0,
+            goal: fatGoal,
+            percentage:
+              fatGoal > 0 ? Math.min((totalFats / fatGoal) * 100, 100) : 0,
             color: isDarkMode ? "#DAA520" : "#FF7D55",
           },
         };
@@ -146,58 +182,149 @@ function DailySummaryWidget({ token, userId, date }) {
           percentage: (7.5 / 8) * 100,
         };
 
-        setNutritionData({ calories, macros, hydration, sleep });
+        // Update state
+        setNutritionData({
+          calories,
+          macros,
+          hydration,
+          sleep,
+        });
         setLoading(false);
       } catch (err) {
-        console.error("Error fetching nutrition logs:", err);
+        console.error("Error fetching data:", err);
         setError(err.message || "Failed to load nutrition data");
         setLoading(false);
       }
     };
 
     if (token && date) {
-      fetchNutritionLogs();
+      fetchData();
     } else {
       setError("Missing required parameters (token or date)");
       setLoading(false);
     }
   }, [token, date, isDarkMode]);
 
-  // Function to retry loading data
   const handleRetry = () => {
     setLoading(true);
     setError(null);
-    // Re-trigger the useEffect by changing its dependency (could be improved with a counter)
-    setTimeout(() => {
-      if (token && date) {
-        // This will trigger the useEffect again
-        const fetchNutritionLogs = async () => {
-          try {
-            const logs = await getNutritionLog(token, userId, date);
-            // Process logs as before...
-            const log = Array.isArray(logs) ? logs[0] : logs;
+    setTimeout(async () => {
+      try {
+        // Fetch nutrition goal
+        let calorieGoal = 2800;
+        let weight = 70;
+        if (token) {
+          const decoded = jwtDecode(token);
+          const email = decoded.email;
+          const user = await getUserByEmail(email, token);
+          calorieGoal = user?.nutritionGoal ?? calorieGoal;
+          weight = user?.weight ?? weight;
+        }
 
-            // Update state with fetched data
-            // (This is duplicate code from the useEffect, which could be refactored to a separate function)
-            // ...code omitted for brevity
+        // Calculate macro goals
+        const { proteinGoal, carbGoal, fatGoal } = calculateMacroGoals(
+          calorieGoal,
+          weight
+        );
 
-            setLoading(false);
-          } catch (err) {
-            console.error("Error retrying nutrition logs fetch:", err);
-            setError(err.message || "Failed to reload nutrition data");
-            setLoading(false);
+        // Fetch nutrition logs
+        let totalCalories = 0;
+        let totalProtein = 0;
+        let totalCarbs = 0;
+        let totalFats = 0;
+        let totalHydration = 0;
+
+        if (token && date) {
+          const logs = await getNutritionLog(token, userId, date);
+
+          if (Array.isArray(logs)) {
+            logs.forEach((log) => {
+              totalCalories += log.totalCalories || 0;
+              totalProtein += log.protein || 0;
+              totalCarbs += log.carbs || 0;
+              totalFats += log.fats || 0;
+              totalHydration += log.hydration || 0;
+            });
+          } else if (logs) {
+            totalCalories = logs.totalCalories || 0;
+            totalProtein = logs.protein || 0;
+            totalCarbs = logs.carbs || 0;
+            totalFats = logs.fats || 0;
+            totalHydration = logs.hydration || 0;
           }
+        }
+
+        totalCalories = Number(totalCalories.toFixed(2));
+        totalProtein = Number(totalProtein.toFixed(2));
+        totalCarbs = Number(totalCarbs.toFixed(2));
+        totalFats = Number(totalFats.toFixed(2));
+        totalHydration = Number(totalHydration.toFixed(2));
+
+        const calories = {
+          consumed: totalCalories,
+          goal: calorieGoal,
+          percentage:
+            calorieGoal > 0
+              ? Math.min((totalCalories / calorieGoal) * 100, 100)
+              : 0,
+          isOverGoal: totalCalories > calorieGoal,
         };
 
-        fetchNutritionLogs();
-      } else {
-        setError("Missing required parameters (token or date)");
+        const macros = {
+          protein: {
+            amount: totalProtein,
+            goal: proteinGoal,
+            percentage:
+              proteinGoal > 0
+                ? Math.min((totalProtein / proteinGoal) * 100, 100)
+                : 0,
+            color: isDarkMode ? "#FFD700" : "#9B87F5",
+          },
+          carbs: {
+            amount: totalCarbs,
+            goal: carbGoal,
+            percentage:
+              carbGoal > 0 ? Math.min((totalCarbs / carbGoal) * 100, 100) : 0,
+            color: isDarkMode ? "#FFC107" : "#6CCFBC",
+          },
+          fats: {
+            amount: totalFats,
+            goal: fatGoal,
+            percentage:
+              fatGoal > 0 ? Math.min((totalFats / fatGoal) * 100, 100) : 0,
+            color: isDarkMode ? "#DAA520" : "#FF7D55",
+          },
+        };
+
+        const hydration = {
+          amount: totalHydration,
+          goal: 3000,
+          percentage: totalHydration
+            ? Math.min((totalHydration / 3000) * 100, 100)
+            : 0,
+        };
+
+        const sleep = {
+          hours: 7.5,
+          goal: 8,
+          percentage: (7.5 / 8) * 100,
+        };
+
+        setNutritionData({
+          calories,
+          macros,
+          hydration,
+          sleep,
+        });
+        setLoading(false);
+      } catch (err) {
+        console.error("Error retrying data fetch:", err);
+        setError(err.message || "Failed to reload nutrition data");
         setLoading(false);
       }
     }, 500);
   };
 
-  // Render loading state
   if (loading) {
     return (
       <Paper
@@ -233,7 +360,6 @@ function DailySummaryWidget({ token, userId, date }) {
     );
   }
 
-  // Render error state
   if (error) {
     return (
       <Paper
@@ -317,7 +443,6 @@ function DailySummaryWidget({ token, userId, date }) {
     );
   }
 
-  // Destructure fetched data
   const { calories, macros, hydration, sleep } = nutritionData;
 
   return (
@@ -361,7 +486,11 @@ function DailySummaryWidget({ token, userId, date }) {
           <Typography
             variant="body1"
             fontWeight={600}
-            sx={{ color: calories.isOverGoal ? theme.palette.error.main : theme.palette.text.primary }}
+            sx={{
+              color: calories.isOverGoal
+                ? theme.palette.error.main
+                : theme.palette.text.primary,
+            }}
           >
             {calories.consumed}{" "}
             <span
@@ -381,9 +510,11 @@ function DailySummaryWidget({ token, userId, date }) {
               ? "rgba(255, 215, 0, 0.15)"
               : "rgba(155, 135, 245, 0.15)",
             "& .MuiLinearProgress-bar": {
-              bgcolor: calories.isOverGoal 
-                ? theme.palette.error.main 
-                : (isDarkMode ? theme.palette.primary.main : "#9B87F5"),
+              bgcolor: calories.isOverGoal
+                ? theme.palette.error.main
+                : isDarkMode
+                ? theme.palette.primary.main
+                : "#9B87F5",
               borderRadius: 2,
             },
           }}
