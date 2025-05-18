@@ -72,35 +72,20 @@ const WorkoutEditModal = ({ workout, onClose, onSave, isCreating = false }) => {
     const fetchExerciseLibrary = async () => {
       setLoading(true);
       try {
-        const options = {
-          method: "GET",
+        // Fetch exercises from your backend API instead of the external API
+        const token = localStorage.getItem("authToken");
+        const response = await fetch("http://localhost:3000/exercises", {
           headers: {
-            "X-RapidAPI-Key": import.meta.env.VITE_RAPID_API_KEY || "",
-            "X-RapidAPI-Host": "exercisedb.p.rapidapi.com",
+            Authorization: `Bearer ${token}`,
+            "Content-Type": "application/json",
           },
-        };
-
-        const response = await fetch(
-          "https://exercisedb.p.rapidapi.com/exercises",
-          options
-        );
-
+        });
         if (!response.ok) {
           throw new Error("Failed to fetch exercise library");
         }
-
         const data = await response.json();
-
-        // Process the data to include GIFs, instructions, etc.
-        const processedExercises = data.slice(0, 100).map((exercise) => ({
-          ...exercise,
-          instructions: exercise.instructions || [
-            "Follow the animation carefully.",
-            "Maintain proper form throughout the exercise.",
-          ],
-        }));
-
-        setExerciseLibrary(processedExercises);
+        // Optionally process the data if needed
+        setExerciseLibrary(data);
       } catch (error) {
         console.error("Error fetching exercise library:", error);
         setError(
@@ -196,8 +181,9 @@ const WorkoutEditModal = ({ workout, onClose, onSave, isCreating = false }) => {
 
   // Add new exercise
   const addExercise = (exercise) => {
+    // Use the real DB id as exerciseId
     const newExercise = {
-      id: `temp-${Date.now()}`, // Temporary ID, will be replaced on save
+      exerciseId: exercise.id, // real DB id from library
       name: exercise.name || "New Exercise",
       reps: "3 sets x 10 reps",
       gifUrl: exercise.gifUrl,
@@ -206,10 +192,9 @@ const WorkoutEditModal = ({ workout, onClose, onSave, isCreating = false }) => {
       equipment: exercise.equipment,
     };
 
-    // Also add to exerciseDetails for rendering
     setExerciseDetails((prev) => ({
       ...prev,
-      [newExercise.id]: {
+      [exercise.id]: {
         gifUrl: exercise.gifUrl,
         bodyPart: exercise.bodyPart,
         target: exercise.target,
@@ -275,14 +260,46 @@ const WorkoutEditModal = ({ workout, onClose, onSave, isCreating = false }) => {
     return Object.keys(errors).length === 0;
   };
 
+  // Utility to parse reps string like "3 sets x 10 reps" to { sets: 3, reps: 10 }
+  function parseRepsString(repsString) {
+    // Match patterns like "3 sets x 10 reps" or "4 sets x 12 reps"
+    const match = repsString.match(/(\d+)\s*sets?\s*x\s*(\d+)\s*reps?/i);
+    if (match) {
+      return {
+        sets: parseInt(match[1], 10),
+        reps: parseInt(match[2], 10),
+      };
+    }
+    // fallback: try to extract any two numbers
+    const numbers = repsString.match(/\d+/g);
+    if (numbers && numbers.length >= 2) {
+      return {
+        sets: parseInt(numbers[0], 10),
+        reps: parseInt(numbers[1], 10),
+      };
+    }
+    return { sets: null, reps: null };
+  }
+
   // Save workout
   const handleSave = () => {
     if (!validateForm()) return;
+
+    // Map exercises to include only exerciseId, sets, reps
+    const exercisesWithSetsReps = editedWorkout.exercises.map((ex) => {
+      const { sets, reps } = parseRepsString(ex.reps || "");
+      return {
+        exerciseId: ex.exerciseId, // always use the DB id
+        sets,
+        reps,
+      };
+    });
 
     onSave({
       ...workout,
       ...editedWorkout,
       timesPerWeek: Number(editedWorkout.timesPerWeek),
+      exercises: exercisesWithSetsReps,
     });
   };
 
@@ -806,11 +823,7 @@ const WorkoutEditModal = ({ workout, onClose, onSave, isCreating = false }) => {
           <button className="cancel-btn" onClick={onClose}>
             Cancel
           </button>
-          <button
-            className="save-btn"
-            onClick={handleSave}
-            disabled={isCreating && !coverImage} // Disable save if creating without image
-          >
+          <button className="save-btn" onClick={handleSave}>
             <Save size={16} />
             <span>{isCreating ? "Create Workout" : "Save Changes"}</span>
           </button>
