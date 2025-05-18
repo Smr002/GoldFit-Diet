@@ -184,13 +184,7 @@ const FAQManagement = () => {
             />
           </div>
           
-          <button 
-            className="admin-btn primary"  // Change this to match other admin buttons
-            onClick={handleCreateFAQ}
-          >
-            <Plus size={16} />
-            <span>Add New FAQ</span>
-          </button>
+
         </div>
       </div>
 
