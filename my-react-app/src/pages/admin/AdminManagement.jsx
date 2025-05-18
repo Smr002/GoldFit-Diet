@@ -1,6 +1,7 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { UserPlus, Search, Edit, Trash2, Eye, MoreVertical, Shield, Lock } from 'lucide-react';
 import 'admin.css';
+import { getAdmins } from '../../api';
 
 const AdminManagement = () => {
   const [searchQuery, setSearchQuery] = useState('');
@@ -15,6 +16,9 @@ const AdminManagement = () => {
   const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
   const [isDemoteModalOpen, setIsDemoteModalOpen] = useState(false);
+  const [admins, setAdmins] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
   
   // Add this ref to track dropdown containers
   const dropdownRef = useRef(null);
@@ -44,49 +48,23 @@ const AdminManagement = () => {
     return index >= total - 2;
   };
 
-  const mockAdmins = [
-    {
-      id: 1,
-      name: 'John Admin',
-      email: 'john.admin@example.com',
-      role: 'Super Admin',
-      permissions: ['All Permissions'],
-      lastActive: '2 hours ago',
-      createdDate: '2023-01-15',
-      status: 'Active',
-      phone: '+1 555-123-4567'
-    },
-    {
-      id: 2,
-      name: 'Sarah Manager',
-      email: 'sarah.manager@example.com',
-      role: 'Admin',
-      permissions: ['Workout Management', 'User Management', 'Notifications'],
-      lastActive: '1 day ago',
-      createdDate: '2023-02-10',
-      status: 'Active',
-      phone: '+1 555-987-6543'
-    },
-    {
-      id: 3,
-      name: 'Mike Content',
-      email: 'mike.content@example.com',
-      role: 'Admin',
-      permissions: ['Workout Management', 'FAQ Management'],
-      lastActive: '5 days ago',
-      createdDate: '2023-03-22',
-      status: 'Inactive',
-      phone: '+1 555-456-7890'
-    },
-  ];
-
-  const mockPermissions = [
-    { id: 'user_management', name: 'User Management', description: 'View and manage users' },
-    { id: 'workout_management', name: 'Workout Management', description: 'Create and manage workouts' },
-    { id: 'notification_management', name: 'Notifications', description: 'Send and manage notifications' },
-    { id: 'faq_management', name: 'FAQ Management', description: 'Manage FAQs' },
-    { id: 'admin_management', name: 'Admin Management', description: 'Manage other admins' },
-  ];
+  useEffect(() => {
+    const fetchAdmins = async () => {
+      setLoading(true);
+      setError(null);
+      try {
+        const token = localStorage.getItem('token');
+        if (!token) throw new Error('No auth token found');
+        const data = await getAdmins(token);
+        setAdmins(data);
+      } catch (err) {
+        setError(err.message || 'Failed to fetch admins');
+      } finally {
+        setLoading(false);
+      }
+    };
+    fetchAdmins();
+  }, []);
 
   const handleFilterChange = (e) => {
     const { name, value } = e.target;
@@ -138,11 +116,24 @@ const AdminManagement = () => {
     setActiveDropdown(null);
   };
 
-  const filteredAdmins = mockAdmins.filter(admin => {
+  // Map backend admin data to display shape with safe defaults
+  const mappedAdmins = admins.map((admin) => ({
+    id: admin.id,
+    fullName: admin.fullName || admin.name || admin.email || 'Admin',
+    email: admin.email || '',
+    role: admin.role || 'Admin',
+    permissions: admin.permissions || ['All Permissions'], // fallback
+    status: admin.status || 'Active',
+    createdDate: admin.createdAt || new Date().toISOString(),
+    lastActive: admin.lastActive || 'Unknown',
+    phone: admin.phone || '',
+  }));
+
+  const filteredAdmins = mappedAdmins.filter(admin => {
     const searchTerm = searchQuery.toLowerCase();
-    const matchesSearch = 
-      admin.name.toLowerCase().includes(searchTerm) || 
-      admin.email.toLowerCase().includes(searchTerm);
+    const matchesSearch =
+      (admin.fullName?.toLowerCase?.().includes(searchTerm) ||
+        admin.email?.toLowerCase?.().includes(searchTerm));
     
     const matchesRole = !filters.role || admin.role === filters.role;
     const matchesPermission = !filters.permission || 
@@ -151,6 +142,15 @@ const AdminManagement = () => {
     
     return matchesSearch && matchesRole && matchesPermission;
   });
+
+  // Move permissionsList definition to the top-level of the component so it's in scope for all uses
+  const permissionsList = [
+    { id: 'user_management', name: 'User Management', description: 'View and manage users' },
+    { id: 'workout_management', name: 'Workout Management', description: 'Create and manage workouts' },
+    { id: 'notification_management', name: 'Notifications', description: 'Send and manage notifications' },
+    { id: 'faq_management', name: 'FAQ Management', description: 'Manage FAQs' },
+    { id: 'admin_management', name: 'Admin Management', description: 'Manage other admins' },
+  ];
 
   return (
     <div className="admin-page">
@@ -200,7 +200,7 @@ const AdminManagement = () => {
         >
           <option value="">All Permissions</option>
           <option value="All Permissions">All Permissions</option>
-          {mockPermissions.map(permission => (
+          {permissionsList.map(permission => (
             <option key={permission.id} value={permission.name}>{permission.name}</option>
           ))}
         </select>
@@ -273,11 +273,11 @@ const AdminManagement = () => {
                     <div className="admin-user-cell">
                       <div className="admin-avatar">
                         <div className="avatar-initials">
-                          {admin.name.split(' ').map(n => n[0]).join('')}
+                          {admin.fullName.split(' ').map(n => n[0]).join('')}
                         </div>
                       </div>
                       <div className="admin-user-info">
-                        <div className="admin-user-name">{admin.name}</div>
+                        <div className="admin-user-name">{admin.fullName}</div>
                         <div className="admin-user-email">{admin.email}</div>
                       </div>
                     </div>
@@ -435,17 +435,17 @@ const AdminManagement = () => {
               // In a real app, you would save the changes to your backend
               // This is just a mock implementation
               if (isCreateModalOpen) {
-                mockAdmins.push({
-                  ...selectedAdmin,
-                  id: mockAdmins.length + 1,
-                  lastActive: 'Just now'
-                });
+                // mockAdmins.push({
+                //   ...selectedAdmin,
+                //   id: mockAdmins.length + 1,
+                //   lastActive: 'Just now'
+                // });
               } else {
                 // Find and update the admin
-                const index = mockAdmins.findIndex(admin => admin.id === selectedAdmin.id);
-                if (index !== -1) {
-                  mockAdmins[index] = selectedAdmin;
-                }
+                // const index = mockAdmins.findIndex(admin => admin.id === selectedAdmin.id);
+                // if (index !== -1) {
+                //   mockAdmins[index] = selectedAdmin;
+                // }
               }
               setIsEditModalOpen(false);
               setIsCreateModalOpen(false);
@@ -521,7 +521,7 @@ const AdminManagement = () => {
                 <div className="form-group">
                   <label>Permissions</label>
                   <div className="permission-checkboxes">
-                    {mockPermissions.map(permission => (
+                    {permissionsList.map(permission => (
                       <label 
                         key={permission.id} 
                         className={`checkbox-label ${selectedAdmin.permissions.includes(permission.name) ? 'selected' : ''}`}
@@ -615,10 +615,10 @@ const AdminManagement = () => {
                 onClick={() => {
                   // In a real app, you would delete from your backend
                   // This is just a mock implementation
-                  const index = mockAdmins.findIndex(admin => admin.id === selectedAdmin.id);
-                  if (index !== -1) {
-                    mockAdmins.splice(index, 1);
-                  }
+                  // const index = mockAdmins.findIndex(admin => admin.id === selectedAdmin.id);
+                  // if (index !== -1) {
+                  //   mockAdmins.splice(index, 1);
+                  // }
                   setIsDeleteModalOpen(false);
                   setSelectedAdmin(null);
                 }} 
@@ -656,11 +656,11 @@ const AdminManagement = () => {
                 onClick={() => {
                   // In a real app, you would call your backend API to demote the admin
                   // This is just a mock implementation
-                  const index = mockAdmins.findIndex(admin => admin.id === selectedAdmin.id);
-                  if (index !== -1) {
-                    // Remove from admin list (in a real app, you'd add them to users)
-                    mockAdmins.splice(index, 1);
-                  }
+                  // const index = mockAdmins.findIndex(admin => admin.id === selectedAdmin.id);
+                  // if (index !== -1) {
+                  //   // Remove from admin list (in a real app, you'd add them to users)
+                  //   mockAdmins.splice(index, 1);
+                  // }
                   setIsDemoteModalOpen(false);
                   setSelectedAdmin(null);
                 }} 

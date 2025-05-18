@@ -516,3 +516,17 @@ export async function fetchTotalUserCount(token: string) {
     throw new Error("Unexpected error");
   }
 }
+
+export async function getAdmins(token: string) {
+  try {
+    const response = await axios.get(`${API_BASE_URL}/users/admins`, {
+      headers: { Authorization: `Bearer ${token}` },
+    });
+    return response.data;
+  } catch (error: any) {
+    if (axios.isAxiosError(error)) {
+      throw new Error(error.response?.data?.error || "Failed to fetch admins");
+    }
+    throw new Error("Unexpected error");
+  }
+}
