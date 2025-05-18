@@ -218,11 +218,40 @@ const NotificationManagement = () => {
         throw new Error('No authentication token found');
       }
 
+      // Sanitize notification object for backend
+      const sanitizedNotification = { ...updatedNotification };
+      delete sanitizedNotification.id;
+      delete sanitizedNotification.status;
+      delete sanitizedNotification.nextSend;
+      // Map frontend type to backend type if needed
+      if (sanitizedNotification.type === 'System') sanitizedNotification.type = 'SYSTEM_ALERT';
+      if (sanitizedNotification.type === 'Reminder') sanitizedNotification.type = 'WORKOUT_REMINDER';
+      if (sanitizedNotification.type === 'Promotion') sanitizedNotification.type = 'ADMIN_MESSAGE';
+      if (sanitizedNotification.type === 'Update') sanitizedNotification.type = 'PROGRESS_UPDATE';
+      // Map recipients to backend targetUsers
+      if (sanitizedNotification.sentTo === 'All Users') sanitizedNotification.targetUsers = 'ALL_USERS';
+      if (sanitizedNotification.sentTo === 'Premium Users') sanitizedNotification.targetUsers = 'PREMIUM_USERS';
+      if (sanitizedNotification.sentTo === 'Specific Users') sanitizedNotification.targetUsers = 'SPECIFIC_USERS';
+      delete sanitizedNotification.sentTo;
+      // Map frequency to backend enum
+      if (sanitizedNotification.frequency === 'One-time') sanitizedNotification.frequency = 'ONCE';
+      if (sanitizedNotification.frequency === 'Daily') sanitizedNotification.frequency = 'DAILY';
+      if (sanitizedNotification.frequency === 'Weekly') sanitizedNotification.frequency = 'WEEKLY';
+      if (sanitizedNotification.frequency === 'Monthly') sanitizedNotification.frequency = 'MONTHLY';
+      // Ensure isAutomated is set (default to false for manual/system)
+      if (typeof sanitizedNotification.isAutomated !== 'boolean') {
+        sanitizedNotification.isAutomated = false;
+      }
+      // Ensure targetUsers is set (default to ALL_USERS)
+      if (!sanitizedNotification.targetUsers) {
+        sanitizedNotification.targetUsers = 'ALL_USERS';
+      }
+
       if (isCreateModalOpen) {
-        const newNotification = await createNotification(updatedNotification, token);
+        const newNotification = await createNotification(sanitizedNotification, token);
         setNotifications([...notifications, newNotification]);
       } else {
-        const updatedNotif = await updateNotification(updatedNotification.id, updatedNotification, token);
+        const updatedNotif = await updateNotification(updatedNotification.id, sanitizedNotification, token);
         setNotifications(notifications.map(n =>
           n.id === updatedNotification.id ? updatedNotif : n
         ));
