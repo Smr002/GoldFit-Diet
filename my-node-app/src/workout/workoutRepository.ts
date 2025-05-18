@@ -283,7 +283,7 @@ export class WorkoutRepository {
 
   async updateSessionExercise(
     sessionExerciseId: number,
-    data: { weightUsed?: number; setsCompleted?: number; repsCompleted?: number }
+    data: { weightUsed?: number; setsCompleted?: number; repsCompleted?: number; maxPr?: number }
   ): Promise<SessionExercise> {
     // If weight is being updated, we need to check for PR
     if (data.weightUsed) {
