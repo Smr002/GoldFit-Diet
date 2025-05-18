@@ -114,7 +114,7 @@ const MealLogger = ({ onAddFood, selectedDay, onMealUpdate }) => {
             // Create food items from all meal logs
             const foodItems = mealLogs.map(mealLog => ({
               id: `food-${mealLog.id || 'unknown'}`,
-              name: mealLog.mealType || 'Unknown Food',
+              name: mealLog.name || 'Unknown Food',
               serving: '1 serving',
               calories: parseFloat(mealLog.totalCalories || 0),
               protein: parseFloat(mealLog.protein || 0),
@@ -369,8 +369,6 @@ const MealLogger = ({ onAddFood, selectedDay, onMealUpdate }) => {
               {localMeals.map((meal, index) => {
                 const isExpanded = expandedMeal === meal.id;
                 const hasFoods = meal.foods && meal.foods.length > 0;
-                console.log(`Meal ${meal.id} foods:`, meal.foods);
-                console.log(`Meal ${meal.id} has foods:`, hasFoods);
                 const totalCalories = hasFoods
                   ? meal.foods.reduce((sum, food) => {
                       console.log(`Adding calories for ${food.name}:`, food.calories);
