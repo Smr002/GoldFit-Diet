@@ -170,8 +170,8 @@ const UserManagement = () => {
         throw new Error('No authentication token found');
       }
 
-      // Call the promoteUser API
-      await promoteUser(selectedUser.id, token);
+      // Call the promoteUser API with required role and permissions
+      await promoteUser(selectedUser.id, token, "admin", {});
 
       // Update the local state to reflect the promotion
       setUsers(users.map(user => 

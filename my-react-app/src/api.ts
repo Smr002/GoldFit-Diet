@@ -306,13 +306,18 @@ export async function deleteUser(id: number, token: string) {
     throw new Error("Unexpected error occurred while deleting user");
   }
 }
-export async function promoteUser(id: number, token: string) {
+export async function promoteUser(id: number, token: string, role = "admin", permissions = {}) {
   try {
-    const response = await axios.post(`${API_BASE_URL}/admin/users/${id}/promote`, {}, {
-      headers: {
-        Authorization: `Bearer ${token}`,
-      },
-    });
+    const response = await axios.post(
+      `${API_BASE_URL}/admin/users/${id}/promote`,
+      { role, permissions },
+      {
+        headers: {
+          Authorization: `Bearer ${token}`,
+          "Content-Type": "application/json",
+        },
+      }
+    );
     return response.data;
   } catch (error: any) {
     if (axios.isAxiosError(error)) {
