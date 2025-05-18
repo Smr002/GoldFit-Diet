@@ -47,15 +47,56 @@ export class UsersRepository {
     });
   }
 
-  async create(data: Omit<User, "id">): Promise<User> {
-    console.log("Creating user with data:", JSON.stringify(data, null, 2));
-    return this.prisma.user.create({
-      data: {
-        ...data,
-        goal: data.goal || Goal.MAINTENANCE,
-      },
-    });
+async create(data: Omit<User, "id">): Promise<User> {
+  console.log("Creating user with data:", JSON.stringify(data, null, 2));
+
+
+  const { weight, height, age, gender, goal = Goal.MAINTENANCE } = data;
+
+
+  let nutritionGoal: number | null = null;
+
+
+  if (weight && height && age && gender) {
+   
+    const userAge = age === 3039 ? 35 : age;
+
+  
+    let bmr: number;
+    if (gender.toLowerCase() === "male") {
+      bmr = 10 * weight + 6.25 * height - 5 * userAge + 5;
+    } else if (gender.toLowerCase() === "female") {
+      bmr = 10 * weight + 6.25 * height - 5 * userAge - 161;
+    } else {
+      throw new Error("Invalid gender specified for BMR calculation");
+    }
+
+    const activityFactor = 1.55;
+    const tdee = bmr * activityFactor;
+
+
+    switch (goal) {
+      case Goal.MUSCLE_GAIN:
+        nutritionGoal = Math.round(tdee + 350); 
+        break;
+      case Goal.WEIGHT_LOSS:
+        nutritionGoal = Math.round(tdee - 500); 
+        break;
+      case Goal.MAINTENANCE:
+      default:
+        nutritionGoal = Math.round(tdee);
+        break;
+    }
   }
+
+  return this.prisma.user.create({
+    data: {
+      ...data,
+      goal,
+      nutritionGoal, 
+    },
+  });
+}
 
   async update(id: number, data: Partial<User>): Promise<User> {
     const updatedUser = await this.prisma.user.update({
