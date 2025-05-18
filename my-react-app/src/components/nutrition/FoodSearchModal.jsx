@@ -136,9 +136,11 @@ const FoodSearchModal = ({ open, onClose, onAddFood, mealId }) => {
         calories: Math.round(calories * multiplier),
         protein: Math.round(protein * multiplier * 10) / 10,
         carbs: Math.round(carbs * multiplier * 10) / 10,
-        fats: Math.round(fats * multiplier * 10) / 10, // Changed from "fat" to "fats"
+        fats: Math.round(fats * multiplier * 10) / 10,
         foodId: selectedFood.fdcId,
       };
+
+      console.log('Adding new food:', newFood); // Debug log
 
       await onAddFood(mealId, newFood);
       onClose();

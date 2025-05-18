@@ -28,12 +28,13 @@ import {
   Fastfood as SnackIcon,
   ExpandMore as ExpandMoreIcon,
   RestaurantMenu as MenuIcon,
-  Info as InfoIcon
+  Info as InfoIcon,
+  Delete as DeleteIcon
 } from '@mui/icons-material';
 import FoodSearchModal from './FoodSearchModal';
 import { createNutritionLog, getNutritionLog, getUserIdFromToken } from '@/api';
 
-const MealLogger = ({ onAddFood, selectedDay }) => {
+const MealLogger = ({ onAddFood, selectedDay, onMealUpdate }) => {
   const theme = useTheme();
   const isDarkMode = theme.palette.mode === 'dark';
   
@@ -99,19 +100,19 @@ const MealLogger = ({ onAddFood, selectedDay }) => {
 
         // Transform the logs into the meal format
         const updatedMeals = defaultMeals.map(defaultMeal => {
-          // Find the log that matches this meal type
-          const mealLog = logs.find(log => {
+          // Find all logs that match this meal type
+          const mealLogs = logs.filter(log => {
             if (!log || !log.mealType) return false;
             const apiMealType = log.mealType.toUpperCase();
             const mappedType = mealTypeMap[apiMealType];
             return mappedType === defaultMeal.id;
           });
 
-          if (mealLog) {
-            console.log(`Processing meal log for ${defaultMeal.id}:`, mealLog);
+          if (mealLogs.length > 0) {
+            console.log(`Processing meal logs for ${defaultMeal.id}:`, mealLogs);
             
-            // Create a food item from the meal log data
-            const foodItem = {
+            // Create food items from all meal logs
+            const foodItems = mealLogs.map(mealLog => ({
               id: `food-${mealLog.id || 'unknown'}`,
               name: mealLog.mealType || 'Unknown Food',
               serving: '1 serving',
@@ -120,12 +121,15 @@ const MealLogger = ({ onAddFood, selectedDay }) => {
               carbs: parseFloat(mealLog.carbs || 0),
               fats: parseFloat(mealLog.fats || 0),
               foodId: mealLog.id || 'unknown'
-            };
+            }));
+
+            // Calculate total calories for the meal
+            const totalCalories = foodItems.reduce((sum, food) => sum + (food.calories || 0), 0);
 
             return {
               ...defaultMeal,
-              foods: [foodItem],
-              calories: parseFloat(mealLog.totalCalories || 0)
+              foods: foodItems,
+              calories: totalCalories
             };
           }
           return defaultMeal;
@@ -195,8 +199,12 @@ const MealLogger = ({ onAddFood, selectedDay }) => {
       // Update local meals with the new food
       const updatedMeals = localMeals.map(meal => {
         if (meal.id === mealId) {
+          // Add the new food to the existing foods array
           const updatedFoods = [...(meal.foods || []), food];
-          return { ...meal, foods: updatedFoods };
+          return { 
+            ...meal, 
+            foods: updatedFoods
+          };
         }
         return meal;
       });
@@ -206,18 +214,12 @@ const MealLogger = ({ onAddFood, selectedDay }) => {
         throw new Error('Meal not found');
       }
 
-      // Calculate totals for the meal
-      const totalCalories = (mealToUpdate.foods || []).reduce((sum, f) => sum + (f.calories || 0), 0);
-      const totalProtein = (mealToUpdate.foods || []).reduce((sum, f) => sum + (f.protein || 0), 0);
-      const totalCarbs = (mealToUpdate.foods || []).reduce((sum, f) => sum + (f.carbs || 0), 0);
-      const totalFats = (mealToUpdate.foods || []).reduce((sum, f) => sum + (f.fats || 0), 0);
-
       // Map mealId to valid mealType
       const mealTypeMap = {
-        'BREAKFAST': 'breakfast',
-        'SNACK': 'snack',
-        'LUNCH': 'lunch',
-        'DINNER': 'dinner'
+        'breakfast': 'BREAKFAST',
+        'snack': 'SNACK',
+        'lunch': 'LUNCH',
+        'dinner': 'DINNER'
       };
 
       // Get the current date in the local timezone
@@ -230,21 +232,21 @@ const MealLogger = ({ onAddFood, selectedDay }) => {
       const logData = {
         date: logDate.toISOString().split('T')[0],
         mealType: mealTypeMap[mealId] || 'SNACK',
-        totalCalories: parseFloat((totalCalories || 0).toString()),
-        protein: parseFloat((totalProtein || 0).toString()),
-        carbs: parseFloat((totalCarbs || 0).toString()),
-        fats: parseFloat((totalFats || 0).toString()),
+        totalCalories: parseFloat((food.calories || 0).toString()),
+        protein: parseFloat((food.protein || 0).toString()),
+        carbs: parseFloat((food.carbs || 0).toString()),
+        fats: parseFloat((food.fats || 0).toString()),
         hydration: 0,
-        foodItems: (mealToUpdate.foods || []).map(f => ({
-          fdcId: f.foodId || 'unknown',
-          description: f.name || 'Unknown Food',
-          servingSize: parseFloat((f.serving?.split(' ')[0] || 100).toString()),
-          unit: f.serving?.split(' ')[1] || 'g',
-          calories: parseFloat((f.calories || 0).toString()),
-          protein: parseFloat((f.protein || 0).toString()),
-          carbs: parseFloat((f.carbs || 0).toString()),
-          fats: parseFloat((f.fats || 0).toString())
-        }))
+        foodItems: [{
+          fdcId: food.foodId || 'unknown',
+          description: food.name || 'Unknown Food',
+          servingSize: parseFloat((food.serving?.split(' ')[0] || 100).toString()),
+          unit: food.serving?.split(' ')[1] || 'g',
+          calories: parseFloat((food.calories || 0).toString()),
+          protein: parseFloat((food.protein || 0).toString()),
+          carbs: parseFloat((food.carbs || 0).toString()),
+          fats: parseFloat((food.fats || 0).toString())
+        }]
       };
 
       console.log('Sending nutrition log data:', logData); // Debug log
@@ -260,6 +262,11 @@ const MealLogger = ({ onAddFood, selectedDay }) => {
 
       // Fetch updated data
       await fetchNutritionLogs();
+
+      // Trigger parent component update
+      if (onMealUpdate) {
+        onMealUpdate();
+      }
 
       if (onAddFood) {
         onAddFood(mealId, food);
@@ -535,46 +542,31 @@ const MealLogger = ({ onAddFood, selectedDay }) => {
                         </Box>
 
                         {hasFoods && (
-                          <Collapse
-                            in={isExpanded}
-                            timeout={300}
-                            unmountOnExit
-                          >
-                            <Box sx={{ mt: 2, ml: 5, mb: 1 }}>
-                              {meal.foods.map((food) => (
-                                <Box
-                                  key={food.id}
-                                  sx={{
-                                    display: 'flex',
+                          <Collapse in={isExpanded}>
+                            <Box sx={{ mt: 1, pl: 2 }}>
+                              {meal.foods && meal.foods.map((food, foodIndex) => (
+                                <Box 
+                                  key={foodIndex} 
+                                  sx={{ 
+                                    display: 'flex', 
                                     justifyContent: 'space-between',
-                                    py: 0.75,
-                                    borderBottom: isDarkMode
-                                      ? '1px dashed rgba(255, 255, 255, 0.1)'
-                                      : '1px dashed rgba(0, 0, 0, 0.1)',
+                                    alignItems: 'center',
+                                    mb: 1,
+                                    p: 1,
+                                    bgcolor: 'background.paper',
+                                    borderRadius: 1
                                   }}
                                 >
                                   <Box>
-                                    <Typography
-                                      variant="body2"
-                                      sx={{ color: theme.palette.text.primary }}
-                                    >
+                                    <Typography variant="body2" color="text.secondary">
                                       {food.name}
                                     </Typography>
-                                    <Typography
-                                      variant="caption"
-                                      sx={{ color: theme.palette.text.secondary }}
-                                    >
+                                    <Typography variant="caption" color="text.secondary">
                                       {food.serving}
                                     </Typography>
                                   </Box>
-                                  <Typography
-                                    variant="body2"
-                                    sx={{
-                                      fontWeight: 500,
-                                      color: mealColor,
-                                    }}
-                                  >
-                                    {food.calories} kcal
+                                  <Typography variant="body2" color="text.secondary">
+                                    {food.calories} cal
                                   </Typography>
                                 </Box>
                               ))}

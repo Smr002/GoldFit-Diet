@@ -17,7 +17,7 @@ import WeeklyCalorieChart from './WeeklyCalorieChart';
 import { getNutritionLog, getUserIdFromToken } from '@/api';
 import { format } from 'date-fns';
 
-const CalorieTracker = ({ calorieTarget, onDaySelect }) => {
+const CalorieTracker = ({ calorieTarget, onDaySelect, refreshTrigger }) => {
   const theme = useTheme();
   
   // State for data and loading
@@ -124,7 +124,7 @@ const CalorieTracker = ({ calorieTarget, onDaySelect }) => {
     };
 
     fetchNutritionData();
-  }, []); // Empty dependency array since we want to fetch only once on mount
+  }, [refreshTrigger]); // Add refreshTrigger to dependency array
 
   // Animation effect for progress bar
   useEffect(() => {

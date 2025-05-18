@@ -45,6 +45,9 @@ const NutritionPage = () => {
   // State for sleep tracking
   const [sleepHours, setSleepHours] = useState(7);
 
+  // State for refresh trigger
+  const [refreshTrigger, setRefreshTrigger] = useState(0);
+
   // Create theme based on dark mode preference
   const theme = createTheme({
     palette: {
@@ -407,6 +410,11 @@ const NutritionPage = () => {
   // Get active data
   const activeData = getActiveData();
 
+  const handleMealUpdate = () => {
+    // Increment refreshTrigger to force child components to re-fetch data
+    setRefreshTrigger(prev => prev + 1);
+  };
+
   return (
     <ThemeProvider theme={theme}>
       <CssBaseline />
@@ -474,6 +482,7 @@ const NutritionPage = () => {
                   calorieTarget={activeData.calories.target}
                   weeklyData={weeklyCalorieData}
                   onDaySelect={handleDaySelect}
+                  refreshTrigger={refreshTrigger}
                 />
               </Box>
 
@@ -481,6 +490,7 @@ const NutritionPage = () => {
                 <MacronutrientBreakdown
                   macros={activeData.macros}
                   selectedDay={selectedDay}
+                  refreshTrigger={refreshTrigger}
                 />
               </Box>
 
@@ -492,6 +502,7 @@ const NutritionPage = () => {
                     meals={activeData.meals}
                     onAddFood={handleAddFood}
                     selectedDay={selectedDay}
+                    onMealUpdate={handleMealUpdate}
                   />
                 </Grid>
 

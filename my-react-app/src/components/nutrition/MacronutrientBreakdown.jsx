@@ -13,7 +13,7 @@ import { useTheme } from '@mui/material/styles';
 import { PieChart } from '@mui/x-charts/PieChart';
 import { getNutritionLog, getUserIdFromToken } from '@/api';
 
-const MacronutrientBreakdown = ({ selectedDay }) => {
+const MacronutrientBreakdown = ({ refreshTrigger }) => {
   const theme = useTheme();
   const isMobile = useMediaQuery(theme.breakpoints.down('sm'));
   const isDarkMode = theme.palette.mode === 'dark';
@@ -22,10 +22,15 @@ const MacronutrientBreakdown = ({ selectedDay }) => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [macros, setMacros] = useState({
-    protein: { consumed: 0, target: 98 },
-    carbs: { consumed: 0, target: 196 },
-    fat: { consumed: 0, target: 65 }
+    protein: 0,
+    carbs: 0,
+    fat: 0
   });
+  const [totalCalories, setTotalCalories] = useState(0);
+  
+  // Animation states
+  const [animateProgress, setAnimateProgress] = useState(0);
+  const [showContent, setShowContent] = useState(false);
 
   // Updated color scheme based on theme
   const MACRO_COLORS = {
@@ -47,20 +52,20 @@ const MacronutrientBreakdown = ({ selectedDay }) => {
 
   const { protein, carbs, fat } = macros;
 
-  const recommendedTotal = protein.target + carbs.target + fat.target;
+  const recommendedTotal = 98 + 196 + 65;
   const recommendedData = [
-    { id: 0, value: Math.round((protein.target / recommendedTotal) * 100), label: 'Protein', color: MACRO_COLORS.protein },
-    { id: 1, value: Math.round((carbs.target / recommendedTotal) * 100), label: 'Carbs', color: MACRO_COLORS.carbs },
-    { id: 2, value: Math.round((fat.target / recommendedTotal) * 100), label: 'Fat', color: MACRO_COLORS.fat }
+    { id: 0, value: Math.round((98 / recommendedTotal) * 100), label: 'Protein', color: MACRO_COLORS.protein },
+    { id: 1, value: Math.round((196 / recommendedTotal) * 100), label: 'Carbs', color: MACRO_COLORS.carbs },
+    { id: 2, value: Math.round((65 / recommendedTotal) * 100), label: 'Fat', color: MACRO_COLORS.fat }
   ];
   
-  const actualTotal = protein.consumed + carbs.consumed + fat.consumed;
+  const actualTotal = protein + carbs + fat;
   const actualData = actualTotal === 0
     ? [{ id: 0, value: 100, label: 'No data', color: MACRO_COLORS.noData }]
     : [
-        { id: 0, value: Math.round((protein.consumed / actualTotal) * 100), label: 'Protein', color: MACRO_COLORS.protein },
-        { id: 1, value: Math.round((carbs.consumed / actualTotal) * 100), label: 'Carbs', color: MACRO_COLORS.carbs },
-        { id: 2, value: Math.round((fat.consumed / actualTotal) * 100), label: 'Fat', color: MACRO_COLORS.fat }
+        { id: 0, value: Math.round((protein / actualTotal) * 100), label: 'Protein', color: MACRO_COLORS.protein },
+        { id: 1, value: Math.round((carbs / actualTotal) * 100), label: 'Carbs', color: MACRO_COLORS.carbs },
+        { id: 2, value: Math.round((fat / actualTotal) * 100), label: 'Fat', color: MACRO_COLORS.fat }
       ];
 
   const chartSize = isMobile ? 160 : 200;
@@ -84,38 +89,46 @@ const MacronutrientBreakdown = ({ selectedDay }) => {
           throw new Error('No user ID found in token');
         }
 
-        // Use selected day's date or today's date
-        const date = selectedDay ? new Date(selectedDay.date) : new Date();
+        // Get today's date
+        const today = new Date();
         
-        // Fetch nutrition data for the selected date
-        const result = await getNutritionLog(token, userId, date);
+        // Fetch today's nutrition data
+        const result = await getNutritionLog(token, userId, today);
         
+        console.log('Raw API result:', result); // Debug log
+        
+        // Process the data
+        let totalProtein = 0;
+        let totalCarbs = 0;
+        let totalFat = 0;
+        let totalCal = 0;
+
         if (result) {
-          // Extract macro data from the result
-          const macroData = {
-            protein: {
-              consumed: Array.isArray(result) 
-                ? Number(result.reduce((sum, entry) => sum + (entry?.protein || 0), 0).toFixed(2))
-                : Number((result.protein || 0).toFixed(2)),
-              target: 98
-            },
-            carbs: {
-              consumed: Array.isArray(result)
-                ? Number(result.reduce((sum, entry) => sum + (entry?.carbs || 0), 0).toFixed(2))
-                : Number((result.carbs || 0).toFixed(2)),
-              target: 196
-            },
-            fat: {
-              consumed: Array.isArray(result)
-                ? Number(result.reduce((sum, entry) => sum + (entry?.fats || 0), 0).toFixed(2))
-                : Number((result.fats || 0).toFixed(2)),
-              target: 65
-            }
-          };
-          
-          console.log('Processed macro data:', macroData); // Debug log
-          setMacros(macroData);
+          // If result is an array, sum up all entries
+          if (Array.isArray(result)) {
+            result.forEach(entry => {
+              if (entry) {
+                totalProtein += entry.protein || 0;
+                totalCarbs += entry.carbs || 0;
+                totalFat += entry.fat || 0;
+                totalCal += entry.totalCalories || 0;
+              }
+            });
+          } else {
+            // If result is a single object
+            totalProtein = result.protein || 0;
+            totalCarbs = result.carbs || 0;
+            totalFat = result.fat || 0;
+            totalCal = result.totalCalories || 0;
+          }
         }
+
+        setMacros({
+          protein: Number(totalProtein.toFixed(2)),
+          carbs: Number(totalCarbs.toFixed(2)),
+          fat: Number(totalFat.toFixed(2))
+        });
+        setTotalCalories(Number(totalCal.toFixed(2)));
       } catch (err) {
         console.error('Error fetching nutrition data:', err);
         setError(err.message || 'Failed to load nutrition data');
@@ -125,7 +138,7 @@ const MacronutrientBreakdown = ({ selectedDay }) => {
     };
 
     fetchNutritionData();
-  }, [selectedDay]); // Re-fetch when selected day changes
+  }, [refreshTrigger]); // Add refreshTrigger to dependency array
 
   // Animation effects
   useEffect(() => {
@@ -404,14 +417,7 @@ const MacronutrientBreakdown = ({ selectedDay }) => {
                   fontWeight="medium" 
                   sx={{ color: MACRO_COLORS.protein }}
                 >
-                  {protein.consumed}g
-                  <Typography 
-                    component="span" 
-                    variant="body2" 
-                    sx={{ color: theme.palette.text.secondary }}
-                  >
-                    {` / ${protein.target}g`}
-                  </Typography>
+                  {protein}g
                 </Typography>
               </Box>
             </Grid>
@@ -439,14 +445,7 @@ const MacronutrientBreakdown = ({ selectedDay }) => {
                   fontWeight="medium" 
                   sx={{ color: MACRO_COLORS.carbs }}
                 >
-                  {carbs.consumed}g
-                  <Typography 
-                    component="span" 
-                    variant="body2" 
-                    sx={{ color: theme.palette.text.secondary }}
-                  >
-                    {` / ${carbs.target}g`}
-                  </Typography>
+                  {carbs}g
                 </Typography>
               </Box>
             </Grid>
@@ -474,14 +473,7 @@ const MacronutrientBreakdown = ({ selectedDay }) => {
                   fontWeight="medium" 
                   sx={{ color: MACRO_COLORS.fat }}
                 >
-                  {fat.consumed}g
-                  <Typography 
-                    component="span" 
-                    variant="body2" 
-                    sx={{ color: theme.palette.text.secondary }}
-                  >
-                    {` / ${fat.target}g`}
-                  </Typography>
+                  {fat}g
                 </Typography>
               </Box>
             </Grid>
