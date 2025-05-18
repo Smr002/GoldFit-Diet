@@ -6,7 +6,6 @@ const router = Router();
 
 router.post("/", (req, res) => userController.create(req, res));
 
-
 router.use(authenticateJWT);
 
 router.get("/email/:email", async (req, res) => {
@@ -19,11 +18,14 @@ router.get("/count", async (req, res) => {
   await userController.getTotalUserCount(req, res);
 });
 
-router.get("/:id", async (req, res) => {
-  await userController.getById(req, res);
+router.get("/admins", async (req, res) => {
+  await userController.getAllAdmins(req, res);
 });
 router.get("/admin/:id", async (req, res) => {
   await userController.getAdminById(req, res);
+});
+router.get("/:id", async (req, res) => {
+  await userController.getById(req, res);
 });
 router.put("/:id", (req, res) => userController.update(req, res));
 router.delete("/:id", (req, res) => userController.delete(req, res));

@@ -119,6 +119,9 @@ async deleteUser(id: number): Promise<User> {
     }
   }
 
+  async getAllAdmins(): Promise<User[]> {
+    return usersRepository.findAllAdmins();
+  }
 }
 
 export const userService = new UserService();

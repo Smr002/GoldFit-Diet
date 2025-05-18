@@ -143,6 +143,22 @@ async create(data: Omit<User, "id">): Promise<User> {
       throw error;
     }
   }
+
+  async findAllAdmins(): Promise<User[]> {
+    // Get all admin userIds from the admin table
+    const adminRecords = await this.prisma.admin.findMany({
+      select: { userId: true }
+    });
+    const adminUserIds = adminRecords.map(a => a.userId);
+    if (adminUserIds.length === 0) return [];
+    // Query users table for those userIds, only active (not deleted)
+    return this.prisma.user.findMany({
+      where: {
+        id: { in: adminUserIds },
+        deletedAt: null,
+      },
+    });
+  }
 }
 
 export const usersRepository = new UsersRepository();

@@ -76,7 +76,7 @@ export class UserController {
     }
   }
 
-async delete(req: AuthenticatedRequest, res: Response) {
+  async delete(req: AuthenticatedRequest, res: Response) {
     try {
       const id = Number(req.params.id);
       if (isNaN(id)) {
@@ -103,6 +103,15 @@ async delete(req: AuthenticatedRequest, res: Response) {
         error: "Failed to deactivate user account",
         details: err.message || "Internal server error",
       });
+    }
+  }
+
+  async getAllAdmins(req: Request, res: Response) {
+    try {
+      const admins = await userService.getAllAdmins();
+      res.json(admins);
+    } catch (err) {
+      res.status(500).json({ error: "Failed to fetch admins." });
     }
   }
 }

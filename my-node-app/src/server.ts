@@ -12,6 +12,7 @@ import adminRoutes from './admin/adminRoutes';
 import notificationRouter from './notifications/notificationRouter';
 import weeklySummary from "./summary/weeklySummaryRouter";
 import paymentRouter from "./payment/paymentRouter";
+import { getAdminProfile, getUserProfile } from './profile/profileController';
 
 dotenv.config();
 
@@ -35,7 +36,7 @@ app.use("/admin", adminRoutes);
 app.use("/notifications", notificationRouter);
 app.use("/summary",weeklySummary);
 app.use("/notify",paymentRouter)
-
+app.use("/profile", getUserProfile);
 
 app.use((req, res) => {
   res.status(404).json({ error: "Not found" });
