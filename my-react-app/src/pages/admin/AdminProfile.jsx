@@ -4,6 +4,7 @@ import 'admin.css';
 // Import the default profile picture
 import defaultProfilePic from '../../assets/pfp.jpg';
 import mockData from '../../data/mockAdmin.json';
+import { getUserById, getUserIdFromToken } from '../../api';
 
 const AdminProfile = ({ 
   adminData: initialAdminData = null, 
@@ -50,6 +51,28 @@ const AdminProfile = ({
     }, 800);
     
     return () => clearTimeout(timer);
+  }, []);
+
+  // Fetch real admin data for the currently logged-in user
+  useEffect(() => {
+    const fetchAdminData = async () => {
+      setIsLoading(true);
+      try {
+        const token = localStorage.getItem('token');
+        if (!token) throw new Error('No auth token found');
+        const userId = getUserIdFromToken(token);
+        if (!userId) throw new Error('No user ID found in token');
+        const user = await getUserById(userId, token);
+        setAdminData(user);
+        setFormData(user);
+      } catch (err) {
+        setErrorMessage(err.message || 'Failed to load profile');
+      } finally {
+        setIsLoading(false);
+        setTimeout(() => setAnimateContent(true), 100);
+      }
+    };
+    fetchAdminData();
   }, []);
 
   const handleInputChange = (e) => {
@@ -275,7 +298,7 @@ const AdminProfile = ({
                   </div>
                   <div className="detail-content">
                     <span className="detail-label">Full Name</span>
-                    <span className="detail-value">{adminData.name}</span>
+                    <span className="detail-value">{(adminData.firstName || '') + (adminData.lastName ? ' ' + adminData.lastName : '')}</span>
                   </div>
                 </div>
                 
@@ -289,48 +312,38 @@ const AdminProfile = ({
                   </div>
                 </div>
                 
-                <div className="profile-detail-item fade-in-up" style={{animationDelay: '0.3s'}}>
-                  <div className="detail-icon">
-                    <Phone size={20} />
-                  </div>
-                  <div className="detail-content">
-                    <span className="detail-label">Phone</span>
-                    <span className="detail-value">{adminData.phone || 'Not provided'}</span>
-                  </div>
-                </div>
-                
                 {/* Show account creation date for all users */}
-                <div className="profile-detail-item fade-in-up" style={{animationDelay: '0.4s'}}>
+                <div className="profile-detail-item fade-in-up" style={{animationDelay: '0.3s'}}>
                   <div className="detail-icon">
                     <Calendar size={20} />
                   </div>
                   <div className="detail-content">
                     <span className="detail-label">Account Created</span>
-                    <span className="detail-value">{new Date(adminData.createdDate).toLocaleDateString()}</span>
+                    <span className="detail-value">{adminData.createdAt ? new Date(adminData.createdAt).toLocaleDateString() : 'N/A'}</span>
                   </div>
                 </div>
                 
                 {/* Show last active date for all users */}
-                <div className="profile-detail-item fade-in-up" style={{animationDelay: '0.5s'}}>
+                <div className="profile-detail-item fade-in-up" style={{animationDelay: '0.4s'}}>
                   <div className="detail-icon">
                     <Calendar size={20} />
                   </div>
                   <div className="detail-content">
                     <span className="detail-label">Last Active</span>
-                    <span className="detail-value">{adminData.lastActive}</span>
+                    <span className="detail-value">{new Date().toLocaleString()}</span>
                   </div>
                 </div>
                 
                 {/* Only show permissions for admin users */}
                 {isAdmin && adminData.permissions && adminData.permissions.length > 0 && (
-                  <div className="profile-permissions fade-in-up" style={{animationDelay: '0.6s'}}>
+                  <div className="profile-permissions fade-in-up" style={{animationDelay: '0.5s'}}>
                     <h3>My Permissions</h3>
                     <div className="permission-tags">
                       {adminData.permissions.map((permission, idx) => (
                         <span 
                           key={idx} 
                           className="permission-tag pop-in"
-                          style={{animationDelay: `${0.7 + (idx * 0.1)}s`}}
+                          style={{animationDelay: `${0.6 + (idx * 0.1)}s`}}
                         >
                           {permission}
                         </span>
@@ -364,21 +377,6 @@ const AdminProfile = ({
                       value={formData.email}
                       onChange={handleInputChange}
                       required
-                      className="input-animation"
-                    />
-                  </div>
-                </div>
-                
-                <div className="form-row">
-                  <div className="form-group">
-                    <label htmlFor="phone">Phone</label>
-                    <input 
-                      type="text"
-                      id="phone"
-                      name="phone"
-                      value={formData.phone || ''}
-                      onChange={handleInputChange}
-                      placeholder="Enter phone number"
                       className="input-animation"
                     />
                   </div>
