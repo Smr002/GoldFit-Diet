@@ -33,6 +33,7 @@ export const NutritionLogSchema = z.object({
     carbs: z.number(),
     fats: z.number(),
   })),
+  name: z.string().optional(),
 });
 
 export type FoodNutrient = z.infer<typeof FoodNutrientSchema>;

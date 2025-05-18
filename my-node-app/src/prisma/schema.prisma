@@ -188,6 +188,7 @@ model NutritionLog {
   fats          Float?
   hydration     Float
   createdAt     DateTime @default(now()) @map("created_at")
+  name          String?
 
   // Relations
   user User @relation(fields: [userId], references: [id])

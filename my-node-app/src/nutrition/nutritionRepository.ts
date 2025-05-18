@@ -20,6 +20,7 @@ export class NutritionRepository {
           carbs: log.carbs,
           fats: log.fats,
           hydration: log.hydration,
+          name: log.foodItems[0]?.description || "",
         },
       });
     } catch (error) {
