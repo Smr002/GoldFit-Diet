@@ -500,3 +500,19 @@ export const createNutritionLog = async (
     throw new Error("Unexpected error");
   }
 };
+
+// api
+
+export async function fetchTotalUserCount(token: string) {
+  try {
+    const response = await axios.get(`${API_BASE_URL}/users/count`, {
+      headers: { Authorization: `Bearer ${token}` },
+    });
+    return response.data.totalUsers;
+  } catch (error: any) {
+    if (axios.isAxiosError(error)) {
+      throw new Error(error.response?.data?.error || "Failed to fetch user count");
+    }
+    throw new Error("Unexpected error");
+  }
+}

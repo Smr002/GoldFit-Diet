@@ -1,7 +1,9 @@
 import React, { useState, useEffect } from 'react';
-import { Users, Dumbbell, Bell, Crown, UserPlus } from 'lucide-react';
+import { Users, Dumbbell, Bell, Crown, UserPlus, LogOut } from 'lucide-react';
 import { LineChart, Line, BarChart, Bar, PieChart, Pie, Cell, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, Legend } from 'recharts';
+import { useNavigate } from 'react-router-dom'; // Import useNavigate for navigation
 import 'admin.css';
+import { fetchTotalUserCount } from '../../api';
 
 const DashboardCard = ({ title, value, icon: Icon, description }) => (
   <div className="dashboard-card">
@@ -17,6 +19,7 @@ const DashboardCard = ({ title, value, icon: Icon, description }) => (
 );
 
 const Dashboard = () => {
+  const navigate = useNavigate(); // Initialize useNavigate for redirection
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [selectedUser, setSelectedUser] = useState(null);
   const [isDeleteConfirmOpen, setIsDeleteConfirmOpen] = useState(false);
@@ -24,7 +27,24 @@ const Dashboard = () => {
   const [modalLeavingClass, setModalLeavingClass] = useState('');
   const [deleteModalLeavingClass, setDeleteModalLeavingClass] = useState('');
   const [promoteModalLeavingClass, setPromoteModalLeavingClass] = useState('');
+  const [totalUsers, setTotalUserCount] = useState(0);
+  const token = localStorage.getItem('token');
 
+  useEffect(() => {
+    const getTotalUsers = async () => {
+      try {
+        if (token) {
+          const count = await fetchTotalUserCount(token);
+          setTotalUserCount(count);
+        }
+      } catch (error) {
+        console.error("Failed to fetch total user count:", error);
+      }
+    };
+
+    getTotalUsers();
+  }, [token]);
+  
   const openModal = (user) => {
     setSelectedUser(user);
     setIsModalOpen(true);
@@ -281,17 +301,20 @@ const Dashboard = () => {
       setModalState(false);
     }, 300); // Match this with your animation duration
   };
+  
+
 
   return (
     <div className="admin-page">
       <div className="admin-page-header">
         <h1 className="admin-page-title">Dashboard</h1>
+        
       </div>
       
       <div className="dashboard-grid">
         <DashboardCard 
           title="Total Users"
-          value={stats.totalUsers}
+          value= {totalUsers}
           icon={Users}
           description="All registered users"
         />
