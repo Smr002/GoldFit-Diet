@@ -27,7 +27,13 @@ const mapPrismaToNotification = (prismaNotification: FullPrismaNotification): No
 
 export class NotificationRepository {
   async createNotification(data: Partial<Notification>): Promise<Notification> {
-    const notificationModel = new NotificationModel(data);
+    const notificationModel = new NotificationModel({
+      ...data,
+      // Ignore any incoming id field from the frontend
+      id: undefined,
+      // Allow frequency to be set regardless of isAutomated
+      frequency: data.frequency,
+    });
     if (!notificationModel.isValid()) {
       throw new Error('Invalid notification data');
     }
