@@ -52,20 +52,16 @@ const MealLogger = ({ onAddFood, selectedDay }) => {
 
   const MEAL_IMAGES = {
     breakfast: 'https://images.unsplash.com/photo-1494859802809-d069c3b71a8a?ixlib=rb-4.0.3&auto=format&fit=crop&w=400&q=80',
-    'morning-snack': 'https://images.unsplash.com/photo-1511688878353-3a2f5be94cd7?ixlib=rb-4.0.3&auto=format&fit=crop&w=400&q=80',
+    snack: 'https://images.unsplash.com/photo-1511688878353-3a2f5be94cd7?ixlib=rb-4.0.3&auto=format&fit=crop&w=400&q=80',
     lunch: 'https://images.unsplash.com/photo-1546793665-c74683f339c1?ixlib=rb-4.0.3&auto=format&fit=crop&w=400&q=80',
-    'afternoon-snack': 'https://images.unsplash.com/photo-1571115177098-24ec42ed204d?ixlib=rb-4.0.3&auto=format&fit=crop&w=400&q=80',
-    dinner: 'https://images.unsplash.com/photo-1576402187878-974f70c890a5?ixlib=rb-4.0.3&auto=format&fit=crop&w=400&q=80',
-    'evening-snack': 'https://images.unsplash.com/photo-1571506165871-ee72a35bc9d4?ixlib=rb-4.0.3&auto=format&fit=crop&w=400&q=80'
+    dinner: 'https://images.unsplash.com/photo-1576402187878-974f70c890a5?ixlib=rb-4.0.3&auto=format&fit=crop&w=400&q=80'
   };
 
   const defaultMeals = [
     { id: 'breakfast', name: 'Breakfast', icon: <MorningIcon />, time: '6:00 - 10:00 AM', calories: 0, foods: [] },
-    { id: 'morning-snack', name: 'Morning Snack', icon: <SnackIcon />, time: '10:00 - 12:00 PM', calories: 0, foods: [] },
+    { id: 'snack', name: 'Snack', icon: <SnackIcon />, time: '10:00 AM - 6:00 PM', calories: 0, foods: [] },
     { id: 'lunch', name: 'Lunch', icon: <NoonIcon />, time: '12:00 - 2:00 PM', calories: 0, foods: [] },
-    { id: 'afternoon-snack', name: 'Afternoon Snack', icon: <SnackIcon />, time: '2:00 - 6:00 PM', calories: 0, foods: [] },
-    { id: 'dinner', name: 'Dinner', icon: <EveningIcon />, time: '6:00 - 8:00 PM', calories: 0, foods: [] },
-    { id: 'evening-snack', name: 'Evening Snack', icon: <SnackIcon />, time: '8:00 - 10:00 PM', calories: 0, foods: [] }
+    { id: 'dinner', name: 'Dinner', icon: <EveningIcon />, time: '6:00 - 8:00 PM', calories: 0, foods: [] }
   ];
 
   // Function to fetch nutrition logs
@@ -96,11 +92,9 @@ const MealLogger = ({ onAddFood, selectedDay }) => {
         // Create a mapping between API meal types and our meal IDs
         const mealTypeMap = {
           'BREAKFAST': 'breakfast',
-          'MORNING_SNACK': 'morning-snack',
+          'SNACK': 'snack',
           'LUNCH': 'lunch',
-          'AFTERNOON_SNACK': 'afternoon-snack',
-          'DINNER': 'dinner',
-          'EVENING_SNACK': 'evening-snack'
+          'DINNER': 'dinner'
         };
 
         // Transform the logs into the meal format
@@ -113,31 +107,31 @@ const MealLogger = ({ onAddFood, selectedDay }) => {
             return mappedType === defaultMeal.id;
           });
 
-          if (mealLog && Array.isArray(mealLog.foodItems) && mealLog.foodItems.length > 0) {
-            const foods = mealLog.foodItems.map(item => ({
-              id: `food-${item.fdcId || 'unknown'}`,
-              name: item.description || 'Unknown Food',
-              serving: `${item.servingSize || 100} ${item.unit || 'g'}`,
-              calories: parseFloat(item.calories || 0),
-              protein: parseFloat(item.protein || 0),
-              carbs: parseFloat(item.carbs || 0),
-              fats: parseFloat(item.fats || 0),
-              foodId: item.fdcId || 'unknown'
-            }));
-
-            // Calculate total calories for the meal
-            const totalCalories = foods.reduce((sum, food) => sum + (food.calories || 0), 0);
+          if (mealLog) {
+            console.log(`Processing meal log for ${defaultMeal.id}:`, mealLog);
+            
+            // Create a food item from the meal log data
+            const foodItem = {
+              id: `food-${mealLog.id || 'unknown'}`,
+              name: mealLog.mealType || 'Unknown Food',
+              serving: '1 serving',
+              calories: parseFloat(mealLog.totalCalories || 0),
+              protein: parseFloat(mealLog.protein || 0),
+              carbs: parseFloat(mealLog.carbs || 0),
+              fats: parseFloat(mealLog.fats || 0),
+              foodId: mealLog.id || 'unknown'
+            };
 
             return {
               ...defaultMeal,
-              foods,
-              calories: totalCalories
+              foods: [foodItem],
+              calories: parseFloat(mealLog.totalCalories || 0)
             };
           }
           return defaultMeal;
         });
 
-        console.log('Updated meals:', updatedMeals); // Debug log
+        console.log('Updated meals with API data:', updatedMeals); // Debug log
         setLocalMeals(updatedMeals);
       } else {
         console.log('No logs found for date:', date.toISOString()); // Debug log
@@ -220,12 +214,10 @@ const MealLogger = ({ onAddFood, selectedDay }) => {
 
       // Map mealId to valid mealType
       const mealTypeMap = {
-        'breakfast': 'BREAKFAST',
-        'morning-snack': 'MORNING_SNACK',
-        'lunch': 'LUNCH',
-        'afternoon-snack': 'AFTERNOON_SNACK',
-        'dinner': 'DINNER',
-        'evening-snack': 'EVENING_SNACK'
+        'BREAKFAST': 'breakfast',
+        'SNACK': 'snack',
+        'LUNCH': 'lunch',
+        'DINNER': 'dinner'
       };
 
       // Get the current date in the local timezone
@@ -284,21 +276,17 @@ const MealLogger = ({ onAddFood, selectedDay }) => {
     if (isDarkMode) {
       switch(mealId) {
         case 'breakfast': return '#FFD700';
-        case 'morning-snack': return '#F0E68C';
+        case 'snack': return '#F0E68C';
         case 'lunch': return '#DAA520';
-        case 'afternoon-snack': return '#B8860B';
         case 'dinner': return '#FFC107';
-        case 'evening-snack': return '#FFECB3';
         default: return '#E0E0E0';
       }
     } else {
       switch(mealId) {
         case 'breakfast': return '#ff9800';
-        case 'morning-snack': return '#ffb74d';
+        case 'snack': return '#ffb74d';
         case 'lunch': return '#2196f3';
-        case 'afternoon-snack': return '#90caf9';
         case 'dinner': return '#673ab7';
-        case 'evening-snack': return '#9575cd';
         default: return '#9e9e9e';
       }
     }
@@ -374,10 +362,16 @@ const MealLogger = ({ onAddFood, selectedDay }) => {
               {localMeals.map((meal, index) => {
                 const isExpanded = expandedMeal === meal.id;
                 const hasFoods = meal.foods && meal.foods.length > 0;
+                console.log(`Meal ${meal.id} foods:`, meal.foods);
+                console.log(`Meal ${meal.id} has foods:`, hasFoods);
                 const totalCalories = hasFoods
-                  ? meal.foods.reduce((sum, food) => sum + (food.calories || 0), 0)
+                  ? meal.foods.reduce((sum, food) => {
+                      console.log(`Adding calories for ${food.name}:`, food.calories);
+                      return sum + (food.calories || 0);
+                    }, 0)
                   : meal.calories || 0;
 
+                console.log(`Meal ${meal.id} total calories:`, totalCalories);
                 const isLastAdded = lastAddedMealId === meal.id;
                 const isHovered = hoveredMealId === meal.id;
                 const mealColor = getMealColor(meal.id);
