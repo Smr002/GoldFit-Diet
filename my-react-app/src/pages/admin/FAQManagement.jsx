@@ -46,42 +46,148 @@ const FAQManagement = () => {
   };
 
   const mockFAQs = [
-    {
-      id: 1,
-      question: 'How often should I work out?',
-      answer: 'We recommend 3-5 workouts per week depending on your fitness level and goals. Beginners should start with 3 sessions per week, allowing for rest days in between. As you progress, you can increase frequency and intensity.',
-      category: 'Workouts',
-      createdDate: '2023-10-10',
-    },
-    {
-      id: 2,
-      question: 'Can I access workouts offline?',
-      answer: 'Yes, you can download workouts for offline access in the premium version of the app. Simply go to the workout page and click the download icon to save it for offline use.',
-      category: 'App Features',
-      createdDate: '2023-09-22',
-    },
-    {
-      id: 3,
-      question: 'How do I track my progress?',
-      answer: 'Progress tracking is available in the "Progress" tab of your profile. You can see metrics like workout completion, consistency, and improvement over time. You can also manually log measurements and take progress photos.',
-      category: 'Tracking',
-      createdDate: '2023-09-15',
-    },
-    {
-      id: 4,
-      question: 'What should I eat before and after workouts?',
-      answer: 'Pre-workout: Eat a balanced meal with carbs and protein 2-3 hours before, or a small snack 30-60 minutes before. Post-workout: Consume protein and carbs within 30-60 minutes after your workout to aid recovery and muscle growth.',
-      category: 'Nutrition',
-      createdDate: '2023-08-05',
-    },
-    {
-      id: 5,
-      question: 'How do I cancel my subscription?',
-      answer: 'You can cancel your subscription from your account settings. Go to Profile > Subscription > Cancel Subscription. Your access will continue until the end of your current billing period.',
-      category: 'Billing',
-      createdDate: '2023-07-18',
-    }
-  ];
+  {
+    id: 1,
+    question: 'How do I log my meals?',
+    answer: 'Tap the "Add Food" button under any meal section (Breakfast, Lunch, Dinner, or Snack) to open the food search. From there, you can search for a food, select it, and add it to your meal.',
+    category: 'Nutrition',
+    createdDate: '2024-01-01',
+  },
+  {
+    id: 2,
+    question: 'How do I search for and add foods to my meals?',
+    answer: 'Use the search bar to find foods by name. Once you select a food item:\n• You can view detailed nutritional info\n• Adjust the serving size and unit (e.g., grams, cups, slices)\n• Tap "Add Food" to log it into your selected meal',
+    category: 'Nutrition',
+    createdDate: '2024-01-02',
+  },
+  {
+    id: 3,
+    question: 'Can I customize serving sizes?',
+    answer: 'Yes. When adding food, you can:\n• Enter a specific amount\n• Select your preferred unit of measurement (e.g., g, ml, cup, tbsp)\n• The nutritional info updates automatically',
+    category: 'Nutrition',
+    createdDate: '2024-01-03',
+  },
+  {
+    id: 4,
+    question: 'How are calories calculated?',
+    answer: 'Calories are based on the food’s nutritional content, adjusted to your selected serving size. Protein and carbs contribute 4 calories per gram, while fats contribute 9 calories per gram.',
+    category: 'Nutrition',
+    createdDate: '2024-01-04',
+  },
+  {
+    id: 5,
+    question: 'What meal types can I log?',
+    answer: 'You can log meals in four categories:\n• Breakfast (6:00–10:00 AM)\n• Snack (10:00 AM–6:00 PM)\n• Lunch (12:00–2:00 PM)\n• Dinner (6:00–8:00 PM)',
+    category: 'Nutrition',
+    createdDate: '2024-01-05',
+  },
+  {
+    id: 6,
+    question: 'Can I edit or remove meals I’ve logged?',
+    answer: 'Yes. You can:\n• Expand a meal to see the food items\n• Delete any individual food from the list\nYour daily totals will update automatically.',
+    category: 'Nutrition',
+    createdDate: '2024-01-06',
+  },
+  {
+    id: 7,
+    question: 'How can I see my meal history?',
+    answer: 'Use the daily or weekly views to review past meals. These are accessible through the calorie tracker. You can select different days and view historical trends in your nutrition.',
+    category: 'Nutrition',
+    createdDate: '2024-01-07',
+  },
+  {
+    id: 8,
+    question: 'How do I log my water intake?',
+    answer: 'Tap the "+" button in the Water Tracker section and select a preset amount (e.g., 250ml, 500ml). Your progress is shown on a visual bar and updates automatically.',
+    category: 'Nutrition',
+    createdDate: '2024-01-08',
+  },
+  {
+    id: 9,
+    question: 'What is the recommended daily intake?',
+    answer: 'The default goal is 2000ml (2 liters) per day, but you can personalize this based on your needs.',
+    category: 'Nutrition',
+    createdDate: '2024-01-09',
+  },
+  {
+    id: 10,
+    question: 'How do I log my sleep?',
+    answer: 'Go to the Sleep Tracker to:\n• Input the number of hours you slept\n• Rate your sleep quality\n• Track trends in your sleep over time',
+    category: 'App Features',
+    createdDate: '2024-01-10',
+  },
+  {
+    id: 11,
+    question: 'How do I view my weekly calorie intake?',
+    answer: 'The calorie tracker shows:\n• A weekly graph of your daily calorie intake\n• A progress bar for the current day\n• Indicators for under/near/over your calorie goal',
+    category: 'App Features',
+    createdDate: '2024-01-11',
+  },
+  {
+    id: 12,
+    question: 'Can I see a breakdown of macronutrients?',
+    answer: 'Yes. You’ll see:\n• Daily totals for protein, carbs, and fats\n• A percentage-based chart showing how your intake compares to your goals',
+    category: 'App Features',
+    createdDate: '2024-01-12',
+  },
+  {
+    id: 13,
+    question: 'How are daily calorie goals set?',
+    answer: 'Your target is based on your personal details, lifestyle, and weight goals. By default, the daily calorie goal is 1961 kcal, but it adjusts based on your inputs.',
+    category: 'App Features',
+    createdDate: '2024-01-13',
+  },
+  {
+    id: 14,
+    question: 'Can I customize macronutrient goals?',
+    answer: 'Yes. Default targets are:\n• Protein: 98g\n• Carbs: 196g\n• Fats: 65g\nYou can change these according to your diet plan.',
+    category: 'App Features',
+    createdDate: '2024-01-14',
+  },
+  {
+    id: 15,
+    question: 'Food search isn’t working—what can I do?',
+    answer: 'Try the following:\n• Check your internet connection\n• Make sure the food name is spelled correctly\n• Refresh the page\nIf the issue continues, contact support.',
+    category: 'App Features',
+    createdDate: '2024-01-15',
+  },
+  {
+    id: 16,
+    question: 'How do I refresh my data?',
+    answer: 'Data updates automatically every 30 seconds. You can also:\n• Tap the manual refresh icon\n• Log out and back in if needed',
+    category: 'App Features',
+    createdDate: '2024-01-16',
+  },
+  {
+    id: 17,
+    question: 'How is my nutrition data stored?',
+    answer: 'Your data is securely saved and includes:\n• Daily meal logs\n• Weekly calorie and macro summaries\n• Long-term historical data for progress tracking',
+    category: 'App Features',
+    createdDate: '2024-01-17',
+  },
+  {
+    id: 18,
+    question: 'Can I use this app on my phone?',
+    answer: 'Yes. The app is fully responsive and works on:\n• Smartphones\n• Tablets\n• Desktop computers\nThe interface adjusts automatically to your screen size.',
+    category: 'App Features',
+    createdDate: '2024-01-18',
+  },
+  {
+    id: 19,
+    question: 'How can I get the most out of the app?',
+    answer: 'For best results:\n• Log meals right after eating\n• Use accurate serving sizes\n• Track water throughout the day\n• Log your sleep each morning\n• Review your weekly progress to stay on track',
+    category: 'App Features',
+    createdDate: '2024-01-19',
+  },
+  {
+    id: 20,
+    question: 'How often should I log my meals?',
+    answer: 'Ideally:\n• Log meals immediately after eating\n• Update water intake as you go\n• Log sleep once you wake up\n• Check your progress at least once a day',
+    category: 'App Features',
+    createdDate: '2024-01-20',
+  }
+];
+
 
   const faqsPerPage = 10;
   
@@ -109,26 +215,8 @@ const FAQManagement = () => {
     setActiveDropdown(null);
   };
 
-  const handleDeleteClick = (faq) => {
-    setSelectedFAQ(faq);
-    setIsDeleteModalOpen(true);
-    setActiveDropdown(null);
-  };
 
-  const handleCreateFAQ = () => {
-    // Set an empty FAQ template
-    const newFAQTemplate = {
-      id: `temp-${Date.now()}`,
-      question: "",
-      answer: "",
-      category: "Workouts",
-      createdDate: new Date().toISOString().split('T')[0]
-    };
-    
-    setSelectedFAQ(newFAQTemplate);
-    setIsEditModalOpen(true);
-    setIsCreateModalOpen(true);
-  };
+
 
   const filteredFAQs = mockFAQs.filter(faq => {
     const searchTerm = searchQuery.toLowerCase();
@@ -250,20 +338,7 @@ const FAQManagement = () => {
                             <Eye size={16} />
                             <span>View Details</span>
                           </button>
-                          <button 
-                            className="dropdown-item"
-                            onClick={() => handleEditFAQ(faq)}
-                          >
-                            <Edit size={16} />
-                            <span>Edit</span>
-                          </button>
-                          <button 
-                            className="dropdown-item delete"
-                            onClick={() => handleDeleteClick(faq)}
-                          >
-                            <Trash2 size={16} />
-                            <span>Delete</span>
-                          </button>
+                        
                         </div>
                       )}
                     </div>
@@ -389,158 +464,8 @@ const FAQManagement = () => {
         </div>
       )}
 
-      {/* Edit FAQ Modal (used for both edit and create) */}
-      {isEditModalOpen && selectedFAQ && (
-        <div className="modal-overlay">
-          <div className="modal faq-edit-modal">
-            <button 
-              className="modal-close-btn" 
-              onClick={() => {
-                setIsEditModalOpen(false);
-                setIsCreateModalOpen(false);
-                setSelectedFAQ(null);
-              }}
-            >
-              &times;
-            </button>
-            <h2>{isCreateModalOpen ? 'Create New FAQ' : 'Edit FAQ'}</h2>
-            
-            <form onSubmit={(e) => {
-              e.preventDefault();
-              // In a real app, you would save the changes to your backend
-              // This is just a mock implementation
-              if (isCreateModalOpen) {
-                mockFAQs.push({
-                  ...selectedFAQ,
-                  id: mockFAQs.length + 1
-                });
-              } else {
-                // Find and update the FAQ
-                const index = mockFAQs.findIndex(faq => faq.id === selectedFAQ.id);
-                if (index !== -1) {
-                  mockFAQs[index] = selectedFAQ;
-                }
-              }
-              setIsEditModalOpen(false);
-              setIsCreateModalOpen(false);
-              setSelectedFAQ(null);
-            }}>
-              <div className="form-group">
-                <label htmlFor="faqCategory">Category</label>
-                <select 
-                  id="faqCategory"
-                  value={selectedFAQ.category}
-                  onChange={(e) => setSelectedFAQ({
-                    ...selectedFAQ, 
-                    category: e.target.value
-                  })}
-                  required
-                >
-                  <option value="Workouts">Workouts</option>
-                  <option value="Nutrition">Nutrition</option>
-                  <option value="App Features">App Features</option>
-                  <option value="Tracking">Tracking</option>
-                  <option value="Billing">Billing</option>
-                </select>
-              </div>
-              
-              <div className="form-group">
-                <label htmlFor="faqQuestion">Question</label>
-                <input 
-                  type="text"
-                  id="faqQuestion"
-                  value={selectedFAQ.question}
-                  onChange={(e) => setSelectedFAQ({
-                    ...selectedFAQ, 
-                    question: e.target.value
-                  })}
-                  placeholder="Enter FAQ question..."
-                  required
-                />
-              </div>
-              
-              <div className="form-group">
-                <label htmlFor="faqAnswer">Answer</label>
-                <textarea 
-                  id="faqAnswer"
-                  value={selectedFAQ.answer}
-                  onChange={(e) => setSelectedFAQ({
-                    ...selectedFAQ, 
-                    answer: e.target.value
-                  })}
-                  rows={6}
-                  placeholder="Enter detailed answer..."
-                  required
-                />
-              </div>
-              
-              <div className="modal-footer">
-                <button 
-                  type="button"
-                  onClick={() => {
-                    setIsEditModalOpen(false);
-                    setIsCreateModalOpen(false);
-                    setSelectedFAQ(null);
-                  }} 
-                  className="cancel-btn"
-                >
-                  Cancel
-                </button>
-                
-                <button 
-                  type="submit"
-                  className="save-btn"
-                >
-                  {isCreateModalOpen ? 'Create' : 'Save Changes'}
-                </button>
-              </div>
-            </form>
-          </div>
-        </div>
-      )}
 
-      {/* Delete Confirmation Modal */}
-      {isDeleteModalOpen && selectedFAQ && (
-        <div className="modal-overlay">
-          <div className="modal confirmation-modal">
-            <h2>Confirm Delete</h2>
-            <p>
-              Are you sure you want to delete this FAQ?<br />
-              <strong className="delete-emphasis">"{selectedFAQ.question.length > 50 ? 
-                `${selectedFAQ.question.substring(0, 50)}...` : 
-                selectedFAQ.question}"</strong>
-              <br />
-              This action cannot be undone.
-            </p>
-            <div className="modal-actions">
-              <button 
-                onClick={() => {
-                  setIsDeleteModalOpen(false);
-                  setSelectedFAQ(null);
-                }} 
-                className="cancel-btn"
-              >
-                Cancel
-              </button>
-              <button 
-                onClick={() => {
-                  // In a real app, you would delete from your backend
-                  // This is just a mock implementation
-                  const index = mockFAQs.findIndex(faq => faq.id === selectedFAQ.id);
-                  if (index !== -1) {
-                    mockFAQs.splice(index, 1);
-                  }
-                  setIsDeleteModalOpen(false);
-                  setSelectedFAQ(null);
-                }} 
-                className="delete-btn"
-              >
-                Delete FAQ
-              </button>
-            </div>
-          </div>
-        </div>
-      )}
+      
     </div>
   );
 };
