@@ -545,5 +545,39 @@ export class WorkoutRepository {
     });
   }
   
+  async getAllSessionExercises(userId: number): Promise<
+    (SessionExercise & { session: { date: Date }; exercise: { name: string } })[]
+  > {
+    return this.prisma.sessionExercise.findMany({
+      where: { session: { userId } },
+      include: {
+        session: { select: { date: true } },
+        exercise: { select: { name: true } },
+      },
+      orderBy: {
+        session: { date: 'desc' },
+      },
+    });
+  }
+
   
+  async getSessionExercisesByExercise(
+    userId: number,
+    exerciseId: number,
+    limit: number
+  ): Promise<(SessionExercise & { session: { date: Date } })[]> {
+    return this.prisma.sessionExercise.findMany({
+      where: {
+        exerciseId,
+        session: { userId },
+      },
+      include: {
+        session: { select: { date: true } },
+      },
+      orderBy: {
+        session: { date: 'desc' },
+      },
+      take: limit,
+    });
+  }
 }

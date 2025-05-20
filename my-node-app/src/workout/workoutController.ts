@@ -329,7 +329,18 @@ export class WorkoutController {
       return res.status(500).json({ error: 'Failed to get weekly progress' });
     }
   }
-
+  async getRecentExercises(req: AuthenticatedRequest, res: Response) {
+    try {
+      const userId = Number(req.user?.id);
+      if (!userId) return res.status(401).json({ error: 'Unauthorized' });
+  
+      const data = await this.service.getRecentExercises(userId, 3);
+      return res.json(data);
+    } catch (error) {
+      console.error('Error fetching recent exercises:', error);
+      return res.status(500).json({ error: 'Failed to fetch recent exercises' });
+    }
+  }
 
 }
 

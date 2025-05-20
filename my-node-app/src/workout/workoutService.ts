@@ -205,12 +205,10 @@ export class WorkoutService {
 
   async getWeeklyProgress(
     userId: number,
-    // controller will pass in fromDate = today–6d
     fromDate: Date
   ) {
     const sessions = await this.repository.getWeeklyProgressSessions(userId, fromDate);
 
-    // Build 7 empty buckets
     const buckets = Array.from({ length: 7 }, (_, i) => {
       const d = new Date(fromDate);
       d.setDate(fromDate.getDate() + i);
@@ -221,12 +219,10 @@ export class WorkoutService {
         date: iso,
         day: dayName,
         totalWeight: 0,
-        // we'll accumulate into this Map, then flatten to array
         exerciseTotals: new Map<number, number>(),
       };
     });
 
-    // Accumulate
     for (const session of sessions) {
       const sd = new Date(session.date);
       sd.setHours(0, 0, 0, 0);
@@ -240,16 +236,13 @@ export class WorkoutService {
         const s = ex.setsCompleted ?? 0;
         const lift = w * r * s;
 
-        // add to day total
         bucket.totalWeight += lift;
 
-        // add to per-exercise total
         const prev = bucket.exerciseTotals.get(ex.exerciseId) ?? 0;
         bucket.exerciseTotals.set(ex.exerciseId, prev + lift);
       }
     }
 
-    // Transform Map → array
     return buckets.map(b => ({
       date: b.date,
       day: b.day,
@@ -260,4 +253,44 @@ export class WorkoutService {
     }));
   }
   
+  async getRecentExercises(userId: number, limit = 3): Promise<{
+    exerciseId: number;
+    name: string;
+    currentWeight: number | null;
+    previousWeight: number | null;
+  }[]> {
+    const allLogs = await this.repository.getAllSessionExercises(userId);
+
+    const seen = new Set<number>();
+    const recent: { exerciseId: number; name: string }[] = [];
+    for (const log of allLogs) {
+      if (!seen.has(log.exerciseId)) {
+        seen.add(log.exerciseId);
+        recent.push({ exerciseId: log.exerciseId, name: log.exercise.name });
+        if (recent.length >= limit) break;
+      }
+    }
+
+    const result: { 
+      exerciseId: number; 
+      name: string; 
+      currentWeight: number | null; 
+      previousWeight: number | null; 
+    }[] = [];
+    for (const { exerciseId, name } of recent) {
+      const history: (SessionExercise & { session: { date: Date } })[] =
+        await this.repository.getSessionExercisesByExercise(userId, exerciseId, 2);
+
+      result.push({
+        exerciseId,
+        name,
+        currentWeight: history[0]?.weightUsed  ?? null,
+        previousWeight: history[1]?.weightUsed ?? null,
+      });
+    }
+
+    return result;
+  }
 }
+
+
