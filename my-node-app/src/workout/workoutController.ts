@@ -178,6 +178,16 @@ export class WorkoutController {
     }
   }
 
+  async getTotalWorkoutCount(req: Request, res: Response) {
+    try {
+      const count = await this.service.getTotalWorkoutCountInDatabase();
+      res.json({ totalWorkouts: count });
+    } catch (err) {
+      console.error('Error in getTotalWorkoutCount:', err); // Log the real error
+      res.status(500).json({ error: "Failed to fetch workout count." });
+    }
+  }
+
   async getSessionHistory(req: AuthenticatedRequest, res: Response) {
     try {
       const limit = (req as Request).query.limit

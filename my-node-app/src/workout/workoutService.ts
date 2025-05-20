@@ -161,6 +161,7 @@ export class WorkoutService {
     }));
   }
 
+
   async toggleFavoriteWorkout(userId: number, workoutId: number): Promise<{ isFavorite: boolean }> {
     const existingFavorite = await this.repository.getFavoriteWorkout(userId, workoutId);
     
@@ -200,5 +201,9 @@ export class WorkoutService {
 
   async getMaxPrForExercise(userId: number, exerciseId: number): Promise<number> {
     return this.repository.getMaxPrForExercise(userId, exerciseId);
+  }
+
+  async getTotalWorkoutCountInDatabase(): Promise<number> {
+    return this.repository.getWorkoutCount();
   }
 }

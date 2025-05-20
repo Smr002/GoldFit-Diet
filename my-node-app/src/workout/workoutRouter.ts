@@ -34,5 +34,5 @@ router.get('/exercises/:exerciseId/maxpr', authenticateJWT, controller.getMaxPrF
 // Favorite Workout Routes
 router.post('/:workoutId/favorite', authenticateJWT, controller.toggleFavoriteWorkout.bind(controller));
 router.get('/favorites', authenticateJWT, controller.getFavoriteWorkouts.bind(controller));
-
+router.get('/count', authenticateJWT, controller.getTotalWorkoutCount.bind(controller));
 export default router;

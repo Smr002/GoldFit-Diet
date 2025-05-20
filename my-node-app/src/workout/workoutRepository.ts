@@ -96,6 +96,12 @@ export class WorkoutRepository {
     });
   }
 
+  async getWorkoutCount(): Promise<number> {
+    console.log(this.prisma.workout.count());
+    console.log('Workout count:', await this.prisma.workout.count());
+    return this.prisma.workout.count();
+  }
+
   async getAllWorkouts(): Promise<Workout[]> {
     return this.prisma.workout.findMany({
       include: {
