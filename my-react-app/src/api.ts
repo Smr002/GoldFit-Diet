@@ -535,3 +535,35 @@ export async function getAdmins(token: string) {
     throw new Error("Unexpected error");
   }
 }
+
+
+
+export async function getUserBadges(token: string): Promise<{ totalSessions: number; badge: string }> {
+  try {
+    const response = await axios.get(
+      `${API_BASE_URL}/workouts/user/badges`,
+      { headers: { Authorization: `Bearer ${token}` } }
+    );
+    return response.data;
+  } catch (error: any) {
+    if (axios.isAxiosError(error)) {
+      throw new Error(error.response?.data?.error || "Failed to fetch badges");
+    }
+    throw new Error("Unexpected error");
+  }
+}
+
+export async function getWorkoutStreak(token: string): Promise<{ streak: number }> {
+  try {
+    const response = await axios.get(
+      `${API_BASE_URL}/workouts/streak`,
+      { headers: { Authorization: `Bearer ${token}` } }
+    );
+    return response.data;
+  } catch (error: any) {
+    if (axios.isAxiosError(error)) {
+      throw new Error(error.response?.data?.error || "Failed to fetch streak");
+    }
+    throw new Error("Unexpected error");
+  }
+}
