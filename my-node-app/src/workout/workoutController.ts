@@ -214,13 +214,9 @@ export class WorkoutController {
   }
 
   async getWorkoutStreak(req: AuthenticatedRequest, res: Response) {
-    try {
-      const userId = Number(req.user?.id);
-      const streak = await this.service.getWorkoutStreak(userId);
-      res.json({ streak });
-    } catch (error) {
-      res.status(500).json({ error: 'Failed to get workout streak' });
-    }
+    const userId = Number(req.user?.id);
+    const streak = await this.service.getWorkoutStreak(userId);
+    res.json({ streak });
   }
 
   async getPersonalBests(req: AuthenticatedRequest, res: Response) {

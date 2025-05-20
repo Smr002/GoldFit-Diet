@@ -4,8 +4,14 @@ import { authenticateJWT } from '../auth/JWT/authMiddleware';
 
 const router = Router();
 const controller = new WorkoutController();
-
+router.get(
+    '/personal-bests',
+    authenticateJWT,                              // ← add this
+    controller.getPersonalBests.bind(controller)
+  );
 // CRUD Routes
+router.get('/streak',authenticateJWT,controller.getWorkoutStreak.bind(controller));
+
 router.post('/',  controller.createWorkout.bind(controller));
 router.get('/:id',  controller.getWorkoutById.bind(controller));
 router.get('/',  controller.getAllWorkouts.bind(controller));
@@ -26,8 +32,7 @@ router.get('/user/badges',authenticateJWT,controller.getUserBadge.bind(controlle
 // Progress Tracking Routes
 router.get('/:workoutId/progress',  controller.getWorkoutProgress.bind(controller));
 router.get('/:workoutId/performance',  controller.getWorkoutPerformance.bind(controller));
-router.get('/streak',  controller.getWorkoutStreak.bind(controller));
-router.get('/personal-bests',  controller.getPersonalBests.bind(controller));
+
 router.get('/exercises/:exerciseId/maxpr', authenticateJWT, controller.getMaxPrForExercise.bind(controller));
 
 router.get('/progress/weekly', authenticateJWT, controller.getWeeklyProgress.bind(controller));//get exercise and weight on the last 7 days
