@@ -122,22 +122,20 @@ export class WorkoutController {
     }
   }
 
-  async getUserBadge(req: Request, res: Response) {
+  async getUserBadge(req: AuthenticatedRequest, res: Response) {
     try {
-      // Get userId from URL parameter instead of auth token
-      const userId = Number(req.params.userId);
-      
+      const userId = Number(req.user?.id);
       if (isNaN(userId)) {
         return res.status(400).json({ error: 'Invalid user ID' });
       }
-      
+  
       const badges = await this.service.getUserBadge(userId);
-      res.json(badges);
+      return res.json(badges);
     } catch (error) {
-      console.error("Error getting user badges:", error);
-      res.status(500).json({ error: 'Failed to get user badges' });
+      console.error('Error getting user badges:', error);
+      return res.status(500).json({ error: 'Failed to get user badges' });
     }
-  }  
+  }
 
   async getSessionById(req: AuthenticatedRequest, res: Response) {
     try {

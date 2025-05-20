@@ -22,8 +22,7 @@ router.get('/exercises/search',  controller.searchExercises.bind(controller));
 // Workout Session Routes
 router.post('/sessions', authenticateJWT, controller.logWorkoutSession.bind(controller));
 router.get('/sessions/log', authenticateJWT, controller.getLogWorkoutSession.bind(controller));
-router.get('/user/badges/:userId', controller.getUserBadge.bind(controller));
-
+router.get('/user/badges',authenticateJWT,controller.getUserBadge.bind(controller));
 // Progress Tracking Routes
 router.get('/:workoutId/progress',  controller.getWorkoutProgress.bind(controller));
 router.get('/:workoutId/performance',  controller.getWorkoutPerformance.bind(controller));
@@ -32,7 +31,7 @@ router.get('/personal-bests',  controller.getPersonalBests.bind(controller));
 router.get('/exercises/:exerciseId/maxpr', authenticateJWT, controller.getMaxPrForExercise.bind(controller));
 
 router.get('/progress/weekly', authenticateJWT, controller.getWeeklyProgress.bind(controller));//get exercise and weight on the last 7 days
-router.get('/progress/recent-exercises',authenticateJWT,controller.getRecentExercises.bind(controller)
+router.get('/progress/recent-exercises',authenticateJWT,controller.getRecentExercises.bind(controller)//get the last 3 exercises w the current& previous weight
   );
 
 // Favorite Workout Routes
