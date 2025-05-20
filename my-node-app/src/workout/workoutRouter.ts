@@ -4,12 +4,8 @@ import { authenticateJWT } from '../auth/JWT/authMiddleware';
 
 const router = Router();
 const controller = new WorkoutController();
-router.get(
-    '/personal-bests',
-    authenticateJWT,                              // ← add this
-    controller.getPersonalBests.bind(controller)
-  );
-// CRUD Routes
+router.get('/personal-bests',authenticateJWT,controller.getPersonalBests.bind(controller));
+
 router.get('/streak',authenticateJWT,controller.getWorkoutStreak.bind(controller));
 
 router.post('/',  controller.createWorkout.bind(controller));
