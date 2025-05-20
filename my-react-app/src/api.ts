@@ -535,3 +535,50 @@ export async function getAdmins(token: string) {
     throw new Error("Unexpected error");
   }
 }
+
+
+export async function fetchTotalWorkoutCount(token: string) {
+  try {
+    const response = await axios.get(`${API_BASE_URL}/workouts/count`, {
+      headers: { Authorization: `Bearer ${token}` },
+    });
+    return response.data.totalWorkouts;
+  } catch (error: any) {
+    if (axios.isAxiosError(error)) {
+      throw new Error(error.response?.data?.error || "Failed to fetch workout count");
+    }
+    throw new Error("Unexpected error");
+  }
+}
+
+export async function getNotificationCount(token: string) {
+  try {
+    const response = await axios.get(`${API_BASE_URL}/notifications/`, {
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    });
+    return Array.isArray(response.data) ? response.data.length : 0;
+  } catch (error: any) {
+    if (axios.isAxiosError(error)) {
+      throw new Error(error.response?.data?.error || "Failed to fetch notifications");
+    }
+    throw new Error("Unexpected error");
+  }
+}
+
+export async function getWorkoutCount(token: string) {
+  try {
+    const response = await axios.get(`${API_BASE_URL}/workouts/count`, {
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    });
+    return typeof response.data.totalWorkouts === 'number' ? response.data.totalWorkouts : 0;
+  } catch (error: any) {
+    if (axios.isAxiosError(error)) {
+      throw new Error(error.response?.data?.error || "Failed to fetch workout count");
+    }
+    throw new Error("Unexpected error");
+  }
+}

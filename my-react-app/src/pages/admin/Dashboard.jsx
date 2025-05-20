@@ -1,9 +1,9 @@
 import React, { useState, useEffect } from 'react';
 import { Users, Dumbbell, Bell, Crown, UserPlus, LogOut } from 'lucide-react';
-import { LineChart, Line, BarChart, Bar, PieChart, Pie, Cell, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, Legend } from 'recharts';
+import { LineChart, Line, PieChart, Pie, Cell, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, Legend } from 'recharts';
 import { useNavigate } from 'react-router-dom'; // Import useNavigate for navigation
 import 'admin.css';
-import { fetchTotalUserCount } from '../../api';
+import { fetchTotalUserCount, fetchTotalWorkoutCount, getNotificationCount, getWorkoutCount } from '../../api';
 
 const DashboardCard = ({ title, value, icon: Icon, description }) => (
   <div className="dashboard-card">
@@ -29,6 +29,9 @@ const Dashboard = () => {
   const [promoteModalLeavingClass, setPromoteModalLeavingClass] = useState('');
   const [totalUsers, setTotalUserCount] = useState(0);
   const token = localStorage.getItem('token');
+  const [totalWorkouts, setTotalWorkoutCount] = useState(0);
+  const [totalNotifications, setTotalNotifications] = useState(0);
+  const [recentUsers, setRecentUsers] = useState([]);
 
   useEffect(() => {
     const getTotalUsers = async () => {
@@ -44,6 +47,62 @@ const Dashboard = () => {
 
     getTotalUsers();
   }, [token]);
+
+  useEffect(() => {
+    const getTotalWorkouts = async () => {
+      try {
+        if (token) {
+          const count = await getWorkoutCount(token);
+          setTotalWorkoutCount(count);
+        }
+      } catch (error) {
+        setTotalWorkoutCount('Error');
+        console.error('Failed to fetch total workout count:', error);
+      }
+    };
+    getTotalWorkouts();
+  }, [token]);
+
+  useEffect(() => {
+    const getTotalNotifications = async () => {
+      try {
+        if (token) {
+          const count = await getNotificationCount(token);
+          setTotalNotifications(count);
+        }
+      } catch (error) {
+        setTotalNotifications('Error');
+        console.error('Failed to fetch total notification count:', error);
+      }
+    };
+    getTotalNotifications();
+  }, [token]);
+
+  useEffect(() => {
+    const fetchRecentUsers = async () => {
+      try {
+        if (token) {
+          const response = await fetch('http://localhost:3000/users', {
+            headers: { Authorization: `Bearer ${token}` },
+          });
+          if (!response.ok) throw new Error('Failed to fetch users');
+          const users = await response.json();
+
+          // Use joinDate if present, otherwise fallback to createdAt, otherwise fallback to 0
+          const sorted = users.sort((a, b) => {
+            const dateA = new Date(a.joinDate || a.createdAt || 0);
+            const dateB = new Date(b.joinDate || b.createdAt || 0);
+            return dateB - dateA;
+          });
+          setRecentUsers(sorted.slice(0, 3));
+        }
+      } catch (error) {
+        setRecentUsers([]);
+        console.error('Failed to fetch recent users:', error);
+      }
+    };
+    fetchRecentUsers();
+  }, [token]);
   
   const openModal = (user) => {
     setSelectedUser(user);
@@ -57,18 +116,6 @@ const Dashboard = () => {
       setIsModalOpen(false);
       setModalLeavingClass('');
     }, 300); // Match this with animation duration
-  };
-
-  const handleDeleteUser = () => {
-    closeModal();
-  };
-
-  const handleSaveChanges = () => {
-    closeModal();
-  };
-
-  const handlePromoteToAdmin = () => {
-    closeModal();
   };
 
   const handleDeleteClick = () => {
@@ -123,39 +170,6 @@ const Dashboard = () => {
     }, 300);
   };
 
-  // Update the closeDeleteConfirm function
-  const closeDeleteConfirm = () => {
-    setDeleteModalLeavingClass('leaving');
-    setTimeout(() => {
-      setIsDeleteConfirmOpen(false);
-      setDeleteModalLeavingClass('');
-      
-      // Add a small delay before reopening the user modal
-      // This prevents state conflicts during transitions
-      if (selectedUser) {
-        setTimeout(() => {
-          setIsModalOpen(true);
-        }, 50);
-      }
-    }, 300);
-  };
-
-  // Similarly update the closePromoteConfirm function
-  const closePromoteConfirm = () => {
-    setPromoteModalLeavingClass('leaving');
-    setTimeout(() => {
-      setIsPromoteConfirmOpen(false);
-      setPromoteModalLeavingClass('');
-      
-      // Add a small delay before reopening the user modal
-      if (selectedUser) {
-        setTimeout(() => {
-          setIsModalOpen(true);
-        }, 50);
-      }
-    }, 300);
-  };
-
   useEffect(() => {
     let timeout;
     if (isModalOpen || isDeleteConfirmOpen || isPromoteConfirmOpen) {
@@ -168,12 +182,6 @@ const Dashboard = () => {
     return () => clearTimeout(timeout);
   }, [isModalOpen, isDeleteConfirmOpen, isPromoteConfirmOpen]);
 
-  const stats = {
-    totalUsers: 150,
-    totalWorkouts: 45,
-    totalNotifications: 28
-  };
-
   const userActivityData = [
     { name: 'Mon', users: 20 },
     { name: 'Tue', users: 25 },
@@ -182,12 +190,6 @@ const Dashboard = () => {
     { name: 'Fri', users: 28 },
     { name: 'Sat', users: 35 },
     { name: 'Sun', users: 32 }
-  ];
-
-  const workoutDistributionData = [
-    { name: 'Weight Loss', value: 45 },
-    { name: 'Muscle Gain', value: 35 },
-    { name: 'Maintenance', value: 20 }
   ];
 
   const topWorkoutsData = [
@@ -212,46 +214,6 @@ const Dashboard = () => {
   };
 
   // Add new mock data for recent users
-  const recentUsers = [
-    {
-      id: 1,
-      firstName: 'John',
-      lastName: 'Doe',
-      email: 'john@example.com',
-      age: 28,
-      gender: 'Male',
-      height: 180,
-      weight: 75,
-      goal: 'Weight Loss',
-      joinDate: '2024-03-26',
-    },
-    {
-      id: 2,
-      firstName: 'Jane',
-      lastName: 'Smith',
-      email: 'jane@example.com',
-      age: 32,
-      gender: 'Female',
-      height: 165,
-      weight: 60,
-      goal: 'Muscle Gain',
-      joinDate: '2024-03-25',
-    },
-    {
-      id: 3,
-      firstName: 'Engjell',
-      lastName: 'Abazaj',
-      email: 'jane@example.com',
-      age: 20,
-      gender: 'Male',
-      height: 173,
-      weight: 100,
-      goal: 'Muscle Gain',
-      joinDate: '2024-03-26',
-    }
-    // Add more users as needed
-  ];
-
   const recentPremiumUsers = [
     {
       id: 1,
@@ -303,7 +265,6 @@ const Dashboard = () => {
   };
   
 
-
   return (
     <div className="admin-page">
       <div className="admin-page-header">
@@ -320,13 +281,13 @@ const Dashboard = () => {
         />
         <DashboardCard 
           title="Total Workouts"
-          value={stats.totalWorkouts}
+          value={totalWorkouts}
           icon={Dumbbell}
           description="All created workouts"
         />
         <DashboardCard 
           title="Total Notifications"
-          value={stats.totalNotifications}
+          value={totalNotifications}
           icon={Bell}
           description="All notifications sent"
         />
