@@ -31,6 +31,9 @@ router.get('/streak',  controller.getWorkoutStreak.bind(controller));
 router.get('/personal-bests',  controller.getPersonalBests.bind(controller));
 router.get('/exercises/:exerciseId/maxpr', authenticateJWT, controller.getMaxPrForExercise.bind(controller));
 
+router.get('/progress/weekly', authenticateJWT, controller.getWeeklyProgress.bind(controller));
+
+
 // Favorite Workout Routes
 router.post('/:workoutId/favorite', authenticateJWT, controller.toggleFavoriteWorkout.bind(controller));
 router.get('/favorites', authenticateJWT, controller.getFavoriteWorkouts.bind(controller));

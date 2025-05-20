@@ -1,5 +1,6 @@
 import { WorkoutModel } from './workoutModel';
 import { WorkoutRepository } from './workoutRepository';
+
 import { Exercise, Workout, WorkoutSession, SessionExercise } from '@prisma/client';
 import { WorkoutSessionModel } from "./sessionModel";
 
@@ -201,4 +202,62 @@ export class WorkoutService {
   async getMaxPrForExercise(userId: number, exerciseId: number): Promise<number> {
     return this.repository.getMaxPrForExercise(userId, exerciseId);
   }
+
+  async getWeeklyProgress(
+    userId: number,
+    // controller will pass in fromDate = today–6d
+    fromDate: Date
+  ) {
+    const sessions = await this.repository.getWeeklyProgressSessions(userId, fromDate);
+
+    // Build 7 empty buckets
+    const buckets = Array.from({ length: 7 }, (_, i) => {
+      const d = new Date(fromDate);
+      d.setDate(fromDate.getDate() + i);
+      const iso = d.toISOString().split('T')[0];
+      const dayName = new Intl.DateTimeFormat('en-US', { weekday: 'long' }).format(d);
+
+      return {
+        date: iso,
+        day: dayName,
+        totalWeight: 0,
+        // we'll accumulate into this Map, then flatten to array
+        exerciseTotals: new Map<number, number>(),
+      };
+    });
+
+    // Accumulate
+    for (const session of sessions) {
+      const sd = new Date(session.date);
+      sd.setHours(0, 0, 0, 0);
+      const iso = sd.toISOString().split('T')[0];
+      const bucket = buckets.find(b => b.date === iso);
+      if (!bucket) continue;
+
+      for (const ex of session.sessionExercises) {
+        const w = ex.weightUsed   ?? 0;
+        const r = ex.repsCompleted ?? 0;
+        const s = ex.setsCompleted ?? 0;
+        const lift = w * r * s;
+
+        // add to day total
+        bucket.totalWeight += lift;
+
+        // add to per-exercise total
+        const prev = bucket.exerciseTotals.get(ex.exerciseId) ?? 0;
+        bucket.exerciseTotals.set(ex.exerciseId, prev + lift);
+      }
+    }
+
+    // Transform Map → array
+    return buckets.map(b => ({
+      date: b.date,
+      day: b.day,
+      totalWeight: b.totalWeight,
+      exercises: Array.from(b.exerciseTotals.entries()).map(
+        ([exerciseId, totalWeight]) => ({ exerciseId, totalWeight })
+      ),
+    }));
+  }
+  
 }

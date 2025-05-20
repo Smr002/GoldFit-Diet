@@ -532,4 +532,18 @@ export class WorkoutRepository {
 
     return result._max.weightUsed ?? 0;
   }
+
+  async getWeeklyProgressSessions(userId: number, fromDate: Date) {
+    return this.prisma.workoutSession.findMany({
+      where: {
+        userId,
+        date: { gte: fromDate },
+      },
+      include: {
+        sessionExercises: true, // pulls in exerciseId, weightUsed, setsCompleted, repsCompleted
+      },
+    });
+  }
+  
+  
 }

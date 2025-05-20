@@ -305,5 +305,31 @@ export class WorkoutController {
       res.status(500).json({ error: 'Failed to get max PR for exercise' });
     }
   }
+
+  async getWeeklyProgress(req: AuthenticatedRequest, res: Response) {
+    try {
+      const userId = Number(req.user?.id);
+      if (!userId) return res.status(401).json({ error: 'Unauthorized' });
+  
+      // allow overriding window start for testing
+      const startQ = req.query.startDate as string | undefined;
+      const fromDate = startQ
+        ? new Date(startQ + 'T00:00:00')
+        : (() => {
+            const d = new Date();
+            d.setHours(0,0,0,0);
+            d.setDate(d.getDate() - 6);
+            return d;
+          })();
+  
+      const progress = await this.service.getWeeklyProgress(userId, fromDate);
+      return res.json(progress);
+    } catch (err) {
+      console.error(err);
+      return res.status(500).json({ error: 'Failed to get weekly progress' });
+    }
+  }
+
+
 }
 
