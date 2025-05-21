@@ -1,7 +1,7 @@
 "use client";
 import { useEffect, useState } from "react";
 import ExerciseDetailModal from "./ExerciseDetailModal";
-import { deleteWorkout } from "@/api";
+import { deleteWorkout, toggleFavoriteWorkout } from "@/api";
 import UpdateStatusModal from "./UpdateStatusModal";
 import { getUserIdFromToken } from "@/helper";
 
@@ -21,9 +21,28 @@ const WorkoutDetailModal = ({
   const [showExerciseDetail, setShowExerciseDetail] = useState(false);
   const [selectedExercise, setSelectedExercise] = useState(null);
   const [showConfirmDelete, setShowConfirmDelete] = useState(false);
-  const [isDeleting, setIsDeleting] = useState(false); // Track deletion state
-  const [error, setError] = useState(null); // Track deletion errors
+  const [isDeleting, setIsDeleting] = useState(false);
+  const [error, setError] = useState(null);
   const [isOwner, setIsOwner] = useState(true);
+  const [favorite, setFavorite] = useState(isFavorite); // local favorite state
+
+  useEffect(() => {
+    if (!token) {
+      setIsOwner(false);
+      return;
+    }
+
+    const loggedInUserId = getUserIdFromToken(token);
+    if (workout?.userId && loggedInUserId) {
+      setIsOwner(workout.userId === loggedInUserId);
+    } else {
+      setIsOwner(false);
+    }
+  }, [workout, token]);
+
+  useEffect(() => {
+    setFavorite(isFavorite);
+  }, [isFavorite]);
 
   const handleExerciseClick = (exerciseId) => {
     setSelectedExercise(exerciseId);
@@ -32,24 +51,8 @@ const WorkoutDetailModal = ({
 
   const handleDeleteWorkout = () => {
     setShowConfirmDelete(true);
-    setError(null); // Reset error state
+    setError(null);
   };
-
-  useEffect(() => {
-    // Use the passed token prop instead of an environment variable
-    if (!token) {
-      setIsOwner(false);
-      return;
-    }
-
-    const loggedInUserId = getUserIdFromToken(token);
-
-    if (workout?.userId && loggedInUserId) {
-      setIsOwner(workout.userId === loggedInUserId);
-    } else {
-      setIsOwner(false);
-    }
-  }, [workout, token]);
 
   const confirmDelete = async () => {
     if (!workout || !workout.id || !token) {
@@ -58,21 +61,43 @@ const WorkoutDetailModal = ({
       return;
     }
 
-    setIsDeleting(true); // Show loading state
+    setIsDeleting(true);
     try {
-      await deleteWorkout(workout.id, token); // Call API
-
+      await deleteWorkout(workout.id, token);
       if (typeof onDelete === "function") {
-        onDelete(workout.id); // Notify parent
+        onDelete(workout.id);
       }
-
-      setShowConfirmDelete(false); // Close confirm modal
-      onClose(); // Close detail modal
+      setShowConfirmDelete(false);
+      onClose();
     } catch (err) {
       console.error("Failed to delete workout:", err);
       setError("Failed to delete workout. Please try again.");
     } finally {
-      setIsDeleting(false); // Reset state
+      setIsDeleting(false);
+    }
+  };
+
+  const handleToggleFavorite = async () => {
+    if (!token || !workout?.id) {
+      setError("Missing token or workout ID.");
+      return;
+    }
+
+    const userId = getUserIdFromToken(token);
+    if (!userId) {
+      setError("Invalid user token.");
+      return;
+    }
+
+    try {
+      const response = await toggleFavoriteWorkout(userId, workout.id, token);
+      setFavorite(response.isFavorite);
+      if (typeof onToggleFavorite === "function") {
+        onToggleFavorite(response.isFavorite);
+      }
+    } catch (err) {
+      console.error("Failed to toggle favorite:", err);
+      setError("Failed to update favorite status.");
     }
   };
 
@@ -156,15 +181,15 @@ const WorkoutDetailModal = ({
 
           <div className="workout-modal-actions">
             <button
-              className={`modal-action-button ${isFavorite ? "active" : ""}`}
-              onClick={onToggleFavorite}
+              className={`modal-action-button ${favorite ? "active" : ""}`}
+              onClick={handleToggleFavorite}
             >
               <svg
                 xmlns="http://www.w3.org/2000/svg"
                 width="16"
                 height="16"
                 viewBox="0 0 24 24"
-                fill={isFavorite ? "currentColor" : "none"}
+                fill={favorite ? "currentColor" : "none"}
                 stroke="currentColor"
                 strokeWidth="2"
                 strokeLinecap="round"
@@ -174,8 +199,7 @@ const WorkoutDetailModal = ({
               </svg>
               Favorite
             </button>
-
-          </div>   
+          </div>
         </div>
 
         <div className="workout-modal-content">
@@ -183,15 +207,11 @@ const WorkoutDetailModal = ({
             <div className="workout-modal-badges">
               <span
                 className="difficulty-badge large"
-                style={{
-                  backgroundColor: getDifficultyColor(workout.difficulty),
-                }}
+                style={{ backgroundColor: getDifficultyColor(workout.difficulty) }}
               >
                 {workout.difficulty}
               </span>
-              <span className="duration-badge large">
-                {workout.duration} min
-              </span>
+              <span className="duration-badge large">{workout.duration} min</span>
               <span className="goal-badge large">{workout.goal}</span>
             </div>
 
@@ -199,9 +219,7 @@ const WorkoutDetailModal = ({
               <h3>Workout Information</h3>
               <div className="workout-detail-item">
                 <span className="detail-label">Created</span>
-                <span className="detail-value">
-                  {formatDate(workout.createdAt)}
-                </span>
+                <span className="detail-value">{formatDate(workout.createdAt)}</span>
               </div>
               <div className="workout-detail-item">
                 <span className="detail-label">Target</span>
@@ -266,8 +284,6 @@ const WorkoutDetailModal = ({
         )}
 
         <div className="workout-modal-footer">
-     
-
           <button className="modal-log-button" onClick={onLog}>
             <svg
               xmlns="http://www.w3.org/2000/svg"

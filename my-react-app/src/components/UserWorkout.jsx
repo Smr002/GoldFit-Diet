@@ -20,6 +20,7 @@ import {
   updateWorkout,
   deleteWorkout,
   getUserIdFromToken,
+  getFavoriteWorkouts
 } from "../api";
 import legs from "../assets/legday.jpg";
 import MobileFooter from "./MobileFooter";
@@ -30,7 +31,11 @@ const UserWorkout = () => {
   const [workouts, setWorkouts] = useState([]);
   const [recommendedWorkouts, setRecommendedWorkouts] = useState([]);
   const [userWorkouts, setUserWorkouts] = useState([]);
-  const [favorites, setFavorites] = useState([]);
+  const [favorites, setFavorites] = useState(() => {
+    // Load favorites from localStorage if available
+    const stored = localStorage.getItem("favorites");
+    return stored ? JSON.parse(stored) : [];
+  });
   const [workoutLogs, setWorkoutLogs] = useState([]);
   const [selectedWorkout, setSelectedWorkout] = useState(null);
   const [showCreateModal, setShowCreateModal] = useState(false);
@@ -206,7 +211,6 @@ const UserWorkout = () => {
         setRecommendedWorkouts(transformed.filter((w) => w.isRecommended));
         setUserWorkouts(transformed.filter((w) => !w.isRecommended));
         setWorkouts(transformed);
-        setFavorites([]);
       } catch (error) {
         console.error("Error fetching workouts:", error);
         if (error.message.includes("401") || error.message.includes("403")) {
@@ -230,6 +234,11 @@ const UserWorkout = () => {
     };
     fetchWorkouts();
   }, [token, navigate]);
+
+  // Save favorites to localStorage whenever it changes
+  useEffect(() => {
+    localStorage.setItem("favorites", JSON.stringify(favorites));
+  }, [favorites]);
 
   // Handle storage changes
   useEffect(() => {
