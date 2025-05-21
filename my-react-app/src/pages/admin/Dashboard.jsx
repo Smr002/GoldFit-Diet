@@ -180,20 +180,39 @@ const Dashboard = () => {
     }, 300);
   };
 
-  const handleDeleteConfirm = () => {
+  const handleDeleteConfirm = async () => {
     setDeleteModalLeavingClass('leaving');
-    setTimeout(() => {
+    setTimeout(async () => {
       setIsDeleteConfirmOpen(false);
       setDeleteModalLeavingClass('');
+      if (selectedUser) {
+        try {
+          await import('../../api').then(api => api.deleteUser(selectedUser.id, token));
+          alert(`${selectedUser.firstName} ${selectedUser.lastName} has been deleted.`);
+          // Remove user from UI lists
+          setRecentUsers(prev => prev.filter(u => u.id !== selectedUser.id));
+          setRecentPremiumUsers(prev => prev.filter(u => u.id !== selectedUser.id));
+        } catch (error) {
+          alert('Failed to delete user: ' + (error.message || error));
+        }
+      }
       setSelectedUser(null);
     }, 300);
   };
 
-  const handlePromoteConfirm = () => {
+  const handlePromoteConfirm = async () => {
     setPromoteModalLeavingClass('leaving');
-    setTimeout(() => {
+    setTimeout(async () => {
       setIsPromoteConfirmOpen(false);
       setPromoteModalLeavingClass('');
+      if (selectedUser) {
+        try {
+          await import('../../api').then(api => api.promoteUser(selectedUser.id, token));
+          alert(`${selectedUser.firstName} ${selectedUser.lastName} has been promoted to admin.`);
+        } catch (error) {
+          alert('Failed to promote user: ' + (error.message || error));
+        }
+      }
       setSelectedUser(null);
     }, 300);
   };
