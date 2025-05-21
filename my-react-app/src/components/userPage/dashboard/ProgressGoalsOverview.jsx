@@ -189,7 +189,7 @@ export default function ProgressGoalsOverview() {
         </Box>
       </Box>
 
-      {/* Export Button */}
+      {/* Export Buutton */}
       <Button
         variant="outlined"
         startIcon={<FileDown size={18} />}
@@ -212,7 +212,11 @@ export default function ProgressGoalsOverview() {
         Export Progress Report
       </Button>
 
-      <ExportPDFModal open={exportModalOpen} onClose={handleCloseExportModal} />
+      <ExportPDFModal 
+        open={exportModalOpen} 
+        onClose={handleCloseExportModal} 
+        token={localStorage.getItem('token')} 
+      />
     </Paper>
   );
 }
