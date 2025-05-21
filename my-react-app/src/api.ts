@@ -635,7 +635,7 @@ export async function getPersonalBests(token: string): Promise<
 > {
   try {
     const response = await axios.get(
-      `${API_BASE_URL}/workouts/progress/personal-bests`,
+      `${API_BASE_URL}/workouts/personal-bests`,
       { headers: { Authorization: `Bearer ${token}` } }
     );
     return response.data;
