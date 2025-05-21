@@ -1,5 +1,6 @@
 import { WorkoutModel } from './workoutModel';
 import { WorkoutRepository } from './workoutRepository';
+
 import { Exercise, Workout, WorkoutSession, SessionExercise } from '@prisma/client';
 import { WorkoutSessionModel } from "./sessionModel";
 
@@ -202,6 +203,98 @@ export class WorkoutService {
   async getMaxPrForExercise(userId: number, exerciseId: number): Promise<number> {
     return this.repository.getMaxPrForExercise(userId, exerciseId);
   }
+
+  async getWeeklyProgress(
+    userId: number,
+    fromDate: Date
+  ) {
+    const sessions = await this.repository.getWeeklyProgressSessions(userId, fromDate);
+
+    const buckets = Array.from({ length: 7 }, (_, i) => {
+      const d = new Date(fromDate);
+      d.setDate(fromDate.getDate() + i);
+      const iso = d.toISOString().split('T')[0];
+      const dayName = new Intl.DateTimeFormat('en-US', { weekday: 'long' }).format(d);
+
+      return {
+        date: iso,
+        day: dayName,
+        totalWeight: 0,
+        exerciseTotals: new Map<number, number>(),
+      };
+    });
+
+    for (const session of sessions) {
+      const sd = new Date(session.date);
+      sd.setHours(0, 0, 0, 0);
+      const iso = sd.toISOString().split('T')[0];
+      const bucket = buckets.find(b => b.date === iso);
+      if (!bucket) continue;
+
+      for (const ex of session.sessionExercises) {
+        const w = ex.weightUsed   ?? 0;
+        const r = ex.repsCompleted ?? 0;
+        const s = ex.setsCompleted ?? 0;
+        const lift = w * r * s;
+
+        bucket.totalWeight += lift;
+
+        const prev = bucket.exerciseTotals.get(ex.exerciseId) ?? 0;
+        bucket.exerciseTotals.set(ex.exerciseId, prev + lift);
+      }
+    }
+
+    return buckets.map(b => ({
+      date: b.date,
+      day: b.day,
+      totalWeight: b.totalWeight,
+      exercises: Array.from(b.exerciseTotals.entries()).map(
+        ([exerciseId, totalWeight]) => ({ exerciseId, totalWeight })
+      ),
+    }));
+  }
+  
+  async getRecentExercises(userId: number, limit = 3): Promise<{
+    exerciseId: number;
+    name: string;
+    currentWeight: number | null;
+    previousWeight: number | null;
+  }[]> {
+    const allLogs = await this.repository.getAllSessionExercises(userId);
+
+    const seen = new Set<number>();
+    const recent: { exerciseId: number; name: string }[] = [];
+    for (const log of allLogs) {
+      if (!seen.has(log.exerciseId)) {
+        seen.add(log.exerciseId);
+        recent.push({ exerciseId: log.exerciseId, name: log.exercise.name });
+        if (recent.length >= limit) break;
+      }
+    }
+
+    const result: { 
+      exerciseId: number; 
+      name: string; 
+      currentWeight: number | null; 
+      previousWeight: number | null; 
+    }[] = [];
+    for (const { exerciseId, name } of recent) {
+      const history: (SessionExercise & { session: { date: Date } })[] =
+        await this.repository.getSessionExercisesByExercise(userId, exerciseId, 2);
+
+      result.push({
+        exerciseId,
+        name,
+        currentWeight: history[0]?.weightUsed  ?? null,
+        previousWeight: history[1]?.weightUsed ?? null,
+      });
+    }
+
+    return result;
+  }
+}
+
+
 
   async getTotalWorkoutCountInDatabase(): Promise<number> {
     return this.repository.getWorkoutCount();

@@ -338,43 +338,64 @@ export class WorkoutRepository {
     const sessions = await this.prisma.workoutSession.findMany({
       where: { userId },
       orderBy: { date: 'desc' },
+      select: { date: true },
     });
-
+  
+    // extract just the dates (midnight)
+    const dates = sessions.map(s => {
+      const d = new Date(s.date);
+      d.setHours(0,0,0,0);
+      return d.getTime();
+    });
+  
     let streak = 0;
-    let currentDate = new Date();
-    currentDate.setHours(0, 0, 0, 0);
-
-    for (const session of sessions) {
-      const sessionDate = new Date(session.date);
-      sessionDate.setHours(0, 0, 0, 0);
-
-      if (currentDate.getTime() - sessionDate.getTime() === 0) {
+    let expected = new Date();
+    expected.setHours(0,0,0,0);
+  
+    let restUsed = false;
+  
+    for (const ts of dates) {
+      const diffDays = (expected.getTime() - ts) / (1000*60*60*24);
+  
+      if (diffDays === 0) {
+        // worked out today
         streak++;
-        currentDate.setDate(currentDate.getDate() - 1);
+        expected.setDate(expected.getDate() - 1);
+  
+      } else if (diffDays === 1 && !restUsed) {
+        // one rest day allowed
+        restUsed = true;
+        // _do_ count this workout as continuation
+        streak++;
+        // move expected to day before this workout
+        expected = new Date(ts);
+        expected.setDate(expected.getDate() - 1);
+  
       } else {
         break;
       }
     }
-
+  
     return streak;
   }
 
-  async getPersonalBests(userId: number): Promise<{ exerciseId: number; maxWeight: number }[]> {
-    const results = await this.prisma.sessionExercise.groupBy({
+  async getPersonalBests(userId: number): Promise<{ exerciseId: number; name: string; maxWeight: number }[]> {
+    const agg = await this.prisma.sessionExercise.groupBy({
       by: ['exerciseId'],
-      where: {
-        session: {
-          userId,
-        },
-      },
-      _max: {
-        weightUsed: true,
-      },
+      where: { session: { userId } },
+      _max: { weightUsed: true },
     });
 
-    return results.map(result => ({
-      exerciseId: result.exerciseId,
-      maxWeight: result._max.weightUsed || 0,
+    const ids = agg.map(r => r.exerciseId);
+    const exercises = await this.prisma.exercise.findMany({
+      where: { id: { in: ids } },
+      select: { id: true, name: true },
+    });
+
+    return agg.map(r => ({
+      exerciseId: r.exerciseId,
+      name: exercises.find(e => e.id === r.exerciseId)?.name ?? 'Unknown',
+      maxWeight: r._max.weightUsed ?? 0,
     }));
   }
 
@@ -537,5 +558,53 @@ export class WorkoutRepository {
     });
 
     return result._max.weightUsed ?? 0;
+  }
+
+  async getWeeklyProgressSessions(userId: number, fromDate: Date) {
+    return this.prisma.workoutSession.findMany({
+      where: {
+        userId,
+        date: { gte: fromDate },
+      },
+      include: {
+        sessionExercises: true, // pulls in exerciseId, weightUsed, setsCompleted, repsCompleted
+      },
+    });
+  }
+  
+  async getAllSessionExercises(userId: number): Promise<
+    (SessionExercise & { session: { date: Date }; exercise: { name: string } })[]
+  > {
+    return this.prisma.sessionExercise.findMany({
+      where: { session: { userId } },
+      include: {
+        session: { select: { date: true } },
+        exercise: { select: { name: true } },
+      },
+      orderBy: {
+        session: { date: 'desc' },
+      },
+    });
+  }
+
+  
+  async getSessionExercisesByExercise(
+    userId: number,
+    exerciseId: number,
+    limit: number
+  ): Promise<(SessionExercise & { session: { date: Date } })[]> {
+    return this.prisma.sessionExercise.findMany({
+      where: {
+        exerciseId,
+        session: { userId },
+      },
+      include: {
+        session: { select: { date: true } },
+      },
+      orderBy: {
+        session: { date: 'desc' },
+      },
+      take: limit,
+    });
   }
 }

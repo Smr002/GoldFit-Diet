@@ -122,22 +122,20 @@ export class WorkoutController {
     }
   }
 
-  async getUserBadge(req: Request, res: Response) {
+  async getUserBadge(req: AuthenticatedRequest, res: Response) {
     try {
-      // Get userId from URL parameter instead of auth token
-      const userId = Number(req.params.userId);
-      
+      const userId = Number(req.user?.id);
       if (isNaN(userId)) {
         return res.status(400).json({ error: 'Invalid user ID' });
       }
-      
+  
       const badges = await this.service.getUserBadge(userId);
-      res.json(badges);
+      return res.json(badges);
     } catch (error) {
-      console.error("Error getting user badges:", error);
-      res.status(500).json({ error: 'Failed to get user badges' });
+      console.error('Error getting user badges:', error);
+      return res.status(500).json({ error: 'Failed to get user badges' });
     }
-  }  
+  }
 
   async getSessionById(req: AuthenticatedRequest, res: Response) {
     try {
@@ -226,13 +224,9 @@ export class WorkoutController {
   }
 
   async getWorkoutStreak(req: AuthenticatedRequest, res: Response) {
-    try {
-      const userId = Number(req.user?.id);
-      const streak = await this.service.getWorkoutStreak(userId);
-      res.json({ streak });
-    } catch (error) {
-      res.status(500).json({ error: 'Failed to get workout streak' });
-    }
+    const userId = Number(req.user?.id);
+    const streak = await this.service.getWorkoutStreak(userId);
+    res.json({ streak });
   }
 
   async getPersonalBests(req: AuthenticatedRequest, res: Response) {
@@ -315,5 +309,42 @@ export class WorkoutController {
       res.status(500).json({ error: 'Failed to get max PR for exercise' });
     }
   }
+
+  async getWeeklyProgress(req: AuthenticatedRequest, res: Response) {
+    try {
+      const userId = Number(req.user?.id);
+      if (!userId) return res.status(401).json({ error: 'Unauthorized' });
+  
+      // allow overriding window start for testing
+      const startQ = req.query.startDate as string | undefined;
+      const fromDate = startQ
+        ? new Date(startQ + 'T00:00:00')
+        : (() => {
+            const d = new Date();
+            d.setHours(0,0,0,0);
+            d.setDate(d.getDate() - 6);
+            return d;
+          })();
+  
+      const progress = await this.service.getWeeklyProgress(userId, fromDate);
+      return res.json(progress);
+    } catch (err) {
+      console.error(err);
+      return res.status(500).json({ error: 'Failed to get weekly progress' });
+    }
+  }
+  async getRecentExercises(req: AuthenticatedRequest, res: Response) {
+    try {
+      const userId = Number(req.user?.id);
+      if (!userId) return res.status(401).json({ error: 'Unauthorized' });
+  
+      const data = await this.service.getRecentExercises(userId, 3);
+      return res.json(data);
+    } catch (error) {
+      console.error('Error fetching recent exercises:', error);
+      return res.status(500).json({ error: 'Failed to fetch recent exercises' });
+    }
+  }
+
 }
 
