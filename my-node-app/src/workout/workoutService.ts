@@ -253,6 +253,12 @@ export class WorkoutService {
       ),
     }));
   }
+
+  
+async getTotalWorkoutCount(): Promise<number> {
+  const workouts = await this.repository.getAllWorkouts();
+  return workouts.length;
+}
   
   async getRecentExercises(userId: number, limit = 3): Promise<{
     exerciseId: number;
@@ -271,6 +277,8 @@ export class WorkoutService {
         if (recent.length >= limit) break;
       }
     }
+
+    
 
     const result: { 
       exerciseId: number; 
@@ -293,7 +301,5 @@ export class WorkoutService {
     return result;
   }
 }
-
-
 
  
