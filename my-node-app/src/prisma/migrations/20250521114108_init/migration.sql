@@ -16,6 +16,7 @@ CREATE TABLE "users" (
     "height" DOUBLE PRECISION NOT NULL,
     "weight" DOUBLE PRECISION NOT NULL,
     "goal" "Goal" NOT NULL,
+    "nutritionGoal" INTEGER,
     "active_workout_id" INTEGER,
     "notify_workout_sessions" BOOLEAN NOT NULL DEFAULT false,
     "notify_motivational" BOOLEAN NOT NULL DEFAULT false,
@@ -109,6 +110,7 @@ CREATE TABLE "session_exercises" (
     "weight_used" DOUBLE PRECISION,
     "sets_completed" INTEGER,
     "reps_completed" INTEGER,
+    "max_pr" INTEGER,
     "created_at" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
 
     CONSTRAINT "session_exercises_pkey" PRIMARY KEY ("session_exercise_id")
@@ -126,6 +128,7 @@ CREATE TABLE "nutrition_logs" (
     "fats" DOUBLE PRECISION,
     "hydration" DOUBLE PRECISION NOT NULL,
     "created_at" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    "name" TEXT,
 
     CONSTRAINT "nutrition_logs_pkey" PRIMARY KEY ("log_id")
 );

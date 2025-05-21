@@ -59,7 +59,12 @@ async create(data: Omit<User, "id">): Promise<User> {
 
   if (weight && height && age && gender) {
    
-    const userAge = age === 3039 ? 35 : age;
+    const userAge =
+  age === 3039 ? 35 :
+  age === 1829 ? 25 :
+  age === 4049 ? 45 :
+  age;
+
 
   
     let bmr: number;
@@ -73,11 +78,13 @@ async create(data: Omit<User, "id">): Promise<User> {
 
     const activityFactor = 1.55;
     const tdee = bmr * activityFactor;
+  
 
 
     switch (goal) {
       case Goal.MUSCLE_GAIN:
         nutritionGoal = Math.round(tdee + 350); 
+
         break;
       case Goal.WEIGHT_LOSS:
         nutritionGoal = Math.round(tdee - 500); 
