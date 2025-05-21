@@ -207,11 +207,15 @@ const WorkoutDetailModal = ({
             <div className="workout-modal-badges">
               <span
                 className="difficulty-badge large"
-                style={{ backgroundColor: getDifficultyColor(workout.difficulty) }}
+                style={{
+                  backgroundColor: getDifficultyColor(workout.difficulty),
+                }}
               >
                 {workout.difficulty}
               </span>
-              <span className="duration-badge large">{workout.duration} min</span>
+              <span className="duration-badge large">
+                {workout.duration} min
+              </span>
               <span className="goal-badge large">{workout.goal}</span>
             </div>
 
@@ -219,7 +223,9 @@ const WorkoutDetailModal = ({
               <h3>Workout Information</h3>
               <div className="workout-detail-item">
                 <span className="detail-label">Created</span>
-                <span className="detail-value">{formatDate(workout.createdAt)}</span>
+                <span className="detail-value">
+                  {formatDate(workout.createdAt)}
+                </span>
               </div>
               <div className="workout-detail-item">
                 <span className="detail-label">Target</span>

@@ -3,6 +3,44 @@ import { CreateUserDto, LoginDto, AuthResponse } from "./types/user";
 
 const API_BASE_URL = "http://localhost:3000";
 
+export async function toggleFavoriteWorkout(userId: number, workoutId: number, token: string): Promise<{ isFavorite: boolean }> {
+  try {
+    const response = await axios.post(
+      `${API_BASE_URL}/workouts/${workoutId}/favorite`,
+      { userId, workoutId },
+      {
+        headers: {
+          Authorization: `Bearer ${token}`,
+          "Content-Type": "application/json",
+        },
+      }
+    );
+    return response.data;
+  } catch (error: any) {
+    if (axios.isAxiosError(error)) {
+      console.error("Toggle favorite workout error:", error.response?.data);
+      throw new Error(error.response?.data?.error || "Failed to toggle favorite workout");
+    }
+    throw new Error("Unexpected error");
+  }
+}
+
+export async function getFavoriteWorkouts(userId: number, token: string) {
+  try {
+    const response = await axios.get(`${API_BASE_URL}/workouts/favorites/${userId}`, {
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    });
+    return response.data;
+  } catch (error: any) {
+    if (axios.isAxiosError(error)) {
+      console.error("Get favorite workouts error:", error.response?.data);
+      throw new Error(error.response?.data?.error || "Failed to fetch favorite workouts");
+    }
+    throw new Error("Unexpected error");
+  }
+}
 export async function createUser(user: CreateUserDto) {
   try {
     const response = await axios.post(`${API_BASE_URL}/users/`, user);
@@ -662,4 +700,7 @@ export async function getWeeklyProgress(token: string): Promise<
     }
     throw new Error("Unexpected error");
   }
+  
 }
+
+
