@@ -296,7 +296,4 @@ export class WorkoutService {
 
 
 
-  async getTotalWorkoutCountInDatabase(): Promise<number> {
-    return this.repository.getWorkoutCount();
-  }
-}
+ 
