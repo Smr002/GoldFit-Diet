@@ -32,6 +32,7 @@ const Dashboard = () => {
   const [totalWorkouts, setTotalWorkoutCount] = useState(0);
   const [totalNotifications, setTotalNotifications] = useState(0);
   const [recentUsers, setRecentUsers] = useState([]);
+  const [recentPremiumUsers, setRecentPremiumUsers] = useState([]);
 
   useEffect(() => {
     const getTotalUsers = async () => {
@@ -104,7 +105,33 @@ const Dashboard = () => {
     };
     fetchRecentUsers();
   }, [token]);
-  
+
+  useEffect(() => {
+    const fetchRecentPremiumUsers = async () => {
+      try {
+        if (token) {
+          const response = await fetch('http://localhost:3000/users', {
+            headers: { Authorization: `Bearer ${token}` },
+          });
+          if (!response.ok) throw new Error('Failed to fetch users');
+          const users = await response.json();
+          // Filter for premium users, sort by joinDate/createdAt, and take top 3
+          const premiumUsers = users.filter(u => u.isPremium);
+          const sorted = premiumUsers.sort((a, b) => {
+            const dateA = new Date(a.joinDate || a.createdAt || 0);
+            const dateB = new Date(b.joinDate || b.createdAt || 0);
+            return dateB - dateA;
+          });
+          setRecentPremiumUsers(sorted.slice(0, 3));
+        }
+      } catch (error) {
+        setRecentPremiumUsers([]);
+        console.error('Failed to fetch recent premium users:', error);
+      }
+    };
+    fetchRecentPremiumUsers();
+  }, [token]);
+
   const openModal = (user) => {
     setSelectedUser(user);
     setIsModalOpen(true);
@@ -215,7 +242,7 @@ const Dashboard = () => {
   };
 
   // Add new mock data for recent users
-  const recentPremiumUsers = [
+  const recentPremiumUsersMock = [
     {
       id: 1,
       firstName: 'Alex',
@@ -353,7 +380,7 @@ const Dashboard = () => {
                   <h3 className="user-name">{user.firstName} {user.lastName}</h3>
                   <p className="user-email">{user.email}</p>
                 </div>
-                <span className="user-date">{user.joinDate}</span>
+                <span className="user-date">{user.joinDate || user.createdAt}</span>
               </div>
             ))}
           </div>
