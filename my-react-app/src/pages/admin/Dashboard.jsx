@@ -53,6 +53,7 @@ const Dashboard = () => {
       try {
         if (token) {
           const count = await getWorkoutCount(token);
+          console.log('Total Workouts:', count);
           setTotalWorkoutCount(count);
         }
       } catch (error) {
