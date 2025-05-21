@@ -14,10 +14,11 @@ import {
 } from '@mui/material';
 import InfoOutlinedIcon from '@mui/icons-material/InfoOutlined';
 import WeeklyCalorieChart from './WeeklyCalorieChart';
-import { getNutritionLog, getUserIdFromToken } from '@/api';
+import { getNutritionLog, getUserIdFromToken, getUserByEmail } from '@/api';
 import { format } from 'date-fns';
+import { jwtDecode } from 'jwt-decode';
 
-const CalorieTracker = ({ calorieTarget, onDaySelect, refreshTrigger }) => {
+const CalorieTracker = ({ onDaySelect, refreshTrigger }) => {
   const theme = useTheme();
   
   // State for data and loading
@@ -26,6 +27,7 @@ const CalorieTracker = ({ calorieTarget, onDaySelect, refreshTrigger }) => {
   const [caloriesConsumed, setCaloriesConsumed] = useState(0);
   const [weeklyData, setWeeklyData] = useState([]);
   const [selectedDate, setSelectedDate] = useState(null);
+  const [calorieTarget, setCalorieTarget] = useState(2800); // Default value matching DailySummaryWidget
   
   // Animation states
   const [animateProgress, setAnimateProgress] = useState(0);
@@ -62,9 +64,9 @@ const CalorieTracker = ({ calorieTarget, onDaySelect, refreshTrigger }) => {
     }
   };
 
-  // Fetch nutrition data
+  // Fetch nutrition data and user's calorie goal
   useEffect(() => {
-    const fetchNutritionData = async () => {
+    const fetchData = async () => {
       try {
         setLoading(true);
         setError(null);
@@ -79,6 +81,14 @@ const CalorieTracker = ({ calorieTarget, onDaySelect, refreshTrigger }) => {
         const userId = getUserIdFromToken(token);
         if (!userId) {
           throw new Error('No user ID found in token');
+        }
+
+        // Fetch user's calorie goal
+        const decoded = jwtDecode(token);
+        const email = decoded.email;
+        const user = await getUserByEmail(email, token);
+        if (user?.nutritionGoal) {
+          setCalorieTarget(user.nutritionGoal);
         }
 
         // Get today's date
@@ -123,7 +133,7 @@ const CalorieTracker = ({ calorieTarget, onDaySelect, refreshTrigger }) => {
       }
     };
 
-    fetchNutritionData();
+    fetchData();
   }, [refreshTrigger]); // Add refreshTrigger to dependency array
 
   // Animation effect for progress bar
