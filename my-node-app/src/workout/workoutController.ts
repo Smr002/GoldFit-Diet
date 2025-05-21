@@ -178,9 +178,10 @@ export class WorkoutController {
 
   async getTotalWorkoutCount(req: Request, res: Response) {
     try {
-      const count = await this.service.getTotalWorkoutCountInDatabase();
+      const count = await this.service.getTotalWorkoutCount();
       res.json({ totalWorkouts: count });
     } catch (err) {
+      console.log('Error in getTotalWorkoutCount:', err); // Log the real error
       console.error('Error in getTotalWorkoutCount:', err); // Log the real error
       res.status(500).json({ error: "Failed to fetch workout count." });
     }
@@ -345,6 +346,7 @@ export class WorkoutController {
       return res.status(500).json({ error: 'Failed to fetch recent exercises' });
     }
   }
+
 
 }
 

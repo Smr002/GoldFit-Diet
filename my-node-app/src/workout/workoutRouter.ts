@@ -4,6 +4,7 @@ import { authenticateJWT } from '../auth/JWT/authMiddleware';
 
 const router = Router();
 const controller = new WorkoutController();
+router.get('/count', authenticateJWT, controller.getTotalWorkoutCount.bind(controller));
 router.get('/personal-bests',authenticateJWT,controller.getPersonalBests.bind(controller));
 
 router.get('/streak',authenticateJWT,controller.getWorkoutStreak.bind(controller));
@@ -38,5 +39,5 @@ router.get('/progress/recent-exercises',authenticateJWT,controller.getRecentExer
 // Favorite Workout Routes
 router.post('/:workoutId/favorite', authenticateJWT, controller.toggleFavoriteWorkout.bind(controller));
 router.get('/favorites', authenticateJWT, controller.getFavoriteWorkouts.bind(controller));
-router.get('/count', authenticateJWT, controller.getTotalWorkoutCount.bind(controller));
+
 export default router;
