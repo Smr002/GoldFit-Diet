@@ -210,16 +210,6 @@ const Dashboard = () => {
     return () => clearTimeout(timeout);
   }, [isModalOpen, isDeleteConfirmOpen, isPromoteConfirmOpen]);
 
-  const userActivityData = [
-    { name: 'Mon', users: 20 },
-    { name: 'Tue', users: 25 },
-    { name: 'Wed', users: 30 },
-    { name: 'Thu', users: 22 },
-    { name: 'Fri', users: 28 },
-    { name: 'Sat', users: 35 },
-    { name: 'Sun', users: 32 }
-  ];
-
   const topWorkoutsData = [
     { name: 'Full Body Workout', value: 35 },
     { name: 'Upper Body Focus', value: 25 },
@@ -241,45 +231,6 @@ const Dashboard = () => {
     return null;
   };
 
-  // Add new mock data for recent users
-  const recentPremiumUsersMock = [
-    {
-      id: 1,
-      firstName: 'Alex',
-      lastName: 'Wilson',
-      email: 'alex@example.com',
-      age: 30,
-      gender: 'Male',
-      height: 175,
-      weight: 70,
-      goal: 'Muscle Gain',
-      joinDate: '2024-03-26',
-      isPremium: true
-    },
-    { id: 1,
-      firstName: 'Alex',
-      lastName: 'Wilson',
-      email: 'alex@example.com',
-      age: 30,
-      gender: 'Male',
-      height: 175,
-      weight: 70,
-      goal: 'Muscle Gain',
-      joinDate: '2024-03-26',
-      isPremium: true },
-    { id: 1,
-      firstName: 'Alex',
-      lastName: 'Wilson',
-      email: 'alex@example.com',
-      age: 30,
-      gender: 'Male',
-      height: 175,
-      weight: 70,
-      goal: 'Muscle Gain',
-      joinDate: '2024-03-26',
-      isPremium: true }
-  ];
-
   // Add this function to your component
   const closeModalWithAnimation = (setModalState) => {
     // First add the leaving class
@@ -292,6 +243,51 @@ const Dashboard = () => {
     }, 300); // Match this with your animation duration
   };
   
+  // Calculate monthly user registration data for the chart
+  const monthlyUserActivityData = React.useMemo(() => {
+    if (!recentUsers || recentUsers.length === 0) return [];
+    // We'll use all users, not just recent, for a real chart
+    // Fetch all users for the chart
+    let allUsers = [];
+    try {
+      allUsers = JSON.parse(localStorage.getItem('allUsersForChart') || '[]');
+    } catch {}
+    // Fallback: use recentUsers if allUsers not available
+    const users = allUsers.length > 0 ? allUsers : recentUsers;
+    const counts = {};
+    users.forEach(user => {
+      const date = new Date(user.joinDate || user.createdAt);
+      if (isNaN(date)) return;
+      const month = date.toLocaleString('default', { month: 'short', year: 'numeric' });
+      counts[month] = (counts[month] || 0) + 1;
+    });
+    // Sort months chronologically
+    const sortedMonths = Object.keys(counts).sort((a, b) => {
+      const [ma, ya] = a.split(' ');
+      const [mb, yb] = b.split(' ');
+      const da = new Date(`${ma} 1, ${ya}`);
+      const db = new Date(`${mb} 1, ${yb}`);
+      return da - db;
+    });
+    return sortedMonths.map(month => ({ name: month, users: counts[month] }));
+  }, [recentUsers]);
+
+  // Fetch all users for the chart (once)
+  useEffect(() => {
+    const fetchAllUsersForChart = async () => {
+      try {
+        if (token) {
+          const response = await fetch('http://localhost:3000/users', {
+            headers: { Authorization: `Bearer ${token}` },
+          });
+          if (!response.ok) throw new Error('Failed to fetch users');
+          const users = await response.json();
+          localStorage.setItem('allUsersForChart', JSON.stringify(users));
+        }
+      } catch {}
+    };
+    fetchAllUsersForChart();
+  }, [token]);
 
   return (
     <div className="admin-page">
@@ -323,18 +319,17 @@ const Dashboard = () => {
 
       <div className="dashboard-charts">
         <div className="chart-container">
-          <h2 className="chart-title">Weekly User Activity</h2>
+          <h2 className="chart-title">Monthly User Registrations</h2>
           <ResponsiveContainer width="100%" height={300}>
-            <LineChart data={userActivityData}>
+            <LineChart data={monthlyUserActivityData}>
               <CartesianGrid strokeDasharray="3 3" />
               <XAxis dataKey="name" />
-              <YAxis />
+              <YAxis allowDecimals={false} />
               <Tooltip />
               <Line type="monotone" dataKey="users" stroke="#4f46e5" strokeWidth={2} />
             </LineChart>
           </ResponsiveContainer>
         </div>
-
         <div className="chart-container">
           <h2 className="chart-title">Most Popular Workouts</h2>
           <ResponsiveContainer width="100%" height={300}>
