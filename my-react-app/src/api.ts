@@ -72,7 +72,7 @@ export async function getUserByEmail(email: string, token: string) {
   }
 }
 
-export async function getAdminById(id: number,token: string) {  
+export async function getAdminById(id: number, token: string) {
   try {
     const response = await axios.get(`${API_BASE_URL}/users/admin/${id}`, {
       headers: { Authorization: `Bearer ${token}` },
@@ -607,6 +607,58 @@ export async function getWorkoutStreak(token: string): Promise<{ streak: number 
   } catch (error: any) {
     if (axios.isAxiosError(error)) {
       throw new Error(error.response?.data?.error || "Failed to fetch streak");
+    }
+    throw new Error("Unexpected error");
+  }
+}
+
+
+export async function getRecentExercises(token: string): Promise<
+  { exerciseId: number; name: string; currentWeight: number; previousWeight: number }[]
+> {
+  try {
+    const response = await axios.get(
+      `${API_BASE_URL}/workouts/progress/recent-exercises`,
+      { headers: { Authorization: `Bearer ${token}` } }
+    );
+    return response.data;
+  } catch (error: any) {
+    if (axios.isAxiosError(error)) {
+      throw new Error(error.response?.data?.error || "Failed to fetch recent exercises");
+    }
+    throw new Error("Unexpected error");
+  }
+}
+
+export async function getPersonalBests(token: string): Promise<
+  { exerciseId: number; name: string; maxWeight: number }[]
+> {
+  try {
+    const response = await axios.get(
+      `${API_BASE_URL}/workouts/progress/personal-bests`,
+      { headers: { Authorization: `Bearer ${token}` } }
+    );
+    return response.data;
+  } catch (error: any) {
+    if (axios.isAxiosError(error)) {
+      throw new Error(error.response?.data?.error || "Failed to fetch personal bests");
+    }
+    throw new Error("Unexpected error");
+  }
+}
+
+export async function getWeeklyProgress(token: string): Promise<
+  { date: string; day: string; totalWeight: number; exercises: { exerciseId: number; totalWeight: number }[] }[]
+> {
+  try {
+    const response = await axios.get(
+      `${API_BASE_URL}/workouts/progress/weekly`,
+      { headers: { Authorization: `Bearer ${token}` } }
+    );
+    return response.data;
+  } catch (error: any) {
+    if (axios.isAxiosError(error)) {
+      throw new Error(error.response?.data?.error || "Failed to fetch weekly progress");
     }
     throw new Error("Unexpected error");
   }
