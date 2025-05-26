@@ -103,4 +103,14 @@ export class NotificationController {
       res.status(500).json({ error: 'Failed to get notifications' });
     }
   }
+
+  async deleteNotification(req: Request, res: Response) {
+    try {
+      const { id } = req.params;
+      await notificationService.deleteNotification(Number(id));
+      res.status(204).send();
+    } catch (error) {
+      res.status(500).json({ error: 'Failed to delete notification' });
+    }
+  }
 }

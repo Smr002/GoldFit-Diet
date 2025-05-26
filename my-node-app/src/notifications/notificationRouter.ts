@@ -23,4 +23,6 @@ router.get('/:id', notificationController.getNotificationById.bind(notificationC
 router.get('/', notificationController.getAllNotifications.bind(notificationController));
 router.post('/', notificationController.createNotification.bind(notificationController));
 
+router.delete('/:id', notificationController.deleteNotification.bind(notificationController));
+
 export default router;

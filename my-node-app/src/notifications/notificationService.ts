@@ -171,4 +171,12 @@ export class NotificationService {
       throw error;
     }
   }
+  async deleteNotification(id: number): Promise<void> {
+    try {
+      await this.repository.deleteNotification(id);
+    } catch (error) {
+      console.error('Error deleting notification:', error);
+      throw error;
+    }
+  }
 }
