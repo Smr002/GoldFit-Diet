@@ -113,7 +113,7 @@ const ContactUs = () => {
               </div>
               <div>
                 <p className="info-label">Phone</p>
-                <p>(555) 123-4567</p>
+                <p>+1 336 568 7240</p>
               </div>
             </div>
 
@@ -135,7 +135,7 @@ const ContactUs = () => {
               </div>
               <div>
                 <p className="info-label">Email</p>
-                <p>info@goldfit.com</p>
+                <p>goldfitservice7@gmail.com</p>
               </div>
             </div>
 
