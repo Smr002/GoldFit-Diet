@@ -200,11 +200,6 @@ const AdminManagement = () => {
               onChange={(e) => setSearchQuery(e.target.value)}
             />
           </div>
-
-          <button className="create-admin-btn" onClick={handleCreateAdmin}>
-            <UserPlus size={16} />
-            <span>Add New Admin</span>
-          </button>
         </div>
       </div>
 

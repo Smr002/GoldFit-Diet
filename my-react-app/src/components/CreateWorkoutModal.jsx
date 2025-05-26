@@ -12,6 +12,7 @@ import {
   Chip,
   Popper,
 } from "@mui/material";
+import CheckIcon from "@mui/icons-material/Check";
 import AddIcon from "@mui/icons-material/Add";
 import DeleteIcon from "@mui/icons-material/Delete";
 import CloseIcon from "@mui/icons-material/Close";
@@ -550,7 +551,7 @@ const CreateWorkoutModal = ({ onClose, onSave, onDelete, workout }) => {
                 disabled={!selectedExercise}
                 sx={{ mt: 1 }}
               >
-                <AddIcon />
+                <CheckIcon />
               </IconButton>
             </Box>
           </Box>
