@@ -154,6 +154,7 @@ async create(data: Omit<User, "id">): Promise<User> {
   async findAllAdmins(): Promise<User[]> {
     // Get all admin userIds from the admin table
     const adminRecords = await this.prisma.admin.findMany({
+      where: { deletedAt: null },
       select: { userId: true }
     });
     const adminUserIds = adminRecords.map(a => a.userId);
