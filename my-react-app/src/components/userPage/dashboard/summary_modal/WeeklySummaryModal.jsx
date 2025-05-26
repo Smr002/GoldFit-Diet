@@ -57,7 +57,7 @@ const WeeklySummaryModal = ({ open, onClose, weekStart }) => {
         averages: {
           protein: formatNumber(data.nutrition.averages.protein),
           carbs: formatNumber(data.nutrition.averages.carbs),
-          fat: formatNumber(data.nutrition.averages.fat)
+          fats: formatNumber(data.nutrition.averages.fat)
         },
         waterIntake: formatNumber(data.nutrition.waterIntake)
       }

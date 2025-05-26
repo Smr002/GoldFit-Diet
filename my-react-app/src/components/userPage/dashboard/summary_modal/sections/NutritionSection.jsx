@@ -246,7 +246,7 @@ const NutritionSection = ({ nutritionData }) => {
           </Grid>
           
           {/* Macro distribution bar */}
-          <Box sx={{ mt: 2, px: 1, mb: -1}}> {/* Added mb: 1 to reduce space */}
+          <Box sx={{ mt: 2, px: 1, mb: 1}}> {/* Added mb: 1 to reduce space */}
             <Box sx={{ 
               display: 'flex',
               height: 8,
@@ -266,62 +266,6 @@ const NutritionSection = ({ nutritionData }) => {
                 width: `${fatsPercentage}%`,
                 bgcolor: themeColors.nutrition.fats.chipBg,
               }} />
-            </Box>
-          </Box>
-        </Box>
-
-
-        {/* Water Intake Section - Moved to bottom */}
-        <Box sx={{ 
-          display: 'flex',
-          alignItems: 'center',
-          p: 1.5,
-          borderRadius: 2,
-          bgcolor: themeColors.nutrition.water.bg,
-        }}>
-          <Box sx={{
-            display: 'flex',
-            alignItems: 'center',
-            gap: 2,
-            flex: 1
-          }}>
-            <Avatar sx={{ 
-              bgcolor: themeColors.nutrition.water.iconBg,
-              width: 40, 
-              height: 40
-            }}>
-              <WaterDropIcon sx={{ color: themeColors.nutrition.water.text }} />
-            </Avatar>
-            <Box sx={{ flex: 1 }}>
-              <Typography variant="subtitle2" color="text.secondary">
-                Daily Water Intake
-              </Typography>
-              <Typography variant="h6" fontWeight="bold" color={themeColors.nutrition.water.text}>
-                {nutritionData.waterIntake} L
-              </Typography>
-            </Box>
-            <Box sx={{ width: '40%' }}>
-              <Box sx={{ 
-                position: 'relative',
-                height: 8,
-                borderRadius: 4,
-                bgcolor: isDarkMode ? 'rgba(255,255,255,0.05)' : 'rgba(0,0,0,0.05)',
-                overflow: 'hidden'
-              }}>
-                <Box sx={{
-                  position: 'absolute',
-                  left: 0,
-                  top: 0,
-                  bottom: 0,
-                  width: `${Math.min((nutritionData.waterIntake / 2.5) * 100, 100)}%`,
-                  bgcolor: themeColors.nutrition.water.text,
-                  borderRadius: 4,
-                  transition: 'width 1s ease-in-out'
-                }} />
-              </Box>
-              <Typography variant="caption" color="text.secondary" sx={{ mt: 0.5, display: 'block', textAlign: 'right' }}>
-                Goal: 2.5 L
-              </Typography>
             </Box>
           </Box>
         </Box>
