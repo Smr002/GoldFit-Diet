@@ -59,9 +59,19 @@ export default function ProgressGoalsOverview() {
       }}
     >
       {/* Header */}
-      <Box sx={{ display: "flex", alignItems: "center", justifyContent: "space-between", mb: 2 }}>
+      <Box
+        sx={{
+          display: "flex",
+          alignItems: "center",
+          justifyContent: "space-between",
+          mb: 2,
+        }}
+      >
         <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
-          <LineChart size={20} color={isDarkMode ? theme.palette.primary.main : "#7E69AB"} />
+          <LineChart
+            size={20}
+            color={isDarkMode ? theme.palette.primary.main : "#7E69AB"}
+          />
           <Typography variant="h6" fontWeight={600} color="text.primary">
             Progress & Goals
           </Typography>
@@ -70,18 +80,32 @@ export default function ProgressGoalsOverview() {
 
       {/* Weight Goal Progress */}
       <Box sx={{ mb: 3 }}>
-        <Typography variant="body1" fontWeight={600} color="text.primary" sx={{ mb: 1 }}>
+        <Typography
+          variant="body1"
+          fontWeight={600}
+          color="text.primary"
+          sx={{ mb: 1 }}
+        >
           Weight Goal Progress
         </Typography>
         <Box
           sx={{
             p: 2,
             borderRadius: 2,
-            bgcolor: isDarkMode ? "rgba(16,185,129,0.05)" : "rgba(16,185,129,0.08)",
+            bgcolor: isDarkMode
+              ? "rgba(16,185,129,0.05)"
+              : "rgba(16,185,129,0.08)",
             mb: 1.5,
           }}
         >
-          <Box sx={{ display: "flex", justifyContent: "space-between", mb: 1, alignItems: "baseline" }}>
+          <Box
+            sx={{
+              display: "flex",
+              justifyContent: "space-between",
+              mb: 1,
+              alignItems: "baseline",
+            }}
+          >
             <Typography variant="body2" fontWeight={500} color="#10B981">
               Start: {goalProgress.start} lbs
             </Typography>
@@ -98,7 +122,9 @@ export default function ProgressGoalsOverview() {
             sx={{
               height: 10,
               borderRadius: 10,
-              bgcolor: isDarkMode ? "rgba(16,185,129,0.1)" : "rgba(16,185,129,0.2)",
+              bgcolor: isDarkMode
+                ? "rgba(16,185,129,0.1)"
+                : "rgba(16,185,129,0.2)",
               "& .MuiLinearProgress-bar": {
                 bgcolor: "#10B981",
                 borderRadius: 10,
@@ -119,73 +145,84 @@ export default function ProgressGoalsOverview() {
 
       {/* Recent Progress (Real Data) */}
       <Box sx={{ mb: 3 }}>
-        <Typography variant="body1" fontWeight={600} color="text.primary" sx={{ mb: 1.5 }}>
+        <Typography
+          variant="body1"
+          fontWeight={600}
+          color="text.primary"
+          sx={{ mb: 1.5 }}
+        >
           Recent Progress
         </Typography>
         <Box sx={{ display: "flex", flexDirection: "column", gap: 1.5 }}>
-          {recentExercises.map(({ exerciseId, name, currentWeight, previousWeight }) => {
-            const change = currentWeight - previousWeight;
-            const trendUp = change > 0;
-            const color = trendUp ? "#EC4899" : "#10B981";
+          {recentExercises.map(
+            ({ exerciseId, name, currentWeight, previousWeight }) => {
+              const change = currentWeight - previousWeight;
+              const trendUp = change > 0;
+              const color = trendUp ? "#EC4899" : "#10B981";
 
-            return (
-              <Box
-                key={exerciseId}
-                sx={{
-                  display: "flex",
-                  justifyContent: "space-between",
-                  alignItems: "center",
-                  bgcolor: isDarkMode ? `${color}08` : `${color}10`,
-                  borderRadius: 2,
-                  px: 2,
-                  py: 1.5,
-                  transition: "all 0.2s ease",
-                  "&:hover": {
-                    transform: "translateY(-2px)",
-                    boxShadow: isDarkMode
-                      ? `0 4px 10px ${color}15`
-                      : `0 4px 10px ${color}20`,
-                  },
-                }}
-              >
-                <Typography variant="body1" fontWeight={600} color="text.primary">
-                  {name}
-                </Typography>
-                <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
-                  <Typography variant="body1" fontWeight={600} sx={{ color }}>
-                    {currentWeight} lbs
-                  </Typography>
-                  <Box
-                    sx={{
-                      display: "flex",
-                      alignItems: "center",
-                      color,
-                      bgcolor: trendUp
-                        ? isDarkMode
-                          ? "rgba(236,72,153,0.08)"
-                          : "rgba(236,72,153,0.1)"
-                        : isDarkMode
-                        ? "rgba(16,185,129,0.08)"
-                        : "rgba(16,185,129,0.1)",
-                      typography: "caption",
-                      py: 0.5,
-                      px: 0.8,
-                      borderRadius: 1,
-                    }}
+              return (
+                <Box
+                  key={exerciseId}
+                  sx={{
+                    display: "flex",
+                    justifyContent: "space-between",
+                    alignItems: "center",
+                    bgcolor: isDarkMode ? `${color}08` : `${color}10`,
+                    borderRadius: 2,
+                    px: 2,
+                    py: 1.5,
+                    transition: "all 0.2s ease",
+                    "&:hover": {
+                      transform: "translateY(-2px)",
+                      boxShadow: isDarkMode
+                        ? `0 4px 10px ${color}15`
+                        : `0 4px 10px ${color}20`,
+                    },
+                  }}
+                >
+                  <Typography
+                    variant="body1"
+                    fontWeight={600}
+                    color="text.primary"
                   >
-                    {trendUp ? (
-                      <TrendingUp size={14} style={{ marginRight: 4 }} />
-                    ) : (
-                      <TrendingDown size={14} style={{ marginRight: 4 }} />
-                    )}
-                    <Typography variant="caption" fontWeight={600}>
-                      {Math.abs(change)} lbs
+                    {name}
+                  </Typography>
+                  <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
+                    <Typography variant="body1" fontWeight={600} sx={{ color }}>
+                      {currentWeight} kg
                     </Typography>
+                    <Box
+                      sx={{
+                        display: "flex",
+                        alignItems: "center",
+                        color,
+                        bgcolor: trendUp
+                          ? isDarkMode
+                            ? "rgba(236,72,153,0.08)"
+                            : "rgba(236,72,153,0.1)"
+                          : isDarkMode
+                          ? "rgba(16,185,129,0.08)"
+                          : "rgba(16,185,129,0.1)",
+                        typography: "caption",
+                        py: 0.5,
+                        px: 0.8,
+                        borderRadius: 1,
+                      }}
+                    >
+                      {trendUp ? (
+                        <TrendingUp size={14} style={{ marginRight: 4 }} />
+                      ) : (
+                        <TrendingDown size={14} style={{ marginRight: 4 }} />
+                      )}
+                      <Typography variant="caption" fontWeight={600}>
+                        {Math.abs(change)} kg
+                      </Typography>
+                    </Box>
                   </Box>
                 </Box>
-              </Box>
-            );
-          })}
+              );
+            }
+          )}
         </Box>
       </Box>
 
@@ -212,10 +249,10 @@ export default function ProgressGoalsOverview() {
         Export Progress Report
       </Button>
 
-      <ExportPDFModal 
-        open={exportModalOpen} 
-        onClose={handleCloseExportModal} 
-        token={localStorage.getItem('token')} 
+      <ExportPDFModal
+        open={exportModalOpen}
+        onClose={handleCloseExportModal}
+        token={localStorage.getItem("token")}
       />
     </Paper>
   );
