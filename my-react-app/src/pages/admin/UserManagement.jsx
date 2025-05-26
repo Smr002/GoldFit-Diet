@@ -98,28 +98,41 @@ const UserManagement = () => {
         throw new Error("No authentication token found");
       }
 
-      // Format the age range for the database
-      const ageRange = editingUser.age.toString();
-
-      // Prepare the update data
+      // Prepare the update data with correct field names for backend mapping
       const updateData = {
         fullName: `${editingUser.firstName} ${editingUser.lastName}`,
         email: editingUser.email,
-        selectedAgeGroup: ageRange,
+        selectedAgeGroup: editingUser.age.toString(),
         selectedGender: editingUser.gender,
         selectedHeight: Number(editingUser.height),
         selectedWeight: Number(editingUser.weight),
-        selectedGoal: goalEnumMap[editingUser.goal],
-
-        selectedLevel: editingUser.level,
+        selectedGoal: goalEnumMap[editingUser.goal] || editingUser.goal,
       };
 
       // Call the updateUser API
       await updateUser(editingUser.id, updateData, token);
 
-      // Update the local state
+      // Update the local state with correct UI fields
       setUsers(
-        users.map((user) => (user.id === editingUser.id ? editingUser : user))
+        users.map((user) => {
+          if (user.id === editingUser.id) {
+            // Split fullName back to firstName and lastName
+            const [firstName, ...lastNameArr] = updateData.fullName.split(" ");
+            const lastName = lastNameArr.join(" ");
+            return {
+              ...user,
+              firstName,
+              lastName,
+              email: updateData.email,
+              age: updateData.selectedAgeGroup,
+              gender: updateData.selectedGender,
+              height: updateData.selectedHeight,
+              weight: updateData.selectedWeight,
+              goal: editingUser.goal, // keep display value for UI
+            };
+          }
+          return user;
+        })
       );
 
       // Close the modal
