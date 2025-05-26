@@ -27,7 +27,7 @@ export class UsersRepository {
       }
 
       return this.prisma.admin.findUnique({
-        where: { userId: id },
+        where: { userId: id, deletedAt: null }, // Ensure admin is not deleted
         include: {
           user: true, // Include user data if needed
         },
