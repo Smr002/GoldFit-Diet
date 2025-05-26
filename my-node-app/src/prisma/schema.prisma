@@ -1,133 +1,103 @@
-// This is your Prisma schema file,
-// learn more about it in the docs: https://pris.ly/d/prisma-schema
-
-// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
-// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
-
 generator client {
   provider = "prisma-client-js"
-  output   = "../node_modules/.prisma/client"
 }
+
 
 datasource db {
   provider = "postgresql"
   url      = env("DATABASE_URL")
 }
 
-enum Goal {
-  WEIGHT_LOSS
-  MUSCLE_GAIN
-  MAINTENANCE
-  STRENGTH
-  ENDURANCE
-}
-
-enum NotificationAudience {
-  ALL_USERS
-  PREMIUM_USERS
-  SPECIFIC_USERS
-}
-
 model User {
-  id                    Int       @id @default(autoincrement()) @map("user_id")
-  email                 String    @unique
+  id                    Int                @id @default(autoincrement()) @map("user_id")
+  email                 String             @unique
   password              String
-  firstName             String?   @map("first_name")
-  lastName              String?   @map("last_name")
+  firstName             String?            @map("first_name")
+  lastName              String?            @map("last_name")
   age                   Int
   gender                String
   height                Float
   weight                Float
   goal                  Goal
   nutritionGoal         Int?
-  activeWorkoutId       Int?      @map("active_workout_id")
-  notifyWorkoutSessions Boolean   @default(false) @map("notify_workout_sessions")
-  notifyMotivational    Boolean   @default(false) @map("notify_motivational")
-  preferredUnits        String    @default("metric") @map("preferred_units")
-  isPremium             Boolean   @default(false) @map("is_premium")
-  createdAt             DateTime  @default(now()) @map("created_at")
-  updatedAt             DateTime  @updatedAt @map("updated_at")
-  deletedAt             DateTime? @map("deleted_at")
-
-  // Relations
-  activeWorkout     Workout?           @relation("UserActiveWorkout", fields: [activeWorkoutId], references: [id])
-  admin             Admin?
-  createdWorkouts   Workout[]          @relation("UserCreatedWorkouts")
-  favoriteWorkouts  FavoriteWorkout[]
-  workoutSessions   WorkoutSession[]
-  nutritionLogs     NutritionLog[]
-  sentNotifications SentNotification[]
+  activeWorkoutId       Int?               @map("active_workout_id")
+  notifyWorkoutSessions Boolean            @default(false) @map("notify_workout_sessions")
+  notifyMotivational    Boolean            @default(false) @map("notify_motivational")
+  preferredUnits        String             @default("metric") @map("preferred_units")
+  isPremium             Boolean            @default(false) @map("is_premium")
+  createdAt             DateTime           @default(now()) @map("created_at")
+  updatedAt             DateTime           @updatedAt @map("updated_at")
+  deletedAt             DateTime?          @map("deleted_at")
+  admin                 Admin?
+  favoriteWorkouts      FavoriteWorkout[]
+  nutritionLogs         NutritionLog[]
+  sentNotifications     SentNotification[]
+  activeWorkout         Workout?           @relation("UserActiveWorkout", fields: [activeWorkoutId], references: [id])
+  workoutSessions       WorkoutSession[]
+  createdWorkouts       Workout[]          @relation("UserCreatedWorkouts")
 
   @@map("users")
 }
 
 model Admin {
-  id          Int       @id @default(autoincrement()) @map("admin_id")
-  userId      Int       @unique @map("user_id")
-  role        String
-  permissions Json?
-  createdAt   DateTime  @default(now()) @map("created_at")
-  updatedAt   DateTime  @updatedAt @map("updated_at")
-  deletedAt   DateTime? @map("deleted_at")
-
-  // Relations
+  id            Int            @id @default(autoincrement()) @map("admin_id")
+  userId        Int            @unique @map("user_id")
+  role          String
+  permissions   Json?
+  createdAt     DateTime       @default(now()) @map("created_at")
+  updatedAt     DateTime       @updatedAt @map("updated_at")
+  deletedAt     DateTime?      @map("deleted_at")
   user          User           @relation(fields: [userId], references: [id], onDelete: Cascade)
   exercises     Exercise[]
-  workouts      Workout[]      @relation("AdminCreatedWorkouts")
   notifications Notification[]
+  workouts      Workout[]      @relation("AdminCreatedWorkouts")
 
   @@map("admins")
 }
 
 model Exercise {
-  id          Int      @id @default(autoincrement()) @map("exercise_id")
-  name        String
-  muscleGroup String?  @map("muscle_group")
-  createdBy   Int?     @map("created_by")
-  createdAt   DateTime @default(now()) @map("created_at")
-  updatedAt   DateTime @updatedAt @map("updated_at")
-
-  // Relations
+  id               Int               @id @default(autoincrement()) @map("exercise_id")
+  name             String
+  muscleGroup      String?           @map("muscle_group")
+  createdBy        Int?              @map("created_by")
+  createdAt        DateTime          @default(now()) @map("created_at")
+  updatedAt        DateTime          @updatedAt @map("updated_at")
   creator          Admin?            @relation(fields: [createdBy], references: [id])
-  workoutExercises WorkoutExercise[]
   sessionExercises SessionExercise[]
+  workoutExercises WorkoutExercise[]
 
   @@map("exercises")
 }
 
 model Workout {
-  id             Int      @id @default(autoincrement()) @map("workout_id")
-  name           String
-  level          String?
-  timesPerWeek   Int?     @map("times_per_week")
-  premium        Boolean?
-  createdByAdmin Int?     @map("created_by_admin")
-  createdByUser  Int?     @map("created_by_user")
-  createdAt      DateTime @default(now()) @map("created_at")
-  updatedAt      DateTime @updatedAt @map("updated_at")
-
-  // Relations
+  id               Int               @id @default(autoincrement()) @map("workout_id")
+  name             String
+  level            String?
+  timesPerWeek     Int?              @map("times_per_week")
+  premium          Boolean?
+  createdByAdmin   Int?              @map("created_by_admin")
+  createdByUser    Int?              @map("created_by_user")
+  createdAt        DateTime          @default(now()) @map("created_at")
+  updatedAt        DateTime          @updatedAt @map("updated_at")
+  favoriteWorkouts FavoriteWorkout[]
+  activeForUsers   User[]            @relation("UserActiveWorkout")
+  workoutExercises WorkoutExercise[]
+  workoutSessions  WorkoutSession[]
   adminCreator     Admin?            @relation("AdminCreatedWorkouts", fields: [createdByAdmin], references: [id])
   userCreator      User?             @relation("UserCreatedWorkouts", fields: [createdByUser], references: [id])
-  workoutExercises WorkoutExercise[]
-  favoriteWorkouts FavoriteWorkout[]
-  workoutSessions  WorkoutSession[]
-  activeForUsers   User[]            @relation("UserActiveWorkout")
 
   @@map("workouts")
 }
 
 model WorkoutExercise {
-  id           Int  @id @default(autoincrement()) @map("workout_exercise_id")
-  exerciseId   Int  @map("exercise_id")
-  workoutId    Int  @map("workout_id")
+  id           Int      @id @default(autoincrement()) @map("workout_exercise_id")
+  exerciseId   Int      @map("exercise_id")
+  workoutId    Int      @map("workout_id")
   dayOfTheWeek Int?
   sets         Int
   reps         Int
-
-  // Relations
-  exercise Exercise @relation(fields: [exerciseId], references: [id])
-  workout  Workout  @relation(fields: [workoutId], references: [id])
+  exercise     Exercise @relation(fields: [exerciseId], references: [id])
+  workout      Workout  @relation(fields: [workoutId], references: [id])
 
   @@map("workout_exercises")
 }
@@ -137,43 +107,36 @@ model FavoriteWorkout {
   workoutId Int      @map("workout_id")
   userId    Int      @map("user_id")
   createdAt DateTime @default(now()) @map("created_at")
-
-  // Relations
-  workout Workout @relation(fields: [workoutId], references: [id])
-  user    User    @relation(fields: [userId], references: [id])
+  user      User     @relation(fields: [userId], references: [id])
+  workout   Workout  @relation(fields: [workoutId], references: [id])
 
   @@map("favorite_workouts")
 }
 
 model WorkoutSession {
-  id        Int      @id @default(autoincrement()) @map("session_id")
-  userId    Int      @map("user_id")
-  workoutId Int      @map("workout_id")
-  date      DateTime @db.Date
-  createdAt DateTime @default(now()) @map("created_at")
-
-  // Relations
+  id               Int               @id @default(autoincrement()) @map("session_id")
+  userId           Int               @map("user_id")
+  workoutId        Int               @map("workout_id")
+  date             DateTime          @db.Date
+  createdAt        DateTime          @default(now()) @map("created_at")
+  sessionExercises SessionExercise[]
   user             User              @relation(fields: [userId], references: [id])
   workout          Workout           @relation(fields: [workoutId], references: [id])
-  sessionExercises SessionExercise[]
 
   @@map("workout_sessions")
 }
 
 model SessionExercise {
-  id            Int    @id @default(autoincrement()) @map("session_exercise_id")
-  sessionId     Int    @map("session_id")
-  exerciseId    Int    @map("exercise_id")
-  weightUsed    Float? @map("weight_used")
-  setsCompleted Int?   @map("sets_completed")
-  repsCompleted Int?   @map("reps_completed")
-  maxPr         Int?   @map("max_pr")
-
-  createdAt DateTime @default(now()) @map("created_at")
-
-  // Relations
-  session  WorkoutSession @relation(fields: [sessionId], references: [id])
-  exercise Exercise       @relation(fields: [exerciseId], references: [id])
+  id            Int            @id @default(autoincrement()) @map("session_exercise_id")
+  sessionId     Int            @map("session_id")
+  exerciseId    Int            @map("exercise_id")
+  weightUsed    Float?         @map("weight_used")
+  setsCompleted Int?           @map("sets_completed")
+  repsCompleted Int?           @map("reps_completed")
+  maxPr         Int?           @map("max_pr")
+  createdAt     DateTime       @default(now()) @map("created_at")
+  exercise      Exercise       @relation(fields: [exerciseId], references: [id])
+  session       WorkoutSession @relation(fields: [sessionId], references: [id])
 
   @@map("session_exercises")
 }
@@ -190,40 +153,48 @@ model NutritionLog {
   hydration     Float
   createdAt     DateTime @default(now()) @map("created_at")
   name          String?
-
-  // Relations
-  user User @relation(fields: [userId], references: [id])
+  user          User     @relation(fields: [userId], references: [id])
 
   @@map("nutrition_logs")
 }
 
 model Notification {
-  id          Int                  @id @default(autoincrement()) @map("notification_id")
-  type        String
-  message     String
-  isAutomated Boolean              @default(false) @map("is_automated")
-  frequency   String?
-  targetUsers NotificationAudience @map("target_users")
-  createdBy   Int?                 @map("created_by")
-  createdAt   DateTime             @default(now()) @map("created_at")
-  updatedAt   DateTime             @updatedAt @map("updated_at")
-
-  // Relations
-  creator           Admin?             @relation(fields: [createdBy], references: [id])
+  id                Int                  @id @default(autoincrement()) @map("notification_id")
+  type              String
+  message           String
+  isAutomated       Boolean              @default(false) @map("is_automated")
+  frequency         String?
+  targetUsers       NotificationAudience @map("target_users")
+  createdBy         Int?                 @map("created_by")
+  createdAt         DateTime             @default(now()) @map("created_at")
+  updatedAt         DateTime             @updatedAt @map("updated_at")
+  creator           Admin?               @relation(fields: [createdBy], references: [id])
   sentNotifications SentNotification[]
 
   @@map("notifications")
 }
 
 model SentNotification {
-  id             Int      @id @default(autoincrement()) @map("sent_notification_id")
-  notificationId Int      @map("notification_id")
-  userId         Int      @map("user_id")
-  sentAt         DateTime @map("sent_at")
-
-  // Relations
-  notification Notification @relation(fields: [notificationId], references: [id])
-  user         User         @relation(fields: [userId], references: [id])
+  id             Int          @id @default(autoincrement()) @map("sent_notification_id")
+  notificationId Int          @map("notification_id")
+  userId         Int          @map("user_id")
+  sentAt         DateTime     @map("sent_at")
+  notification   Notification @relation(fields: [notificationId], references: [id])
+  user           User         @relation(fields: [userId], references: [id])
 
   @@map("sent_notifications")
+}
+
+enum Goal {
+  WEIGHT_LOSS
+  MUSCLE_GAIN
+  MAINTENANCE
+  STRENGTH
+  ENDURANCE
+}
+
+enum NotificationAudience {
+  ALL_USERS
+  PREMIUM_USERS
+  SPECIFIC_USERS
 }

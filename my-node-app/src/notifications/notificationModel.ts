@@ -77,7 +77,7 @@ export class NotificationModel {
 
   isValid(): boolean {
     try {
-      console.log('Validating notification data:', this.data);
+      // Validate the notification data against the schema
       NotificationSchema.parse(this.data);
       return true;
     } catch (error) {

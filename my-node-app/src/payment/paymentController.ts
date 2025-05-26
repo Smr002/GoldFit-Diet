@@ -8,7 +8,7 @@ export const processPayment = async (req: Request, res: Response) => {
     const payment = await paymentService.handlePayment(userId, phone, amount);
     res.status(200).json({ success: true, payment });
   } catch (err) {
-    console.log(err);
+ 
     res.status(500).json({ success: false, message: "Payment failed" });
   }
 };

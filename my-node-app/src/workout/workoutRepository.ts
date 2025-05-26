@@ -47,36 +47,37 @@ export class WorkoutRepository {
     this.prisma = new PrismaClient();
   }
 
-  async createWorkout(workoutData: CreateWorkoutData): Promise<Workout> {
-    const exercises = workoutData.workoutExercises || workoutData.exercises || [];
-    console.log('Received workout data:', workoutData); // Debug log
+ async createWorkout(workoutData: CreateWorkoutData): Promise<Workout> {
+  const exercises = workoutData.workoutExercises || workoutData.exercises || [];
+  
 
-    return this.prisma.workout.create({
-      data: {
-        name: workoutData.name,
-        level: workoutData.level,
-        timesPerWeek: workoutData.timesPerWeek,
-        premium: workoutData.premium ?? false,
-        createdByAdmin: workoutData.createdByAdmin,
-        createdByUser: workoutData.createdByUser,
-        workoutExercises: {
-          create: exercises.map(exercise => ({
-            exerciseId: exercise.exerciseId,
-            dayOfTheWeek: exercise.dayOfTheWeek,
-            sets: exercise.sets,
-            reps: exercise.reps,
-          })),
+  return this.prisma.workout.create({
+    data: {
+      name: workoutData.name,
+      level: workoutData.level,
+      timesPerWeek: workoutData.timesPerWeek,
+      premium: workoutData.premium ?? false,
+      createdByAdmin: workoutData.createdByAdmin,
+      createdByUser: workoutData.createdByUser,
+      workoutExercises: {
+        create: exercises.map(exercise => ({
+          exerciseId: exercise.exerciseId,
+           dayOfTheWeek: exercise.dayOfTheWeek ?? 1,
+          sets: exercise.sets,
+          reps: exercise.reps,
+        })),
+      },
+    },
+    include: {
+      workoutExercises: {
+        include: {
+          exercise: true,
         },
       },
-      include: {
-        workoutExercises: {
-          include: {
-            exercise: true,
-          },
-        },
-      },
-    });
-  }
+    },
+  });
+}
+
 
   async getWorkoutById(id: number): Promise<Workout | null> {
     return this.prisma.workout.findUnique({
@@ -97,8 +98,7 @@ export class WorkoutRepository {
   }
 
   async getWorkoutCount(): Promise<number> {
-    console.log(this.prisma.workout.count());
-    console.log('Workout count:', await this.prisma.workout.count());
+
     return this.prisma.workout.count();
   }
 
@@ -118,7 +118,7 @@ export class WorkoutRepository {
 
   async updateWorkout(id: number, workoutData: UpdateWorkoutData): Promise<Workout> {
     const exercises = workoutData.workoutExercises || workoutData.exercises || [];
-    console.log('Updating workout with data:', workoutData); // Debug log
+ 
 
     return this.prisma.workout.update({
       where: { id },
@@ -436,6 +436,7 @@ export class WorkoutRepository {
   async addFavoriteWorkout(userId: number, workoutId: number): Promise<FavoriteWorkout> {
     return this.prisma.favoriteWorkout.create({
       data: {
+        
         userId,
         workoutId
       }
@@ -479,7 +480,7 @@ export class WorkoutRepository {
 
   async getLogWorkoutSession(userId: number): Promise<WorkoutSession[]> {
     try {
-      console.log('Repository: Fetching sessions for userId:', userId);
+
       
       const sessions = await this.prisma.workoutSession.findMany({
         where: { userId },
@@ -509,7 +510,7 @@ export class WorkoutRepository {
         }
       });
 
-      console.log(`Repository: Found ${sessions.length} sessions`);
+ 
       return sessions;
     } catch (error) {
       console.error('Repository error in getLogWorkoutSession:', error);

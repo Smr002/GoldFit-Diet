@@ -12,7 +12,7 @@ export class NotificationController {
       res.status(201).json(notification);
     } catch (error) {
       if (error instanceof Error) {
-        console.log(error)
+      
         if (error.message === 'Creator user not found') {
           return res.status(400).json({ error: 'The specified creator user does not exist' });
         }

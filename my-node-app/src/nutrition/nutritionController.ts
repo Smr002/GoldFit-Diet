@@ -26,8 +26,7 @@ export class NutritionController {
 
   async createNutritionLog(req: Request, res: Response) {
     try {
-      console.log("Request user:", req.user);
-      console.log("Request body:", req.body);
+
       
       // Convert date string to Date object if it's a string
       const body = {
@@ -36,15 +35,15 @@ export class NutritionController {
         userId: req.user?.id,
       };
       
-      console.log("Processed body:", body);
+ 
       
       const logData = NutritionLogSchema.parse(body);
-      console.log("Parsed log data:", logData);
+
       
       const log = await this.service.createNutritionLog(logData);
       res.status(201).json(log);
     } catch (error) {
-      console.log("Error in createNutritionLog:", error);
+    
       res.status(400).json({ 
         error: "Invalid nutrition log data",
         details: error instanceof Error ? error.message : "Unknown error"
@@ -64,7 +63,7 @@ export class NutritionController {
 
       if (date) {
         logs = await this.service.getNutritionLogsByDate(userId, new Date(date as string));
-        console.log("Logs for date:", date, logs);
+       
       } else {
         logs = await this.service.getNutritionLogsByDate(userId,new Date());
       }

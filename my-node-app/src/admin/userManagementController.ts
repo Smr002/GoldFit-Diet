@@ -211,10 +211,7 @@ export const updateUser = async (req: Request, res: Response) => {
 export const deleteUser = async (req: Request, res: Response) => {
   try {
     const { id } = req.params;
-    const authHeader = req.headers.authorization;
 
-    console.log("Received ID for deletion:", id); // Debugging log
-    console.log("Authorization header:", authHeader); // Debugging log
 
     // Validate the ID
     if (!id || isNaN(Number(id))) {

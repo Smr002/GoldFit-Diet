@@ -24,16 +24,16 @@ export class NotificationScheduler {
     // Run every day at 9 AM
     cron.schedule('0 9 * * *', async () => {
       try {
-        console.log('Running automated notification checks...');
+  
         await notificationService.checkMissedWorkouts();
         await notificationService.checkProgressAchievements();
-        console.log('Automated notification checks completed successfully');
+   
       } catch (error) {
         console.error('Error running automated notifications:', error);
       }
     });
 
     this.isInitialized = true;
-    console.log('Notification scheduler initialized');
+ 
   }
 } 

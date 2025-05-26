@@ -16,7 +16,7 @@ router.use(authenticateJWT);
 
 // Debug middleware to log user info
 router.use((req, res, next) => {
-  console.log("User from JWT:", req.user);
+
   next();
 });
 

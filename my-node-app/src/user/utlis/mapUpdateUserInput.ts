@@ -14,6 +14,6 @@ export function mapUpdateUserInput(data: any, hashedPassword: string): Partial<U
     goal: data.selectedGoal.toUpperCase().replace(" ", "_"),
     preferred_units: "metric", // Default value
   };
-  console.log("mapUpdateUserInput Result:", mappedData);
+
   return mappedData;
 }

@@ -181,7 +181,7 @@ export class WorkoutController {
       const count = await this.service.getTotalWorkoutCount();
       res.json({ totalWorkouts: count });
     } catch (err) {
-      console.log('Error in getTotalWorkoutCount:', err); // Log the real error
+
       console.error('Error in getTotalWorkoutCount:', err); // Log the real error
       res.status(500).json({ error: "Failed to fetch workout count." });
     }
@@ -282,7 +282,7 @@ export class WorkoutController {
       }
 
       const sessions = await this.service.getLogWorkoutSession(userId);
-      console.log('Retrieved sessions:', sessions);
+ 
       return res.status(200).json(sessions);
     } catch (error) {
       console.error('Error getting workout sessions:', error);

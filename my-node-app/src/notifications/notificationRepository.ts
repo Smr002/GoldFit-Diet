@@ -40,18 +40,18 @@ export class NotificationRepository {
 
     // Verify the creator exists if createdByUserId is provided
     if (data.createdByUserId) {
-      console.log('Checking for creator with ID:', data.createdByUserId);
+
       const creator = await prisma.user.findUnique({
         where: { id: data.createdByUserId }
       });
-      console.log('Creator found:', creator);
+ 
       if (!creator) {
         throw new Error('Creator user not found');
       }
     }
 
     const notificationData = notificationModel.toObject();
-    console.log('Creating notification with data:', notificationData);
+  
     const prismaNotification = await prisma.notification.create({
       data: {
         type: notificationData.type,

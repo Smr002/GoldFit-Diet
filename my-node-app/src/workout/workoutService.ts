@@ -185,14 +185,14 @@ export class WorkoutService {
         throw new Error('Invalid user ID');
       }
 
-      console.log('Service: Fetching workout sessions for user:', userId);
+
       const sessions = await this.repository.getLogWorkoutSession(userId);
       
       if (!sessions) {
         throw new Error('No sessions found');
       }
 
-      console.log(`Service: Found ${sessions.length} sessions`);
+ 
       return sessions;
     } catch (error) {
       console.error('Service error in getLogWorkoutSession:', error);

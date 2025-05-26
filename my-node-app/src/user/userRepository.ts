@@ -48,7 +48,7 @@ export class UsersRepository {
   }
 
 async create(data: Omit<User, "id">): Promise<User> {
-  console.log("Creating user with data:", JSON.stringify(data, null, 2));
+
 
 
   const { weight, height, age, gender, goal = Goal.MAINTENANCE } = data;
