@@ -1,13 +1,22 @@
-import React, { useState, useRef, useEffect } from 'react';
-import { UserPlus, Search, Edit, Trash2, Eye, MoreVertical, Shield, Lock } from 'lucide-react';
-import 'admin.css';
-import { getAdmins } from '../../api';
+import React, { useState, useRef, useEffect } from "react";
+import {
+  UserPlus,
+  Search,
+  Edit,
+  Trash2,
+  Eye,
+  MoreVertical,
+  Shield,
+  Lock,
+} from "lucide-react";
+import "admin.css";
+import { getAdmins } from "../../api";
 
 const AdminManagement = () => {
-  const [searchQuery, setSearchQuery] = useState('');
+  const [searchQuery, setSearchQuery] = useState("");
   const [filters, setFilters] = useState({
-    role: '',
-    permission: ''
+    role: "",
+    permission: "",
   });
   const [activeDropdown, setActiveDropdown] = useState(null);
   const [selectedAdmin, setSelectedAdmin] = useState(null);
@@ -19,10 +28,10 @@ const AdminManagement = () => {
   const [admins, setAdmins] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
-  
+
   // Add this ref to track dropdown containers
   const dropdownRef = useRef(null);
-  
+
   // Add this useEffect to handle clicks outside the dropdown
   useEffect(() => {
     const handleClickOutside = (event) => {
@@ -33,15 +42,15 @@ const AdminManagement = () => {
 
     // Add event listener when dropdown is open
     if (activeDropdown !== null) {
-      document.addEventListener('mousedown', handleClickOutside);
+      document.addEventListener("mousedown", handleClickOutside);
     }
-    
+
     // Cleanup function to remove the listener
     return () => {
-      document.removeEventListener('mousedown', handleClickOutside);
+      document.removeEventListener("mousedown", handleClickOutside);
     };
   }, [activeDropdown]);
-  
+
   // Add this function to determine which dropdowns should flip up
   const shouldFlipDropdown = (index, total) => {
     // Always flip the last 2 rows' dropdowns
@@ -53,12 +62,12 @@ const AdminManagement = () => {
       setLoading(true);
       setError(null);
       try {
-        const token = localStorage.getItem('token');
-        if (!token) throw new Error('No auth token found');
+        const token = localStorage.getItem("token");
+        if (!token) throw new Error("No auth token found");
         const data = await getAdmins(token);
         setAdmins(data);
       } catch (err) {
-        setError(err.message || 'Failed to fetch admins');
+        setError(err.message || "Failed to fetch admins");
       } finally {
         setLoading(false);
       }
@@ -68,9 +77,9 @@ const AdminManagement = () => {
 
   const handleFilterChange = (e) => {
     const { name, value } = e.target;
-    setFilters(prev => ({
+    setFilters((prev) => ({
       ...prev,
-      [name]: value
+      [name]: value,
     }));
   };
 
@@ -101,9 +110,9 @@ const AdminManagement = () => {
       role: "Admin",
       permissions: [],
       status: "Active",
-      createdDate: new Date().toISOString().split('T')[0]
+      createdDate: new Date().toISOString().split("T")[0],
     };
-    
+
     setSelectedAdmin(newAdminTemplate);
     setIsEditModalOpen(true);
     setIsCreateModalOpen(true);
@@ -119,37 +128,59 @@ const AdminManagement = () => {
   // Map backend admin data to display shape with safe defaults
   const mappedAdmins = admins.map((admin) => ({
     id: admin.id,
-    fullName: admin.fullName || admin.name || admin.email || 'Admin',
-    email: admin.email || '',
-    role: admin.role || 'Admin',
-    permissions: admin.permissions || ['All Permissions'], // fallback
-    status: admin.status || 'Active',
+    fullName: admin.fullName || admin.name || admin.email || "Admin",
+    email: admin.email || "",
+    role: admin.role || "Admin",
+    permissions: admin.permissions || ["All Permissions"], // fallback
+    status: admin.status || "Active",
     createdDate: admin.createdAt || new Date().toISOString(),
-    lastActive: admin.lastActive || 'Unknown',
-    phone: admin.phone || '',
+    lastActive: admin.lastActive || "Unknown",
+    phone: admin.phone || "",
   }));
 
-  const filteredAdmins = mappedAdmins.filter(admin => {
+  const filteredAdmins = mappedAdmins.filter((admin) => {
     const searchTerm = searchQuery.toLowerCase();
     const matchesSearch =
-      (admin.fullName?.toLowerCase?.().includes(searchTerm) ||
-        admin.email?.toLowerCase?.().includes(searchTerm));
-    
+      admin.fullName?.toLowerCase?.().includes(searchTerm) ||
+      admin.email?.toLowerCase?.().includes(searchTerm);
+
     const matchesRole = !filters.role || admin.role === filters.role;
-    const matchesPermission = !filters.permission || 
+    const matchesPermission =
+      !filters.permission ||
       admin.permissions.includes(filters.permission) ||
-      (filters.permission === "All Permissions" && admin.permissions.includes("All Permissions"));
-    
+      (filters.permission === "All Permissions" &&
+        admin.permissions.includes("All Permissions"));
+
     return matchesSearch && matchesRole && matchesPermission;
   });
 
   // Move permissionsList definition to the top-level of the component so it's in scope for all uses
   const permissionsList = [
-    { id: 'user_management', name: 'User Management', description: 'View and manage users' },
-    { id: 'workout_management', name: 'Workout Management', description: 'Create and manage workouts' },
-    { id: 'notification_management', name: 'Notifications', description: 'Send and manage notifications' },
-    { id: 'faq_management', name: 'FAQ Management', description: 'Manage FAQs' },
-    { id: 'admin_management', name: 'Admin Management', description: 'Manage other admins' },
+    {
+      id: "user_management",
+      name: "User Management",
+      description: "View and manage users",
+    },
+    {
+      id: "workout_management",
+      name: "Workout Management",
+      description: "Create and manage workouts",
+    },
+    {
+      id: "notification_management",
+      name: "Notifications",
+      description: "Send and manage notifications",
+    },
+    {
+      id: "faq_management",
+      name: "FAQ Management",
+      description: "Manage FAQs",
+    },
+    {
+      id: "admin_management",
+      name: "Admin Management",
+      description: "Manage other admins",
+    },
   ];
 
   return (
@@ -169,11 +200,8 @@ const AdminManagement = () => {
               onChange={(e) => setSearchQuery(e.target.value)}
             />
           </div>
-          
-          <button 
-            className="create-admin-btn"
-            onClick={handleCreateAdmin}
-          >
+
+          <button className="create-admin-btn" onClick={handleCreateAdmin}>
             <UserPlus size={16} />
             <span>Add New Admin</span>
           </button>
@@ -200,15 +228,20 @@ const AdminManagement = () => {
         >
           <option value="">All Permissions</option>
           <option value="All Permissions">All Permissions</option>
-          {permissionsList.map(permission => (
-            <option key={permission.id} value={permission.name}>{permission.name}</option>
+          {permissionsList.map((permission) => (
+            <option key={permission.id} value={permission.name}>
+              {permission.name}
+            </option>
           ))}
         </select>
       </div>
 
       <div className="users-table-container">
         {filteredAdmins.length > 0 ? (
-          <table className="users-table" key={`${filters.role}-${filters.permission}-${searchQuery}`}>
+          <table
+            className="users-table"
+            key={`${filters.role}-${filters.permission}-${searchQuery}`}
+          >
             <thead>
               <tr>
                 <th>Actions</th>
@@ -221,50 +254,42 @@ const AdminManagement = () => {
               {filteredAdmins.map((admin, index) => (
                 <tr key={admin.id} className="animate-fade-in">
                   <td>
-                    <div 
+                    <div
                       className="actions-dropdown"
                       ref={activeDropdown === admin.id ? dropdownRef : null}
                     >
-                      <button 
+                      <button
                         className="dropdown-trigger"
-                        onClick={() => setActiveDropdown(activeDropdown === admin.id ? null : admin.id)}
+                        onClick={() =>
+                          setActiveDropdown(
+                            activeDropdown === admin.id ? null : admin.id
+                          )
+                        }
                       >
                         <MoreVertical size={20} />
                       </button>
                       {activeDropdown === admin.id && (
-                        <div className={`dropdown-menu ${shouldFlipDropdown(index, filteredAdmins.length) ? 'flip-up' : ''}`}>
-                          <button 
+                        <div
+                          className={`dropdown-menu ${
+                            shouldFlipDropdown(index, filteredAdmins.length)
+                              ? "flip-up"
+                              : ""
+                          }`}
+                        >
+                          <button
                             className="dropdown-item"
                             onClick={() => handleViewDetails(admin)}
                           >
                             <Eye size={16} />
                             <span>View Details</span>
                           </button>
-                          <button 
+                          <button
                             className="dropdown-item"
                             onClick={() => handleEditAdmin(admin)}
                           >
                             <Edit size={16} />
                             <span>Edit</span>
                           </button>
-                          {admin.role !== 'Super Admin' && (
-                            <>
-                              <button 
-                                className="dropdown-item warning"
-                                onClick={() => handleDemoteAdmin(admin)}
-                              >
-                                <UserPlus size={16} />
-                                <span>Demote to User</span>
-                              </button>
-                              <button 
-                                className="dropdown-item delete"
-                                onClick={() => handleDeleteClick(admin)}
-                              >
-                                <Trash2 size={16} />
-                                <span>Delete</span>
-                              </button>
-                            </>
-                          )}
                         </div>
                       )}
                     </div>
@@ -273,7 +298,10 @@ const AdminManagement = () => {
                     <div className="admin-user-cell">
                       <div className="admin-avatar">
                         <div className="avatar-initials">
-                          {admin.fullName.split(' ').map(n => n[0]).join('')}
+                          {admin.fullName
+                            .split(" ")
+                            .map((n) => n[0])
+                            .join("")}
                         </div>
                       </div>
                       <div className="admin-user-info">
@@ -284,7 +312,7 @@ const AdminManagement = () => {
                   </td>
                   <td>
                     <div className="admin-role-badge">
-                      {admin.role === 'Super Admin' ? (
+                      {admin.role === "Super Admin" ? (
                         <Shield size={16} />
                       ) : (
                         <Lock size={16} />
@@ -320,8 +348,8 @@ const AdminManagement = () => {
       {isViewModalOpen && selectedAdmin && (
         <div className="modal-overlay">
           <div className="modal admin-details-modal">
-            <button 
-              className="modal-close-btn" 
+            <button
+              className="modal-close-btn"
               onClick={() => {
                 setIsViewModalOpen(false);
                 setSelectedAdmin(null);
@@ -330,25 +358,30 @@ const AdminManagement = () => {
               &times;
             </button>
             <h2>Admin Details</h2>
-            
+
             <div className="admin-details">
               <div className="admin-details-header">
                 <div className="admin-details-avatar">
                   <div className="avatar-initials large">
-                    {selectedAdmin.name.split(' ').map(n => n[0]).join('')}
+                    {selectedAdmin.name
+                      .split(" ")
+                      .map((n) => n[0])
+                      .join("")}
                   </div>
                 </div>
                 <div className="admin-details-primary">
                   <h3>{selectedAdmin.name}</h3>
                   <div className="admin-role-badge">
-                    {selectedAdmin.role === 'Super Admin' ? (
+                    {selectedAdmin.role === "Super Admin" ? (
                       <Shield size={16} />
                     ) : (
                       <Lock size={16} />
                     )}
                     <span>{selectedAdmin.role}</span>
                   </div>
-                  <span className={`status-badge ${selectedAdmin.status.toLowerCase()}`}>
+                  <span
+                    className={`status-badge ${selectedAdmin.status.toLowerCase()}`}
+                  >
                     {selectedAdmin.status}
                   </span>
                 </div>
@@ -359,23 +392,25 @@ const AdminManagement = () => {
                   <label>Email</label>
                   <span>{selectedAdmin.email}</span>
                 </div>
-                
+
                 <div className="info-item">
                   <label>Phone</label>
-                  <span>{selectedAdmin.phone || 'Not provided'}</span>
+                  <span>{selectedAdmin.phone || "Not provided"}</span>
                 </div>
-                
+
                 <div className="info-item">
                   <label>Added On</label>
-                  <span>{new Date(selectedAdmin.createdDate).toLocaleDateString()}</span>
+                  <span>
+                    {new Date(selectedAdmin.createdDate).toLocaleDateString()}
+                  </span>
                 </div>
-                
+
                 <div className="info-item">
                   <label>Last Active</label>
                   <span>{selectedAdmin.lastActive}</span>
                 </div>
               </div>
-              
+
               <div className="admin-permissions-section">
                 <h4>Permissions</h4>
                 <div className="admin-permission-tags large">
@@ -387,23 +422,23 @@ const AdminManagement = () => {
                 </div>
               </div>
             </div>
-            
+
             <div className="modal-footer">
-              <button 
+              <button
                 onClick={() => {
                   setIsViewModalOpen(false);
                   setSelectedAdmin(null);
-                }} 
+                }}
                 className="close-btn"
               >
                 Close
               </button>
-              
-              <button 
+
+              <button
                 onClick={() => {
                   setIsViewModalOpen(false);
                   handleEditAdmin(selectedAdmin);
-                }} 
+                }}
                 className="edit-btn"
               >
                 <Edit size={16} />
@@ -418,8 +453,8 @@ const AdminManagement = () => {
       {isEditModalOpen && selectedAdmin && (
         <div className="modal-overlay">
           <div className="modal admin-edit-modal">
-            <button 
-              className="modal-close-btn" 
+            <button
+              className="modal-close-btn"
               onClick={() => {
                 setIsEditModalOpen(false);
                 setIsCreateModalOpen(false);
@@ -428,86 +463,99 @@ const AdminManagement = () => {
             >
               &times;
             </button>
-            <h2>{isCreateModalOpen ? 'Create New Admin' : 'Edit Admin'}</h2>
-            
-            <form onSubmit={(e) => {
-              e.preventDefault();
-              // In a real app, you would save the changes to your backend
-              // This is just a mock implementation
-              if (isCreateModalOpen) {
-                // mockAdmins.push({
-                //   ...selectedAdmin,
-                //   id: mockAdmins.length + 1,
-                //   lastActive: 'Just now'
-                // });
-              } else {
-                // Find and update the admin
-                // const index = mockAdmins.findIndex(admin => admin.id === selectedAdmin.id);
-                // if (index !== -1) {
-                //   mockAdmins[index] = selectedAdmin;
-                // }
-              }
-              setIsEditModalOpen(false);
-              setIsCreateModalOpen(false);
-              setSelectedAdmin(null);
-            }}>
+            <h2>{isCreateModalOpen ? "Create New Admin" : "Edit Admin"}</h2>
+
+            <form
+              onSubmit={(e) => {
+                e.preventDefault();
+                // In a real app, you would save the changes to your backend
+                // This is just a mock implementation
+                if (isCreateModalOpen) {
+                  // mockAdmins.push({
+                  //   ...selectedAdmin,
+                  //   id: mockAdmins.length + 1,
+                  //   lastActive: 'Just now'
+                  // });
+                } else {
+                  // Find and update the admin
+                  // const index = mockAdmins.findIndex(admin => admin.id === selectedAdmin.id);
+                  // if (index !== -1) {
+                  //   mockAdmins[index] = selectedAdmin;
+                  // }
+                }
+                setIsEditModalOpen(false);
+                setIsCreateModalOpen(false);
+                setSelectedAdmin(null);
+              }}
+            >
               <div className="form-row">
                 <div className="form-group">
                   <label htmlFor="adminName">Full Name</label>
-                  <input 
+                  <input
                     type="text"
                     id="adminName"
                     value={selectedAdmin.name}
-                    onChange={(e) => setSelectedAdmin({
-                      ...selectedAdmin, 
-                      name: e.target.value
-                    })}
+                    onChange={(e) =>
+                      setSelectedAdmin({
+                        ...selectedAdmin,
+                        name: e.target.value,
+                      })
+                    }
                     placeholder="Full name"
                     required
                   />
                 </div>
-                
+
                 <div className="form-group">
                   <label htmlFor="adminEmail">Email</label>
-                  <input 
+                  <input
                     type="email"
                     id="adminEmail"
                     value={selectedAdmin.email}
-                    onChange={(e) => setSelectedAdmin({
-                      ...selectedAdmin, 
-                      email: e.target.value
-                    })}
+                    onChange={(e) =>
+                      setSelectedAdmin({
+                        ...selectedAdmin,
+                        email: e.target.value,
+                      })
+                    }
                     placeholder="Email address"
                     required
                   />
                 </div>
               </div>
-              
+
               <div className="form-row">
                 <div className="form-group">
                   <label htmlFor="adminPhone">Phone</label>
-                  <input 
+                  <input
                     type="text"
                     id="adminPhone"
-                    value={selectedAdmin.phone || ''}
-                    onChange={(e) => setSelectedAdmin({
-                      ...selectedAdmin, 
-                      phone: e.target.value
-                    })}
+                    value={selectedAdmin.phone || ""}
+                    onChange={(e) =>
+                      setSelectedAdmin({
+                        ...selectedAdmin,
+                        phone: e.target.value,
+                      })
+                    }
                     placeholder="Phone number"
                   />
                 </div>
-                
+
                 <div className="form-group">
                   <label htmlFor="adminRole">Role</label>
-                  <select 
+                  <select
                     id="adminRole"
                     value={selectedAdmin.role}
-                    onChange={(e) => setSelectedAdmin({
-                      ...selectedAdmin, 
-                      role: e.target.value,
-                      permissions: e.target.value === 'Super Admin' ? ['All Permissions'] : selectedAdmin.permissions
-                    })}
+                    onChange={(e) =>
+                      setSelectedAdmin({
+                        ...selectedAdmin,
+                        role: e.target.value,
+                        permissions:
+                          e.target.value === "Super Admin"
+                            ? ["All Permissions"]
+                            : selectedAdmin.permissions,
+                      })
+                    }
                     required
                   >
                     <option value="Admin">Admin</option>
@@ -515,74 +563,86 @@ const AdminManagement = () => {
                   </select>
                 </div>
               </div>
-              
-          
-              {selectedAdmin.role !== 'Super Admin' && (
+
+              {selectedAdmin.role !== "Super Admin" && (
                 <div className="form-group">
                   <label>Permissions</label>
                   <div className="permission-checkboxes">
-                    {permissionsList.map(permission => (
-                      <label 
-                        key={permission.id} 
-                        className={`checkbox-label ${selectedAdmin.permissions.includes(permission.name) ? 'selected' : ''}`}
+                    {permissionsList.map((permission) => (
+                      <label
+                        key={permission.id}
+                        className={`checkbox-label ${
+                          selectedAdmin.permissions.includes(permission.name)
+                            ? "selected"
+                            : ""
+                        }`}
                       >
-                        <input 
+                        <input
                           type="checkbox"
-                          checked={selectedAdmin.permissions.includes(permission.name)}
+                          checked={selectedAdmin.permissions.includes(
+                            permission.name
+                          )}
                           onChange={(e) => {
                             const newPermissions = e.target.checked
                               ? [...selectedAdmin.permissions, permission.name]
-                              : selectedAdmin.permissions.filter(p => p !== permission.name);
-                            
+                              : selectedAdmin.permissions.filter(
+                                  (p) => p !== permission.name
+                                );
+
                             setSelectedAdmin({
                               ...selectedAdmin,
-                              permissions: newPermissions
+                              permissions: newPermissions,
                             });
                           }}
                         />
                         <span className="checkbox-custom"></span>
                         <div className="permission-info">
-                          <span className="permission-name">{permission.name}</span>
-                          <span className="permission-description">{permission.description}</span>
+                          <span className="permission-name">
+                            {permission.name}
+                          </span>
+                          <span className="permission-description">
+                            {permission.description}
+                          </span>
                         </div>
                       </label>
                     ))}
                   </div>
-                  <p className="helper-text">Select the permissions for this admin account.</p>
+                  <p className="helper-text">
+                    Select the permissions for this admin account.
+                  </p>
                 </div>
               )}
-              
+
               {isCreateModalOpen && (
                 <div className="form-group">
                   <label htmlFor="adminPassword">Temporary Password</label>
-                  <input 
+                  <input
                     type="password"
                     id="adminPassword"
                     placeholder="Set temporary password"
                     required={isCreateModalOpen}
                   />
-                  <p className="password-note">The admin will be prompted to change this on first login.</p>
+                  <p className="password-note">
+                    The admin will be prompted to change this on first login.
+                  </p>
                 </div>
               )}
-              
+
               <div className="modal-footer">
-                <button 
+                <button
                   type="button"
                   onClick={() => {
                     setIsEditModalOpen(false);
                     setIsCreateModalOpen(false);
                     setSelectedAdmin(null);
-                  }} 
+                  }}
                   className="cancel-btn"
                 >
                   Cancel
                 </button>
-                
-                <button 
-                  type="submit"
-                  className="save-btn"
-                >
-                  {isCreateModalOpen ? 'Create' : 'Save Changes'}
+
+                <button type="submit" className="save-btn">
+                  {isCreateModalOpen ? "Create" : "Save Changes"}
                 </button>
               </div>
             </form>
@@ -596,22 +656,25 @@ const AdminManagement = () => {
           <div className="modal confirmation-modal">
             <h2>Confirm Delete</h2>
             <p>
-              Are you sure you want to delete this admin?<br />
-              <strong className="delete-emphasis">{selectedAdmin.name} ({selectedAdmin.email})</strong>
+              Are you sure you want to delete this admin?
+              <br />
+              <strong className="delete-emphasis">
+                {selectedAdmin.name} ({selectedAdmin.email})
+              </strong>
               <br />
               This action cannot be undone.
             </p>
             <div className="modal-actions">
-              <button 
+              <button
                 onClick={() => {
                   setIsDeleteModalOpen(false);
                   setSelectedAdmin(null);
-                }} 
+                }}
                 className="cancel-btn"
               >
                 Cancel
               </button>
-              <button 
+              <button
                 onClick={() => {
                   // In a real app, you would delete from your backend
                   // This is just a mock implementation
@@ -621,7 +684,7 @@ const AdminManagement = () => {
                   // }
                   setIsDeleteModalOpen(false);
                   setSelectedAdmin(null);
-                }} 
+                }}
                 className="delete-btn"
               >
                 Delete Admin
@@ -637,22 +700,26 @@ const AdminManagement = () => {
           <div className="modal confirmation-modal">
             <h2>Confirm Demotion</h2>
             <p>
-              Are you sure you want to demote this admin to a regular user?<br />
-              <strong className="demote-emphasis">{selectedAdmin.name} ({selectedAdmin.email})</strong>
+              Are you sure you want to demote this admin to a regular user?
               <br />
-              They will lose all admin privileges and access to the admin dashboard.
+              <strong className="demote-emphasis">
+                {selectedAdmin.name} ({selectedAdmin.email})
+              </strong>
+              <br />
+              They will lose all admin privileges and access to the admin
+              dashboard.
             </p>
             <div className="modal-actions">
-              <button 
+              <button
                 onClick={() => {
                   setIsDemoteModalOpen(false);
                   setSelectedAdmin(null);
-                }} 
+                }}
                 className="cancel-btn"
               >
                 Cancel
               </button>
-              <button 
+              <button
                 onClick={() => {
                   // In a real app, you would call your backend API to demote the admin
                   // This is just a mock implementation
@@ -663,7 +730,7 @@ const AdminManagement = () => {
                   // }
                   setIsDemoteModalOpen(false);
                   setSelectedAdmin(null);
-                }} 
+                }}
                 className="warning-btn"
               >
                 Demote to User
