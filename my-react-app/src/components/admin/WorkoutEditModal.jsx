@@ -507,7 +507,7 @@ const WorkoutEditModal = ({ workout, onClose, onSave, isCreating = false }) => {
           </div>
         </div>
 
-        {loading && !editedWorkout.exercises.length ? (
+        {loading && !editedWorkout.exercises?.length ? (
           <div className="workout-loading-container">
             <div className="workout-loading-spinner"></div>
             <span>Loading...</span>
@@ -695,7 +695,7 @@ const WorkoutEditModal = ({ workout, onClose, onSave, isCreating = false }) => {
             )}
 
             <div className="admin-exercises-list sortable-list">
-              {editedWorkout.exercises.map((exercise, index) => (
+              {editedWorkout.exercises?.map((exercise, index) => (
                 <div key={exercise.id} className="admin-exercise-item-wrapper">
                   <div
                     className={`admin-exercise-item ${
