@@ -15,7 +15,13 @@ const AdminProfile = ({
   // Use provided admin data or fall back to mock data
   const [adminData, setAdminData] = useState(initialAdminData || mockData.currentUser);
   const [isEditMode, setIsEditMode] = useState(false);
-  const [formData, setFormData] = useState({...adminData});
+  const [formData, setFormData] = useState({
+    firstName: adminData.firstName || '',
+    lastName: adminData.lastName || '',
+    email: adminData.email || '',
+    phone: adminData.phone || '',
+    avatar: adminData.avatar || null
+  });
   const [passwordData, setPasswordData] = useState({
     currentPassword: '',
     newPassword: '',
@@ -34,7 +40,13 @@ const AdminProfile = ({
   useEffect(() => {
     if (initialAdminData) {
       setAdminData(initialAdminData);
-      setFormData(initialAdminData);
+      setFormData({
+        firstName: initialAdminData.firstName || '',
+        lastName: initialAdminData.lastName || '',
+        email: initialAdminData.email || '',
+        phone: initialAdminData.phone || '',
+        avatar: initialAdminData.avatar || null
+      });
     }
   }, [initialAdminData]);
 
@@ -64,7 +76,13 @@ const AdminProfile = ({
         if (!userId) throw new Error('No user ID found in token');
         const user = await getUserById(userId, token);
         setAdminData(user);
-        setFormData(user);
+        setFormData({
+          firstName: user.firstName || '',
+          lastName: user.lastName || '',
+          email: user.email || '',
+          phone: user.phone || '',
+          avatar: user.avatar || null
+        });
       } catch (err) {
         setErrorMessage(err.message || 'Failed to load profile');
       } finally {
@@ -77,10 +95,10 @@ const AdminProfile = ({
 
   const handleInputChange = (e) => {
     const { name, value } = e.target;
-    setFormData({
-      ...formData,
+    setFormData(prev => ({
+      ...prev,
       [name]: value
-    });
+    }));
   };
 
   const handlePasswordChange = (e) => {
@@ -91,34 +109,61 @@ const AdminProfile = ({
     });
   };
 
-  const handleProfileSubmit = (e) => {
+  const handleProfileSubmit = async (e) => {
     e.preventDefault();
-    
+    setErrorMessage('');
+    setSuccessMessage('');
     setIsLoading(true);
     
-    // If an onSave callback was provided, use it
-    if (onSave) {
-      onSave(formData)
-        .then(() => {
-          setAdminData(formData);
-          setIsEditMode(false);
-          setIsLoading(false);
-          setSuccessMessage('Profile updated successfully!');
-          setTimeout(() => setSuccessMessage(''), 3000);
-        })
-        .catch(error => {
-          setIsLoading(false);
-          setErrorMessage(error.message || 'Failed to update profile');
-        });
-    } else {
-      // For demo/mock mode, simulate API call
-      setTimeout(() => {
-        setAdminData({...formData});
-        setIsEditMode(false);
-        setIsLoading(false);
-        setSuccessMessage('Profile updated successfully!');
+    try {
+      const token = localStorage.getItem('token');
+      if (!token) throw new Error('No auth token found');
+
+      // Prepare the data for the API
+      const updateData = {
+        firstName: formData.firstName.trim(),
+        lastName: formData.lastName.trim(),
+        email: formData.email.trim(),
+        phone: formData.phone?.trim() || null,
+        avatar: formData.avatar
+      };
+
+      // Validate required fields
+      if (!updateData.firstName || !updateData.lastName) {
+        throw new Error('First name and last name are required');
+      }
+
+      if (!updateData.email) {
+        throw new Error('Email is required');
+      }
+
+      // Email validation
+      const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+      if (!emailRegex.test(updateData.email)) {
+        throw new Error('Please enter a valid email address');
+      }
+
+      // If an onSave callback was provided, use it
+      if (onSave) {
+        await onSave(updateData);
+      } else {
+        // For demo/mock mode, simulate API call
+        await new Promise(resolve => setTimeout(resolve, 800));
+      }
+
+      setAdminData(prev => ({
+        ...prev,
+        ...updateData
+      }));
+      setIsEditMode(false);
+      setSuccessMessage('Profile updated successfully!');
+    } catch (error) {
+      setErrorMessage(error.message || 'Failed to update profile');
+    } finally {
+      setIsLoading(false);
+      if (successMessage) {
         setTimeout(() => setSuccessMessage(''), 3000);
-      }, 800);
+      }
     }
   };
 
@@ -356,18 +401,35 @@ const AdminProfile = ({
               <form onSubmit={handleProfileSubmit} className="profile-edit-form fade-in">
                 <div className="form-row">
                   <div className="form-group">
-                    <label htmlFor="name">Full Name</label>
+                    <label htmlFor="firstName">First Name</label>
                     <input 
                       type="text"
-                      id="name"
-                      name="name"
-                      value={formData.name}
+                      id="firstName"
+                      name="firstName"
+                      value={formData.firstName}
                       onChange={handleInputChange}
                       required
                       className="input-animation"
+                      placeholder="Enter first name"
                     />
                   </div>
                   
+                  <div className="form-group">
+                    <label htmlFor="lastName">Last Name</label>
+                    <input 
+                      type="text"
+                      id="lastName"
+                      name="lastName"
+                      value={formData.lastName}
+                      onChange={handleInputChange}
+                      required
+                      className="input-animation"
+                      placeholder="Enter last name"
+                    />
+                  </div>
+                </div>
+
+                <div className="form-row">
                   <div className="form-group">
                     <label htmlFor="email">Email</label>
                     <input 
@@ -378,6 +440,20 @@ const AdminProfile = ({
                       onChange={handleInputChange}
                       required
                       className="input-animation"
+                      placeholder="Enter email address"
+                    />
+                  </div>
+                  
+                  <div className="form-group">
+                    <label htmlFor="phone">Phone (Optional)</label>
+                    <input 
+                      type="tel"
+                      id="phone"
+                      name="phone"
+                      value={formData.phone || ''}
+                      onChange={handleInputChange}
+                      className="input-animation"
+                      placeholder="Enter phone number"
                     />
                   </div>
                 </div>
@@ -388,7 +464,14 @@ const AdminProfile = ({
                     className="cancel-btn"
                     onClick={() => {
                       setIsEditMode(false);
-                      setFormData({...adminData});
+                      setFormData({
+                        firstName: adminData.firstName || '',
+                        lastName: adminData.lastName || '',
+                        email: adminData.email || '',
+                        phone: adminData.phone || '',
+                        avatar: adminData.avatar || null
+                      });
+                      setErrorMessage('');
                     }}
                   >
                     Cancel
@@ -397,8 +480,9 @@ const AdminProfile = ({
                   <button 
                     type="submit"
                     className="save-btn"
+                    disabled={isLoading}
                   >
-                    Save Changes
+                    {isLoading ? 'Saving...' : 'Save Changes'}
                   </button>
                 </div>
               </form>
