@@ -1,0 +1,129 @@
+.users-table {
+  width: 100%;
+  border-collapse: collapse;
+  margin-top: 1rem;
+}
+
+.users-table th,
+.users-table td {
+  padding: 1rem;
+  text-align: left;
+  vertical-align: middle;
+}
+
+/* Column widths and alignment */
+.col-admin {
+  width: 40%;
+  min-width: 300px;
+}
+
+.col-role {
+  width: 20%;
+  min-width: 150px;
+}
+
+.col-permissions {
+  width: 40%;
+  min-width: 300px;
+}
+
+/* Admin cell styles */
+.admin-user-cell {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+}
+
+.admin-avatar {
+  flex-shrink: 0;
+}
+
+.admin-user-info {
+  min-width: 0; /* Allows text truncation */
+}
+
+.admin-user-name {
+  font-weight: 500;
+  margin-bottom: 0.25rem;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.admin-user-email {
+  color: #666;
+  font-size: 0.875rem;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+/* Role badge styles */
+.admin-role-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.5rem 0.75rem;
+  background: #f3f4f6;
+  border-radius: 0.375rem;
+  font-size: 0.875rem;
+}
+
+/* Permission tags styles */
+.admin-permission-tags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+}
+
+.admin-tag {
+  display: inline-block;
+  padding: 0.25rem 0.75rem;
+  background: #e5e7eb;
+  border-radius: 9999px;
+  font-size: 0.75rem;
+  white-space: nowrap;
+}
+
+/* Avatar styles */
+.avatar-initials {
+  width: 2.5rem;
+  height: 2.5rem;
+  background: #4b5563;
+  color: white;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 500;
+  font-size: 1rem;
+}
+
+/* Table header styles */
+.users-table th {
+  background: #f9fafb;
+  font-weight: 600;
+  color: #374151;
+  border-bottom: 2px solid #e5e7eb;
+}
+
+/* Table row hover effect */
+.users-table tbody tr:hover {
+  background: #f9fafb;
+}
+
+/* Animation for new rows */
+.animate-fade-in {
+  animation: fadeIn 0.3s ease-in-out;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+} 

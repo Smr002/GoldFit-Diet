@@ -1,14 +1,18 @@
 import React, { useState } from "react";
+import emailjs from "emailjs-com";
 
 const ContactUs = () => {
   const [formData, setFormData] = useState({
     name: "",
-    email: "",
     subject: "",
     message: "",
+    email: "",
   });
 
   const [submitted, setSubmitted] = useState(false);
+
+  // ✅ Init EmailJS
+  emailjs.init("IMj8XOG521Ow67f3D");
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -18,18 +22,35 @@ const ContactUs = () => {
     }));
   };
 
+  const sendMail = (formData) => {
+    const params = {
+      user_name: formData.name,
+      message: formData.message,
+      user_email: formData.email,
+      subject: formData.subject,
+    };
+
+    emailjs.send("service_1cbr1sj", "template_gz98svp", params).then(
+      function (res) {
+        setFormData({
+          name: "",
+          email: "",
+          subject: "",
+          message: "",
+        });
+      },
+      function (error) {
+        console.error("Failed to send email:", error);
+      }
+    );
+  };
+
   const handleSubmit = (e) => {
     e.preventDefault();
-    console.log("Form submitted:", formData);
+    sendMail(formData);
     setSubmitted(true);
 
     setTimeout(() => {
-      setFormData({
-        name: "",
-        email: "",
-        subject: "",
-        message: "",
-      });
       setSubmitted(false);
     }, 3000);
   };
@@ -46,7 +67,7 @@ const ContactUs = () => {
           <div className="contact-info">
             <h3>Get in Touch</h3>
 
-            <div className="info-item">
+            <div className="info-item visible">
               <div className="info-icon">
                 <svg
                   xmlns="http://www.w3.org/2000/svg"
@@ -74,7 +95,7 @@ const ContactUs = () => {
               </div>
             </div>
 
-            <div className="info-item">
+            <div className="info-item visible">
               <div className="info-icon">
                 <svg
                   xmlns="http://www.w3.org/2000/svg"
@@ -92,11 +113,11 @@ const ContactUs = () => {
               </div>
               <div>
                 <p className="info-label">Phone</p>
-                <p>(555) 123-4567</p>
+                <p>+1 336 568 7240</p>
               </div>
             </div>
 
-            <div className="info-item">
+            <div className="info-item visible">
               <div className="info-icon">
                 <svg
                   xmlns="http://www.w3.org/2000/svg"
@@ -114,11 +135,11 @@ const ContactUs = () => {
               </div>
               <div>
                 <p className="info-label">Email</p>
-                <p>info@fitlife.com</p>
+                <p>goldfitservice7@gmail.com</p>
               </div>
             </div>
 
-            <div className="info-item">
+            <div className="info-item visible">
               <div className="info-icon">
                 <svg
                   xmlns="http://www.w3.org/2000/svg"
@@ -173,7 +194,6 @@ const ContactUs = () => {
               </div>
             </div>
           </div>
-
           <div className="contact-form">
             {submitted ? (
               <div className="form-success">

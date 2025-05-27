@@ -4,7 +4,6 @@ import {
   Typography,
   Box,
   IconButton,
-  Link,
   Divider,
   Button,
 } from "@mui/material";
@@ -19,20 +18,38 @@ export default function DynamicSelection({
   data,
   linkPrefix,
   nextLink,
-  imageHeight,
   prevLink,
+  imageHeight,
 }) {
   const navigate = useNavigate();
-
-  const { setBodyType, setAgeGroup, setGoal } = useCreateAccountStore();
+  const {
+    setBodyType,
+    setAgeGroup,
+    setHeight,
+    setWeight,
+    setGoal,
+    setBodyYouWant,
+    setGender,
+    setYourRealGoal,
+  } = useCreateAccountStore();
 
   const handleSelect = (itemLabel) => {
-    if (linkPrefix.includes("body-type")) {
+    if (linkPrefix.includes("gender")) {
+      setGender(itemLabel);
+    } else if (linkPrefix.includes("body-type")) {
       setBodyType(itemLabel);
     } else if (linkPrefix.includes("age-selection")) {
       setAgeGroup(itemLabel);
+    } else if (linkPrefix.includes("height")) {
+      setHeight(itemLabel);
+    } else if (linkPrefix.includes("weight")) {
+      setWeight(itemLabel);
     } else if (linkPrefix.includes("your-goal")) {
       setGoal(itemLabel);
+      // Also set the real goal which in turn sets the proper flags.
+      setYourRealGoal(itemLabel);
+    } else if (linkPrefix.includes("body-you-want")) {
+      setBodyYouWant(itemLabel);
     }
 
     navigate(nextLink || `${linkPrefix}/${itemLabel.toLowerCase()}`);
@@ -50,7 +67,6 @@ export default function DynamicSelection({
         <Typography variant="h3" fontWeight="bold" sx={{ marginBottom: 2 }}>
           {title}
         </Typography>
-
         {description && (
           <Typography
             variant="subtitle1"
@@ -59,7 +75,6 @@ export default function DynamicSelection({
             {description}
           </Typography>
         )}
-
         <Box
           sx={{
             display: "grid",
@@ -104,7 +119,11 @@ export default function DynamicSelection({
               >
                 <Typography
                   variant="subtitle1"
-                  sx={{ color: "#fff", fontWeight: "bold", letterSpacing: 1 }}
+                  sx={{
+                    color: "#fff",
+                    fontWeight: "bold",
+                    letterSpacing: 1,
+                  }}
                 >
                   {item.label}
                 </Typography>
@@ -115,7 +134,6 @@ export default function DynamicSelection({
             </Card>
           ))}
         </Box>
-
         {prevLink && (
           <>
             <Divider sx={{ marginY: 2 }}>or</Divider>

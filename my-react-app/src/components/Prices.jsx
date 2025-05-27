@@ -2,20 +2,20 @@ import React, { useState, useEffect } from "react";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faEllipsisH, faMoon, faSun } from "@fortawesome/free-solid-svg-icons";
 
-const Prices = () => {
+const Prices = ({ setModalOpen }) => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [isDarkMode, setIsDarkMode] = useState(false);
-  
+
   const [isVisible, setIsVisible] = useState(false);
   const [selectedPlan, setSelectedPlan] = useState("monthly");
-  
+
   useEffect(() => {
     const savedTheme = localStorage.getItem("theme");
     if (savedTheme === "dark") {
       setIsDarkMode(true);
       document.body.classList.add("dark-mode");
     }
-    
+
     const handleScroll = () => {
       const section = document.getElementById("prices-section");
       if (section) {
@@ -25,20 +25,20 @@ const Prices = () => {
         }
       }
     };
-    
+
     window.addEventListener("scroll", handleScroll);
     handleScroll();
     return () => window.removeEventListener("scroll", handleScroll);
   }, []);
-  
+
   const toggleMenu = () => {
     setIsMenuOpen(!isMenuOpen);
   };
-  
+
   const toggleDarkMode = () => {
     const newDarkModeState = !isDarkMode;
     setIsDarkMode(newDarkModeState);
-    
+
     if (newDarkModeState) {
       document.body.classList.add("dark-mode");
       localStorage.setItem("theme", "dark");
@@ -46,14 +46,28 @@ const Prices = () => {
       document.body.classList.remove("dark-mode");
       localStorage.setItem("theme", "light");
     }
-    
+
     setIsMenuOpen(false);
   };
-  
+
   const togglePlan = (plan) => {
     setSelectedPlan(plan);
   };
-  
+
+  // Function to handle CTA button clicks - opens the modal
+  const handleCTAClick = (plan) => {
+    if (typeof setModalOpen === "function") {
+      // Pass the selected plan and period to the modal
+      setModalOpen({
+        open: true,
+        plan: plan,
+        period: selectedPlan,
+      });
+    } else {
+      console.error("setModalOpen is not a function");
+    }
+  };
+
   const plans = {
     monthly: [
       {
@@ -69,11 +83,11 @@ const Prices = () => {
           { text: "Online workout library", included: true },
           { text: "Personal training sessions", included: false },
           { text: "Nutrition consultation", included: false },
-          { text: "Premium app features", included: false }
+          { text: "Premium app features", included: false },
         ],
         popular: false,
         cta: "Get Started",
-        color: "var(--primary-color)"
+        color: "var(--primary-color)",
       },
       {
         id: 2,
@@ -88,11 +102,11 @@ const Prices = () => {
           { text: "Online workout library", included: true },
           { text: "2 personal training sessions", included: true },
           { text: "Nutrition consultation", included: false },
-          { text: "Premium app features", included: true }
+          { text: "Premium app features", included: true },
         ],
         popular: true,
         cta: "Join Now",
-        color: "var(--secondary-color)"
+        color: "var(--secondary-color)",
       },
       {
         id: 3,
@@ -107,12 +121,12 @@ const Prices = () => {
           { text: "Online workout library", included: true },
           { text: "4 personal training sessions", included: true },
           { text: "Monthly nutrition consultation", included: true },
-          { text: "Premium app features", included: true }
+          { text: "Premium app features", included: true },
         ],
         popular: false,
         cta: "Go Premium",
-        color: "var(--primary-color)"
-      }
+        color: "var(--primary-color)",
+      },
     ],
     annual: [
       {
@@ -128,12 +142,12 @@ const Prices = () => {
           { text: "Online workout library", included: true },
           { text: "Personal training sessions", included: false },
           { text: "Nutrition consultation", included: false },
-          { text: "Premium app features", included: false }
+          { text: "Premium app features", included: false },
         ],
         popular: false,
         cta: "Get Started",
         color: "var(--primary-color)",
-        savings: "Save $60"
+        savings: "Save $60",
       },
       {
         id: 2,
@@ -148,12 +162,12 @@ const Prices = () => {
           { text: "Online workout library", included: true },
           { text: "2 personal training sessions", included: true },
           { text: "Nutrition consultation", included: false },
-          { text: "Premium app features", included: true }
+          { text: "Premium app features", included: true },
         ],
         popular: true,
         cta: "Join Now",
         color: "var(--secondary-color)",
-        savings: "Save $100"
+        savings: "Save $100",
       },
       {
         id: 3,
@@ -168,49 +182,60 @@ const Prices = () => {
           { text: "Online workout library", included: true },
           { text: "4 personal training sessions", included: true },
           { text: "Monthly nutrition consultation", included: true },
-          { text: "Premium app features", included: true }
+          { text: "Premium app features", included: true },
         ],
         popular: false,
         cta: "Go Premium",
         color: "var(--primary-color)",
-        savings: "Save $160"
-      }
-    ]
+        savings: "Save $160",
+      },
+    ],
   };
-  
+
   return (
     <section id="prices" className="section">
-      <div id="prices-section" className={`prices-content section-content fade-in ${isVisible ? "visible" : ""}`}>
+      <div
+        id="prices-section"
+        className={`prices-content section-content fade-in ${
+          isVisible ? "visible" : ""
+        }`}
+      >
         <h2 className="section-title">Membership Plans</h2>
         <div className="section-divider"></div>
         <p className="prices-description">
-          Choose the perfect membership plan to achieve your fitness goals. 
-          Sign up today and start your journey to a healthier lifestyle.
+          Choose the perfect membership plan to achieve your fitness goals. Sign
+          up today and start your journey to a healthier lifestyle.
         </p>
-        
+
         <div className="pricing-toggle">
-          <button 
-            className={`toggle-btn ${selectedPlan === "monthly" ? "active" : ""}`}
+          <button
+            className={`toggle-btn ${
+              selectedPlan === "monthly" ? "active" : ""
+            }`}
             onClick={() => togglePlan("monthly")}
           >
             Monthly
           </button>
-          <button 
-            className={`toggle-btn ${selectedPlan === "annual" ? "active" : ""}`}
+          <button
+            className={`toggle-btn ${
+              selectedPlan === "annual" ? "active" : ""
+            }`}
             onClick={() => togglePlan("annual")}
           >
             Annual
           </button>
         </div>
-        
+
         <div className="pricing-cards">
           {plans[selectedPlan].map((plan) => (
-            <div 
-              key={plan.id} 
+            <div
+              key={plan.id}
               className={`pricing-card ${plan.popular ? "popular" : ""}`}
               style={plan.popular ? { borderColor: plan.color } : {}}
             >
-              {plan.popular && <div className="popular-badge">Most Popular</div>}
+              {plan.popular && (
+                <div className="popular-badge">Most Popular</div>
+              )}
               <div className="pricing-header">
                 <h3>{plan.title}</h3>
                 <div className="pricing-amount">
@@ -218,12 +243,17 @@ const Prices = () => {
                   <span className="price">{plan.price}</span>
                   <span className="period">/{plan.period}</span>
                 </div>
-                {plan.savings && <div className="annual-savings">{plan.savings}</div>}
+                {plan.savings && (
+                  <div className="annual-savings">{plan.savings}</div>
+                )}
               </div>
               <div className="pricing-features">
                 <ul>
                   {plan.features.map((feature, index) => (
-                    <li key={index} className={feature.included ? "included" : "excluded"}>
+                    <li
+                      key={index}
+                      className={feature.included ? "included" : "excluded"}
+                    >
                       <span className="feature-icon">
                         {feature.included ? "✓" : "×"}
                       </span>
@@ -233,9 +263,16 @@ const Prices = () => {
                 </ul>
               </div>
               <div className="pricing-footer">
-                <button 
-                  className="pricing-cta" 
-                  style={{ background: `linear-gradient(to right, ${plan.color}, ${plan.popular ? "var(--secondary-color)" : "var(--primary-color)"})` }}
+                <button
+                  className="pricing-cta"
+                  style={{
+                    background: `linear-gradient(to right, ${plan.color}, ${
+                      plan.popular
+                        ? "var(--secondary-color)"
+                        : "var(--primary-color)"
+                    })`,
+                  }}
+                  onClick={() => handleCTAClick(plan)}
                 >
                   {plan.cta}
                 </button>
@@ -243,13 +280,21 @@ const Prices = () => {
             </div>
           ))}
         </div>
-        
+
         <div className="pricing-note">
-          <p>All plans include a 7-day free trial. Cancel anytime during trial period.</p>
-          <p>Need a custom plan? <a href="#contact">Contact us</a></p>
+          <p>
+            All plans include a 7-day free trial. Cancel anytime during trial
+            period.
+          </p>
+          <p>
+            Need a custom plan?{" "}
+            <a href="https://mail.google.com/mail/?view=cm&fs=1&to=goldfitservice7@gmail.com&su=Hello&body=Hi%20GoldFit%20Team,">
+              Contact us
+            </a>
+          </p>
         </div>
       </div>
-      
+
       {/* Theme Toggle */}
       <div className="theme-toggle-container">
         {isMenuOpen && (
