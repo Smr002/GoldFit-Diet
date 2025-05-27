@@ -722,7 +722,7 @@ const handleDeleteProfile = async () => {
             },
           }}
         >
-          Delete Profile
+          Deactivate Profile
         </Button>
       </Box>
 

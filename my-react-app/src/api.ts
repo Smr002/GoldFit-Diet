@@ -318,16 +318,15 @@ export async function getWeeklySummary(token: string, weekStart: string) {
   }
 }
 
-// api.ts
 export async function deleteUser(id: number, token: string) {
   try {
-    console.log("Sending DELETE request for user ID:", id); // Debugging log
-    const response = await axios.delete(`${API_BASE_URL}/users/${id}`, {
+    console.log("Sending DELETE request for user ID:", id);
+    const response = await axios.delete(`${API_BASE_URL}/admin/users/${id}`, {  // Changed from /users/${id} to /admin/users/${id}
       headers: {
         Authorization: `Bearer ${token}`,
       },
     });
-    console.log("Delete user response:", response.data); // Debugging log
+    console.log("Delete user response:", response.data);
     return response.data;
   } catch (error: any) {
     if (axios.isAxiosError(error)) {
@@ -344,6 +343,7 @@ export async function deleteUser(id: number, token: string) {
     throw new Error("Unexpected error occurred while deleting user");
   }
 }
+
 export async function promoteUser(id: number, token: string, role = "admin", permissions = {}) {
   try {
     const response = await axios.post(
