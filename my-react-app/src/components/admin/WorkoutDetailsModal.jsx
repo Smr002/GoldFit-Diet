@@ -19,6 +19,7 @@ const WorkoutDetailsModal = ({ workout, onClose, onEdit }) => {
   const [exerciseDetails, setExerciseDetails] = useState({});
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
+  const [haveExercises, setHaveExercises] = useState([]);
   
   // Track whether details or instructions section is open
   const [detailsOpen, setDetailsOpen] = useState(true);
@@ -27,6 +28,8 @@ const WorkoutDetailsModal = ({ workout, onClose, onEdit }) => {
   // Fetch exercise details for all exercises in the workout
   useEffect(() => {
     const fetchExerciseDetails = async () => {
+      if (!workout.workoutExercises || workout.workoutExercises.length === 0) return;
+      
       setLoading(true);
       setError(null);
 
@@ -40,8 +43,8 @@ const WorkoutDetailsModal = ({ workout, onClose, onEdit }) => {
         };
 
         // Fetch exercises by their approximate names
-        const exercisePromises = workout.exercises.map(exercise => {
-          const searchTerm = exerciseNameMapping[exercise.name]?.[0] || normalizeExerciseName(exercise.name);
+        const exercisePromises = workout.workoutExercises.map(workoutExercise => {
+          const searchTerm = exerciseNameMapping[workoutExercise.exercise?.name]?.[0] || normalizeExerciseName(workoutExercise.exercise?.name);
           return fetch(
             `https://exercisedb.p.rapidapi.com/exercises/name/${searchTerm}`,
             options
@@ -54,7 +57,7 @@ const WorkoutDetailsModal = ({ workout, onClose, onEdit }) => {
         const exerciseData = {};
         results.forEach((result, index) => {
           if (result && result.length > 0) {
-            exerciseData[workout.exercises[index].id] = {
+            exerciseData[workout.workoutExercises[index].exerciseId] = {
               gifUrl: result[0].gifUrl,
               bodyPart: result[0].bodyPart,
               target: result[0].target,
@@ -74,66 +77,10 @@ const WorkoutDetailsModal = ({ workout, onClose, onEdit }) => {
     };
 
     fetchExerciseDetails();
-  }, [workout.exercises]);
+  }, [workout.workoutExercises]);
 
-  const handleExerciseClick = (exercise) => {
-    if (expandedExercise === exercise.id) {
-      setExpandedExercise(null);
-      return;
-    }
-
-    setExpandedExercise(exercise.id);
-    setError(null);
-    
-    if (!exerciseDetails[exercise.id]) {
-      // If we don't have this exercise's details yet, fetch it
-      fetchSingleExerciseDetails(exercise);
-    }
-  };
-
-  const fetchSingleExerciseDetails = async (exercise) => {
-    try {
-      const options = {
-        method: "GET",
-        headers: {
-          "X-RapidAPI-Key": import.meta.env.VITE_RAPID_API_KEY || "",
-          "X-RapidAPI-Host": "exercisedb.p.rapidapi.com",
-        },
-      };
-      
-      // Try each possible name variation
-      const namesToTry = exerciseNameMapping[exercise.name] || [normalizeExerciseName(exercise.name)];
-      
-      for (const name of namesToTry) {
-        const response = await fetch(
-          `https://exercisedb.p.rapidapi.com/exercises/name/${name}`,
-          options
-        );
-        
-        if (response.ok) {
-          const data = await response.json();
-          if (data && data.length > 0) {
-            setExerciseDetails(prev => ({
-              ...prev,
-              [exercise.id]: {
-                gifUrl: data[0].gifUrl,
-                bodyPart: data[0].bodyPart,
-                target: data[0].target,
-                equipment: data[0].equipment,
-                instructions: data[0].instructions || ["Follow the animation carefully.", "Maintain proper form throughout the exercise."]
-              }
-            }));
-            return; // Exit once we find a match
-          }
-        }
-      }
-      
-      // If we get here, no match was found
-      setError(`Could not find exercise: ${exercise.name}`);
-    } catch (error) {
-      console.error("Error fetching exercise details:", error);
-      setError("Failed to fetch exercise details. Please try again.");
-    }
+  const handleExerciseClick = (exerciseId) => {
+    setExpandedExercise(expandedExercise === exerciseId ? null : exerciseId);
   };
 
   const formattedDate = new Date(workout.createdAt).toLocaleDateString('en-US', {
@@ -193,13 +140,6 @@ const WorkoutDetailsModal = ({ workout, onClose, onEdit }) => {
           </div>
         </div>
 
-        {/* Display workout cover image if available */}
-        {workout.coverImage && (
-          <div className="workout-cover-image">
-            <img src={workout.coverImage} alt={workout.name} />
-          </div>
-        )}
-
         {loading ? (
           <div className="workout-loading-container">
             <div className="workout-loading-spinner"></div>
@@ -209,105 +149,115 @@ const WorkoutDetailsModal = ({ workout, onClose, onEdit }) => {
           <div className="workout-details-content">
             <div className="admin-exercises-header">
               <h3>Exercises</h3>
-              <span className="admin-exercise-count">{workout.exercises?.length || 0} exercises</span>
+              <span className="admin-exercise-count">{workout.workoutExercises?.length || 0} exercises</span>
             </div>
 
             <div className="admin-exercises-list">
-              {workout.exercises?.map((exercise) => (
-                <div key={exercise.id} className="admin-exercise-item-wrapper">
-                  <div
-                    className={`admin-exercise-item ${expandedExercise === exercise.id ? 'expanded' : ''}`}
-                    onClick={() => handleExerciseClick(exercise)}
-                  >
-                    <div className="admin-exercise-icon">
-                      <Dumbbell size={20} />
-                    </div>
-                    <div className="admin-exercise-info">
-                      <span className="admin-exercise-name">{exercise.name}</span>
-                      <span className="admin-exercise-reps">{exercise.reps}</span>
-                    </div>
-                    <ChevronDown
-                      size={20}
-                      className={`admin-exercise-chevron ${expandedExercise === exercise.id ? 'rotated' : ''}`}
-                    />
-                  </div>
-                  {expandedExercise === exercise.id && (
-                    <div className="admin-exercise-content">
-                      {error && expandedExercise === exercise.id ? (
-                        <div className="admin-exercise-error">{error}</div>
-                      ) : exerciseDetails[exercise.id] ? (
-                        <div className="admin-exercise-details">
-                          <div className="admin-exercise-video">
-                            <img
-                              src={exerciseDetails[exercise.id].gifUrl}
-                              alt={exercise.name}
-                              loading="lazy"
-                            />
+              {workout.workoutExercises && workout.workoutExercises.length > 0 ? (
+                workout.workoutExercises.map((workoutExercise, index) => {
+                  return (
+                    <div key={workoutExercise.exerciseId} className="admin-exercise-item-wrapper">
+                      <div
+                        className={`admin-exercise-item ${
+                          expandedExercise === workoutExercise.exerciseId ? "expanded" : ""
+                        }`}
+                        onClick={() => handleExerciseClick(workoutExercise.exerciseId)}
+                      >
+                        <div className="exercise-drag-handle">
+                          <span className="drag-dots">⋮⋮</span>
+                        </div>
+                        <div className="admin-exercise-icon">
+                          <Dumbbell size={20} />
+                        </div>
+                        <div className="admin-exercise-info">
+                          <div className="exercise-details">
+                            <h4 className="exercise-name">
+                              {workoutExercise.exercise?.name}
+                            </h4>
+                            <div className="exercise-meta">
+                              {workoutExercise.sets} sets x {workoutExercise.reps} reps
+                            </div>
                           </div>
-                          
-                          {/* Exercise Details Section */}
-                          <div className="exercise-info-section">
-                            <div 
-                              className="exercise-info-header"
-                              onClick={toggleDetails}
-                            >
-                              <h4>Details</h4>
-                              <ChevronDown
-                                size={16}
-                                className={`info-chevron ${detailsOpen ? 'rotated' : ''}`}
+                        </div>
+                        <ChevronDown
+                          size={20}
+                          className={`admin-exercise-chevron ${
+                            expandedExercise === workoutExercise.exerciseId ? "rotated" : ""
+                          }`}
+                        />
+                      </div>
+                      {expandedExercise === workoutExercise.exerciseId && (
+                        <div className="admin-exercise-content">
+                          <div className="admin-exercise-details">
+                            <div className="admin-exercise-video">
+                              <img
+                                src={exerciseDetails[workoutExercise.exerciseId]?.gifUrl}
+                                alt={workoutExercise.exercise?.name}
+                                loading="lazy"
                               />
                             </div>
-                            
-                            {detailsOpen && (
+
+                            <div className="exercise-info-section">
+                              <div className="exercise-info-header">
+                                <h4>Details</h4>
+                                <ChevronDown
+                                  size={16}
+                                  className="info-chevron rotated"
+                                />
+                              </div>
                               <div className="exercise-info-content">
                                 <div className="exercise-info-grid">
                                   <span className="info-label">Body Part:</span>
-                                  <span className="info-value">{exerciseDetails[exercise.id].bodyPart}</span>
-                                  
+                                  <span className="info-value">
+                                    {exerciseDetails[workoutExercise.exerciseId]?.bodyPart}
+                                  </span>
+
                                   <span className="info-label">Target:</span>
-                                  <span className="info-value">{exerciseDetails[exercise.id].target}</span>
-                                  
+                                  <span className="info-value">
+                                    {exerciseDetails[workoutExercise.exerciseId]?.target}
+                                  </span>
+
                                   <span className="info-label">Equipment:</span>
-                                  <span className="info-value">{exerciseDetails[exercise.id].equipment}</span>
+                                  <span className="info-value">
+                                    {exerciseDetails[workoutExercise.exerciseId]?.equipment || "Bodyweight"}
+                                  </span>
+
+                                  <span className="info-label">Day:</span>
+                                  <span className="info-value">
+                                    Day {workoutExercise.dayOfTheWeek}
+                                  </span>
                                 </div>
                               </div>
-                            )}
-                          </div>
-                          
-                          {/* Exercise Instructions Section */}
-                          <div className="exercise-info-section">
-                            <div 
-                              className="exercise-info-header"
-                              onClick={toggleInstructions}
-                            >
-                              <h4>Instructions</h4>
-                              <ChevronDown
-                                size={16}
-                                className={`info-chevron ${instructionsOpen ? 'rotated' : ''}`}
-                              />
                             </div>
-                            
-                            {instructionsOpen && (
+
+                            <div className="exercise-info-section">
+                              <div className="exercise-info-header">
+                                <h4>Instructions</h4>
+                                <ChevronDown size={16} className="info-chevron" />
+                              </div>
                               <div className="exercise-info-content">
                                 <ol className="exercise-instructions-list">
-                                  {exerciseDetails[exercise.id].instructions?.map((instruction, i) => (
-                                    <li key={i}>{instruction}</li>
-                                  ))}
+                                  {exerciseDetails[workoutExercise.exerciseId]?.instructions ? (
+                                    exerciseDetails[workoutExercise.exerciseId].instructions.map((instruction, i) => (
+                                      <li key={i}>{instruction}</li>
+                                    ))
+                                  ) : (
+                                    <li>Follow proper form and technique for {workoutExercise.exercise?.name}</li>
+                                  )}
                                 </ol>
                               </div>
-                            )}
+                            </div>
                           </div>
-                        </div>
-                      ) : (
-                        <div className="admin-exercise-loading">
-                          <div className="loading-spinner"></div>
-                          <span>Loading exercise details...</span>
                         </div>
                       )}
                     </div>
-                  )}
+                  );
+                })
+              ) : (
+                <div className="no-exercises-message">
+                  No exercises in this workout.
                 </div>
-              ))}
+              )}
             </div>
           </div>
         )}

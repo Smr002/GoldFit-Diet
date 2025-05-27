@@ -15,7 +15,9 @@ import {
   Info,
   Image,
   Upload,
+  CheckIcon,
 } from "lucide-react";
+import { getExercisesById } from "../../api";
 
 // Mapping for common exercise name variations
 const exerciseNameMapping = {
@@ -66,6 +68,41 @@ const WorkoutEditModal = ({ workout, onClose, onSave, isCreating = false }) => {
   const [selectedListExercise, setSelectedListExercise] = useState(null);
   const [detailsOpen, setDetailsOpen] = useState(true);
   const [instructionsOpen, setInstructionsOpen] = useState(false);
+  const [haveExercises, setHaveExercises] = useState(workout.workoutExercises || []);
+
+  // Add debug logs
+  useEffect(() => {
+    console.log("Initial workout:", workout);
+    console.log("Initial workoutExercises:", workout.workoutExercises);
+    console.log("Initial haveExercises:", haveExercises);
+  }, []);
+
+  // Update haveExercises when workout.workoutExercises changes
+  useEffect(() => {
+    console.log("workoutExercises changed:", workout.workoutExercises);
+    if (workout.workoutExercises) {
+      // Fetch exercise details for each workout exercise
+      const fetchExerciseDetails = async () => {
+        try {
+          const token = localStorage.getItem("authToken");
+          const exercisesWithDetails = await Promise.all(
+            workout.workoutExercises.map(async (we) => {
+              const exerciseDetails = await getExercisesById(we.exerciseId, token);
+              return {
+                ...we,
+                exercise: exerciseDetails
+              };
+            })
+          );
+          console.log("Exercises with details:", exercisesWithDetails);
+          setHaveExercises(exercisesWithDetails);
+        } catch (error) {
+          console.error("Error fetching exercise details:", error);
+        }
+      };
+      fetchExerciseDetails();
+    }
+  }, [workout.workoutExercises]);
 
   // Fetch exercise library for adding new exercises
   useEffect(() => {
@@ -102,7 +139,7 @@ const WorkoutEditModal = ({ workout, onClose, onSave, isCreating = false }) => {
   // Fetch details for existing exercises in the workout
   useEffect(() => {
     const fetchExerciseDetails = async () => {
-      if (!workout.exercises || workout.exercises.length === 0) return;
+      if (!workout.workoutExercises || workout.workoutExercises.length === 0) return;
 
       try {
         const options = {
@@ -114,10 +151,10 @@ const WorkoutEditModal = ({ workout, onClose, onSave, isCreating = false }) => {
         };
 
         // Fetch exercises by their approximate names
-        const exercisePromises = workout.exercises.map((exercise) => {
+        const exercisePromises = workout.workoutExercises.map((workoutExercise) => {
           const searchTerm =
-            exerciseNameMapping[exercise.name]?.[0] ||
-            normalizeExerciseName(exercise.name);
+            workoutExercise.exercise?.name?.[0] ||
+            normalizeExerciseName(workoutExercise.exercise?.name);
           return fetch(
             `https://exercisedb.p.rapidapi.com/exercises/name/${searchTerm}`,
             options
@@ -130,7 +167,7 @@ const WorkoutEditModal = ({ workout, onClose, onSave, isCreating = false }) => {
         const exerciseData = {};
         results.forEach((result, index) => {
           if (result && result.length > 0) {
-            exerciseData[workout.exercises[index].id] = {
+            exerciseData[workout.workoutExercises[index].id] = {
               gifUrl: result[0].gifUrl,
               bodyPart: result[0].bodyPart,
               target: result[0].target,
@@ -153,7 +190,32 @@ const WorkoutEditModal = ({ workout, onClose, onSave, isCreating = false }) => {
     };
 
     fetchExerciseDetails();
-  }, [workout.exercises]);
+  }, [workout.workoutExercises]);
+
+  // Fetch exercises by ID
+  useEffect(() => {
+    const fetchExercises = async () => {
+      if (!workout.workoutExercises || workout.workoutExercises.length === 0) return;
+      
+      setLoading(true);
+      try {
+        const token = localStorage.getItem("authToken");
+        const exercisePromises = workout.workoutExercises.map(workoutExercise => 
+          getExercisesById(workoutExercise.exerciseId, token)
+        );
+        
+        const exercises = await Promise.all(exercisePromises);
+        setHaveExercises(exercises);
+      } catch (error) {
+        console.error("Error fetching exercises:", error);
+        setError("Failed to fetch exercises");
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchExercises();
+  }, [workout.workoutExercises]);
 
   // Handle form field changes
   const handleInputChange = (e) => {
@@ -171,43 +233,35 @@ const WorkoutEditModal = ({ workout, onClose, onSave, isCreating = false }) => {
 
   // Handle exercise changes
   const handleExerciseChange = (index, field, value) => {
-    const updatedExercises = [...editedWorkout.exercises];
-    updatedExercises[index] = {
-      ...updatedExercises[index],
-      [field]: value,
-    };
-    setEditedWorkout((prev) => ({ ...prev, exercises: updatedExercises }));
+    setEditedWorkout(prev => {
+      const updatedExercises = [...(prev.workoutExercises || [])];
+      updatedExercises[index] = {
+        ...updatedExercises[index],
+        [field]: value
+      };
+      return {
+        ...prev,
+        workoutExercises: updatedExercises
+      };
+    });
   };
 
   // Add new exercise
   const addExercise = (exercise) => {
-    // Use the real DB id as exerciseId
     const newExercise = {
-      exerciseId: exercise.id, // real DB id from library
-      name: exercise.name || "New Exercise",
-      reps: "3 sets x 10 reps",
-      gifUrl: exercise.gifUrl,
-      bodyPart: exercise.bodyPart,
-      target: exercise.target,
-      equipment: exercise.equipment,
+      exerciseId: exercise.id,
+      workoutId: workout.id,
+      dayOfTheWeek: 1, // Default to day 1
+      sets: 3,
+      reps: 10
     };
 
-    setExerciseDetails((prev) => ({
+    setEditedWorkout(prev => ({
       ...prev,
-      [exercise.id]: {
-        gifUrl: exercise.gifUrl,
-        bodyPart: exercise.bodyPart,
-        target: exercise.target,
-        equipment: exercise.equipment,
-        instructions: exercise.instructions,
-      },
+      workoutExercises: [...(prev.workoutExercises || []), newExercise]
     }));
 
-    setEditedWorkout((prev) => ({
-      ...prev,
-      exercises: [...prev.exercises, newExercise],
-    }));
-
+    setHaveExercises(prev => [...prev, exercise]);
     setShowExerciseSelector(false);
     setSearchTerm("");
     setSelectedListExercise(null);
@@ -215,13 +269,18 @@ const WorkoutEditModal = ({ workout, onClose, onSave, isCreating = false }) => {
 
   // Remove exercise
   const removeExercise = (index) => {
-    const updatedExercises = [...editedWorkout.exercises];
-    updatedExercises.splice(index, 1);
-    setEditedWorkout((prev) => ({ ...prev, exercises: updatedExercises }));
+    setEditedWorkout(prev => ({
+      ...prev,
+      workoutExercises: (prev.workoutExercises || []).filter((_, i) => i !== index)
+    }));
+
+    setHaveExercises(prev => prev.filter((_, i) => i !== index));
   };
 
   // Toggle exercise expansion
   const handleExerciseClick = (id) => {
+    console.log("handleExerciseClick", id);
+    console.log("Current haveExercises:", haveExercises);
     setExpandedExercise(expandedExercise === id ? null : id);
   };
 
@@ -252,7 +311,7 @@ const WorkoutEditModal = ({ workout, onClose, onSave, isCreating = false }) => {
       errors.timesPerWeek = "Frequency must be between 1-7";
     }
 
-    if (editedWorkout.exercises.length === 0) {
+    if (editedWorkout.workoutExercises.length === 0) {
       errors.exercises = "At least one exercise is required";
     }
 
@@ -260,38 +319,17 @@ const WorkoutEditModal = ({ workout, onClose, onSave, isCreating = false }) => {
     return Object.keys(errors).length === 0;
   };
 
-  // Utility to parse reps string like "3 sets x 10 reps" to { sets: 3, reps: 10 }
-  function parseRepsString(repsString) {
-    // Match patterns like "3 sets x 10 reps" or "4 sets x 12 reps"
-    const match = repsString.match(/(\d+)\s*sets?\s*x\s*(\d+)\s*reps?/i);
-    if (match) {
-      return {
-        sets: parseInt(match[1], 10),
-        reps: parseInt(match[2], 10),
-      };
-    }
-    // fallback: try to extract any two numbers
-    const numbers = repsString.match(/\d+/g);
-    if (numbers && numbers.length >= 2) {
-      return {
-        sets: parseInt(numbers[0], 10),
-        reps: parseInt(numbers[1], 10),
-      };
-    }
-    return { sets: null, reps: null };
-  }
-
   // Save workout
   const handleSave = () => {
     if (!validateForm()) return;
 
     // Map exercises to include only exerciseId, sets, reps
-    const exercisesWithSetsReps = editedWorkout.exercises.map((ex) => {
-      const { sets, reps } = parseRepsString(ex.reps || "");
+    const exercisesWithSetsReps = editedWorkout.workoutExercises.map((ex) => {
       return {
-        exerciseId: ex.exerciseId, // always use the DB id
-        sets,
-        reps,
+        exerciseId: ex.exerciseId,
+        sets: ex.sets,
+        reps: ex.reps,
+        dayOfTheWeek: ex.dayOfTheWeek
       };
     });
 
@@ -299,7 +337,7 @@ const WorkoutEditModal = ({ workout, onClose, onSave, isCreating = false }) => {
       ...workout,
       ...editedWorkout,
       timesPerWeek: Number(editedWorkout.timesPerWeek),
-      exercises: exercisesWithSetsReps,
+      workoutExercises: exercisesWithSetsReps,
     });
   };
 
@@ -382,46 +420,6 @@ const WorkoutEditModal = ({ workout, onClose, onSave, isCreating = false }) => {
             )}
           </div>
 
-          {/* Cover Image Upload Section */}
-          <div className="form-group cover-image-upload">
-            <label>
-              Cover Image {isCreating && <span className="required">*</span>}
-            </label>
-            <div className="image-upload-container">
-              {coverImage ? (
-                <div className="image-preview-container">
-                  <img
-                    src={coverImage}
-                    alt="Workout cover"
-                    className="image-preview"
-                  />
-                  <button
-                    className="remove-image-btn"
-                    onClick={handleRemoveImage}
-                    type="button"
-                  >
-                    <Trash2 size={16} />
-                  </button>
-                </div>
-              ) : (
-                <div
-                  className="upload-placeholder"
-                  onClick={() => fileInputRef.current.click()}
-                >
-                  <Image size={48} />
-                  <p>Click to upload workout cover image</p>
-                  <span>Recommended: 16:9 ratio, min 800x450px</span>
-                </div>
-              )}
-              <input
-                type="file"
-                ref={fileInputRef}
-                onChange={handleFileChange}
-                accept="image/*"
-                style={{ display: "none" }}
-              />
-            </div>
-          </div>
 
           <div className="workout-meta-grid workout-meta-edit-grid">
             <div className="meta-item">
@@ -507,7 +505,7 @@ const WorkoutEditModal = ({ workout, onClose, onSave, isCreating = false }) => {
           </div>
         </div>
 
-        {loading && !editedWorkout.exercises?.length ? (
+        {loading && !editedWorkout.workoutExercises?.length ? (
           <div className="workout-loading-container">
             <div className="workout-loading-spinner"></div>
             <span>Loading...</span>
@@ -521,11 +519,10 @@ const WorkoutEditModal = ({ workout, onClose, onSave, isCreating = false }) => {
                   className="add-exercise-btn"
                   onClick={() => setShowExerciseSelector(!showExerciseSelector)}
                 >
-                  <Plus size={16} />
-                  <span>Add Exercise</span>
+                 <span>+</span>
                 </button>
                 <span className="admin-exercise-count">
-                  {editedWorkout.exercises?.length || 0} exercises
+                  {haveExercises.length || 0} exercises
                 </span>
               </div>
               {formErrors.exercises && (
@@ -534,7 +531,6 @@ const WorkoutEditModal = ({ workout, onClose, onSave, isCreating = false }) => {
                 </div>
               )}
             </div>
-
             {showExerciseSelector && (
               <div className="exercise-selector">
                 <div className="exercise-selector-header">
@@ -693,129 +689,143 @@ const WorkoutEditModal = ({ workout, onClose, onSave, isCreating = false }) => {
                 </div>
               </div>
             )}
-
             <div className="admin-exercises-list sortable-list">
-              {editedWorkout.exercises?.map((exercise, index) => (
-                <div key={exercise.id} className="admin-exercise-item-wrapper">
-                  <div
-                    className={`admin-exercise-item ${
-                      expandedExercise === exercise.id ? "expanded" : ""
-                    }`}
-                    onClick={() => handleExerciseClick(exercise.id)}
-                  >
-                    <div className="exercise-drag-handle">
-                      <span className="drag-dots">⋮⋮</span>
-                    </div>
-                    <div className="admin-exercise-icon">
-                      <Dumbbell size={20} />
-                    </div>
-                    <div className="admin-exercise-info">
-                      <input
-                        type="text"
-                        value={exercise.name}
-                        onChange={(e) =>
-                          handleExerciseChange(index, "name", e.target.value)
-                        }
-                        onClick={(e) => e.stopPropagation()}
-                        className="admin-exercise-name-input"
-                        placeholder="Exercise name"
-                      />
-                      <input
-                        type="text"
-                        value={exercise.reps}
-                        onChange={(e) =>
-                          handleExerciseChange(index, "reps", e.target.value)
-                        }
-                        onClick={(e) => e.stopPropagation()}
-                        className="admin-exercise-reps-input"
-                        placeholder="e.g. 3 sets x 10 reps"
-                      />
-                    </div>
-                    <button
-                      className="remove-exercise-btn"
-                      onClick={(e) => {
-                        e.stopPropagation();
-                        removeExercise(index);
-                      }}
-                    >
-                      <Trash2 size={16} />
-                    </button>
-                    <ChevronDown
-                      size={20}
-                      className={`admin-exercise-chevron ${
-                        expandedExercise === exercise.id ? "rotated" : ""
-                      }`}
-                    />
-                  </div>
-                  {expandedExercise === exercise.id && (
-                    <div className="admin-exercise-content">
-                      {exerciseDetails[exercise.id] ? (
-                        <div className="admin-exercise-details">
-                          <div className="admin-exercise-video">
-                            <img
-                              src={exerciseDetails[exercise.id].gifUrl}
-                              alt={exercise.name}
-                              loading="lazy"
-                            />
+       
+              {haveExercises && haveExercises.length > 0 ? (
+                haveExercises.map((workoutExercise, index) => {
+                  // Find the corresponding workout exercise details
+                  const workoutExerciseDetails = editedWorkout.workoutExercises?.find(
+                    we => we.exerciseId === workoutExercise.id
+                  );
+                  
+                  console.log("Exercise:", workoutExercise);
+                  console.log("Exercise Details:", workoutExerciseDetails);
+                  
+                  return (
+                    <div key={workoutExercise.id} className="admin-exercise-item-wrapper">
+                      <div
+                        className={`admin-exercise-item ${
+                          expandedExercise === workoutExercise.id ? "expanded" : ""
+                        }`}
+                        onClick={() => handleExerciseClick(workoutExercise.id)}
+                      >
+                        <div className="exercise-drag-handle">
+                          <span className="drag-dots">⋮⋮</span>
+                        </div>
+                        <div className="admin-exercise-icon">
+                          <Dumbbell size={20} />
+                        </div>
+                        <div className="admin-exercise-info">
+                          <div className="exercise-details">
+                            <h4 className="exercise-name">
+                              {workoutExercise.name}
+                            </h4>
+                            <div className="exercise-meta">
+                              {workoutExerciseDetails ? (
+                                <>
+                                  {workoutExerciseDetails.sets} sets x {workoutExerciseDetails.reps} reps
+                                </>
+                              ) : (
+                                "No sets/reps specified"
+                              )}
+                            </div>
                           </div>
-
-                          {/* Exercise Body Part, Target, Equipment Info */}
-                          <div className="exercise-info-section">
-                            <div className="exercise-info-header">
-                              <h4>Details</h4>
-                              <ChevronDown
-                                size={16}
-                                className="info-chevron rotated"
+                        </div>
+                        <button
+                          className="remove-exercise-btn"
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            removeExercise(index);
+                          }}
+                        >
+                          <Trash2 size={16} />
+                        </button>
+                        <ChevronDown
+                          size={20}
+                          className={`admin-exercise-chevron ${
+                            expandedExercise === workoutExercise.id ? "rotated" : ""
+                          }`}
+                        />
+                      </div>
+                      {expandedExercise === workoutExercise.id && (
+                        <div className="admin-exercise-content">
+                          <div className="admin-exercise-details">
+                            <div className="admin-exercise-video">
+                              <img
+                                src={workoutExercise.gifUrl}
+                                alt={workoutExercise.name}
+                                loading="lazy"
                               />
                             </div>
-                            <div className="exercise-info-content">
-                              <div className="exercise-info-grid">
-                                <span className="info-label">Body Part:</span>
-                                <span className="info-value">
-                                  {exerciseDetails[exercise.id].bodyPart}
-                                </span>
 
-                                <span className="info-label">Target:</span>
-                                <span className="info-value">
-                                  {exerciseDetails[exercise.id].target}
-                                </span>
+                            <div className="exercise-info-section">
+                              <div className="exercise-info-header">
+                                <h4>Details</h4>
+                                <ChevronDown
+                                  size={16}
+                                  className="info-chevron rotated"
+                                />
+                              </div>
+                              <div className="exercise-info-content">
+                                <div className="exercise-info-grid">
+                                  <span className="info-label">Body Part:</span>
+                                  <span className="info-value">
+                                    {workoutExercise.muscleGroup}
+                                  </span>
 
-                                <span className="info-label">Equipment:</span>
-                                <span className="info-value">
-                                  {exerciseDetails[exercise.id].equipment}
-                                </span>
+                                  <span className="info-label">Target:</span>
+                                  <span className="info-value">
+                                    {workoutExercise.target || workoutExercise.muscleGroup}
+                                  </span>
+
+                                  <span className="info-label">Equipment:</span>
+                                  <span className="info-value">
+                                    {workoutExercise.equipment || "Bodyweight"}
+                                  </span>
+
+                                  {workoutExerciseDetails && (
+                                    <>
+                                      <span className="info-label">Day:</span>
+                                      <span className="info-value">
+                                        Day {workoutExerciseDetails.dayOfTheWeek}
+                                      </span>
+                                    </>
+                                  )}
+                                </div>
+                              </div>
+                            </div>
+
+                            <div className="exercise-info-section">
+                              <div className="exercise-info-header">
+                                <h4>Instructions</h4>
+                                <ChevronDown size={16} className="info-chevron" />
+                              </div>
+                              <div className="exercise-info-content">
+                                <ol className="exercise-instructions-list">
+                                  {workoutExercise.instructions ? (
+                                    workoutExercise.instructions.map((instruction, i) => (
+                                      <li key={i}>{instruction}</li>
+                                    ))
+                                  ) : (
+                                    <li>Follow proper form and technique for {workoutExercise.name}</li>
+                                  )}
+                                </ol>
                               </div>
                             </div>
                           </div>
-
-                          {/* Exercise Instructions */}
-                          <div className="exercise-info-section">
-                            <div className="exercise-info-header">
-                              <h4>Instructions</h4>
-                              <ChevronDown size={16} className="info-chevron" />
-                            </div>
-                            <div className="exercise-info-content">
-                              <ol className="exercise-instructions-list">
-                                {exerciseDetails[exercise.id].instructions?.map(
-                                  (instruction, i) => (
-                                    <li key={i}>{instruction}</li>
-                                  )
-                                )}
-                              </ol>
-                            </div>
-                          </div>
-                        </div>
-                      ) : (
-                        <div className="admin-exercise-loading">
-                          <div className="loading-spinner"></div>
-                          <span>Loading exercise details...</span>
                         </div>
                       )}
                     </div>
-                  )}
+                  );
+                })
+              ) : (
+                <div className="no-exercises-message">
+                  No exercises added yet. Click the + button to add exercises.
                 </div>
-              ))}
+              )}
             </div>
+
+      
           </div>
         )}
 

@@ -7,6 +7,29 @@ import DeleteConfirmModal from '../../components/admin/DeleteConfirmModal';
 import { getWorkouts, createWorkout, updateWorkout, deleteWorkout } from '../../api';
 
 const WorkoutManagement = () => {
+  // Data mappings for display and filtering
+  const workoutLevelMap = {
+    BEGINNER: "beginner",
+    INTERMEDIATE: "intermediate",
+    ADVANCED: "advanced"
+  };
+
+  const workoutSourceMap = {
+    ADMIN: "Admin",
+    USER: "User"
+  };
+
+  // Reverse mappings for filtering
+  const reverseLevelMap = Object.entries(workoutLevelMap).reduce((acc, [key, value]) => {
+    acc[value] = key;
+    return acc;
+  }, {});
+
+  const reverseSourceMap = Object.entries(workoutSourceMap).reduce((acc, [key, value]) => {
+    acc[value] = key;
+    return acc;
+  }, {});
+
   const [searchQuery, setSearchQuery] = useState('');
   const [filters, setFilters] = useState({
     level: '',
@@ -140,9 +163,9 @@ const WorkoutManagement = () => {
   const handleCreateWorkout = () => {
     const newWorkoutTemplate = {
       name: '',
-      level: 'Beginner',
+      level: 'BEGINNER',
       timesPerWeek: 3,
-      createdBy: 'Admin',
+      createdBy: 'ADMIN',
       isPremade: true,
       createdAt: new Date().toISOString().split('T')[0],
       coverImage: null,
@@ -157,10 +180,15 @@ const WorkoutManagement = () => {
     const searchTerm = searchQuery.toLowerCase();
     const matchesSearch = workout.name.toLowerCase().includes(searchTerm);
     
-    const matchesLevel = !filters.level || workout.level === filters.level;
-    const matchesCreatedBy = !filters.createdBy || workout.createdBy === filters.createdBy;
-    const matchesPremade = !filters.isPremade || 
-                          (filters.isPremade === 'yes' ? workout.isPremade : !workout.isPremade);
+    // Get the display values for comparison
+    const workoutLevel = workoutLevelMap[workout.level] || workout.level.toLowerCase();
+    const workoutSource = workout.createdByAdmin ? workoutSourceMap.ADMIN : workout.createdByUser ? workoutSourceMap.USER : 'Unknown';
+    const workoutPremade = workout.isPremade ? 'Yes' : 'No';
+    
+    // Compare with filter values (case-insensitive for level)
+    const matchesLevel = !filters.level || workoutLevel === filters.level.toLowerCase();
+    const matchesCreatedBy = !filters.createdBy || workoutSource === filters.createdBy;
+    const matchesPremade = !filters.isPremade || workoutPremade === filters.isPremade;
     
     return matchesSearch && matchesLevel && matchesCreatedBy && matchesPremade;
   });
@@ -209,9 +237,9 @@ const WorkoutManagement = () => {
           className="filter-select"
         >
           <option value="">All Levels</option>
-          <option value="Beginner">Beginner</option>
-          <option value="Intermediate">Intermediate</option>
-          <option value="Advanced">Advanced</option>
+          {Object.entries(workoutLevelMap).map(([key, value]) => (
+            <option key={key} value={value}>{value}</option>
+          ))}
         </select>
 
         <select
@@ -221,8 +249,9 @@ const WorkoutManagement = () => {
           className="filter-select"
         >
           <option value="">All Sources</option>
-          <option value="Admin">Admin</option>
-          <option value="User">User</option>
+          {Object.entries(workoutSourceMap).map(([key, value]) => (
+            <option key={key} value={value}>{value}</option>
+          ))}
         </select>
 
         <select
@@ -232,8 +261,8 @@ const WorkoutManagement = () => {
           className="filter-select"
         >
           <option value="">All Types</option>
-          <option value="yes">Premade</option>
-          <option value="no">Custom</option>
+          <option value="Yes">Yes</option>
+          <option value="No">No</option>
         </select>
       </div>
 
@@ -292,13 +321,13 @@ const WorkoutManagement = () => {
                     </div>
                   </td>
                   <td>{workout.name}</td>
-                  <td>{workout.level}</td>
+                  <td>{workoutLevelMap[workout.level] || workout.level.toLowerCase()}</td>
                   <td>{workout.timesPerWeek}</td>
                   <td>
                     {workout.createdByAdmin
-                      ? `Admin #${workout.createdByAdmin}`
+                      ? workoutSourceMap.ADMIN
                       : workout.createdByUser
-                        ? `User #${workout.createdByUser}`
+                        ? workoutSourceMap.USER
                         : 'Unknown'}
                   </td>
                   <td>{workout.isPremade ? 'Yes' : 'No'}</td>
