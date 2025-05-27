@@ -11,7 +11,7 @@ import {
 } from "lucide-react";
 import "admin.css";
 import DeleteConfirmModal from "../../components/admin/DeleteConfirmModal";
-import { getUsers, updateUser, deleteUser, promoteUser } from "../../api";
+import { getUsers, updateUser, deleteUser, promoteUser, getUserBadges, getWorkoutStreak } from "../../api";
 
 const UserManagement = () => {
   const [users, setUsers] = useState([]);
@@ -33,8 +33,9 @@ const UserManagement = () => {
   const [selectedUser, setSelectedUser] = useState(null);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState(null);
-
+  const [dropdownPosition, setDropdownPosition] = useState('bottom');
   const dropdownRef = useRef(null);
+  const triggerRef = useRef(null);
 
   const fetchUsers = async () => {
     try {
@@ -73,6 +74,30 @@ const UserManagement = () => {
       document.removeEventListener("mousedown", handleClickOutside);
     };
   }, [activeDropdown]);
+
+  const checkDropdownPosition = (triggerElement) => {
+    if (!triggerElement) return;
+    
+    const rect = triggerElement.getBoundingClientRect();
+    const spaceBelow = window.innerHeight - rect.bottom;
+    const spaceAbove = rect.top;
+    const dropdownHeight = 200; // Approximate height of dropdown menu
+
+    setDropdownPosition(spaceBelow >= dropdownHeight || spaceBelow >= spaceAbove ? 'bottom' : 'top');
+  };
+
+  const handleDropdownClick = (userId, index) => {
+    const newState = activeDropdown === userId ? null : userId;
+    setActiveDropdown(newState);
+    
+    if (newState) {
+      // Wait for the next frame to ensure the trigger element is rendered
+      requestAnimationFrame(() => {
+        const triggerElement = triggerRef.current;
+        checkDropdownPosition(triggerElement);
+      });
+    }
+  };
 
   const openEditModal = (user) => {
     setEditingUser({ ...user });
@@ -159,30 +184,53 @@ const UserManagement = () => {
     }));
   };
 
-  const handleViewBadges = (user) => {
-    // Simulated badges data - replace with actual badges data
-    const userBadges = [
-      {
-        id: 1,
-        name: "Weight Loss Champion",
-        description: "Lost 10kg",
-        earnedDate: "2024-02-15",
-      },
-      {
-        id: 2,
-        name: "Workout Warrior",
-        description: "Completed 30 workouts",
-        earnedDate: "2024-03-01",
-      },
-      {
-        id: 3,
-        name: "Early Bird",
-        description: "5 morning workouts",
-        earnedDate: "2024-03-10",
-      },
-    ];
-    setSelectedUserBadges({ user, badges: userBadges });
-    setIsBadgesModalOpen(true);
+  const handleViewBadges = async (user) => {
+    try {
+      const token = localStorage.getItem("token");
+      if (!token) {
+        throw new Error("No authentication token found");
+      }
+
+      // Fetch user's badges and streak data
+      const [badgesResponse, streakResponse] = await Promise.all([
+        getUserBadges(token),
+        getWorkoutStreak(token)
+      ]);
+
+      // Format the badges to match BadgeSection.jsx data but keep existing UI structure
+      const userBadges = [
+        {
+          id: 1,
+          name: `${streakResponse.streak || 0}-Day Streak`,
+          description: "Current workout streak",
+          earnedDate: new Date().toISOString()
+        },
+        {
+          id: 2,
+          name: `${badgesResponse.totalSessions || 0} Workouts`,
+          description: "Total workout sessions completed",
+          earnedDate: new Date().toISOString()
+        },
+        {
+          id: 3,
+          name: badgesResponse.badge || "No Badge Yet",
+          description: "Current achievement badge",
+          earnedDate: new Date().toISOString()
+        },
+        {
+          id: 4,
+          name: "Perfect Month",
+          description: "Complete all workouts in a month",
+          earnedDate: null
+        }
+      ];
+
+      setSelectedUserBadges({ user, badges: userBadges });
+      setIsBadgesModalOpen(true);
+    } catch (error) {
+      console.error("Error fetching user badges:", error);
+      alert(error.message || "Failed to fetch user badges");
+    }
   };
 
   const handleDeleteConfirm = async () => {
@@ -256,8 +304,9 @@ const UserManagement = () => {
 
   // Add this function inside your UserManagement component
   const shouldFlipDropdown = (index, total) => {
-    // Flip the last 2 rows' dropdowns to prevent them being cut off
-    return index >= total - 2;
+    // Flip the dropdown up for the last 2 rows to prevent them being cut off
+    // For the first 2 rows, keep it down
+    return index >= total - 2 && index < total;
   };
 
   const formatDate = (dateString) => {
@@ -385,25 +434,18 @@ const UserManagement = () => {
                   <td>
                     <div
                       className="actions-dropdown"
-                      ref={activeDropdown === user.id ? dropdownRef : null}
                     >
                       <button
+                        ref={triggerRef}
                         className="dropdown-trigger"
-                        onClick={() =>
-                          setActiveDropdown(
-                            activeDropdown === user.id ? null : user.id
-                          )
-                        }
+                        onClick={() => handleDropdownClick(user.id, index)}
                       >
                         <MoreVertical size={20} />
                       </button>
                       {activeDropdown === user.id && (
-                        <div
-                          className={`dropdown-menu ${
-                            shouldFlipDropdown(index, currentUsers.length)
-                              ? "flip-up"
-                              : ""
-                          }`}
+                        <div 
+                          ref={dropdownRef}
+                          className={`dropdown-menu ${dropdownPosition === 'top' ? 'flip-up' : ''}`}
                         >
                           <button
                             onClick={() => {
@@ -645,9 +687,15 @@ const UserManagement = () => {
                     </div>
                     <h3>{badge.name}</h3>
                     <p>{badge.description}</p>
-                    <span className="badge-date">
-                      Earned: {badge.earnedDate}
-                    </span>
+                    {badge.earnedDate && (
+                      <span className="badge-date">
+                        Earned: {new Date(badge.earnedDate).toLocaleDateString('en-US', {
+                          day: 'numeric',
+                          month: 'long',
+                          year: 'numeric'
+                        })}
+                      </span>
+                    )}
                   </div>
                 ))
               ) : (
