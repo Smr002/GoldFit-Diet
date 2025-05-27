@@ -14,6 +14,42 @@ import DeleteConfirmModal from "../../components/admin/DeleteConfirmModal";
 import { getUsers, updateUser, deleteUser, promoteUser, getUserBadges, getWorkoutStreak } from "../../api";
 
 const UserManagement = () => {
+  // Data mappings for display and filtering
+  const userLevelMap = {
+    BEGINNER: "Beginner",
+    INTERMEDIATE: "Intermediate",
+    ADVANCED: "Advanced"
+  };
+
+  const userGoalMap = {
+    WEIGHT_LOSS: "Weight Loss",
+    MUSCLE_GAIN: "Muscle Gain",
+    MAINTENANCE: "Maintenance",
+    STRENGTH: "Strength",
+    ENDURANCE: "Endurance"
+  };
+
+  const userGenderMap = {
+    MALE: "Male",
+    FEMALE: "Female"
+  };
+
+  // Reverse mappings for filtering
+  const reverseLevelMap = Object.entries(userLevelMap).reduce((acc, [key, value]) => {
+    acc[value] = key;
+    return acc;
+  }, {});
+
+  const reverseGoalMap = Object.entries(userGoalMap).reduce((acc, [key, value]) => {
+    acc[value] = key;
+    return acc;
+  }, {});
+
+  const reverseGenderMap = Object.entries(userGenderMap).reduce((acc, [key, value]) => {
+    acc[value] = key;
+    return acc;
+  }, {});
+
   const [users, setUsers] = useState([]);
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
   const [editingUser, setEditingUser] = useState(null);
@@ -108,13 +144,6 @@ const UserManagement = () => {
     setEditingUser(null);
     setIsEditModalOpen(false);
   };
-  const goalEnumMap = {
-    "Weight Loss": "WEIGHT_LOSS",
-    "Muscle Gain": "MUSCLE_GAIN",
-    Maintenance: "MAINTENANCE",
-    Strength: "STRENGTH",
-    Endurance: "ENDURANCE",
-  };
 
   const handleEditUser = async () => {
     try {
@@ -128,10 +157,11 @@ const UserManagement = () => {
         fullName: `${editingUser.firstName} ${editingUser.lastName}`,
         email: editingUser.email,
         selectedAgeGroup: editingUser.age.toString(),
-        selectedGender: editingUser.gender,
+        selectedGender: reverseGenderMap[editingUser.gender] || editingUser.gender,
         selectedHeight: Number(editingUser.height),
         selectedWeight: Number(editingUser.weight),
-        selectedGoal: goalEnumMap[editingUser.goal] || editingUser.goal,
+        selectedGoal: reverseGoalMap[editingUser.goal] || editingUser.goal,
+        selectedLevel: reverseLevelMap[editingUser.level] || editingUser.level
       };
 
       // Call the updateUser API
@@ -150,10 +180,11 @@ const UserManagement = () => {
               lastName,
               email: updateData.email,
               age: updateData.selectedAgeGroup,
-              gender: updateData.selectedGender,
+              gender: userGenderMap[updateData.selectedGender] || updateData.selectedGender,
               height: updateData.selectedHeight,
               weight: updateData.selectedWeight,
-              goal: editingUser.goal, // keep display value for UI
+              goal: userGoalMap[updateData.selectedGoal] || updateData.selectedGoal,
+              level: userLevelMap[updateData.selectedLevel] || updateData.selectedLevel
             };
           }
           return user;
@@ -288,8 +319,8 @@ const UserManagement = () => {
       fullName.includes(searchTerm) ||
       user.email.toLowerCase().includes(searchTerm);
 
-    const matchesLevel = !filters.level || user.level === filters.level;
-    const matchesGoal = !filters.goal || user.goal === filters.goal;
+    const matchesLevel = !filters.level || userLevelMap[user.level] === filters.level;
+    const matchesGoal = !filters.goal || userGoalMap[user.goal] === filters.goal;
     const matchesPremium =
       !filters.premium ||
       (filters.premium === "premium" ? user.isPremium : !user.isPremium);
@@ -355,18 +386,6 @@ const UserManagement = () => {
       </div>
 
       <div className="filters-container">
-        <select
-          name="level"
-          value={filters.level}
-          onChange={handleFilterChange}
-          className="filter-select"
-        >
-          <option value="">All Levels</option>
-          <option value="Beginner">Beginner</option>
-          <option value="Intermediate">Intermediate</option>
-          <option value="Advanced">Advanced</option>
-        </select>
-
         <select
           name="goal"
           value={filters.goal}
@@ -502,10 +521,10 @@ const UserManagement = () => {
                   </td>
                   <td>{user.email}</td>
                   <td>{formatAgeRange(user.age)}</td>
-                  <td>{user.gender}</td>
+                  <td>{userGenderMap[user.gender] || user.gender}</td>
                   <td>{user.height} cm</td>
                   <td>{user.weight} kg</td>
-                  <td>{user.goal}</td>
+                  <td>{userGoalMap[user.goal] || user.goal}</td>
                   <td>{formatDate(user.createdAt)}</td>
                 </tr>
               ))}
@@ -631,9 +650,9 @@ const UserManagement = () => {
                   value={editingUser.goal}
                   onChange={handleInputChange}
                 >
-                  <option value="Weight Loss">Weight Loss</option>
-                  <option value="Muscle Gain">Muscle Gain</option>
-                  <option value="Maintenance">Maintenance</option>
+                  {Object.values(userGoalMap).map(goal => (
+                    <option key={goal} value={goal}>{goal}</option>
+                  ))}
                 </select>
               </div>
               <div className="form-group">
@@ -643,9 +662,9 @@ const UserManagement = () => {
                   value={editingUser.level}
                   onChange={handleInputChange}
                 >
-                  <option value="Beginner">Beginner</option>
-                  <option value="Intermediate">Intermediate</option>
-                  <option value="Advanced">Advanced</option>
+                  {Object.values(userLevelMap).map(level => (
+                    <option key={level} value={level}>{level}</option>
+                  ))}
                 </select>
               </div>
             </div>

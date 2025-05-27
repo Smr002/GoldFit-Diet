@@ -33,11 +33,6 @@ const NotificationManagement = () => {
 
   // State for filtering and search
   const [searchQuery, setSearchQuery] = useState("");
-  const [filters, setFilters] = useState({
-    type: "",
-    status: "",
-    frequency: "",
-  });
   const [showFilters, setShowFilters] = useState(false);
 
   // State for active tab and modal controls
@@ -129,7 +124,7 @@ const NotificationManagement = () => {
     fetchNotificationsAndUsers();
   }, []);
 
-  // Filter notifications based on search and filters
+  // Filter notifications based on search
   const filteredNotifications = notifications.filter((notification) => {
     const message = notification.message || "";
     const type = notification.type || "";
@@ -138,13 +133,7 @@ const NotificationManagement = () => {
       message.toLowerCase().includes(searchQuery.toLowerCase()) ||
       type.toLowerCase().includes(searchQuery.toLowerCase());
 
-    const matchesType = !filters.type || notification.type === filters.type;
-    const matchesStatus =
-      !filters.status || notification.status === filters.status;
-    const matchesFrequency =
-      !filters.frequency || notification.frequency === filters.frequency;
-
-    return matchesSearch && matchesType && matchesStatus && matchesFrequency;
+    return matchesSearch;
   });
 
   // Filter by tab
@@ -177,15 +166,6 @@ const NotificationManagement = () => {
   // Determine if dropdown should flip up
   const shouldFlipDropdown = (index, total) => {
     return index >= total - 2;
-  };
-
-  // Handle filter changes
-  const handleFilterChange = (e) => {
-    const { name, value } = e.target;
-    setFilters((prev) => ({
-      ...prev,
-      [name]: value,
-    }));
   };
 
   // Handle notification actions
@@ -350,40 +330,7 @@ const NotificationManagement = () => {
     }
   };
 
-  // Calculate next send date for automation
-  // const calculateNextSendDate = () => {
-  //   const now = new Date();
-  //   let nextDate = appetizer new Date();
 
-  //   if (automationFrequency === 'Daily') {
-  //     nextDate.setDate(now.getDate() + 1);
-  //   } else if (automationFrequency === 'Weekly') {
-  //     const currentDay = now.getDay();
-  //     const nextDays = selectedDays.filter(day => day > currentDay);
-
-  //     if (nextDays.length > 0) {
-  //       nextDate.setDate(now.getDate() + (nextDays[0] - currentDay));
-  //     } else {
-  //       nextDate.setDate(now.getDate() + (7 - currentDay) + selectedDays[0]);
-  //     }
-  //   } else if (automationFrequency === 'Monthly') {
-  //     const currentDay = now.getDate();
-  //     const monthLastDay = new Date(now.getFullYear(), now.getMonth() + 1, 0).getDate();
-
-  //     if (monthlyDay <= monthLastDay) {
-  //       if (monthlyDay > currentDay) {
-  //         nextDate.setDate(monthlyDay);
-  //       } else {
-  //         nextDate.setMonth(now.getMonth() + 1);
-  //         nextDate.setDate(monthlyDay);
-  //       }
-  //     } else {
-  //       nextDate = new Date(now.getFullYear(), now.getMonth() + 1, 0);
-  //     }
-  //   }
-
-  //   return nextDate.toISOString().split('T')[0];
-  // };
 
   return (
     <div className="admin-page">
@@ -415,46 +362,6 @@ const NotificationManagement = () => {
         </div>
       </div>
 
-      <div className="filters-container">
-        <select
-          name="type"
-          value={filters.type}
-          onChange={handleFilterChange}
-          className="filter-select"
-        >
-          <option value="">All Types</option>
-          <option value="System">System</option>
-          <option value="Reminder">Reminder</option>
-          <option value="Promotion">Promotion</option>
-          <option value="Update">Update</option>
-        </select>
-
-        <select
-          name="status"
-          value={filters.status}
-          onChange={handleFilterChange}
-          className="filter-select"
-        >
-          <option value="">All Statuses</option>
-          <option value="Sent">Sent</option>
-          <option value="Scheduled">Scheduled</option>
-          <option value="Draft">Draft</option>
-        </select>
-
-        <select
-          name="frequency"
-          value={filters.frequency}
-          onChange={handleFilterChange}
-          className="filter-select"
-        >
-          <option value="">All Frequencies</option>
-          <option value="One-time">One-time</option>
-          <option value="Daily">Daily</option>
-          <option value="Weekly">Weekly</option>
-          <option value="Monthly">Monthly</option>
-        </select>
-      </div>
-
       <div className="users-table-container">
         {isLoading ? (
           <div className="loading-state">
@@ -474,7 +381,7 @@ const NotificationManagement = () => {
         ) : displayedNotifications.length > 0 ? (
           <table
             className="users-table"
-            key={`${filters.type}-${filters.status}-${filters.frequency}-${searchQuery}`}
+            key={`${searchQuery}`}
           >
             <thead>
               <tr>
@@ -562,7 +469,7 @@ const NotificationManagement = () => {
             <div className="no-results-content">
               <Bell size={48} className="no-results-icon" />
               <h3>No notifications found</h3>
-              <p>Try adjusting your search or filters</p>
+              <p>Try adjusting your search</p>
             </div>
           </div>
         )}
